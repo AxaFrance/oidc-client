@@ -1,5 +1,7 @@
 # @axa-fr/react-oidc
 
+[![Build Status](https://travis-ci.com/AxaGuilDEv/react-oidc.svg?branch=master)](https://travis-ci.com/AxaGuilDEv/react-oidc)
+
 <p align="center">
     <img src="./docs/img/introduction.gif"
      alt="Sample React Oicd"
