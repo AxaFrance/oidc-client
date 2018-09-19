@@ -12,6 +12,6 @@ jspm_packages/
 .yarn-integrity
 /node_modules
 /coverage
-/**/LICENSE
+**/*/LICENSE
 dist
 .cache
