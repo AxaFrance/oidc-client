@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authenticating test suite renders correctly 1`] = `
+<Switch>
+  <Route
+    component="Callback"
+    path="http://url.com/callback"
+  />
+  <Route
+    component="SilentCallback"
+    path="http://url.com/silent_callback"
+  />
+  <Route
+    component="NotAuthenticated"
+    path="http://url.com/not-authentified"
+  />
+  <Route
+    component="NotAuthorized"
+    path="http://url.com/not-authorized"
+  />
+</Switch>
+`;

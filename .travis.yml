@@ -1,0 +1,14 @@
+branches:
+  only:
+  - master
+sudo: required
+dist: trusty
+language: node_js
+node_js:
+  - '8'
+install:
+  - npm install
+  - npm run bootstrap
+script:
+  - npm test -- --coverage
+  - npm run lint
