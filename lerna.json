@@ -1,0 +1,17 @@
+{
+  "version": "2.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "command": {
+    "publish": {
+      "ignoreChanges": ["ignored-file", "*.md"],
+      "allowBranch": "release/1.1"
+    },
+    "bootstrap": {
+      "ignore": "component-*",
+      "npmClientArgs": ["--no-package-lock"]
+    }
+  },
+  "packages": ["examples/*", "packages/*"]
+}
