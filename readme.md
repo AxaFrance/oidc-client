@@ -1,4 +1,4 @@
-# AF Oidc React
+# @axa-fr/react-oidc
 
 <p align="center">
     <img src="./docs/img/introduction.gif"
@@ -14,10 +14,10 @@
 - [Getting Started](#getting-started)
 - [How It Works](#how-it-works)
 - Packages
-  - [`@axa-fr/react-oidc-context`](./packages/context/readme.md)
-  - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch/readme.md)
-  - [`@axa-fr/react-oidc-redux`](./packages/redux/readme.md)
-  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch/readme.md)
+  - [`@axa-fr/react-oidc-context`](./packages/context#readme.md)
+  - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md)
+  - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md)
+  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md)
 - [Concepts](#concepts)
 - [Contribute](#ontribute)
 
@@ -58,4 +58,4 @@ The purpose of the component is :
 ## Contribute
 
 - [How to run the solution and to contribute](./CONTRIBUTING.md)
-- [Please respect our code of conduct](./CODE_OF_CONDUCT)
+- [Please respect our code of conduct](./CODE_OF_CONDUCT.md)

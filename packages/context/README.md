@@ -4,10 +4,6 @@
 
 Easy set up of OIDC for react and use the new react context api as state management.
 
-## API
-
-[`API Documentation`](./doc/#API)
-
 ## Getting Started
 
 ```sh

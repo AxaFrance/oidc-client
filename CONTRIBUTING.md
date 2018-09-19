@@ -1,4 +1,4 @@
-# Contributing to AF React Oidc
+# Contributing to @axa-fr/react-oidc
 
 First, ensure you have the [latest `npm`](https://docs.npmjs.com/).
 
@@ -6,7 +6,7 @@ To get started with the repository:
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd af-react-oidc
+cd react-oidc
 npm install
 npm run bootstrap
 ```
