@@ -1,0 +1,35 @@
+{
+  "name": "@axa-fr/react-oidc-redux-fetch",
+  "version": "1.0.0",
+  "private": false,
+  "main": "dist/index.js",
+  "jsnext:main": "src/index.js",
+  "description": "Inject authentification behavior to fetch using react High Order Component",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+  },
+  "keywords": [
+    "oidc",
+    "redux",
+    "react-component",
+    "react-hoc",
+    "openid",
+    "oauth2"
+  ],
+  "peerDependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-router-dom": "^4.3.1",
+    "react-redux": "^5.0.7",
+    "recompose": "^0.30.0"
+  },
+  "dependencies": {
+    "@axa-fr/react-oidc-redux": "1.0.0",
+    "@axa-fr/react-oidc-fetch-core": "1.0.0"
+  },
+  "scripts": {
+    "prepare": "node ../../scripts/prepare.js"
+  },
+  "license": "MIT"
+}

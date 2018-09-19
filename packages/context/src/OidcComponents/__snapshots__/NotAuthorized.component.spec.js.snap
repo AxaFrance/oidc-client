@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Not Authorize test suite renders correctly 1`] = `
+<div>
+  <div
+    className="container"
+  >
+    <h1>
+      Authentification
+    </h1>
+    <p>
+      Vous n'êtes pas authentifié.
+    </p>
+  </div>
+</div>
+`;
