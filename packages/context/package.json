@@ -29,5 +29,8 @@
   "dependencies": {
     "recompose": "^0.30.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

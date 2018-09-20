@@ -18,5 +18,8 @@
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
