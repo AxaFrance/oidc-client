@@ -1,16 +1,16 @@
 import { oidcLog } from './loggerService';
 
-export const isRequireAuthentication = () => props => props.isForce || !props.oidcUser;
+export const isRequireAuthentication = (oidcUser, isForce) => isForce || !oidcUser;
 
 export const authenticateUser = (userManager, location) => async (isForce = false) => {
   if (!userManager || !userManager.getUser) {
     return;
   }
   const oidcUser = await userManager.getUser();
-  if (isRequireAuthentication()({ oidcUser, isForce })) {
+  if (isRequireAuthentication(oidcUser, isForce)) {
     oidcLog.info('authenticate user...');
-    const currentUrl = location.pathname + (location.search ? location.search : '');
-    await userManager.signinRedirect({ data: { url: currentUrl } });
+    const url = location.pathname + (location.search || '');
+    await userManager.signinRedirect({ data: { url } });
   }
 };
 
