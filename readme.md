@@ -1,6 +1,7 @@
 # @axa-fr/react-oidc
 
 [![Build Status](https://travis-ci.com/AxaGuilDEv/react-oidc.svg?branch=master)](https://travis-ci.com/AxaGuilDEv/react-oidc)
+[![Maintainability](https://api.codeclimate.com/v1/badges/fa08906f524b67a943b0/maintainability)](https://codeclimate.com/github/AxaGuilDEv/react-oidc/maintainability)
 
 <p align="center">
     <img src="./docs/img/introduction.gif"
