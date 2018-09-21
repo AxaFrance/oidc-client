@@ -1,6 +1,7 @@
 branches:
   only:
   - master
+  - chore/npm
 sudo: required
 dist: trusty
 language: node_js
@@ -12,3 +13,7 @@ install:
 script:
   - npm test -- --coverage
   - npm run lint
+deploy:
+  provider: script
+  script: "cp .npmrc.template $HOME/.npmrc && npm run publish prerelease --yes -m \"chore(release): publish %s ***NO_CI***\""
+  skip_cleanup: true
