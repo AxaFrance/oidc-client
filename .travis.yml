@@ -13,8 +13,5 @@ deploy:
   on:
     all_branches: true
   provider: script
-  script: 
-    - cp .npmrc.template $HOME/.npmrc 
-    - git reset --hard
-    - npm run publish prerelease --yes --concurrency 1 --force-publish --no-verify-access --no-verify-registry --registry registry=https://registry.npmjs.org:_authToken=${NPM_AUTH_TOKEN} -m \"chore(release): publish %s ***NO_CI***\"
+  script: "cp .npmrc.template $HOME/.npmrc &&  git reset --hard && npm run publish prerelease --yes --concurrency 1 --force-publish --no-verify-access --no-verify-registry --registry registry=https://registry.npmjs.org:_authToken=${NPM_AUTH_TOKEN} -m \"chore(release): publish %s ***NO_CI***\""
   skip_cleanup: true
