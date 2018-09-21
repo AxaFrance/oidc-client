@@ -1,7 +1,3 @@
-branches:
-  only:
-  - master
-  - chore/npm
 sudo: required
 dist: trusty
 language: node_js
