@@ -10,6 +10,8 @@ script:
   - npm test -- --coverage
   - npm run lint
 deploy:
+  on:
+    all_branches: true
   provider: script
-  script: "cp .npmrc.template $HOME/.npmrc && npm run publish prerelease --yes -m \"chore(release): publish %s ***NO_CI***\""
+  script: "cp .npmrc.template $HOME/.npmrc && git reset --hard && npm run publish prerelease --yes -m \"chore(release): publish %s ***NO_CI***\""
   skip_cleanup: true
