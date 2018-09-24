@@ -3,6 +3,8 @@ dist: trusty
 language: node_js
 node_js:
   - '8'
+before_install:
+ - printf "registry=https://registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
 install:
   - npm install
   - npm run bootstrap
@@ -13,5 +15,5 @@ deploy:
   on:
     all_branches: true
   provider: script
-  script: "cp .npmrc.template $HOME/.npmrc &&  git reset --hard && npm run publish -- prerelease --yes --concurrency 1 --force-publish --no-verify-access --no-verify-registry -m \"chore(release): publish %s ***NO_CI***\""
+  script: "git reset --hard && npm run publish -- prerelease --yes --concurrency 1 --force-publish --no-verify-access --no-verify-registry -m \"chore(release): publish %s ***NO_CI***\""
   skip_cleanup: true
