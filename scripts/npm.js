@@ -6,6 +6,6 @@ always-auth=true`;
 
 template = template.replace('${NPM_AUTH_TOKEN}', process.env.NPM_AUTH_TOKEN)
 
-const npmrcPath = __dirname +'/../npmrc';
+const npmrcPath = __dirname +'/../.npmrc';
 fs.unlinkSync(npmrcPath);
 fs.appendFileSync(npmrcPath, template);
