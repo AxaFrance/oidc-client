@@ -8,7 +8,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "version": "lerna version",
-    "publish": "node ./scripts/npm.js && lerna publish",
+    "setnpmtoken": "node ./scripts/npm.js",
+    "publish": "lerna publish",
     "example:redux": "npm -C ./examples/redux run start",
     "example:context": "npm -C ./examples/context run start",
     "test": "jest --config=jest.config.js",
