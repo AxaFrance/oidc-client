@@ -1,7 +1,6 @@
 const fs = require("fs");
 
 let template = `registry=https://registry.npmjs.org
-always-auth=true
 `
 template += "//https://registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}";
 
