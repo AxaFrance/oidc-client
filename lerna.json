@@ -2,7 +2,7 @@
   "version": "0.0.0",
   "command": {
     "publish": {
-      "ignoreChanges": ["ignored-file", "*.md"]
+      "ignoreChanges": ["ignored-file", "*.md", ".npmrc"]
     },
     "bootstrap": {
       "ignore": "component-*",
