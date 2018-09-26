@@ -1,14 +1,23 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=50ac64e5f30a66cb80b711b524ec8f2bf0932cc27827730373d7f8bb44199e6b
 branches:
   only:
-  - master
+    - master
 sudo: required
 dist: trusty
 language: node_js
 node_js:
-  - '8'
+  - "8"
 install:
   - npm install
   - npm run bootstrap
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 script:
   - npm test -- --coverage
   - npm run lint
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
