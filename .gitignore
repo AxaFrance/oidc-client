@@ -15,3 +15,4 @@ jspm_packages/
 **/*/LICENSE
 dist
 .cache
+.npmrc
