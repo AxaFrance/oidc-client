@@ -7,7 +7,6 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "version": "lerna version",
     "setnpmtoken": "node ./scripts/npm.js",
     "publish": "lerna publish",
     "example:redux": "npm -C ./examples/redux run start",
