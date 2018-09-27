@@ -13,5 +13,5 @@ deploy:
   on:
     all_branches: true
   provider: script
-  script: "git reset --hard && git checkout ${TRAVIS_BRANCH} && git status && npm run publish -- prerelease --yes --concurrency 1 --registry https://registry.npmjs.org --force-publish --no-verify-access --no-verify-registry -m \"chore(release): publish %s ***NO_CI***\""
+  script: "git reset --hard && git checkout ${TRAVIS_BRANCH} && git status && npm run publish -- prerelease --yes --concurrency 1 --registry https://registry.npmjs.org --loglevel=silly --force-publish --no-verify-access --no-verify-registry -m \"chore(release): publish %s ***NO_CI***\""
   skip_cleanup: true
