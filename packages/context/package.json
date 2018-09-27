@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-context",
-  "version": "1.0.0",
+  "version": "0.0.1-alpha.0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
@@ -20,11 +20,11 @@
     "prepare": "node ../../scripts/prepare.js"
   },
   "peerDependencies": {
+    "oidc-client": "^1.5.2",
+    "prop-types": "~15.6.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
-    "react-router-dom": "^4.3.1",
-    "prop-types": "~15.6.2",
-    "oidc-client": "^1.5.2"
+    "react-router-dom": "^4.3.1"
   },
   "dependencies": {
     "recompose": "^0.30.0"
