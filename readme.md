@@ -7,7 +7,7 @@
     <img src="./docs/img/introduction.gif"
      alt="Sample React Oicd"
       />
-</p>
+</p> 
 
 <p align="center">
   A set of react components and HOC to make Oidc client easy. It aim to simplify OAuth authentication between multiples providers.
