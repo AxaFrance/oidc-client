@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-fetch-core",
-  "version": "0.0.1-alpha.3",
+  "version": "0.0.1-alpha.4",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
