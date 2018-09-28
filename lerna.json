@@ -6,7 +6,8 @@
       "npmClient": "npm",
       "ignoreChanges": [
         "ignored-file",
-        "*.md"
+        "*.md",
+        ".npmrc"
       ]
     },
     "bootstrap": {
