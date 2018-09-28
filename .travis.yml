@@ -1,3 +1,6 @@
+branches:
+  only:
+    - master
 sudo: required
 dist: trusty
 language: node_js
@@ -9,6 +12,10 @@ node_js:
 install:
   - npm install
   - npm run bootstrap
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 script:
   - npm test -- --coverage
   - npm run lint
@@ -18,3 +25,6 @@ deploy:
   provider: script
   script: "git reset --hard && git remote set-url origin https://${GH_TOKEN}@github.com/AxaGuilDEv/react-oidc.git && git checkout ${TRAVIS_BRANCH} && cp .npmrc $HOME/.npmrc && npm run publish -- prerelease --yes --concurrency 1 --loglevel=silly --force-publish"
   skip_cleanup: true
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  
