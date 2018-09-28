@@ -16,5 +16,5 @@ deploy:
   on:
     all_branches: true
   provider: script
-  script: "git reset --hard && git remote set-url origin https://${GH_TOKEN}@github.com/AxaGuilDEv/react-oidc.git && git checkout ${TRAVIS_BRANCH} && npm run publish -- prerelease --yes --concurrency 1 --loglevel=silly --force-publish --no-verify-access"
+  script: "git reset --hard && git remote set-url origin https://${GH_TOKEN}@github.com/AxaGuilDEv/react-oidc.git && git checkout ${TRAVIS_BRANCH} && cp .npmrc $HOME/.npmrc && npm run publish -- prerelease --yes --concurrency 1 --loglevel=silly --force-publish"
   skip_cleanup: true
