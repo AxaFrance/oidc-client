@@ -4,9 +4,6 @@ branches:
 sudo: required
 dist: trusty
 language: node_js
-config:
-  env: 
-  - NPM_PUBLISH_VERSION=none
 env: 
   - NPM_PUBLISH_VERSION=none
 before_script:
