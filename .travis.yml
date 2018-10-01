@@ -4,6 +4,9 @@ branches:
 sudo: required
 dist: trusty
 language: node_js
+before_script:
+  - git config --global user.email "build-ci@axa.fr"
+  - git config --global user.name "Build-CI"
 node_js:
   - "8"
 install:
@@ -16,5 +19,12 @@ before_script:
 script:
   - npm test -- --coverage
   - npm run lint
+deploy:
+  on:
+    all_branches: true
+  provider: script
+  script: "git reset --hard && git remote set-url origin https://${GH_TOKEN}@github.com/AxaGuilDEv/react-oidc.git && git checkout ${TRAVIS_BRANCH} && cp .npmrc.template $HOME/.npmrc && npm run publish -- prerelease --yes --concurrency 1 --loglevel=silly --force-publish"
+  skip_cleanup: true
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  
