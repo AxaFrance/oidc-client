@@ -19,10 +19,10 @@
 - [Getting Started](#getting-started)
 - [How It Works](#how-it-works)
 - Packages
-  - [`@axa-fr/react-oidc-context`](./packages/context#readme.md)
-  - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md)
-  - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md)
-  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md)
+  - [`@axa-fr/react-oidc-context`](./packages/context#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context)
+  - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch)
+  - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux)
+  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch)
 - [Concepts](#concepts)
 - [Contribute](#ontribute)
 
