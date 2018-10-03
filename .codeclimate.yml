@@ -1,0 +1,4 @@
+exclude_patterns:
+  - "examples/"
+  - "**/*.spec.js"
+  - "**/*.test.js"
