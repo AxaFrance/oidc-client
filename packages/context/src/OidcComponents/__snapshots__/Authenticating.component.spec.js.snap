@@ -9,7 +9,7 @@ exports[`Authenticating test suite renders correctly 1`] = `
       Authentification en cours
     </h1>
     <p>
-      Vous allez être redirigé sur la page de login.
+      Vous allez être redirigé sur la page de login
     </p>
   </div>
 </div>
