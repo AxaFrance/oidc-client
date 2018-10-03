@@ -25,6 +25,16 @@ $ npm run example:redux
 $ npm run example:context
 ```
 
+## How to develop on package
+
+To link your developments with the examples
+
+In an other command window :
+
+```sh
+$ npm run dev:js
+```
+
 ### Run Unit Tests
 
 ```sh
