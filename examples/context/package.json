@@ -1,13 +1,13 @@
 {
   "name": "@axa-fr/react-oidc-context-demo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Demo how to use react oidc redux",
   "private": true,
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
-    "@axa-fr/react-oidc-context": "^1.0.0",
-    "@axa-fr/react-oidc-context-fetch": "^1.0.0",
+    "@axa-fr/react-oidc-context": "^1.0.1",
+    "@axa-fr/react-oidc-context-fetch": "^1.0.1",
     "oidc-client": "^1.5.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
