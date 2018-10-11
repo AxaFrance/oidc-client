@@ -1,17 +1,23 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
-import { compose, withHandlers, withState, lifecycle, withProps } from 'recompose';
+import React from "react";
+import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
+import {
+  compose,
+  withHandlers,
+  withState,
+  lifecycle,
+  withProps
+} from "recompose";
 
 import {
   authenticationService,
   authenticateUser,
   logoutUser,
   setLogger,
-  oidcLog,
-} from '../Services';
-import AuthenticationProviderComponent from './AuthenticationContext';
-import { AuthenticationContext } from './AuthenticationContextCreator';
+  oidcLog
+} from "../Services";
+import AuthenticationProviderComponent from "./AuthenticationContext";
+import { AuthenticationContext } from "./AuthenticationContextCreator";
 
 const propTypes = {
   notAuthentified: PropTypes.node,
@@ -25,7 +31,7 @@ const propTypes = {
     silent_redirect_uri: PropTypes.string.isRequired,
     automaticSilentRenew: PropTypes.bool.isRequired,
     loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired,
+    triggerAuthFlow: PropTypes.bool.isRequired
   }).isRequired,
   isEnabled: PropTypes.bool,
   location: PropTypes.string,
@@ -34,8 +40,8 @@ const propTypes = {
     info: PropTypes.func.isRequired,
     warn: PropTypes.func.isRequired,
     error: PropTypes.func.isRequired,
-    debug: PropTypes.func.isRequired,
-  }),
+    debug: PropTypes.func.isRequired
+  })
 };
 
 const defaultProps = {
@@ -43,7 +49,7 @@ const defaultProps = {
   notAuthorized: null,
   isEnabled: true,
   loggerLevel: 0,
-  logger: console,
+  logger: console
 };
 
 export const onUserLoaded = props => user => {
@@ -51,7 +57,7 @@ export const onUserLoaded = props => user => {
   props.setOidcState({
     ...props.oidcState,
     oidcUser: user,
-    isLoading: false,
+    isLoading: false
   });
 };
 
@@ -60,7 +66,7 @@ export const onUserUnloaded = props => () => {
   props.setOidcState({
     ...props.oidcState,
     oidcUser: null,
-    isLoading: false,
+    isLoading: false
   });
 };
 
@@ -70,8 +76,8 @@ export const setDefaultState = ({ configuration, loggerLevel, logger }) => {
     oidcUser: undefined,
     userManager: authenticationService(configuration),
     isLoading: false,
-    error: '',
-    isFrozen: false,
+    error: "",
+    isFrozen: false
   };
 };
 
@@ -79,9 +85,9 @@ export const login = props => async () => {
   props.setOidcState({
     ...props.oidcState,
     oidcUser: null,
-    isLoading: true,
+    isLoading: true
   });
-  oidcLog.info('Login requested');
+  oidcLog.info("Login requested");
   await authenticateUser(props.oidcState.userManager, props.location)();
 };
 
@@ -90,11 +96,11 @@ export const logout = props => async () => {
     ...props.oidcState,
     oidcUser: null,
     isLoading: true,
-    isFrozen: true,
+    isFrozen: true
   });
   try {
     await logoutUser(props.oidcState.userManager);
-    oidcLog.info('Logout successfull');
+    oidcLog.info("Logout successfull");
   } catch (error) {
     props.onError(error);
   }
@@ -105,7 +111,7 @@ export const onError = props => error => {
   props.setOidcState({
     ...props.oidcState,
     error: error.message,
-    isLoading: false,
+    isLoading: false
   });
 };
 
@@ -122,7 +128,9 @@ export const AuthenticationProviderComponentWithInit = WrappedComponent => {
 
     shouldComponentUpdate(nextProps) {
       // Hack to avoid resfreshing user before logout
-      oidcLog.info(`Protected component update : ${!nextProps.oidcState.isFrozen}`);
+      oidcLog.info(
+        `Protected component update : ${!nextProps.oidcState.isFrozen}`
+      );
       return !nextProps.oidcState.isFrozen;
     }
 
@@ -134,17 +142,21 @@ export const AuthenticationProviderComponentWithInit = WrappedComponent => {
   return ConstructedComponent;
 };
 
-export const withOidcState = withState('oidcState', 'setOidcState', setDefaultState);
+export const withOidcState = withState(
+  "oidcState",
+  "setOidcState",
+  setDefaultState
+);
 
 export const withOidcHandlers = withHandlers({
   onError,
   onUserLoaded,
-  onUserUnloaded,
+  onUserUnloaded
 });
 
 export const withSecondOidcHandlers = withHandlers({
   login,
-  logout,
+  logout
 });
 
 export const withOidcProps = withProps(({ oidcState }) => ({ ...oidcState }));
@@ -154,23 +166,31 @@ export const withLifeCycle = lifecycle({
     if (this.props.configuration) {
       this.props.setOidcState({
         ...this.props.oidcState,
-        isLoading: true,
+        isLoading: true
       });
 
       const user = await this.props.oidcState.userManager.getUser();
       this.props.setOidcState({
         ...this.props.oidcState,
-        oidcUser: user,
+        oidcUser: user
       });
     }
   },
   componentWillUnmount() {
     // unregister the event callbacks
-    this.props.oidcState.userManager.events.removeUserLoaded(this.props.onUserLoaded);
-    this.props.oidcState.userManager.events.removeSilentRenewError(this.props.onError);
-    this.props.oidcState.userManager.events.removeUserUnloaded(this.props.onUserUnloaded);
-    this.props.oidcState.userManager.events.removeUserSignedOut(this.props.onUserUnloaded);
-  },
+    this.props.oidcState.userManager.events.removeUserLoaded(
+      this.props.onUserLoaded
+    );
+    this.props.oidcState.userManager.events.removeSilentRenewError(
+      this.props.onError
+    );
+    this.props.oidcState.userManager.events.removeUserUnloaded(
+      this.props.onUserUnloaded
+    );
+    this.props.oidcState.userManager.events.removeUserSignedOut(
+      this.props.onUserUnloaded
+    );
+  }
 });
 
 const AuthenticationProviderComponentHOC = compose(
@@ -183,7 +203,9 @@ const AuthenticationProviderComponentHOC = compose(
   withOidcProps
 );
 
-const AuthenticationProvider = AuthenticationProviderComponentHOC(AuthenticationProviderComponent);
+const AuthenticationProvider = AuthenticationProviderComponentHOC(
+  AuthenticationProviderComponent
+);
 
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
@@ -201,4 +223,15 @@ const withOidcUser = Component => props => (
   </AuthenticationConsumer>
 );
 
-export { AuthenticationProvider, AuthenticationConsumer, withOidcUser };
+const withOidc = Component => props => (
+  <AuthenticationConsumer>
+    {oidcProps => <Component {...props} oidcProps={oidcProps} />}
+  </AuthenticationConsumer>
+);
+
+export {
+  AuthenticationProvider,
+  AuthenticationConsumer,
+  withOidcUser,
+  withOidc
+};
