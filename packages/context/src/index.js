@@ -2,13 +2,14 @@ export {
   AuthenticationProvider,
   AuthenticationConsumer,
   withOidcUser,
+  withOidc,
   OidcSecure,
-  withOidcSecure,
-} from './Context';
+  withOidcSecure
+} from "./Context";
 export {
   isRequireAuthentication,
   authenticateUser,
   signinSilent,
   oidcLog,
-  getUserManager,
-} from './Services';
+  getUserManager
+} from "./Services";
