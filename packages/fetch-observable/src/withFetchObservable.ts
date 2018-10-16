@@ -1,5 +1,5 @@
-import { withProps } from 'recompose';
-import { defer, from, Observable } from 'rxjs';
+import { withProps } from "recompose";
+import { defer, Observable, from } from "rxjs";
 
 export type Fetch = (
   input?: Request | string,
@@ -12,20 +12,22 @@ export type FetchObservable = (
 ) => Observable<Response>;
 
 // tslint:disable-next-line:interface-name
-export interface WithFetchObservable  {fetchWithObservable: FetchObservable;
-};
+export interface WithFetchObservable {
+  fetchWithObservable: FetchObservable;
+}
 
-export const fetchWithObservable = (fetch: Fetch) => (input?: Request | string,
+export const fetchWithObservable = (fetch: Fetch) => (
+  input?: Request | string,
   init?: RequestInit
 ): Observable<Response> => {
-  return defer(() => from(fetch(input, init)));
+  return defer(() => from(fetch(input, init).then()));
 };
 
 export const withFetchObservable = (fetch: Fetch): WithFetchObservable => ({
-  fetchWithObservable: fetchWithObservable(fetch),
+  fetchWithObservable: fetchWithObservable(fetch)
 });
 
 const enhance = (fetch: Fetch) =>
   withProps<any, WithFetchObservable>(withFetchObservable(fetch));
- 
+
 export default enhance;

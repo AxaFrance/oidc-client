@@ -4,18 +4,16 @@
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
-  "dependencies": {
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
-    "react-scripts-ts": "3.1.0",
+  "peerDependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.3.1",
     "recompose": "^0.30.0",
     "rxjs": "^6.3.3"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "prepare": "node ../../scripts/prepare.js"
   },
   "devDependencies": {
     "@types/jest": "^23.3.5",
