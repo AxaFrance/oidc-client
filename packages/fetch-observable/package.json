@@ -1,7 +1,9 @@
 {
   "name": "@axa-fr/react-oidc-fetch-observable",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "main": "dist/index.js",
+  "jsnext:main": "src/index.js",
   "dependencies": {
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
