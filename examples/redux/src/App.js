@@ -76,11 +76,11 @@ const enhanceObservable = compose(
     handObservableClick: e => {
       e.preventDefault();
       props
-        .fetchWithObservable(" http://www.mocky.io/v2/5bc6643f3200005e000b032b")
-        .pipe(flatMap(r => r.json()))
-        .subscribe(resp => {
-          console.warn(resp);
-          alert(JSON.stringify(resp));
+        .fetchWithObservable("http://www.mocky.io/v2/5bc6643f3200005e000b032b")
+        .pipe(flatMap(resp => resp.json()))
+        .subscribe(data => {
+          console.warn(data);
+          alert(JSON.stringify(data));
         });
     }
   }))

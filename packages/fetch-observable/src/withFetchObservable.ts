@@ -1,5 +1,5 @@
 import { withProps } from "recompose";
-import { defer, Observable, from } from "rxjs";
+import { defer, from, Observable } from "rxjs";
 
 export type Fetch = (
   input?: Request | string,
