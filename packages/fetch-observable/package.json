@@ -7,20 +7,10 @@
   "peerDependencies": {
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
-    "react-redux": "^5.0.7",
-    "react-router-dom": "^4.3.1",
     "recompose": "^0.30.0",
     "rxjs": "^6.3.3"
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
-  },
-  "devDependencies": {
-    "@types/jest": "^23.3.5",
-    "@types/node": "^10.11.7",
-    "@types/react": "^16.4.16",
-    "@types/react-dom": "^16.0.9",
-    "@types/recompose": "^0.27.0",
-    "typescript": "^3.1.3"
   }
 }
