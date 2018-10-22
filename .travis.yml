@@ -12,7 +12,7 @@ before_script:
 node_js:
   - "8"
 install:
-  - npm install
+  - rm -f package-lock.json && npm install
   - npm run bootstrap
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
