@@ -21,6 +21,6 @@
     "react-scripts": "^1.1.4"
   },
   "scripts": {
-    "start": "set PORT=3006&&react-scripts start"
+    "start": "set PORT=3000&&react-scripts start"
   }
 }
