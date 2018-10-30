@@ -19,7 +19,7 @@
     "curly": true,
     "eofline": true,
     "forin": true,
-    "import-blacklist": [true, "rxjs"],
+    "import-blacklist": [false, "rxjs"],
     "import-spacing": true,
     "indent": [true, "spaces", 2],
     "interface-over-type-literal": true,

@@ -1,1 +1,1 @@
-export { default as withFetchObservable } from "./withFetchObservable";
+export { default as withFetchObservable } from './withFetchObservable';
