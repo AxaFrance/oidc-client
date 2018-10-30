@@ -7,6 +7,7 @@
   "dependencies": {
     "@axa-fr/react-oidc-redux": "^1.0.1",
     "@axa-fr/react-oidc-redux-fetch": "^1.0.1",
+    "@axa-fr/react-oidc-fetch-observable": "0.1.0",
     "oidc-client": "^1.5.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
@@ -15,12 +16,13 @@
     "recompose": "~0.30.0",
     "redux": "^4.0.0",
     "redux-oidc": "^3.0.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "rxjs": "^6.3.3"
   },
   "devDependencies": {
     "react-scripts": "^1.1.4"
   },
   "scripts": {
-    "start": "set PORT=3006&&react-scripts start"
+    "start": "set PORT=3000&&react-scripts start"
   }
 }

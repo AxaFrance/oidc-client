@@ -1,0 +1,16 @@
+{
+  "name": "@axa-fr/react-oidc-fetch-observable",
+  "version": "0.1.0",
+  "private": false,
+  "main": "dist/index.js",
+  "jsnext:main": "src/index.js",
+  "peerDependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "recompose": "^0.30.0",
+    "rxjs": "^6.3.3"
+  },
+  "scripts": {
+    "prepare": "node ../../scripts/prepare.js"
+  }
+}
