@@ -33,6 +33,8 @@
     }
   },
   "devDependencies": {
+    "@angular/compiler": "^7.0.3",
+    "@angular/core": "^7.0.3",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
