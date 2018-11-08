@@ -1,9 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "declaration": true,
-    "declarationMap": true,
-    "jsx": "react",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,

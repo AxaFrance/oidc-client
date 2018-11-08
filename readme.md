@@ -23,8 +23,9 @@
   - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch)
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux)
   - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch)
+  - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable)
 - [Concepts](#concepts)
-- [Contribute](#ontribute)
+- [Contribute](#contribute)
 
 ## About
 
@@ -42,6 +43,7 @@ Two version of the component with different "State management" are available :
 - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme)
 - [`@axa-fr/react-oidc-redux`](./packages/redux#readme)
 - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme)
+- [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme)
 
 ## How It Works
 

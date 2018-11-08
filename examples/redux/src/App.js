@@ -1,15 +1,12 @@
-import React, { Component } from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import { Route, Switch, Link } from "react-router-dom";
-import { OidcSecure, oidcSecure } from "@axa-fr/react-oidc-redux";
-import { withAuthentication } from "@axa-fr/react-oidc-redux-fetch";
-import { withFetchObservable } from "@axa-fr/react-oidc-fetch-observable";
-import { flatMap } from "rxjs/operators";
-
-import User from "./User";
-import configuration from "./configuration";
-import { compose, withProps } from "recompose";
+import React, { Component } from 'react';
+import logo from './logo.svg';
+import './App.css';
+import { Route, Switch, Link } from 'react-router-dom';
+import { OidcSecure, oidcSecure } from '@axa-fr/react-oidc-redux';
+import { withAuthentication } from '@axa-fr/react-oidc-redux-fetch';
+import User from './User';
+import configuration from './configuration';
+import { compose, withProps } from 'recompose';
 
 const fetch = status => (url, options) => {
   return new Promise(resolve => {
@@ -29,13 +26,9 @@ const enhance401 = compose(
     handleClick: e => {
       e.preventDefault();
       props
-        .fetch("http://www.demo.url")
-        .then(() => alert("fetch end"))
+        .fetch('http://www.demo.url')
+        .then(() => alert('fetch end'))
         .catch(e => alert(e));
-    },
-    handObservable: e => {
-      e.preventDefault();
-      props.fetchWithObservable("").suscribre(() => {});
     }
   }))
 );
@@ -54,8 +47,8 @@ const enhance403 = compose(
     handleClick: e => {
       e.preventDefault();
       props
-        .fetch("http://www.demo.url")
-        .then(() => alert("fetch end"))
+        .fetch('http://www.demo.url')
+        .then(() => alert('fetch end'))
         .catch(e => alert(e));
     }
   }))
@@ -69,30 +62,6 @@ const Button403 = ({ handleClick }) => (
 
 const Button403Enhance = enhance403(Button403);
 
-const enhanceObservable = compose(
-  withAuthentication(global.fetch),
-  withFetchObservable(global.fetch),
-  withProps(props => ({
-    handObservableClick: e => {
-      e.preventDefault();
-      props
-        .fetchWithObservable("http://www.mocky.io/v2/5bc6643f3200005e000b032b")
-        .pipe(flatMap(resp => resp.json()))
-        .subscribe(data => {
-          console.warn(data);
-          alert(JSON.stringify(data));
-        });
-    }
-  }))
-);
-const ButtonObservable = ({ handObservableClick }) => (
-  <button onClick={handObservableClick} type="button">
-    Simulate Observable
-  </button>
-);
-
-const ButtonObservableEnhanced = enhanceObservable(ButtonObservable);
-
 const Home = () => (
   <div className="App">
     <header className="App-header">
@@ -105,7 +74,6 @@ const Home = () => (
     <p>Demo access_token is valid during 30 seconds</p>
     <Button403Enhance />
     <Button401Enhance />
-    <ButtonObservableEnhanced />
   </div>
 );
 

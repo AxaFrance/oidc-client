@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-redux",
-  "version": "1.0.2",
+  "version": "1.0.1",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
@@ -16,16 +16,18 @@
     "openid",
     "oauth2"
   ],
-  "peerDependencies": {
+  "dependencies": {
     "oidc-client": "^1.5.1",
-    "prop-types": "^15.6.1",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
     "react-redux": "^5.0.7",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "recompose": "^0.30.0",
-    "redux-oidc": "^3.0.0"
+    "redux-oidc": "^3.0.0",
+    "prop-types": "^15.6.1"
+  },
+  "peerDependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2"
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
