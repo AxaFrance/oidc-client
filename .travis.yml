@@ -10,7 +10,7 @@ before_script:
   - git config --global user.email "build-ci@axa.fr"
   - git config --global user.name "Build-CI"
 node_js:
-  - "8"
+  - "10"
 install:
   - npm install
   - npm run bootstrap
