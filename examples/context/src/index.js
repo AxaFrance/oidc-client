@@ -6,8 +6,6 @@ import Header from './Layout/Header';
 import Routes from './Router';
 import oidcConfiguration from './configuration';
 
-const origin = document.location.origin;
-
 const App = () => (
   <div>
     <Router>

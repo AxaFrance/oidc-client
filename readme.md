@@ -1,8 +1,11 @@
 # @axa-fr/react-oidc
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a9789e76484e4c42805230367efbe95a)](https://app.codacy.com/app/cyril.lakech/react-oidc?utm_source=github.com&utm_medium=referral&utm_content=AxaGuilDEv/react-oidc&utm_campaign=Badge_Grade_Settings)
+
 [![Build Status](https://travis-ci.com/AxaGuilDEv/react-oidc.svg?branch=master)](https://travis-ci.com/AxaGuilDEv/react-oidc)
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/fa08906f524b67a943b0/maintainability)](https://codeclimate.com/github/AxaGuilDEv/react-oidc/maintainability)
+
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fa08906f524b67a943b0/test_coverage)](https://codeclimate.com/github/AxaGuilDEv/react-oidc/test_coverage)
 
 <p align="center">
@@ -44,6 +47,11 @@ Two version of the component with different "State management" are available :
 - [`@axa-fr/react-oidc-redux`](./packages/redux#readme)
 - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme)
 - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme)
+
+## Examples
+
+- [`create react app & context api`](./examples/redux)
+- [`create react app & redux`](./examples/redux)
 
 ## How It Works
 
