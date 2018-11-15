@@ -8,9 +8,20 @@ Easy set up of OIDC for react and use the new react context api as state managem
 
 ```sh
 npm install @axa-fr/react-oidc-context --save
+
 ```
 
 ### Application startup (index.js)
+
+"BrowserRouter" should be declared before "AuthentificationProvider".
+The library need it to manage and normalise http redirection.
+
+The default routes used internally :
+
+- www.your-app.fr/authentication/callback
+- www.your-app.fr/authentication/silent_callback
+- www.your-app.fr/authentication/not-authentified
+- www.your-app.fr/authentication/not-authorized
 
 ```javascript
 import React from 'react';
@@ -20,8 +31,6 @@ import { AuthenticationProvider, oidcLog } from '@axa-fr/react-oidc-context';
 import Header from './Layout/Header';
 import Routes from './Router';
 import oidcConfiguration from './configuration';
-
-const origin = document.location.origin;
 
 const App = () => (
   <div>
@@ -40,7 +49,60 @@ const App = () => (
 render(<App />, document.getElementById('root'));
 ```
 
-### How to consume : classic method (Layout/Header.js)
+"Authentificationprovider" accept the following properties :
+
+```javascript
+const propTypes = {
+  notAuthentified: PropTypes.node, // react component displayed during authentication
+  notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
+  configuration: PropTypes.shape({
+    client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
+    redirect_uri: PropTypes.string.isRequired,
+    response_type: PropTypes.string.isRequired,
+    scope: PropTypes.string.isRequired,
+    authority: PropTypes.string.isRequired,
+    silent_redirect_uri: PropTypes.string.isRequired,
+    automaticSilentRenew: PropTypes.bool.isRequired,
+    loadUserInfo: PropTypes.bool.isRequired,
+    triggerAuthFlow: PropTypes.bool.isRequired
+  }).isRequired,
+  isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
+  loggerLevel: PropTypes.number,
+  logger: PropTypes.shape({
+    info: PropTypes.func.isRequired,
+    warn: PropTypes.func.isRequired,
+    error: PropTypes.func.isRequired,
+    debug: PropTypes.func.isRequired
+  })
+};
+```
+
+See bellow a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
+
+```javascript
+const configuration = {
+  client_id: 'implicit',
+  redirect_uri: 'http://localhost:3000/authentication/callback',
+  response_type: 'id_token token',
+  post_logout_redirect_uri: 'http://localhost:3000/',
+  scope: 'openid profile email',
+  authority: 'https://demo.identityserver.io',
+  silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
+  automaticSilentRenew: true,
+  loadUserInfo: true,
+  triggerAuthFlow: true
+};
+
+export default configuration;
+```
+
+### How to consume : react api context consumer method (Layout/Header.js)
+
+"AuthenticationConsumer" component inject to children "props" the properties :
+
+- oidcUser : user information (null if not authenticated)
+- logout: logout function
+- login: login function
 
 ```javascript
 import React from 'react';
@@ -98,6 +160,9 @@ export default () => (
 
 ### How to consume : HOC method (Layout/Header.js)
 
+"withOidcUser" function act like "AuthenticationConsumer" below.
+"OidcSecure" component trigger authentication in case user is not authentified. So, the children of that component can be accessible only once you are connected.
+
 ```javascript
 import React from 'react';
 import { withOidcUser, OidcSecure } from '@axa-fr/react-oidc-context';
@@ -115,6 +180,8 @@ export default withOidcUser(Admin);
 ```
 
 ### How to secure a component (Router/Routes.js)
+
+"withOidcSecure" act the same as "OidcSecure" it also trigger authentication in case user is not authentified.
 
 ```javascript
 import React from 'react';

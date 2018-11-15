@@ -28,7 +28,6 @@ const propTypes = {
     triggerAuthFlow: PropTypes.bool.isRequired,
   }).isRequired,
   isEnabled: PropTypes.bool,
-  location: PropTypes.string,
   loggerLevel: PropTypes.number,
   logger: PropTypes.shape({
     info: PropTypes.func.isRequired,
@@ -114,10 +113,11 @@ export const AuthenticationProviderComponentWithInit = WrappedComponent => {
     constructor(props) {
       super(props);
       setLogger(props.loggerLevel, props.logger);
-      props.oidcState.userManager.events.addUserLoaded(props.onUserLoaded);
-      props.oidcState.userManager.events.addSilentRenewError(props.onError);
-      props.oidcState.userManager.events.addUserUnloaded(props.onUserUnloaded);
-      props.oidcState.userManager.events.addUserSignedOut(props.onUserUnloaded);
+      const { events } = props.oidcState.userManager;
+      events.addUserLoaded(props.onUserLoaded);
+      events.addSilentRenewError(props.onError);
+      events.addUserUnloaded(props.onUserUnloaded);
+      events.addUserSignedOut(props.onUserUnloaded);
     }
 
     shouldComponentUpdate(nextProps) {
@@ -166,10 +166,11 @@ export const withLifeCycle = lifecycle({
   },
   componentWillUnmount() {
     // unregister the event callbacks
-    this.props.oidcState.userManager.events.removeUserLoaded(this.props.onUserLoaded);
-    this.props.oidcState.userManager.events.removeSilentRenewError(this.props.onError);
-    this.props.oidcState.userManager.events.removeUserUnloaded(this.props.onUserUnloaded);
-    this.props.oidcState.userManager.events.removeUserSignedOut(this.props.onUserUnloaded);
+    const { events } = this.props.oidcState.userManager;
+    events.removeUserLoaded(this.props.onUserLoaded);
+    events.removeSilentRenewError(this.props.onError);
+    events.removeUserUnloaded(this.props.onUserUnloaded);
+    events.removeUserSignedOut(this.props.onUserUnloaded);
   },
 });
 
