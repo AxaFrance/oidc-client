@@ -12,6 +12,15 @@ npm install @axa-fr/react-oidc-redux --save
 
 ### Application startup (index.js)
 
+"BrowserRouter" should be declared before "AuthentificationProvider".
+The library need it to manage and normalise http redirection.
+ The default routes used internally :
+ - www.your-app.fr/authentication/callback
+- www.your-app.fr/authentication/silent_callback
+- www.your-app.fr/authentication/not-authentified
+- www.your-app.fr/authentication/not-authorized
+
+
 ```javascript
 import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
@@ -41,10 +50,12 @@ const configuration = {
   }
 };
 
+const isEnabled = configuration.origin === document.location.origin;
+
 const Start = (
   <Provider store={store}>
     <BrowserRouter>
-      <Oidc store={store} configuration={configuration}>
+      <Oidc store={store} configuration={configuration.config}  isEnabled={isEnabled}>
         <App />
       </Oidc>
     </BrowserRouter>
@@ -54,6 +65,29 @@ const Start = (
 ReactDOM.render(Start, document.getElementById('root'));
 registerServiceWorker();
 ```
+
+The optional parameter "isEnabled" allows you to enable or disable authentication. You will also find it in the `OidcSecure` component.
+
+"Authentificationprovider" accept the following properties :
+ ```javascript
+const propTypes = {
+  notAuthentified: PropTypes.node, // react component displayed during authentication
+  notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
+  configuration: PropTypes.shape({
+    client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
+    redirect_uri: PropTypes.string.isRequired,
+    response_type: PropTypes.string.isRequired,
+    scope: PropTypes.string.isRequired,
+    authority: PropTypes.string.isRequired,
+    silent_redirect_uri: PropTypes.string.isRequired,
+    automaticSilentRenew: PropTypes.bool.isRequired,
+    loadUserInfo: PropTypes.bool.isRequired,
+    triggerAuthFlow: PropTypes.bool.isRequired
+  }).isRequired,
+  isEnabled: PropTypes.bool // enable/disable the protections and trigger of authentication (useful during development).
+};
+```
+ See bellow a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
 
 ### Initialize Oidc reducer (Store/reducer.js)
 
@@ -111,4 +145,15 @@ class App extends Component {
 }
 
 export default App;
+```
+
+### Example
+You can also test a demo application by uploading it to [this link](https://download-directory.github.io/?url=https://github.com/AxaGuilDEv/react-oidc/tree/master/examples/redux) or cloning [the repository](https://github.com/AxaGuilDEv/react-oidc.git) (examples / redux directory).
+Then you just need to run a
+``` shell
+npm install
+```
+then a
+``` Shell
+npm start
 ```
