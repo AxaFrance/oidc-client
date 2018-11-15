@@ -36,7 +36,7 @@ import { Oidc } from '@axa-fr/react-oidc-redux';
 const store = configureStore();
 
 const configuration = {
-  origin: 'http://localhost:3000'
+  origin: 'http://localhost:3000',
   config: {
     client_id: 'CSk26fuOE2NjQr17oCI1bKzBch9eUzF0',
     redirect_uri: 'http://localhost:3000/authentication/callback',
@@ -154,6 +154,7 @@ class App extends Component {
 export default App;
 ```
 
+### Example
 You can also test a demo application by uploading it to [this link](https://download-directory.github.io/?url=https://github.com/AxaGuilDEv/react-oidc/tree/master/examples/redux) or cloning [the repository](https://github.com/AxaGuilDEv/react-oidc.git) (examples / redux directory).
 Then you just need to run a
 ``` shell
