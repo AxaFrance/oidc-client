@@ -84,14 +84,7 @@ const propTypes = {
     loadUserInfo: PropTypes.bool.isRequired,
     triggerAuthFlow: PropTypes.bool.isRequired
   }).isRequired,
-  isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
-  loggerLevel: PropTypes.number,
-  logger: PropTypes.shape({
-    info: PropTypes.func.isRequired,
-    warn: PropTypes.func.isRequired,
-    error: PropTypes.func.isRequired,
-    debug: PropTypes.func.isRequired
-  })
+  isEnabled: PropTypes.bool // enable/disable the protections and trigger of authentication (useful during development).
 };
 ```
  See bellow a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
@@ -158,9 +151,9 @@ export default App;
 You can also test a demo application by uploading it to [this link](https://download-directory.github.io/?url=https://github.com/AxaGuilDEv/react-oidc/tree/master/examples/redux) or cloning [the repository](https://github.com/AxaGuilDEv/react-oidc.git) (examples / redux directory).
 Then you just need to run a
 ``` shell
-yarn install
+npm install
 ```
 then a
 ``` Shell
-yarn start
+npm start
 ```
