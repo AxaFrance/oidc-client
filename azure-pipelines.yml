@@ -28,7 +28,7 @@ steps:
     git reset --hard 
     git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
     git checkout $(Build.SourceBranchName) && cp .npmrc.template .npmrc
-    npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
+    npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish --registry registry.npmjs.org/:_authToken=$(NPM_TOKEN)
   displayName: 'lerna publish'
   condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
 
