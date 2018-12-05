@@ -28,7 +28,7 @@ steps:
     git reset --hard 
     git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
     git checkout $(Build.SourceBranchName) 
-    cp .npmrc.template .npmrc
+    node scripts/npm.js $(NPM_TOKEN)
     cat .npmrc
   displayName: 'configuration'
 
