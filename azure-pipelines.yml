@@ -31,5 +31,7 @@ steps:
     npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish --registry https://registry.npmjs.org/:_authToken=$(NPM_TOKEN)
   displayName: 'lerna publish'
   condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
+  env:
+    NPM_TOKEN: $(NPM_TOKEN)
 
   
