@@ -6,12 +6,16 @@
 pool:
   vmImage: 'Ubuntu 16.04'
 
+variables:
+  Npm.Publish.Version: 'none'
+  Github.Token: 'none'
+
 steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
-
+  
 - script: |
     npm install
     npm run bootstrap
@@ -19,4 +23,17 @@ steps:
 
 - script: |
     npm test -- --coverage
-  displayName: 'npm test'
+    npm run lint
+  displayName: 'npm test and lint'
+
+- script: |
+    git config --global user.email "build-ci@axa.fr"
+    git config --global user.name "Build-CI"
+    git reset --hard 
+    git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
+    git checkout $(Build.SourceBranchName) && cp .npmrc.template $HOME/.npmrc
+    npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
+  displayName: 'lerna publish'
+  condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), ne(variables['Npm.Publish.Version'], 'none'))
+
+  
