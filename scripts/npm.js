@@ -14,9 +14,9 @@ const template = `registry=https://registry.npmjs.org
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}`;
 
 const filePath = path.join(__dirname, '../.npmrc');
-console.log(filePath);
+console.log("-"+filePath);
 fs.writeFileSync(filePath  , template, 'utf8');
-
+console.log('--' + template);
 } catch(ex) {
-    console.error(ex);
+    console.log("---"+ex);
 }
