@@ -6,10 +6,6 @@
 pool:
   vmImage: 'Ubuntu 16.04'
 
-variables:
-  Npm.Publish.Version: 'none'
-  Github.Token: 'none'
-
 steps:
 - task: NodeTool@0
   inputs:
@@ -34,6 +30,6 @@ steps:
     git checkout $(Build.SourceBranchName) && cp .npmrc.template $HOME/.npmrc
     npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
   displayName: 'lerna publish'
-  condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), ne(variables['Npm.Publish.Version'], 'none'))
+  condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
 
   
