@@ -6,6 +6,9 @@
 pool:
   vmImage: 'Ubuntu 16.04'
 
+variables:
+  NPM_TOKEN: $(NPM_TOKEN)
+
 steps:
 - task: NodeTool@0
   inputs:
@@ -28,7 +31,6 @@ steps:
     git reset --hard 
     git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
     git checkout chore/azure-pipeline-2 
-    node scripts/npm.js $(NPM_TOKEN)
     echo $(Build.SourceBranch) 
     git status
   displayName: 'configuration'
