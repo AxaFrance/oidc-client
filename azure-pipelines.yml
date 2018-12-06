@@ -29,8 +29,7 @@ steps:
     git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
     git checkout $(Build.SourceBranchName) 
     node scripts/npm.js $(NPM_TOKEN)
-    cat .npmrc
-    echo $PWD
+    echo $(Build.SourceBranchName) 
   displayName: 'configuration'
 
 - script: |
