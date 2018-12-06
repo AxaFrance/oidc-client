@@ -30,6 +30,7 @@ steps:
     git checkout $(Build.SourceBranchName) 
     node scripts/npm.js $(NPM_TOKEN)
     cat .npmrc
+    echo $PWD
   displayName: 'configuration'
 
 - task: npmAuthenticate@0

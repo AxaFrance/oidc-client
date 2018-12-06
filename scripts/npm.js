@@ -17,6 +17,10 @@ const filePath = path.join(__dirname, '../.npmrc');
 console.log("-"+filePath);
 fs.writeFileSync(filePath  , template, 'utf8');
 console.log('--' + template);
+
+var contents = fs.readFileSync(filePath, 'utf8');
+console.log('----'+ contents);
+
 } catch(ex) {
     console.log("---"+ex);
 }
