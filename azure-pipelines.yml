@@ -33,8 +33,6 @@ steps:
     echo $PWD
   displayName: 'configuration'
 
-- task: npmAuthenticate@0
-
 - script: |
     npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
   displayName: 'lerna publish'
