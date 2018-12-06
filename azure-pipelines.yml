@@ -22,6 +22,7 @@ steps:
   displayName: 'npm install and bootstrap'
 
 - script: |
+    export NPM_TOKEN=$(NPM_TOKEN)
     npm test -- --coverage
     npm run lint
   displayName: 'npm test and lint'
@@ -37,6 +38,7 @@ steps:
   displayName: 'configuration'
 
 - script: |
+    export NPM_TOKEN=$(NPM_TOKEN)
     npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
   displayName: 'lerna publish'
   condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
