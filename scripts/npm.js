@@ -1,26 +1,20 @@
 const path = require('path');
 var fs = require('fs');
 
-try{
-const args = process.argv;
-console.log(args);
+try {
+   const args = process.argv;
+    let template = '';
 
-const NPM_TOKEN = args[2];
-
-
-
- 
-const template = `registry=https://registry.npmjs.org
+    if(args.length >= 3){
+        const NPM_TOKEN = args[2];
+        template = `registry=https://registry.npmjs.org
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}`;
-
-const filePath = path.join(__dirname, '../.npmrc');
-console.log("-"+filePath);
-fs.writeFileSync(filePath  , template, 'utf8');
-console.log('--' + template);
-
-var contents = fs.readFileSync(filePath, 'utf8');
-console.log('----'+ contents);
+    } else {
+        template = 'registry=https://registry.npmjs.org';
+    }
+   const filePath = path.join(__dirname, '../.npmrc');
+   fs.writeFileSync(filePath  , template, 'utf8');
 
 } catch(ex) {
-    console.log("---"+ex);
+    console.error(ex);
 }
