@@ -18,8 +18,14 @@ steps:
   displayName: 'npm install and bootstrap'
 
 - script: |
+   curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+   chmod +x ./cc-test-reporter
+   ./cc-test-reporter before-build
+
+- script: |
     npm test -- --coverage
     npm run lint
+    ./cc-test-reporter after-build --exit-code $(TRAVIS_TEST_RESULT)
   displayName: 'npm test and lint'
 
 - script: |
@@ -27,10 +33,10 @@ steps:
     git config --global user.name "Build-CI"
     git reset --hard 
     git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
-    git checkout chore/azure-pipeline-2 
+    git checkout $(Build.SourceBranch)
     node ./scripts/npm.js $(NPM_TOKEN)
     cp .npmrc $HOME/.npmrc
-    echo $(Build.SourceBranch) 
+    echo $(Build.SourceBranch)
     git status
   displayName: 'configuration'
 
