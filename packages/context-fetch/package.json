@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-context-fetch",
-  "version": "1.1.0",
+  "version": "1.1.1-alpha.0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
@@ -22,8 +22,8 @@
     "react-dom": "^16.4.2"
   },
   "dependencies": {
-    "@axa-fr/react-oidc-context": "^1.1.0",
-    "@axa-fr/react-oidc-fetch-core": "^1.1.0",
+    "@axa-fr/react-oidc-context": "^1.1.1-alpha.0",
+    "@axa-fr/react-oidc-fetch-core": "^1.1.1-alpha.0",
     "prop-types": "~15.6.1",
     "react-router-dom": "^4.3.1",
     "recompose": "~0.30.0"
