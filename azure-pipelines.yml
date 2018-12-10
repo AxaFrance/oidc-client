@@ -11,6 +11,20 @@ steps:
   inputs:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
+
+- task: SonarSource.sonarqube.15B84CA1-B62F-4A2A-A403-89B77A063157.SonarQubePrepare@4
+  displayName: 'Prepare analysis on SonarQube'
+  inputs:
+    SonarQube: 'SonarCloud'
+    projectKey: AxaGuilDEv_react-oidc 
+    projectName: react-oidc
+    projectVersion: '1.0.0'
+    extraProperties: |
+     sonar.organization=axaguildev
+     sonar.branch.name=$(Build.SourceBranchName)
+     sonar.sources=. \
+     sonar.host.url=https://sonarcloud.io 
+     sonar.login=$(Sonar.Login)
   
 - script: |
     npm install
@@ -35,6 +49,9 @@ steps:
     echo $(Build.SourceBranch)
     git status
   displayName: 'configuration'
+
+- task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@4
+  displayName: 'Run Code Analysis'
 
 - script: |
     npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
