@@ -26,7 +26,9 @@ steps:
      # Additional properties that will be passed to the scanner, 
      # Put one key=value per line, example:
      sonar.exclusions=**/*.stories.js,**/*.spec.js,coverage/**/*.js,**/node_modules/**/*.js
+     sonar.inclusions=**/*.js,**/*.ts,**/*.jsx,**/*.tsx
      sonar.javascript.file.suffixes=.js,.jsx
+     sonar.language=js
      sonar.javascript.lcov.reportPaths=coverage/lcov.info
   
 - script: |
