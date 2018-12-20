@@ -2,6 +2,9 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a9789e76484e4c42805230367efbe95a)](https://app.codacy.com/app/cyril.lakech/react-oidc?utm_source=github.com&utm_medium=referral&utm_content=AxaGuilDEv/react-oidc&utm_campaign=Badge_Grade_Settings) [![Build Status](https://travis-ci.com/AxaGuilDEv/react-oidc.svg?branch=master)](https://travis-ci.com/AxaGuilDEv/react-oidc) [![Maintainability](https://api.codeclimate.com/v1/badges/fa08906f524b67a943b0/maintainability)](https://codeclimate.com/github/AxaGuilDEv/react-oidc/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/fa08906f524b67a943b0/test_coverage)](https://codeclimate.com/github/AxaGuilDEv/react-oidc/test_coverage)
 
+
+[![Build status](https://dev.azure.com/axaguildev/react-oidc/_apis/build/status/AxaGuilDEv.react-oidc?branch=master)](https://dev.azure.com/axaguildev/react-oidc/_apis/build/status/AxaGuilDEv.react-oidc?branch=master?branch=master)]
+[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc)
 [![codecov](https://codecov.io/gh/AxaGuilDEv/react-oidc/branch/master/graph/badge.svg)](https://codecov.io/gh/AxaGuilDEv/react-oidc)
 
 <p align="center">
