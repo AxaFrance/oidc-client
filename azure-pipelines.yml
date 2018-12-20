@@ -25,7 +25,7 @@ steps:
     extraProperties: |
      # Additional properties that will be passed to the scanner, 
      # Put one key=value per line, example:
-     sonar.exclusions=**/*.stories.js,**/*.spec.js,coverage/**/*.js,node_modules/**/*.js
+     sonar.exclusions=**/*.stories.js,**/*.spec.js,coverage/**/*.js,**/node_modules/**/*.js
      sonar.javascript.file.suffixes=.js,.jsx
      sonar.javascript.lcov.reportPaths=coverage/lcov.info
   
