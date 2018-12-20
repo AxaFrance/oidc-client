@@ -28,7 +28,6 @@ steps:
      sonar.exclusions=**/*.stories.js,**/*.spec.js,coverage/**/*.js,**/node_modules/**
      sonar.inclusions=packages/**
      sonar.javascript.file.suffixes=.js,.jsx,.ts,.tsx
-     sonar.languages=js
      sonar.javascript.lcov.reportPaths=coverage/lcov.info
   
 - script: |
