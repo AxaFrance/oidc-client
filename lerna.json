@@ -1,8 +1,8 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.4-alpha.0",
   "command": {
     "publish": {
-      "message": "chore(release): publish %s [ci skip]",
+      "message": "chore(release): publish %s ***NO_CI***",
       "npmClient": "npm",
       "ignoreChanges": [
         "ignored-file",

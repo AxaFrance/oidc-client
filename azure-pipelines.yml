@@ -6,15 +6,30 @@
 pool:
   vmImage: 'Ubuntu 16.04'
 
-variables:
-  Npm.Publish.Version: 'none'
-  Github.Token: 'none'
-
 steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
+
+- task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
+  displayName: 'Prepare analysis on SonarCloud'
+  inputs:
+    SonarCloud: SonarCloud
+    organization: axaguildev
+    scannerMode: CLI
+    configMode: manual
+    cliProjectKey: 'AxaGuilDEv_react-oidc'
+    cliProjectName: 'react-oidc'
+    extraProperties: |
+     # Additional properties that will be passed to the scanner, 
+     # Put one key=value per line, example:
+     sonar.exclusions=**/*.stories.js,**/*.spec.js,**/*.spec.ts,scripts/**,coverage/**,**/node_modules/**,**/dist/**,**/__mocks__/**
+     sonar.javascript.lcov.reportPaths=coverage/lcov.info
+     sonar.sourceEncoding=UTF-8
+     sonar.verbose=true
+     sonar.host.url=https://sonarcloud.io
+     sonar.cfamily.build-wrapper-output.bypass=true
   
 - script: |
     npm install
@@ -24,6 +39,8 @@ steps:
 - script: |
     npm test -- --coverage
     npm run lint
+    npm install -g codecov
+    codecov
   displayName: 'npm test and lint'
 
 - script: |
@@ -31,9 +48,22 @@ steps:
     git config --global user.name "Build-CI"
     git reset --hard 
     git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
-    git checkout $(Build.SourceBranchName) && cp .npmrc.template $HOME/.npmrc
+    git checkout $(Build.SourceBranch)
+    node ./scripts/npm.js $(NPM_TOKEN)
+    cp .npmrc $HOME/.npmrc
+    echo $(Build.SourceBranch)
+    git status
+  displayName: 'configuration'
+
+- task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
+  displayName: 'Run Code Analysis'
+
+- task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@1
+  displayName: 'Publish Quality Gate Result'
+
+- script: |
     npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
   displayName: 'lerna publish'
-  condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), ne(variables['Npm.Publish.Version'], 'none'))
+  condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
 
-  
+
