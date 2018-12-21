@@ -25,9 +25,12 @@ steps:
      # Additional properties that will be passed to the scanner, 
      # Put one key=value per line, example:
      sonar.exclusions=**/*.stories.js,**/*.spec.js,**/*.spec.ts,scripts/**,coverage/**,**/node_modules/**,**/dist/**,**/__mocks__/**
-     sonar.javascript.lcov.reportPaths=coverage/lcov.info
+     #sonar.javascript.lcov.reportPaths=coverage/lcov.info
      sonar.sourceEncoding=UTF-8
      sonar.verbose=true
+     sonar.sources=./packages
+     sonar.host.url=https://sonarcloud.io
+     sonar.cfamily.build-wrapper-output.bypass=true
   
 - script: |
     npm install
