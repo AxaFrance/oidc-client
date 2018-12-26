@@ -79,7 +79,7 @@
     "redux": "^4.0.1",
     "redux-oidc": "^3.1.0",
     "redux-thunk": "^2.3.0",
-    "regenerator-runtime": "^0.12.1",
+    "regenerator-runtime": "^0.13.1",
     "shelljs": "^0.8.2",
     "tslint": "~5.11.0",
     "tslint-config-prettier": "^1.15.0",
