@@ -5,10 +5,5 @@ rules:
         required_approving_review_count: 1
       required_status_checks:
         contexts:
-        - Codacy/PR Quality Review
-        - codeclimate/diff-coverage
-        - continuous-integration/travis-ci
-        - codeclimate/total-coverage
-        - codeclimate
         - WIP
         - af-react-oidc-github.CI
