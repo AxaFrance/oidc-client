@@ -5,6 +5,5 @@ rules:
         required_approving_review_count: 1
       required_status_checks:
         contexts:
-        - sonarcloud
         - WIP
         - af-react-oidc-github.CI
