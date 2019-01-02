@@ -1,8 +1,11 @@
 import { oidcLog } from './loggerService';
 
-export const isRequireAuthentication = (oidcUser, isForce) => isForce || !oidcUser;
+export const isRequireAuthentication = (oidcUser, isForce) =>
+  isForce || !oidcUser || oidcUser.expired;
 
-export const authenticateUser = (userManager, location) => async (isForce = false) => {
+export const authenticateUser = (userManager, location) => async (
+  isForce = false,
+) => {
   if (!userManager || !userManager.getUser) {
     return;
   }
@@ -25,4 +28,5 @@ export const logoutUser = async userManager => {
   }
 };
 
-export const signinSilent = getUserManager => () => getUserManager().signinSilent();
+export const signinSilent = getUserManager => () =>
+  getUserManager().signinSilent();
