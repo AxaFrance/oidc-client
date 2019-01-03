@@ -61,13 +61,10 @@ steps:
     git config --global user.name "Build-CI"
     git reset --hard 
     git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
-    echo "bfefore checkout" $(Build.SourceBranchName) orguigui $(Build.SourceBranch) orguigui $(SmartBranchName)
     git checkout $(SmartBranchName) 
     echo "bfefore home"
     node ./scripts/npm.js $(NPM_TOKEN)
     cp .npmrc $HOME/.npmrc
-    echo "bfefore echo"
-    echo $(Build.SourceBranch)
     git status
   displayName: 'configuration'
 
