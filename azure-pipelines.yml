@@ -12,7 +12,6 @@ steps:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
 
-steps:
 - task: jessehouwing.jessehouwing-vsts-variable-tasks.vsts-variable-transform.VariableTransformTask@1
   displayName: 'Transform value $(Build.SourceBranch) and assign to variable: SmartBrancheName'
   inputs:
