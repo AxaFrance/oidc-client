@@ -50,7 +50,7 @@ steps:
     #git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
     #git pull
     echo "bfefore checkout" $(Build.SourceBranchName) orguigui $(Build.SourceBranch)
-    git checkout $(Build.SourceBranch)
+    git checkout $(Build.SourceBranchName) -f
     echo "bfefore home"
     node ./scripts/npm.js $(NPM_TOKEN)
     cp .npmrc $HOME/.npmrc
