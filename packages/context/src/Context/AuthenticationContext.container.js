@@ -1,7 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
-import { compose, withHandlers, withState, lifecycle, withProps } from 'recompose';
+import {
+  compose,
+  withHandlers,
+  withState,
+  lifecycle,
+  withProps,
+} from 'recompose';
 
 import {
   authenticationService,
@@ -63,6 +69,16 @@ export const onUserUnloaded = props => () => {
   });
 };
 
+export const onAccessTokenExpired = props => async () => {
+  oidcLog.info(`AccessToken Expired `);
+  props.setOidcState({
+    ...props.oidcState,
+    oidcUser: null,
+    isLoading: false,
+  });
+  await props.oidcState.userManager.signinSilent();
+};
+
 export const setDefaultState = ({ configuration, loggerLevel, logger }) => {
   setLogger(loggerLevel, logger);
   return {
@@ -118,11 +134,14 @@ export const AuthenticationProviderComponentWithInit = WrappedComponent => {
       events.addSilentRenewError(props.onError);
       events.addUserUnloaded(props.onUserUnloaded);
       events.addUserSignedOut(props.onUserUnloaded);
+      events.addAccessTokenExpired(props.onAccessTokenExpired);
     }
 
     shouldComponentUpdate(nextProps) {
       // Hack to avoid resfreshing user before logout
-      oidcLog.info(`Protected component update : ${!nextProps.oidcState.isFrozen}`);
+      oidcLog.info(
+        `Protected component update : ${!nextProps.oidcState.isFrozen}`,
+      );
       return !nextProps.oidcState.isFrozen;
     }
 
@@ -134,12 +153,17 @@ export const AuthenticationProviderComponentWithInit = WrappedComponent => {
   return ConstructedComponent;
 };
 
-export const withOidcState = withState('oidcState', 'setOidcState', setDefaultState);
+export const withOidcState = withState(
+  'oidcState',
+  'setOidcState',
+  setDefaultState,
+);
 
 export const withOidcHandlers = withHandlers({
   onError,
   onUserLoaded,
   onUserUnloaded,
+  onAccessTokenExpired,
 });
 
 export const withSecondOidcHandlers = withHandlers({
@@ -171,6 +195,7 @@ export const withLifeCycle = lifecycle({
     events.removeSilentRenewError(this.props.onError);
     events.removeUserUnloaded(this.props.onUserUnloaded);
     events.removeUserSignedOut(this.props.onUserUnloaded);
+    events.removeAccessTokenExpired(this.props.onAccessTokenExpired);
   },
 });
 
@@ -181,10 +206,12 @@ const AuthenticationProviderComponentHOC = compose(
   withSecondOidcHandlers,
   withLifeCycle,
   AuthenticationProviderComponentWithInit,
-  withOidcProps
+  withOidcProps,
 );
 
-const AuthenticationProvider = AuthenticationProviderComponentHOC(AuthenticationProviderComponent);
+const AuthenticationProvider = AuthenticationProviderComponentHOC(
+  AuthenticationProviderComponent,
+);
 
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;

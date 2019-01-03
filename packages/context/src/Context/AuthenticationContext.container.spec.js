@@ -24,6 +24,7 @@ describe('AuthContext tests suite', () => {
   beforeEach(() => {
     userManagerMock = {
       removeUser: jest.fn(),
+      signinSilent: jest.fn(),
     };
     // eslint-disable-next-line
     services.authenticateUser = jest.fn(() => () => jest.fn());
@@ -68,6 +69,16 @@ describe('AuthContext tests suite', () => {
     });
   });
 
+  it('should set state and call silentSignin to location when call onAccessTokenExpired', () => {
+    container.onAccessTokenExpired(propsMock)();
+    expect(propsMock.setOidcState).toBeCalledWith({
+      ...previousOidcState,
+      isLoading: false,
+      oidcUser: null,
+    });
+    expect(userManagerMock.signinSilent).toBeCalled();
+  });
+
   it('should set default state when call setDefaultState', () => {
     const defaultState = container.setDefaultState(propsMock);
     expect(services.authenticationService).toBeCalledWith(configurationMock);
@@ -87,7 +98,10 @@ describe('AuthContext tests suite', () => {
       isLoading: true,
       oidcUser: null,
     });
-    expect(services.authenticateUser).toBeCalledWith(userManagerMock, 'locationMock');
+    expect(services.authenticateUser).toBeCalledWith(
+      userManagerMock,
+      'locationMock',
+    );
   });
 
   it('should set state and call onUserUnload function when call logout', async () => {
