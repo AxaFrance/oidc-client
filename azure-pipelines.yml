@@ -12,6 +12,20 @@ steps:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
 
+steps:
+- task: jessehouwing.jessehouwing-vsts-variable-tasks.vsts-variable-transform.VariableTransformTask@1
+  displayName: 'Transform value ''$(Build.SourceBranch)' and assign to variable: SmartBrancheName'
+  inputs:
+    value: '$(Build.SourceBranch)'
+    variableName: SmartBranchName
+    searchReplace: true
+    searchValue: refs/heads/
+    trim: true
+    slice: false
+    substring: false
+    casing: false
+    pad: false
+
 - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
   displayName: 'Prepare analysis on SonarCloud'
   inputs:
@@ -46,11 +60,10 @@ steps:
 - script: |
     git config --global user.email "build-ci@axa.fr"
     git config --global user.name "Build-CI"
-    #git reset --hard 
-    #git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
-    #git pull
-    echo "bfefore checkout" $(Build.SourceBranchName) orguigui $(Build.SourceBranch)
-    git checkout $(Build.SourceBranchName) -f
+    git reset --hard 
+    git remote set-url origin https://$(Github.Token)@github.com/AxaGuilDEv/react-oidc.git 
+    echo "bfefore checkout" $(Build.SourceBranchName) orguigui $(Build.SourceBranch) orguigui $(SmartBranchName)
+    git checkout $(Build.SmartBranchName) 
     echo "bfefore home"
     node ./scripts/npm.js $(NPM_TOKEN)
     cp .npmrc $HOME/.npmrc
