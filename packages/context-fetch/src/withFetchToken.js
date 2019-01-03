@@ -5,7 +5,10 @@ import { fetchToken } from '@axa-fr/react-oidc-fetch-core';
 const enhance = fetch =>
   compose(
     withOidcUser,
-    withProps(fetchToken(fetch))
+    withProps(({ oidcUser }) => ({
+      user: oidcUser,
+    })),
+    withProps(fetchToken(fetch)),
   );
 
 export default enhance;
