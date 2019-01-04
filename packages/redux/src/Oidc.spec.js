@@ -11,19 +11,19 @@ import Oidc, { OidcBase } from './Oidc';
 jest.mock('./authenticationService', () => ({
   __esModule: true,
   default: jest.fn(),
-  getUserManager: jest.fn()
+  getUserManager: jest.fn(),
 }));
 jest.mock('redux-oidc', () => ({
   OidcProvider: jest.fn(),
-  loadUser: jest.fn()
+  loadUser: jest.fn(),
 }));
 
 describe('redux-fetch.withAuthentication', () => {
   it('Render <Oidc/> correctly', () => {
     const component = renderer.create(
-      <OidcBase isEnabled={false} store={{}} configuration={{}}>
+      <Oidc isEnabled={false} store={{}} configuration={{}}>
         <p>isEnabled</p>
-      </OidcBase>
+      </Oidc>,
     );
     const tree = component.toJSON();
     expect(tree).toMatchSnapshot();

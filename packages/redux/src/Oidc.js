@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
-import { compose, lifecycle } from 'recompose';
 import PropTypes from 'prop-types';
 import OidcRoutes from './OidcRoutes';
 import authenticationService, { getUserManager } from './authenticationService';
@@ -22,35 +21,41 @@ const defaultProps = {
   children: null,
 };
 
-export const OidcBase = props => {
-  const { isEnabled, children, store, notAuthentified, notAuthorized } = props;
-
-  if (!isEnabled) {
-    return <Fragment>{children}</Fragment>;
+class Oidc extends React.Component {
+  componentWillMount() {
+    if (this.props.isEnabled) {
+      const userManager = authenticationService(this.props.configuration);
+      loadUser(this.props.store, userManager);
+    }
   }
 
-  return (
-    <OidcProvider store={store} userManager={getUserManager()}>
-      <OidcRoutes notAuthentified={notAuthentified} notAuthorized={notAuthorized}>
-        {children}
-      </OidcRoutes>
-    </OidcProvider>
-  );
-};
+  render() {
+    const {
+      isEnabled,
+      children,
+      store,
+      notAuthentified,
+      notAuthorized,
+    } = this.props;
 
-OidcBase.propTypes = propTypes;
-OidcBase.defaultProps = defaultProps;
-
-const lifecycleComponent = {
-  componentWillMount() {
-    const { isEnabled, store, configuration } = this.props;
-    if (isEnabled) {
-      const userManager = authenticationService(configuration);
-      loadUser(store, userManager);
+    if (!isEnabled) {
+      return <Fragment>{children}</Fragment>;
     }
-  },
-};
 
-const enhance = compose(lifecycle(lifecycleComponent));
+    return (
+      <OidcProvider store={store} userManager={getUserManager()}>
+        <OidcRoutes
+          notAuthentified={notAuthentified}
+          notAuthorized={notAuthorized}
+        >
+          {children}
+        </OidcRoutes>
+      </OidcProvider>
+    );
+  }
+}
 
-export default enhance(OidcBase);
+Oidc.propTypes = propTypes;
+Oidc.defaultProps = defaultProps;
+
+export default Oidc;
