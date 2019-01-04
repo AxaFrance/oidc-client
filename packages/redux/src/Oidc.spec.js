@@ -18,7 +18,7 @@ jest.mock('redux-oidc', () => ({
   loadUser: jest.fn(),
 }));
 
-describe('redux-fetch.withAuthentication', () => {
+describe('redux.Oidc', () => {
   it('Render <Oidc/> correctly', () => {
     const component = renderer.create(
       <Oidc isEnabled={false} store={{}} configuration={{}}>
