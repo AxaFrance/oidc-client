@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
+import { compose, lifecycle, defaultProps } from 'recompose';
 import PropTypes from 'prop-types';
 import OidcRoutes from './OidcRoutes';
 import authenticationService, { getUserManager } from './authenticationService';
@@ -14,48 +15,47 @@ const propTypes = {
   children: PropTypes.node,
 };
 
-const defaultProps = {
+export const OidcBase = props => {
+  const { isEnabled, children, store, notAuthentified, notAuthorized } = props;
+
+  if (!isEnabled) {
+    return <Fragment>{children}</Fragment>;
+  }
+
+  return (
+    <OidcProvider store={store} userManager={getUserManager()}>
+      <OidcRoutes
+        notAuthentified={notAuthentified}
+        notAuthorized={notAuthorized}
+      >
+        {children}
+      </OidcRoutes>
+    </OidcProvider>
+  );
+};
+
+OidcBase.propTypes = propTypes;
+
+const lifecycleComponent = {
+  componentWillMount() {
+    const { isEnabled, store, configuration } = this.props;
+    if (isEnabled) {
+      const userManager = authenticationService(configuration);
+      loadUser(store, userManager);
+    }
+  },
+};
+
+const defaultPropsObject = {
   notAuthentified: null,
   notAuthorized: null,
   isEnabled: true,
   children: null,
 };
 
-class Oidc extends React.Component {
-  componentWillMount() {
-    if (this.props.isEnabled) {
-      const userManager = authenticationService(this.props.configuration);
-      loadUser(this.props.store, userManager);
-    }
-  }
+export const enhance = compose(
+  defaultProps(defaultPropsObject),
+  lifecycle(lifecycleComponent),
+);
 
-  render() {
-    const {
-      isEnabled,
-      children,
-      store,
-      notAuthentified,
-      notAuthorized,
-    } = this.props;
-
-    if (!isEnabled) {
-      return <Fragment>{children}</Fragment>;
-    }
-
-    return (
-      <OidcProvider store={store} userManager={getUserManager()}>
-        <OidcRoutes
-          notAuthentified={notAuthentified}
-          notAuthorized={notAuthorized}
-        >
-          {children}
-        </OidcRoutes>
-      </OidcProvider>
-    );
-  }
-}
-
-Oidc.propTypes = propTypes;
-Oidc.defaultProps = defaultProps;
-
-export default Oidc;
+export default enhance(OidcBase);

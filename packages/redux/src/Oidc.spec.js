@@ -1,10 +1,10 @@
 // Link.react.test.js
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import { loadUser } from 'redux-oidc';
 
-import Oidc, { OidcBase } from './Oidc';
+import Oidc from './Oidc';
 
 // I used __esModule to mock a module with default and named exports
 // cf: https://github.com/facebook/jest/issues/5579#issuecomment-397406174
@@ -14,7 +14,7 @@ jest.mock('./authenticationService', () => ({
   getUserManager: jest.fn(),
 }));
 jest.mock('redux-oidc', () => ({
-  OidcProvider: jest.fn(),
+  OidcProvider: jest.fn(() => <p>Render Something</p>),
   loadUser: jest.fn(),
 }));
 
@@ -30,10 +30,7 @@ describe('redux.Oidc', () => {
   });
 
   it('should call loadUser when component mounts even if isEnabled prop is not set', () => {
-    const wrapper = shallow(<Oidc store={{}} configuration={{}} />);
-    const instance = wrapper.instance();
-
-    instance.componentWillMount();
+    mount(<Oidc store={{}} configuration={{}} />);
 
     expect(loadUser).toHaveBeenCalled();
   });
