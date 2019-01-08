@@ -53,7 +53,7 @@ const defaultPropsObject = {
   children: null,
 };
 
-export const enhance = compose(
+const enhance = compose(
   defaultProps(defaultPropsObject),
   lifecycle(lifecycleComponent),
 );
