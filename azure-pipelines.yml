@@ -72,6 +72,7 @@ steps:
       cp .npmrc $HOME/.npmrc
       git status
     displayName: 'configuration'
+    condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
 
   - task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
     displayName: 'Run Code Analysis'
