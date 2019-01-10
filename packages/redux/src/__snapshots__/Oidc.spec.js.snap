@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`redux-fetch.withAuthentication Render <Oidc/> correctly 1`] = `
+exports[`redux.Oidc Render <Oidc/> correctly 1`] = `
 <p>
   isEnabled
 </p>
