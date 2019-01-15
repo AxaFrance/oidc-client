@@ -46,7 +46,7 @@ Two version of the component with different "State management" are available :
 
 ## Examples
 
-- [`create react app & context api`](./examples/redux)
+- [`create react app & context api`](./examples/context)
 - [`create react app & redux`](./examples/redux)
 
 ## How It Works
