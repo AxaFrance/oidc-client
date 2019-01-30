@@ -1,54 +1,50 @@
-import React, { Fragment } from "react";
-import { withRouter } from "react-router-dom";
+import React, { Fragment } from 'react';
+import { withRouter } from 'react-router-dom';
 import {
+  fromRenderProps,
   compose,
   branch,
   lifecycle,
-  defaultProps,
-  renderComponent
-} from "recompose";
-
-import PropTypes from "prop-types";
-import { withOidcUser } from "./AuthenticationContext.container";
+  renderComponent,
+} from 'recompose';
+import {
+  AuthenticationConsumer,
+  withOidcUser,
+} from './AuthenticationContext.container';
 import {
   authenticateUser,
   getUserManager,
   oidcLog,
-  isRequireAuthentication
-} from "../Services";
-import { Authenticating } from "../OidcComponents";
+  isRequireAuthentication,
+} from '../Services';
+import { Authenticating } from '../OidcComponents';
+
+const withContext = fromRenderProps(
+  AuthenticationConsumer,
+  ({ isEnabled }) => ({ isEnabled }),
+);
 
 const lifecycleComponent = {
   async componentDidMount() {
-    oidcLog.info("Protected component mounted");
+    oidcLog.info('Protected component mounted');
     const usermanager = getUserManager();
     await authenticateUser(usermanager, this.props.location)();
-  }
-};
-
-const dummyDefaultProps = {
-  children: PropTypes.node
+  },
 };
 
 const wrapAuthenticating = () => <Authenticating />;
 const Dummy = ({ children }) => <Fragment>{children}</Fragment>;
 
-Dummy.defaultProps = dummyDefaultProps;
-
-const withDefaultProps = defaultProps({
-  isEnabled: true
-});
-
 export const withOidcSecure = compose(
-  withDefaultProps,
+  withContext,
   branch(({ isEnabled }) => !isEnabled, renderComponent(Dummy)),
   withOidcUser,
   withRouter,
   lifecycle(lifecycleComponent),
   branch(
     ({ oidcUser }) => isRequireAuthentication(oidcUser, false),
-    renderComponent(wrapAuthenticating)
-  )
+    renderComponent(wrapAuthenticating),
+  ),
 );
 
 const OidcSecure = props => {

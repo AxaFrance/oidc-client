@@ -7,6 +7,7 @@ const propTypes = {
   notAuthentified: PropTypes.node,
   notAuthorized: PropTypes.node,
   isLoading: PropTypes.bool.isRequired,
+  isEnabled: PropTypes.bool,
   // eslint-disable-next-line
   oidcUser: PropTypes.object, //TODO : récuperer le proptypes depuis OIDC client ?
   error: PropTypes.string.isRequired,
@@ -17,10 +18,12 @@ const propTypes = {
 const defaultProps = {
   notAuthentified: null,
   notAuthorized: null,
+  isEnabled: true,
 };
 
 const AuthenticationProviderComponent = ({
   isLoading,
+  isEnabled,
   oidcUser,
   error,
   login,
@@ -36,6 +39,7 @@ const AuthenticationProviderComponent = ({
       error,
       login,
       logout,
+      isEnabled,
     }}
   >
     <OidcRoutes notAuthentified={notAuthentified} notAuthorized={notAuthorized}>
