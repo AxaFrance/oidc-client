@@ -7,6 +7,7 @@ import {
   withState,
   lifecycle,
   withProps,
+  fromRenderProps,
 } from 'recompose';
 
 import {
@@ -79,7 +80,12 @@ export const onAccessTokenExpired = props => async () => {
   await props.oidcState.userManager.signinSilent();
 };
 
-export const setDefaultState = ({ configuration, loggerLevel, logger }) => {
+export const setDefaultState = ({
+  configuration,
+  loggerLevel,
+  logger,
+  isEnabled,
+}) => {
   setLogger(loggerLevel, logger);
   return {
     oidcUser: undefined,
@@ -87,6 +93,7 @@ export const setDefaultState = ({ configuration, loggerLevel, logger }) => {
     isLoading: false,
     error: '',
     isFrozen: false,
+    isEnabled,
   };
 };
 
@@ -215,18 +222,12 @@ const AuthenticationProvider = AuthenticationProviderComponentHOC(
 
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
+AuthenticationProvider.displayName = 'AuthenticationProvider';
 const AuthenticationConsumer = AuthenticationContext.Consumer;
 
-const withOidcUser = Component => props => (
-  <AuthenticationConsumer>
-    {({ oidcUser }) =>
-      oidcUser ? (
-        <Component {...props} oidcUser={oidcUser} />
-      ) : (
-        <Component {...props} oidcUser={null} />
-      )
-    }
-  </AuthenticationConsumer>
+const withOidcUser = fromRenderProps(
+  AuthenticationConsumer,
+  ({ oidcUser }) => ({ oidcUser }),
 );
 
 export { AuthenticationProvider, AuthenticationConsumer, withOidcUser };

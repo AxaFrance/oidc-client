@@ -1,17 +1,17 @@
-import React from "react";
-import { AuthenticationConsumer } from "@axa-fr/react-oidc-context";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { AuthenticationConsumer } from '@axa-fr/react-oidc-context';
+import { Link } from 'react-router-dom';
 
 const headerStyle = {
-  display: "flex",
-  backgroundColor: "#26c6da",
-  justifyContent: "space-between",
-  padding: 10
+  display: 'flex',
+  backgroundColor: '#26c6da',
+  justifyContent: 'space-between',
+  padding: 10,
 };
 
 const linkStyle = {
-  color: "white",
-  textDecoration: "underline"
+  color: 'white',
+  textDecoration: 'underline',
 };
 
 export default () => (
@@ -26,7 +26,7 @@ export default () => (
               </Link>
             </h3>
 
-            {props.oidcUser ? (
+            {props.oidcUser || !props.isEnabled ? (
               <ul>
                 <li>
                   <Link style={linkStyle} to="/dashboard">

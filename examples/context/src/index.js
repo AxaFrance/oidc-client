@@ -12,6 +12,7 @@ const App = () => (
       <AuthenticationProvider
         configuration={oidcConfiguration}
         loggerLevel={oidcLog.DEBUG}
+        isEnabled={true}
       >
         <Header />
         <Routes />
