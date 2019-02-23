@@ -21,10 +21,7 @@ import { Authenticating } from '../OidcComponents';
 
 const withContext = fromRenderProps(
   AuthenticationConsumer,
-  ({ isEnabled, authenticating }) => { 
-    console.log({isEnabled, authenticating})
-    return { isEnabled, authenticating }
-  },
+  ({ isEnabled, authenticating }) => ({ isEnabled, authenticating })
 );
 
 const lifecycleComponent = {
