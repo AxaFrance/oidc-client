@@ -1,11 +1,12 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { AuthenticationContext } from "./AuthenticationContextCreator";
-import { OidcRoutes } from "../Routes";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { AuthenticationContext } from './AuthenticationContextCreator';
+import { OidcRoutes } from '../Routes';
 
 const propTypes = {
   notAuthentified: PropTypes.node,
   notAuthorized: PropTypes.node,
+  authenticating: PropTypes.node,
   isLoading: PropTypes.bool.isRequired,
   isEnabled: PropTypes.bool,
   // eslint-disable-next-line
@@ -18,6 +19,7 @@ const propTypes = {
 const defaultProps = {
   notAuthentified: null,
   notAuthorized: null,
+  authenticating: null,
   isEnabled: true
 };
 
@@ -44,11 +46,7 @@ const AuthenticationProviderComponent = ({
       isEnabled
     }}
   >
-    <OidcRoutes
-      notAuthentified={notAuthentified}
-      notAuthorized={notAuthorized}
-      authenticating={authenticating}
-    >
+    <OidcRoutes notAuthentified={notAuthentified} notAuthorized={notAuthorized}>
       {children}
     </OidcRoutes>
   </AuthenticationContext.Provider>
