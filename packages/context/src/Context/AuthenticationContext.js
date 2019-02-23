@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { AuthenticationContext } from './AuthenticationContextCreator';
-import { OidcRoutes } from '../Routes';
+import React from "react";
+import PropTypes from "prop-types";
+import { AuthenticationContext } from "./AuthenticationContextCreator";
+import { OidcRoutes } from "../Routes";
 
 const propTypes = {
   notAuthentified: PropTypes.node,
@@ -12,13 +12,13 @@ const propTypes = {
   oidcUser: PropTypes.object, //TODO : récuperer le proptypes depuis OIDC client ?
   error: PropTypes.string.isRequired,
   login: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired
 };
 
 const defaultProps = {
   notAuthentified: null,
   notAuthorized: null,
-  isEnabled: true,
+  isEnabled: true
 };
 
 const AuthenticationProviderComponent = ({
@@ -30,7 +30,8 @@ const AuthenticationProviderComponent = ({
   logout,
   notAuthentified,
   notAuthorized,
-  children,
+  authenticating,
+  children
 }) => (
   <AuthenticationContext.Provider
     value={{
@@ -39,10 +40,15 @@ const AuthenticationProviderComponent = ({
       error,
       login,
       logout,
-      isEnabled,
+      authenticating,
+      isEnabled
     }}
   >
-    <OidcRoutes notAuthentified={notAuthentified} notAuthorized={notAuthorized}>
+    <OidcRoutes
+      notAuthentified={notAuthentified}
+      notAuthorized={notAuthorized}
+      authenticating={authenticating}
+    >
       {children}
     </OidcRoutes>
   </AuthenticationContext.Provider>

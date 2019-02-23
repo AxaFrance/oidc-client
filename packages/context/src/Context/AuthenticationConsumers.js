@@ -21,7 +21,10 @@ import { Authenticating } from '../OidcComponents';
 
 const withContext = fromRenderProps(
   AuthenticationConsumer,
-  ({ isEnabled }) => ({ isEnabled }),
+  ({ isEnabled, authenticating }) => { 
+    console.log({isEnabled, authenticating})
+    return { isEnabled, authenticating }
+  },
 );
 
 const lifecycleComponent = {
@@ -32,7 +35,10 @@ const lifecycleComponent = {
   },
 };
 
-const wrapAuthenticating = () => <Authenticating />;
+const wrapAuthenticating = ({authenticating}) => {
+  const AuthenticatingComponent = authenticating || Authenticating;
+  return <AuthenticatingComponent />;
+} 
 const Dummy = ({ children }) => <Fragment>{children}</Fragment>;
 
 export const withOidcSecure = compose(
