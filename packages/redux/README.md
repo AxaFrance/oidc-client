@@ -17,7 +17,7 @@ The library need it to manage and normalise http redirection.
  The default routes used internally :
  - www.your-app.fr/authentication/callback
 - www.your-app.fr/authentication/silent_callback
-- www.your-app.fr/authentication/not-authentified
+- www.your-app.fr/authentication/not-authenticated
 - www.your-app.fr/authentication/not-authorized
 
 

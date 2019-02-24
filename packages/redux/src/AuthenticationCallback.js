@@ -26,7 +26,7 @@ const AuthenticationCallback = ({ history, userManager }) => {
   const errorCallback = error => {
     const { message } = error;
     logError(`There was an error handling the token callback: ${message}`);
-    history.push(`/authentication/not-authentified?message=${message}`);
+    history.push(`/authentication/not-authenticated?message=${message}`);
   };
 
   return (
