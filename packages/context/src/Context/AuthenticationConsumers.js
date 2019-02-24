@@ -18,7 +18,7 @@ import {
   isRequireAuthentication,
 } from '../Services';
 import { Authenticating } from '../OidcComponents';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 
 const withContext = fromRenderProps(
   AuthenticationConsumer,
@@ -36,7 +36,7 @@ const lifecycleComponent = {
 const wrapAuthenticating = ({ authenticating }) => {
   const AuthenticatingComponent = authenticating || Authenticating;
   return <AuthenticatingComponent />;
-}
+};
 
 wrapAuthenticating.propTypes = {
   authenticating: PropTypes.node
@@ -44,7 +44,7 @@ wrapAuthenticating.propTypes = {
 
 wrapAuthenticating.defaultProps = {
   authenticating: null
-}
+};
 
 const Dummy = ({ children }) => <Fragment>{children}</Fragment>;
 
