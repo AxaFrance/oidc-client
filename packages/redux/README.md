@@ -17,7 +17,7 @@ The library need it to manage and normalise http redirection.
  The default routes used internally :
  - www.your-app.fr/authentication/callback
 - www.your-app.fr/authentication/silent_callback
-- www.your-app.fr/authentication/not-authentified
+- www.your-app.fr/authentication/not-authenticated
 - www.your-app.fr/authentication/not-authorized
 
 
@@ -71,7 +71,7 @@ The optional parameter "isEnabled" allows you to enable or disable authenticatio
 "Authentificationprovider" accept the following properties :
  ```javascript
 const propTypes = {
-  notAuthentified: PropTypes.node, // react component displayed during authentication
+  notAuthenticated: PropTypes.node, // react component displayed during authentication
   notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js

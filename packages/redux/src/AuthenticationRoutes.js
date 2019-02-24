@@ -15,7 +15,7 @@ const AuthenticationRoutes = (notAuthenticated, notAuthorized) => ({ match }) =>
         path={`${match.url}/signin-silent-callback`}
         component={AuthenticationSignSilentCallback}
       />
-      <Route path={`${match.url}/not-authentified`} component={notAuthenticatedComponent} />
+      <Route path={`${match.url}/not-authenticated`} component={notAuthenticatedComponent} />
       <Route path={`${match.url}/not-authorized`} component={notAuthorizedComponent} />
     </Switch>
   );

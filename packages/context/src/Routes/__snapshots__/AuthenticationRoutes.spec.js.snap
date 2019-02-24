@@ -12,7 +12,7 @@ exports[`Authenticating test suite renders correctly 1`] = `
   />
   <Route
     component="NotAuthenticated"
-    path="http://url.com/not-authentified"
+    path="http://url.com/not-authenticated"
   />
   <Route
     component="NotAuthorized"

@@ -20,7 +20,7 @@ The default routes used internally :
 
 - www.your-app.fr/authentication/callback
 - www.your-app.fr/authentication/silent_callback
-- www.your-app.fr/authentication/not-authentified
+- www.your-app.fr/authentication/not-authenticated
 - www.your-app.fr/authentication/not-authorized
 
 ```javascript
@@ -53,7 +53,7 @@ render(<App />, document.getElementById('root'));
 
 ```javascript
 const propTypes = {
-  notAuthentified: PropTypes.node, // react component displayed during authentication
+  notAuthenticated: PropTypes.node, // react component displayed during authentication
   notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
   authenticating: PropTypes.node, // react component displayed when about to redirect user to be authenticated
   configuration: PropTypes.shape({
@@ -162,7 +162,7 @@ export default () => (
 ### How to consume : HOC method (Layout/Header.js)
 
 "withOidcUser" function act like "AuthenticationConsumer" below.
-"OidcSecure" component trigger authentication in case user is not authentified. So, the children of that component can be accessible only once you are connected.
+"OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
 
 ```javascript
 import React from 'react';
@@ -182,7 +182,7 @@ export default withOidcUser(Admin);
 
 ### How to secure a component (Router/Routes.js)
 
-"withOidcSecure" act the same as "OidcSecure" it also trigger authentication in case user is not authentified.
+"withOidcSecure" act the same as "OidcSecure" it also trigger authentication in case user is not authenticated.
 
 ```javascript
 import React from 'react';

@@ -27,7 +27,7 @@ describe('Callback container tests suite', () => {
 
   it('Should push on error message when onError is call', () => {
     container.onRedirectError({ history })({ message: 'errorMessage' });
-    expect(history.push).toBeCalledWith('/authentication/not-authentified?message=errorMessage');
+    expect(history.push).toBeCalledWith('/authentication/not-authenticated?message=errorMessage');
   });
 
   it('Should call signinRedirectCallback and onRedirectSuccess when call componentDidMount', async () => {

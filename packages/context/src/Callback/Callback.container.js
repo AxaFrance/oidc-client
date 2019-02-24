@@ -16,7 +16,7 @@ export const onRedirectSuccess = ({ history }) => user => {
 export const onRedirectError = ({ history }) => error => {
   const { message } = error;
   oidcLog.error(`There was an error handling the token callback: ${error.message}`);
-  history.push(`/authentication/not-authentified?message=${message}`);
+  history.push(`/authentication/not-authenticated?message=${message}`);
 };
 
 export const componentDidMountFunction = async props => {

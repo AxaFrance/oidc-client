@@ -4,7 +4,7 @@ import { AuthenticationContext } from './AuthenticationContextCreator';
 import { OidcRoutes } from '../Routes';
 
 const propTypes = {
-  notAuthentified: PropTypes.node,
+  notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
   authenticating: PropTypes.node,
   isLoading: PropTypes.bool.isRequired,
@@ -17,7 +17,7 @@ const propTypes = {
 };
 
 const defaultProps = {
-  notAuthentified: null,
+  notAuthenticated: null,
   notAuthorized: null,
   authenticating: null,
   isEnabled: true
@@ -30,7 +30,7 @@ const AuthenticationProviderComponent = ({
   error,
   login,
   logout,
-  notAuthentified,
+  notAuthenticated,
   notAuthorized,
   authenticating,
   children
@@ -46,7 +46,7 @@ const AuthenticationProviderComponent = ({
       isEnabled
     }}
   >
-    <OidcRoutes notAuthentified={notAuthentified} notAuthorized={notAuthorized}>
+    <OidcRoutes notAuthenticated={notAuthenticated} notAuthorized={notAuthorized}>
       {children}
     </OidcRoutes>
   </AuthenticationContext.Provider>

@@ -12,7 +12,7 @@ describe('Authenticating test suite', () => {
   it('renders correctly', () => {
     const props = {
       children: 'http://url.com',
-      notAuthentified: 'notAuthentified',
+      notAuthenticated: 'notAuthenticated',
       notAuthorized: 'notAuthorized',
     };
 
