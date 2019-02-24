@@ -71,7 +71,7 @@ The optional parameter "isEnabled" allows you to enable or disable authenticatio
 "Authentificationprovider" accept the following properties :
  ```javascript
 const propTypes = {
-  notAuthentified: PropTypes.node, // react component displayed during authentication
+  notAuthenticated: PropTypes.node, // react component displayed during authentication
   notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js

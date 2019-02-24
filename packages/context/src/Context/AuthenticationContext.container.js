@@ -21,7 +21,7 @@ import AuthenticationProviderComponent from './AuthenticationContext';
 import { AuthenticationContext } from './AuthenticationContextCreator';
 
 const propTypes = {
-  notAuthentified: PropTypes.node,
+  notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired,
@@ -45,7 +45,7 @@ const propTypes = {
 };
 
 const defaultProps = {
-  notAuthentified: null,
+  notAuthenticated: null,
   notAuthorized: null,
   isEnabled: true,
   loggerLevel: 0,

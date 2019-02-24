@@ -6,7 +6,7 @@ import OidcRoutes from './OidcRoutes';
 import authenticationService, { getUserManager } from './authenticationService';
 
 const propTypes = {
-  notAuthentified: PropTypes.node,
+  notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
   // eslint-disable-next-line
   configuration: PropTypes.object.isRequired,
@@ -16,7 +16,7 @@ const propTypes = {
 };
 
 export const OidcBase = props => {
-  const { isEnabled, children, store, notAuthentified, notAuthorized } = props;
+  const { isEnabled, children, store, notAuthenticated, notAuthorized } = props;
 
   if (!isEnabled) {
     return <Fragment>{children}</Fragment>;
@@ -25,7 +25,7 @@ export const OidcBase = props => {
   return (
     <OidcProvider store={store} userManager={getUserManager()}>
       <OidcRoutes
-        notAuthentified={notAuthentified}
+        notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
       >
         {children}
@@ -47,7 +47,7 @@ const lifecycleComponent = {
 };
 
 const defaultPropsObject = {
-  notAuthentified: null,
+  notAuthenticated: null,
   notAuthorized: null,
   isEnabled: true,
   children: null,

@@ -53,7 +53,7 @@ render(<App />, document.getElementById('root'));
 
 ```javascript
 const propTypes = {
-  notAuthentified: PropTypes.node, // react component displayed during authentication
+  notAuthenticated: PropTypes.node, // react component displayed during authentication
   notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
   authenticating: PropTypes.node, // react component displayed when about to redirect user to be authenticated
   configuration: PropTypes.shape({
