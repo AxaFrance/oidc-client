@@ -55,6 +55,7 @@ render(<App />, document.getElementById('root'));
 const propTypes = {
   notAuthentified: PropTypes.node, // react component displayed during authentication
   notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
+  authenticating: PropTypes.node, // react component displayed when about to redirect user to be authenticated
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
     redirect_uri: PropTypes.string.isRequired,

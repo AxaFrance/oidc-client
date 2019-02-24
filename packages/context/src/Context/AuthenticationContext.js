@@ -6,19 +6,21 @@ import { OidcRoutes } from '../Routes';
 const propTypes = {
   notAuthentified: PropTypes.node,
   notAuthorized: PropTypes.node,
+  authenticating: PropTypes.node,
   isLoading: PropTypes.bool.isRequired,
   isEnabled: PropTypes.bool,
   // eslint-disable-next-line
   oidcUser: PropTypes.object, //TODO : récuperer le proptypes depuis OIDC client ?
   error: PropTypes.string.isRequired,
   login: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired
 };
 
 const defaultProps = {
   notAuthentified: null,
   notAuthorized: null,
-  isEnabled: true,
+  authenticating: null,
+  isEnabled: true
 };
 
 const AuthenticationProviderComponent = ({
@@ -30,7 +32,8 @@ const AuthenticationProviderComponent = ({
   logout,
   notAuthentified,
   notAuthorized,
-  children,
+  authenticating,
+  children
 }) => (
   <AuthenticationContext.Provider
     value={{
@@ -39,7 +42,8 @@ const AuthenticationProviderComponent = ({
       error,
       login,
       logout,
-      isEnabled,
+      authenticating,
+      isEnabled
     }}
   >
     <OidcRoutes notAuthentified={notAuthentified} notAuthorized={notAuthorized}>
