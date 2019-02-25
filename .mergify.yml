@@ -1,9 +1,9 @@
-rules:
-  default:
-    protection:
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-      required_status_checks:
-        contexts:
-        - WIP
-        - af-react-oidc-github.CI
+pull_request_rules:
+  - name: automatic merge on approval and CI pass
+    conditions:
+      - '#approved-reviews-by>=1'
+      - status-success=af-react-oidc-github.CI
+      - label!=WIP
+    actions:
+      merge:
+        method: squash
