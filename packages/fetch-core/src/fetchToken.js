@@ -7,18 +7,23 @@ const getAccessToken = user => () => {
 
 export const fetchWithToken = (fetch, getAccessTokenInjected) => async (
   url,
-  options = { method: 'GET' }
+  options = { method: "GET" }
 ) => {
   // eslint-disable-next-line
-  const headers = options.headers || new Headers();
+  let headers = new Headers();
+  // eslint-disable-next-line
+  if (options.headers && !(options.headers instanceof Headers)) {
+    // eslint-disable-next-line
+    headers = new Headers(options.headers);
+  }
 
   const accessToken = getAccessTokenInjected();
-  if (!headers.has('Accept')) {
-    headers.set('Accept', 'application/json');
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/json");
   }
   if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`);
-    headers.set('Credentials', 'same-origin');
+    headers.set("Authorization", `Bearer ${accessToken}`);
+    headers.set("Credentials", "same-origin");
   }
   const newOptions = Object.assign(options, { headers });
   const response = await fetch(url, newOptions);
@@ -29,9 +34,12 @@ export const fetchWrapper = fetchWithTokenInjected => getAccessTokenInjected => 
   fetch = undefined
 ) => props => {
   const previousFetch = fetch || props.fetch;
-  const newFetch = fetchWithTokenInjected(previousFetch, getAccessTokenInjected(props.user));
+  const newFetch = fetchWithTokenInjected(
+    previousFetch,
+    getAccessTokenInjected(props.user)
+  );
   const newProps = {
-    fetch: newFetch,
+    fetch: newFetch
   };
   return newProps;
 };

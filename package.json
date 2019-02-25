@@ -21,7 +21,8 @@
     "dev:js": "lerna exec --parallel -- cross-env-shell node \\$LERNA_ROOT_PATH/scripts/watch-js.js",
     "dev:ts": "lerna exec --parallel -- cross-env-shell node \\$LERNA_ROOT_PATH/scripts/watch-ts.js",
     "precommit": "lint-staged",
-    "prepare": "node ./scripts/npm.js"
+    "prepare": "node ./scripts/npm.js",
+    "changelog": "auto-changelog --unreleased --commit-limit false --template changelog-template.hbs -p  --output ./CHANGELOG.md"
   },
   "lint-staged": {
     "linters": {
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@angular/compiler": "^7.0.3",
     "@angular/core": "^7.0.3",
+    "auto-changelog": "^1.10.2",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.1",
