@@ -1,9 +1,9 @@
-import React, { Fragment } from 'react';
-import { OidcProvider, loadUser } from 'redux-oidc';
-import { compose, lifecycle, defaultProps } from 'recompose';
-import PropTypes from 'prop-types';
-import OidcRoutes from './OidcRoutes';
-import authenticationService, { getUserManager } from './authenticationService';
+import React, { Fragment } from "react";
+import { OidcProvider, loadUser } from "redux-oidc";
+import { compose, lifecycle } from "recompose";
+import PropTypes from "prop-types";
+import OidcRoutes from "./OidcRoutes";
+import authenticationService, { getUserManager } from "./authenticationService";
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
@@ -12,7 +12,14 @@ const propTypes = {
   configuration: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
-  children: PropTypes.node,
+  children: PropTypes.node
+};
+
+const defaultPropsObject = {
+  notAuthenticated: null,
+  notAuthorized: null,
+  isEnabled: true,
+  children: null
 };
 
 export const OidcBase = props => {
@@ -35,6 +42,7 @@ export const OidcBase = props => {
 };
 
 OidcBase.propTypes = propTypes;
+OidcBase.defaultProps = defaultPropsObject;
 
 const lifecycleComponent = {
   componentWillMount() {
@@ -43,19 +51,9 @@ const lifecycleComponent = {
       const userManager = authenticationService(configuration);
       loadUser(store, userManager);
     }
-  },
+  }
 };
 
-const defaultPropsObject = {
-  notAuthenticated: null,
-  notAuthorized: null,
-  isEnabled: true,
-  children: null,
-};
-
-const enhance = compose(
-  defaultProps(defaultPropsObject),
-  lifecycle(lifecycleComponent),
-);
+const enhance = compose(lifecycle(lifecycleComponent));
 
 export default enhance(OidcBase);
