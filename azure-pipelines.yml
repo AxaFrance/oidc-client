@@ -85,5 +85,7 @@ steps:
 
   - script: |
       npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
+      node ./scripts/publish-changelog.js $(Github.Token)
+      node ./scripts/twitter.js $(Twitter.consumer_key) $(Twitter.consumer_secret) $(Twitter.access_token) $(Twitter.access_token_secret)
     displayName: 'lerna publish'
     condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))

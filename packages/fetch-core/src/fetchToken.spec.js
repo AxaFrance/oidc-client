@@ -16,6 +16,11 @@ describe('redux-fetch.fetchToken', () => {
     });
     const fetchResponse = await fetchWithToken(fetch, getAccessToken)('/a-url');
     expect(fetchResponse).toBe(response);
+
+    const fetchResponseWithCustomHeader = await fetchWithToken(fetch, getAccessToken)('/a-url', {
+      customHeader: 'customHeader',
+    });
+    expect(fetchResponseWithCustomHeader).toBe(response);
   });
 
   it('should select and wrap fetch', async () => {
