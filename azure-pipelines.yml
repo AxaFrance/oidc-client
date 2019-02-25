@@ -53,14 +53,11 @@ steps:
   - script: |
       npm test -- --coverage
       npm run lint
-      npm install -g codecov
-      codecov
     displayName: 'npm test and lint'
 
   - script: |
       npm run build:example:redux
       npm run build:example:context
-      codecov
     displayName: 'build demos'
 
   - script: |
