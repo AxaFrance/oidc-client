@@ -27,7 +27,7 @@ We advise to use the callback route bellow :
   <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.js"></script>
 <![endif]-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client/1.6.1/oidc-client.js"></script>
-<script src="https://raw.githubusercontent.com/AxaGuilDEv/react-oidc/master/packages/vanilla/src/vanilla-oidc.js"></script>
+<script src="https://rawcdn.githack.com/AxaGuilDEv/react-oidc/master/packages/vanilla/src/vanilla-oidc.js"></script>
 ```
 
 "Authentificationprovider" accept the following properties :
