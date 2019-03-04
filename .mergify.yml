@@ -1,8 +1,8 @@
 pull_request_rules:
   - name: automatic merge on approval and CI pass
     conditions:
-      - '#approved-reviews-by>=1'
-      - status-success=af-react-oidc-github.CI
+      - "#approved-reviews-by>=1"
+      - status-success=AxaGuilDEv.react-oidc
       - label!=WIP
     actions:
       merge:
