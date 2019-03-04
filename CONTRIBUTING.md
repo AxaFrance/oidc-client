@@ -23,6 +23,9 @@ $ npm run example:redux
 
 # Demo using new react context as state management
 $ npm run example:context
+
+# Demo in pure vanilla js
+$ npm run example:vanilla
 ```
 
 ## How to develop on package

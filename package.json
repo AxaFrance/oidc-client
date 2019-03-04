@@ -10,6 +10,7 @@
     "publish": "lerna publish",
     "example:redux": "npm -C ./examples/redux run start",
     "example:context": "npm -C ./examples/context run start",
+    "example:vanilla": "npm -C ./examples/vanilla run start",
     "build:example:redux": "npm -C ./examples/redux run build",
     "build:example:context": "npm -C ./examples/context run build",
     "test": "jest --config=jest.config.js",
