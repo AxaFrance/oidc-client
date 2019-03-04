@@ -1,5 +1,5 @@
 ﻿/* eslint-disable */
-window.oidcWithRouter = (function(Oidc) {
+window.vanillaOidc = (function(Oidc) {
   var userManager = null;
   var configuration = configuration;
   let state = { oidcUser: null };
