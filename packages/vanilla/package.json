@@ -1,0 +1,25 @@
+{
+  "name": "@axa-fr/vanillajs-oidc",
+  "version": "1.2.0",
+  "private": false,
+  "main": "dist/vanillajs-oidc.js",
+  "jsnext:main": "src/index.js",
+  "description": "OpenID Connect & OAuth authentication using oidc-client wrapped in order to simplify how to use it",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+  },
+  "keywords": [
+    "oidc",
+    "openid",
+    "oauth2"
+  ],
+  "scripts": {
+    "prepare": "node ../../scripts/prepare.js"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
