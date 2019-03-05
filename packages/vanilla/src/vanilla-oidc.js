@@ -1,12 +1,10 @@
 ﻿/* eslint-disable */
 window.vanillaOidc = (function(Oidc) {
   var userManager = null;
-  var configuration = configuration;
   let state = { oidcUser: null };
 
   function init(config) {
     userManager = new Oidc.UserManager(config);
-    configuration = config;
     var events = userManager.events;
     events.addUserLoaded(onUserLoaded);
     events.addSilentRenewError(onError);
@@ -42,7 +40,6 @@ window.vanillaOidc = (function(Oidc) {
     state = {
       oidcUser: user
     };
-    console.log(user);
   }
 
   function onUserUnloaded() {

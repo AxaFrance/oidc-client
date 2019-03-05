@@ -22,6 +22,8 @@ We advise to use the callback route bellow :
 - www.your-app.fr/authentication/not-authenticated
 - www.your-app.fr/authentication/not-authorized
 
+Add the scripts bellow in your html file :
+
 ```html
 <!--[if (IE)]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.js"></script>
@@ -101,7 +103,7 @@ window.vanillaOidc.init(configuration).then(function(status) {
 });
 ```
 
-All your server side callback route should redirect to your javascript application (configured with our library).
+Your server side callback route should redirect to your javascript application (configured with our library).
 
 ```csharp
 using System;
@@ -145,3 +147,7 @@ namespace MS.Experiences.Web
     }
 }
 ```
+
+## Example
+
+- [`create react app & vanilla`](./examples/vanilla)

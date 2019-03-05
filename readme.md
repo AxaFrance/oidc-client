@@ -42,11 +42,13 @@ Two version of the component with different "State management" are available :
 - [`@axa-fr/react-oidc-redux`](./packages/redux#readme)
 - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme)
 - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme)
+- [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme)
 
 ## Examples
 
 - [`create react app & context api`](./examples/context)
 - [`create react app & redux`](./examples/redux)
+- [`create react app & vanilla`](./examples/vanilla)
 
 ## How It Works
 

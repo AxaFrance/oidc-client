@@ -37,7 +37,7 @@ steps:
       extraProperties: |
         # Additional properties that will be passed to the scanner, 
         # Put one key=value per line, example:
-        sonar.exclusions=**/*.stories.js,**/*.spec.js,**/*.spec.ts,scripts/**,coverage/**,**/node_modules/**,**/dist/**,**/__mocks__/**,examples/**,jest.config.js
+        sonar.exclusions=**/*.stories.js,**/*.spec.js,**/*.spec.ts,scripts/**,coverage/**,**/node_modules/**,**/dist/**,**/__mocks__/**,examples/**,jest.config.js,packages/vanilla/**
         sonar.javascript.lcov.reportPaths=coverage/lcov.info
         sonar.sourceEncoding=UTF-8
         sonar.verbose=true
@@ -52,13 +52,21 @@ steps:
 
   - script: |
       npm test -- --coverage
-      npm run lint
-    displayName: 'npm test and lint'
+    displayName: 'npm test'
 
-  - script: |
-      npm run build:example:redux
-      npm run build:example:context
-    displayName: 'build demos'
+   - script: |
+      npm test -- --coverage
+      npm run lint
+    displayName: 'npm lint'
+
+  - script: npm run build:example:redux
+    displayName: 'build demos redux'
+
+  - script: npm run build:example:context
+    displayName: 'build demos context'
+
+  - script: npm run build:example:vanilla
+    displayName: 'build demos vanilla'
 
   - script: |
       git config --global user.email "build-ci@axa.fr"

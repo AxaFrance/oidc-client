@@ -2,7 +2,7 @@
   "name": "@axa-fr/vanilla-oidc",
   "version": "1.2.0",
   "private": true,
-  "main": "dist/vanilla-oidc.js",
+  "main": "dist/index.js",
   "jsnext:main": "src/index.js",
   "description": "OpenID Connect & OAuth authentication using oidc-client wrapped in order to simplify how to use it",
   "repository": {
