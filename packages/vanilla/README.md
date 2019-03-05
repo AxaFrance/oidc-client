@@ -6,14 +6,43 @@ Wrap of ["oidc client"](https://github.com/IdentityModel/oidc-client-js) library
 This library aim to simplify the migration of our all authentification system to OIDC using "implicit" flow.
 The library is built in vanilla js in order to be used with old javascript librairies like : anuglarjs, jquery, etc.
 
-## Getting Started
+### Getting Started es6
 
 ```sh
 npm install @axa-fr/vanilla-oidc --save
-
 ```
 
-### Application startup (index.js)
+```javascript
+import vanillaOidc from "@axa-fr/vanilla-oidc";
+
+const configuration = {
+  client_id: "implicit",
+  redirect_uri: "http://localhost:3000/authentication/callback",
+  response_type: "id_token token",
+  post_logout_redirect_uri: "http://localhost:3000/",
+  scope: "openid profile email",
+  authority: "https://demo.identityserver.io",
+  silent_redirect_uri: "http://localhost:3000/authentication/silent_callback",
+  automaticSilentRenew: true,
+  loadUserInfo: true,
+  triggerAuthFlow: true
+};
+
+// vanillaOidc.init(configuration) must always be the root of your application because it is used to manage all routes callback
+vanillaOidc.init(configuration).then(function(status) {
+  if (status.type !== "callback") {
+    if (!status.user) {
+      // start the signin
+      vanillaOidc.signinRedirect();
+    } else {
+      // run you application
+      alert("My application started");
+    }
+  }
+});
+```
+
+### Getting Started es5
 
 We advise to use the callback route bellow :
 
@@ -88,6 +117,7 @@ app.config([
 
 app.run([function() {}]);
 
+// vanillaOidc.init(configuration) must always be the root of your application because it is used to manage all routes callback
 window.vanillaOidc.init(configuration).then(function(status) {
   if (status.type !== "callback") {
     if (!status.user) {
@@ -151,3 +181,13 @@ namespace MS.Experiences.Web
 ## Example
 
 - [`create react app & vanilla`](../../examples/vanilla)
+
+## Polyfill
+
+For IE this library need a Polyfill for the es6 Promise compatibility. For example :
+
+```html
+<!--[if (IE)]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.js"></script>
+<![endif]-->
+```
