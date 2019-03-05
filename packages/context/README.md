@@ -206,4 +206,4 @@ export default Routes;
 
 ## Example
 
-- [`create react app & context`](./examples/context)
+- [`create react app & context`](../../examples/context)

@@ -150,4 +150,4 @@ namespace MS.Experiences.Web
 
 ## Example
 
-- [`create react app & vanilla`](./examples/vanilla)
+- [`create react app & vanilla`](../../examples/vanilla)

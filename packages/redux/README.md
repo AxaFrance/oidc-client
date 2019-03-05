@@ -170,4 +170,4 @@ npm start
 
 ## Example
 
-- [`create react app & redux`](./examples/redux)
+- [`create react app & redux`](../../examples/redux)
