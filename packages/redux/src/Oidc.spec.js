@@ -2,7 +2,6 @@
 import React from "react";
 import renderer from "react-test-renderer";
 import { mount } from "enzyme";
-import { loadUser } from "redux-oidc";
 
 import Oidc from "./Oidc";
 
@@ -27,11 +26,5 @@ describe("redux.Oidc", () => {
     );
     const tree = component.toJSON();
     expect(tree).toMatchSnapshot();
-  });
-
-  it("should call loadUser when component mounts even if isEnabled prop is not set", () => {
-    mount(<Oidc store={{}} configuration={{}} />);
-
-    // expect(loadUser).toHaveBeenCalled();
   });
 });
