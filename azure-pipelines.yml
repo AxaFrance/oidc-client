@@ -4,18 +4,18 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 pool:
-  vmImage: 'Ubuntu 16.04'
+  vmImage: "Ubuntu 16.04"
 
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: '8.x'
-    displayName: 'Install Node.js'
+      versionSpec: "8.x"
+    displayName: "Install Node.js"
 
   - task: jessehouwing.jessehouwing-vsts-variable-tasks.vsts-variable-transform.VariableTransformTask@1
-    displayName: 'Transform value $(Build.SourceBranch) and assign to variable: SmartBrancheName'
+    displayName: "Transform value $(Build.SourceBranch) and assign to variable: SmartBrancheName"
     inputs:
-      value: '$(Build.SourceBranch)'
+      value: "$(Build.SourceBranch)"
       variableName: SmartBranchName
       searchReplace: true
       searchValue: refs/heads/
@@ -26,14 +26,14 @@ steps:
       pad: false
 
   - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
-    displayName: 'Prepare analysis on SonarCloud'
+    displayName: "Prepare analysis on SonarCloud"
     inputs:
       SonarCloud: SonarCloud
       organization: axaguildev
       scannerMode: CLI
       configMode: manual
-      cliProjectKey: 'AxaGuilDEv_react-oidc'
-      cliProjectName: 'react-oidc'
+      cliProjectKey: "AxaGuilDEv_react-oidc"
+      cliProjectName: "react-oidc"
       extraProperties: |
         # Additional properties that will be passed to the scanner, 
         # Put one key=value per line, example:
@@ -48,25 +48,22 @@ steps:
   - script: |
       npm install
       npm run bootstrap
-    displayName: 'npm install and bootstrap'
+    displayName: "npm install and bootstrap"
 
-  - script: |
-      npm test -- --coverage
-    displayName: 'npm test'
+  - script: npm test -- --coverage
+    displayName: "npm test"
 
-   - script: |
-      npm test -- --coverage
-      npm run lint
-    displayName: 'npm lint'
+  - script: npm run lint
+    displayName: "npm lint"
 
   - script: npm run build:example:redux
-    displayName: 'build demos redux'
+    displayName: "build demos redux"
 
   - script: npm run build:example:context
-    displayName: 'build demos context'
+    displayName: "build demos context"
 
   - script: npm run build:example:vanilla
-    displayName: 'build demos vanilla'
+    displayName: "build demos vanilla"
 
   - script: |
       git config --global user.email "build-ci@axa.fr"
@@ -77,20 +74,20 @@ steps:
       node ./scripts/npm.js $(NPM_TOKEN)
       cp .npmrc $HOME/.npmrc
       git status
-    displayName: 'configuration'
+    displayName: "configuration"
     condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
 
   - task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
-    displayName: 'Run Code Analysis'
+    displayName: "Run Code Analysis"
     condition: and(succeeded(), eq(variables['System.PullRequest.IsFork'], 'False'))
 
   - task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@1
-    displayName: 'Publish Quality Gate Result'
+    displayName: "Publish Quality Gate Result"
     condition: and(succeeded(), eq(variables['System.PullRequest.IsFork'], 'False'))
 
   - script: |
       npm run publish -- $(Npm.Publish.Version) --yes --concurrency 1 --force-publish
       node ./scripts/publish-changelog.js $(Github.Token)
       node ./scripts/twitter.js $(Twitter.consumer_key) $(Twitter.consumer_secret) $(Twitter.access_token) $(Twitter.access_token_secret)
-    displayName: 'lerna publish'
+    displayName: "lerna publish"
     condition: and(succeeded(), ne(variables['Npm.Publish.Version'], 'none'))
