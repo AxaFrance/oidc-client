@@ -20,8 +20,8 @@
     "prepare": "node ../../scripts/prepare.js"
   },
   "peerDependencies": {
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2"
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2"
   },
   "dependencies": {
     "oidc-client": "^1.7.0",

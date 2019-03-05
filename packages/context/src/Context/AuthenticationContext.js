@@ -1,7 +1,7 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { AuthenticationContext } from "./AuthenticationContextCreator";
-import { OidcRoutes } from "../Routes";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { AuthenticationContext } from './AuthenticationContextCreator';
+import { OidcRoutes } from '../Routes';
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
@@ -16,15 +16,17 @@ const propTypes = {
   logout: PropTypes.func.isRequired,
   configuration: PropTypes.shape({
     redirect_uri: PropTypes.string.isRequired,
-    silent_redirect_uri: PropTypes.string.isRequired
-  }).isRequired
+    silent_redirect_uri: PropTypes.string.isRequired,
+  }).isRequired,
+  isLogout: PropTypes.bool,
 };
 
 const defaultProps = {
   notAuthenticated: null,
   notAuthorized: null,
   authenticating: null,
-  isEnabled: true
+  isEnabled: true,
+  isLogout: false,
 };
 
 const AuthenticationProviderComponent = ({
@@ -38,7 +40,8 @@ const AuthenticationProviderComponent = ({
   notAuthorized,
   authenticating,
   configuration,
-  children
+  children,
+  isLogout,
 }) => (
   <AuthenticationContext.Provider
     value={{
@@ -48,7 +51,8 @@ const AuthenticationProviderComponent = ({
       login,
       logout,
       authenticating,
-      isEnabled
+      isEnabled,
+      isLogout,
     }}
   >
     <OidcRoutes
@@ -63,5 +67,7 @@ const AuthenticationProviderComponent = ({
 
 AuthenticationProviderComponent.propTypes = propTypes;
 AuthenticationProviderComponent.defaultProps = defaultProps;
+
+export const AuthenticationConsumer = AuthenticationContext.Consumer;
 
 export default AuthenticationProviderComponent;

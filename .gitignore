@@ -18,3 +18,4 @@ dist
 .npmrc
 examples/**/build/
 .scannerwork/
+.vscode/

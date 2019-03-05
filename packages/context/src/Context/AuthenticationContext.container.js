@@ -1,16 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
-import {
-  compose,
-  withHandlers,
-  withState,
-  lifecycle,
-  withProps,
-  fromRenderProps,
-  branch,
-  renderComponent,
-} from 'recompose';
 
 import {
   authenticationService,
@@ -20,11 +10,11 @@ import {
   oidcLog,
 } from '../Services';
 import AuthenticationProviderComponent from './AuthenticationContext';
-import { AuthenticationContext } from './AuthenticationContextCreator';
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
+  authenticating: PropTypes.node,
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired,
     redirect_uri: PropTypes.string.isRequired,
@@ -49,37 +39,10 @@ const propTypes = {
 const defaultProps = {
   notAuthenticated: null,
   notAuthorized: null,
+  authenticating: null,
   isEnabled: true,
   loggerLevel: 0,
   logger: console,
-};
-
-export const onUserLoaded = props => user => {
-  oidcLog.info(`User Loaded`);
-  props.setOidcState({
-    ...props.oidcState,
-    oidcUser: user,
-    isLoading: false,
-  });
-};
-
-export const onUserUnloaded = props => () => {
-  oidcLog.info(`User unloaded `);
-  props.setOidcState({
-    ...props.oidcState,
-    oidcUser: null,
-    isLoading: false,
-  });
-};
-
-export const onAccessTokenExpired = props => async () => {
-  oidcLog.info(`AccessToken Expired `);
-  props.setOidcState({
-    ...props.oidcState,
-    oidcUser: null,
-    isLoading: false,
-  });
-  await props.oidcState.userManager.signinSilent();
 };
 
 export const setDefaultState = ({ configuration, loggerLevel, logger, isEnabled }) => {
@@ -89,133 +52,129 @@ export const setDefaultState = ({ configuration, loggerLevel, logger, isEnabled 
     userManager: authenticationService(configuration),
     isLoading: false,
     error: '',
-    isFrozen: false,
+    isLogout: false,
     isEnabled,
   };
 };
 
-export const login = props => async () => {
-  props.setOidcState({
-    ...props.oidcState,
+export const login = (oidcState, setOidcState, location) => async () => {
+  setOidcState({
+    ...oidcState,
     oidcUser: null,
     isLoading: true,
   });
   oidcLog.info('Login requested');
-  await authenticateUser(props.oidcState.userManager, props.location)();
+  await authenticateUser(oidcState.userManager, location)();
 };
 
-export const logout = props => async () => {
-  props.setOidcState({
-    ...props.oidcState,
-    oidcUser: null,
-    isLoading: true,
-    isFrozen: true,
-  });
-  try {
-    await logoutUser(props.oidcState.userManager);
-    oidcLog.info('Logout successfull');
-  } catch (error) {
-    props.onError(error);
-  }
-};
-
-export const onError = props => error => {
+export const onError = (oidcState, setOidcState) => error => {
   oidcLog.error(`Error : ${error.message}`);
-  props.setOidcState({
-    ...props.oidcState,
+  setOidcState({
+    ...oidcState,
     error: error.message,
     isLoading: false,
   });
 };
 
-export const AuthenticationProviderComponentWithInit = WrappedComponent => {
-  class ConstructedComponent extends React.Component {
-    constructor(props) {
-      super(props);
-      setLogger(props.loggerLevel, props.logger);
-      const { events } = props.oidcState.userManager;
-      events.addUserLoaded(props.onUserLoaded);
-      events.addSilentRenewError(props.onError);
-      events.addUserUnloaded(props.onUserUnloaded);
-      events.addUserSignedOut(props.onUserUnloaded);
-      events.addAccessTokenExpired(props.onAccessTokenExpired);
-    }
-
-    shouldComponentUpdate(nextProps) {
-      // Hack to avoid resfreshing user before logout
-      oidcLog.info(`Protected component update : ${!nextProps.oidcState.isFrozen}`);
-      return !nextProps.oidcState.isFrozen;
-    }
-
-    render() {
-      return <WrappedComponent {...this.props} />;
-    }
+export const logout = (oidcState, setOidcState) => async () => {
+  setOidcState({
+    ...oidcState,
+    oidcUser: null,
+    isLoading: true,
+    isLogout: true,
+  });
+  try {
+    await logoutUser(oidcState.userManager);
+    oidcLog.info('Logout successfull');
+  } catch (error) {
+    onError(setOidcState, oidcState)(error);
   }
-
-  return ConstructedComponent;
 };
 
-export const withOidcState = withState('oidcState', 'setOidcState', setDefaultState);
+export const onUserLoaded = (oidcState, setOidcState) => user => {
+  oidcLog.info(`User Loaded`);
+  setOidcState({
+    ...oidcState,
+    oidcUser: user,
+    isLoading: false,
+  });
+};
 
-export const withOidcHandlers = withHandlers({
-  onError,
-  onUserLoaded,
-  onUserUnloaded,
-  onAccessTokenExpired,
-});
+export const onUserUnloaded = (oidcState, setOidcState) => () => {
+  oidcLog.info(`User unloaded `);
+  setOidcState({
+    ...oidcState,
+    oidcUser: null,
+    isLoading: false,
+  });
+};
 
-export const withSecondOidcHandlers = withHandlers({
-  login,
-  logout,
-});
+export const onAccessTokenExpired = (oidcState, setOidcState) => async () => {
+  oidcLog.info(`AccessToken Expired `);
+  setOidcState({
+    ...oidcState,
+    oidcUser: null,
+    isLoading: false,
+  });
+  await oidcState.userManager.signinSilent();
+};
 
-export const withOidcProps = withProps(({ oidcState }) => ({ ...oidcState }));
+const addOidcEvents = (events, oidcState, setOidcState) => {
+  events.addUserLoaded(onUserLoaded(oidcState, setOidcState));
+  events.addSilentRenewError(onError(oidcState, setOidcState));
+  events.addUserUnloaded(onUserUnloaded(oidcState, setOidcState));
+  events.addUserSignedOut(onUserUnloaded(oidcState, setOidcState));
+  events.addAccessTokenExpired(onAccessTokenExpired(oidcState, setOidcState));
+};
 
-export const withLifeCycle = lifecycle({
-  async componentDidMount() {
-    if (this.props.configuration) {
-      this.props.setOidcState({
-        ...this.props.oidcState,
-        isLoading: true,
-      });
+const removeEvents = (events, oidcState, setOidcState) => {
+  events.removeUserLoaded(onUserLoaded(oidcState, setOidcState));
+  events.removeSilentRenewError(onError(oidcState, setOidcState));
+  events.removeUserUnloaded(onUserUnloaded(oidcState, setOidcState));
+  events.removeUserSignedOut(onUserUnloaded(oidcState, setOidcState));
+  events.removeAccessTokenExpired(onAccessTokenExpired(oidcState, setOidcState));
+};
 
-      const user = await this.props.oidcState.userManager.getUser();
-      this.props.setOidcState({
-        ...this.props.oidcState,
+const AuthenticationProviderInt = ({ location, ...otherProps }) => {
+  const [oidcState, setOidcState] = useState(() => setDefaultState(otherProps));
+  const { oidcUser, isLoading, error, isEnabled, userManager, isLogout } = oidcState;
+  const loginCb = useCallback(() => login(oidcState, setOidcState, location)(), [
+    location,
+    oidcState,
+  ]);
+  const logoutCb = useCallback(() => logout(oidcState, setOidcState)(), [oidcState]);
+  useEffect(() => {
+    setOidcState({
+      ...oidcState,
+      isLoading: true,
+    });
+    addOidcEvents(userManager.events, oidcState, setOidcState);
+    userManager.getUser().then(user =>
+      setOidcState({
+        ...oidcState,
         oidcUser: user,
-        isLoading: false,
-      });
-    }
-  },
-  componentWillUnmount() {
-    // unregister the event callbacks
-    const { events } = this.props.oidcState.userManager;
-    events.removeUserLoaded(this.props.onUserLoaded);
-    events.removeSilentRenewError(this.props.onError);
-    events.removeUserUnloaded(this.props.onUserUnloaded);
-    events.removeUserSignedOut(this.props.onUserUnloaded);
-    events.removeAccessTokenExpired(this.props.onAccessTokenExpired);
-  },
-});
-const Loading = () => <span>Loading</span>;
-const AuthenticationProviderComponentHOC = compose(
-  withRouter,
-  withOidcState,
-  withOidcHandlers,
-  withSecondOidcHandlers,
-  withLifeCycle,
-  branch(props => props.oidcState.isLoading, renderComponent(Loading)),
-  AuthenticationProviderComponentWithInit,
-  withOidcProps
-);
+      })
+    );
+    return () => removeEvents(userManager.events, oidcState, setOidcState);
+  }, []);
 
-const AuthenticationProvider = AuthenticationProviderComponentHOC(AuthenticationProviderComponent);
+  return (
+    <AuthenticationProviderComponent
+      isLoading={isLoading}
+      oidcUser={oidcUser}
+      error={error}
+      login={loginCb}
+      logout={logoutCb}
+      isEnabled={isEnabled}
+      isLogout={isLogout}
+      {...otherProps}
+    />
+  );
+};
 
+const AuthenticationProvider = withRouter(AuthenticationProviderInt);
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
 AuthenticationProvider.displayName = 'AuthenticationProvider';
-const AuthenticationConsumer = AuthenticationContext.Consumer;
 
-const withOidcUser = fromRenderProps(AuthenticationConsumer, ({ oidcUser }) => ({ oidcUser }));
-
-export { AuthenticationProvider, AuthenticationConsumer, withOidcUser };
+export default AuthenticationProvider;

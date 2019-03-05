@@ -1,7 +1,16 @@
-import * as container from './AuthenticationContext.container';
+import {
+  onUserLoaded,
+  onUserUnloaded,
+  onError,
+  login,
+  logout,
+  setDefaultState,
+  onAccessTokenExpired
+} from './AuthenticationContext.container';
 import * as services from '../Services';
 
 jest.mock('../Services');
+jest.mock('./AuthenticationContext', () => 'AuthenticationContext');
 
 describe('AuthContext tests suite', () => {
   let setOidcStateMock;
@@ -14,17 +23,17 @@ describe('AuthContext tests suite', () => {
   const userMock = {
     name: 'name',
     token: 'token wyz',
-    anyProp: 'lorem ipsum',
+    anyProp: 'lorem ipsum'
   };
   const configurationMock = {
     configProps1: 'configValue1',
-    configProps2: 'configValue2',
+    configProps2: 'configValue2'
   };
 
   beforeEach(() => {
     userManagerMock = {
       removeUser: jest.fn(),
-      signinSilent: jest.fn(),
+      signinSilent: jest.fn()
     };
     // eslint-disable-next-line
     services.authenticateUser = jest.fn(() => () => jest.fn());
@@ -35,92 +44,96 @@ describe('AuthContext tests suite', () => {
     previousOidcState = {
       prop1: 'value1',
       prop2: 'value2',
-      userManager: userManagerMock,
+      userManager: userManagerMock
     };
     setOidcStateMock = jest.fn();
     onUserUnloadedMockReturn = jest.fn();
     onUserUnloadedMock = jest.fn(() => onUserUnloadedMockReturn);
     propsMock = {
+      isEnabled: true,
       history: historyMock,
       oidcState: previousOidcState,
       setOidcState: setOidcStateMock,
       configuration: configurationMock,
       location: 'locationMock',
-      onUserUnloaded: onUserUnloadedMock,
+      onUserUnloaded: onUserUnloadedMock
     };
     jest.clearAllMocks();
   });
 
   it('should set state with user when call onUserLoaded', async () => {
-    container.onUserLoaded(propsMock)(userMock);
+    onUserLoaded(previousOidcState, setOidcStateMock)(userMock);
     expect(propsMock.setOidcState).toBeCalledWith({
       ...previousOidcState,
       isLoading: false,
-      oidcUser: userMock,
+      oidcUser: userMock
     });
   });
 
   it('should set state and redirect to location when call onUserUnload', () => {
-    container.onUserUnloaded(propsMock)();
+    onUserUnloaded(previousOidcState, setOidcStateMock)();
     expect(propsMock.setOidcState).toBeCalledWith({
       ...previousOidcState,
       isLoading: false,
-      oidcUser: null,
+      oidcUser: null
     });
   });
 
   it('should set state and call silentSignin to location when call onAccessTokenExpired', () => {
-    container.onAccessTokenExpired(propsMock)();
+    onAccessTokenExpired(previousOidcState, setOidcStateMock)();
     expect(propsMock.setOidcState).toBeCalledWith({
       ...previousOidcState,
       isLoading: false,
-      oidcUser: null,
+      oidcUser: null
     });
     expect(userManagerMock.signinSilent).toBeCalled();
   });
 
   it('should set default state when call setDefaultState', () => {
-    const defaultState = container.setDefaultState(propsMock);
+    const defaultState = setDefaultState(propsMock);
     expect(services.authenticationService).toBeCalledWith(configurationMock);
     expect(defaultState).toEqual({
+      isEnabled: true,
       oidcUser: undefined,
       userManager: userManagerMock,
       isLoading: false,
       error: '',
-      isFrozen: false,
+      isLogout: false
     });
   });
 
   it('should set state and call authentication when call login function', async () => {
-    await container.login(propsMock)();
+    await login(previousOidcState, setOidcStateMock, propsMock.location)();
     expect(propsMock.setOidcState).toBeCalledWith({
       ...previousOidcState,
       isLoading: true,
-      oidcUser: null,
+      oidcUser: null
     });
     expect(services.authenticateUser).toBeCalledWith(
       userManagerMock,
-      'locationMock',
+      'locationMock'
     );
   });
 
   it('should set state and call onUserUnload function when call logout', async () => {
-    await container.logout(propsMock)('redirection Url');
+    await logout(previousOidcState, setOidcStateMock)('redirection Url');
     expect(propsMock.setOidcState).toBeCalledWith({
       ...previousOidcState,
       isLoading: true,
       oidcUser: null,
-      isFrozen: true,
+      isLogout: true
     });
     expect(services.logoutUser).toBeCalledWith(userManagerMock);
   });
 
   it('should set state with erreor when call onError function', () => {
-    container.onError(propsMock)({ message: 'error unexcecpted' });
+    onError(previousOidcState, setOidcStateMock)({
+      message: 'error unexcecpted'
+    });
     expect(propsMock.setOidcState).toBeCalledWith({
       ...previousOidcState,
       isLoading: false,
-      error: 'error unexcecpted',
+      error: 'error unexcecpted'
     });
   });
 });

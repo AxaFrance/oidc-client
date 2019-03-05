@@ -4,5 +4,6 @@ export {
   authenticateUser,
   signinSilent,
   isRequireAuthentication,
-  logoutUser,
+  logoutUser
 } from './oidcServices';
+export { default as withServices } from './withService';

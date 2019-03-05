@@ -1,10 +1,10 @@
 import * as React from 'react';
-import renderer from 'react-test-renderer';
+import { render } from 'react-testing-library';
 import Component from './NotAuthenticated.component';
 
 describe('Not Authorize test suite', () => {
   it('renders correctly', () => {
-    const tree = renderer.create(<Component />).toJSON();
-    expect(tree).toMatchSnapshot();
+    const { asFragment } = render(<Component />);
+    expect(asFragment()).toMatchSnapshot();
   });
 });
