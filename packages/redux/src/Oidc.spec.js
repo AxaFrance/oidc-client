@@ -1,7 +1,6 @@
 // Link.react.test.js
 import React from "react";
 import renderer from "react-test-renderer";
-import { mount } from "enzyme";
 
 import Oidc from "./Oidc";
 
