@@ -18,6 +18,7 @@ const defaultProps = {
 
 const getLocation = href => {
   const match = href.match(
+    // eslint-disable-next-line no-useless-escape
     /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
   );
   return (
