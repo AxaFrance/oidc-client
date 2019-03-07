@@ -3,8 +3,20 @@
 exports[`Authenticating test suite renders correctly 1`] = `
 <Switch>
   <Route
-    component="AuthenticationRoutes"
-    path="/authentication"
+    component="Callback"
+    path="/authentication/callback"
+  />
+  <Route
+    component="SilentCallback"
+    path="/authentication/silent_callback"
+  />
+  <Route
+    component="notAuthenticated"
+    path="/authentication/not-authenticated"
+  />
+  <Route
+    component="notAuthorized"
+    path="/authentication/not-authorized"
   />
   <Route
     render={[Function]}
