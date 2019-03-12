@@ -36,10 +36,10 @@ const Dummy = ({ children }) => <Fragment>{children}</Fragment>;
 
 export const withOidcSecure = compose(
   withContext,
+  branch(({ isEnabled }) => !isEnabled, renderComponent(Dummy)),
   withOidcUser,
   withRouter,
   lifecycle(lifecycleComponent),
-  branch(({ isEnabled }) => !isEnabled, renderComponent(Dummy)),
   branch(
     ({ oidcUser }) => isRequireAuthentication(oidcUser, false),
     renderComponent(wrapAuthenticating)
