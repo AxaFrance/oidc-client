@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v1.3.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.2.1...v1.3.0)
+> 12 March 2019
+- fix(context) no state found in storage [`#168`](https://github.com/AxaGuilDEv/react-oidc/pull/168) by Guillaume Chervet
+- docs(changelog) update to new 1.2.1 [`4eed1e9`](https://github.com/AxaGuilDEv/react-oidc/commit/4eed1e91ad3ed5dce05827444334a598f747844c) by Guillaume Chervet 
+- chore(release): publish v1.3.0 ***NO_CI*** [`517804b`](https://github.com/AxaGuilDEv/react-oidc/commit/517804b569c31e2e6a43f32f0aac2ff960291988) by Build-CI 
+
 #### [v1.2.1](https://github.com/AxaGuilDEv/react-oidc/compare/v1.2.0...v1.2.1)
 > 8 March 2019
 - feature(context/routes) allow to configure callbacks [`#164`](https://github.com/AxaGuilDEv/react-oidc/pull/164) by Guillaume Chervet
@@ -172,5 +178,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.2.1...v0.0.0)
-> 8 March 2019
+### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.0...v0.0.0)
+> 12 March 2019

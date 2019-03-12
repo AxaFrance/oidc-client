@@ -1,0 +1,7 @@
+organization=axaguildev
+projectKey=AxaGuilDEv_react-oidc
+serverUrl=https://sonarcloud.io
+serverVersion=7.7.0.22487
+dashboardUrl=https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc
+ceTaskId=AWlyQgha17pPkTt51Eo1
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AWlyQgha17pPkTt51Eo1
