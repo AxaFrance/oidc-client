@@ -18,7 +18,7 @@ const json = require("../packages/context/package.json");
 
 const message = `Hey a new version (${
   json.version
-}) of the @axa-fr/@axa-fr/react-oidc is available on @github and @npm! 
+}) of the @axa-fr/react-oidc is available on @github and @npm! 
 check out the new changelog https://github.com/AxaGuilDEv/react-oidc/blob/master/CHANGELOG.md`;
 
 T.post("statuses/update", { status: message }, err => {
