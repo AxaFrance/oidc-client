@@ -1,5 +1,5 @@
 import { withRouter } from 'react-router-dom';
-import { compose, withProps, lifecycle, withHandlers } from 'recompose';
+import { compose, withProps, lifecycle, withHandlers, pure } from 'recompose';
 
 import { getUserManager, oidcLog } from '../Services';
 import CallbackComponent from './Callback.component';
@@ -48,4 +48,4 @@ const enhance = compose(
   withLifeCycle
 );
 
-export default enhance(CallbackComponent);
+export default pure(enhance(CallbackComponent));
