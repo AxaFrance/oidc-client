@@ -1,5 +1,6 @@
-import React from 'react';
-import { UserManager } from 'oidc-client';
+import React from "react";
+import { UserManager } from "oidc-client";
+import { pure } from "recompose";
 
 class AuthenticationSignSilentCallback extends React.Component {
   componentWillMount = () => new UserManager({}).signinSilentCallback();
@@ -7,4 +8,4 @@ class AuthenticationSignSilentCallback extends React.Component {
   render = () => <div />;
 }
 
-export default AuthenticationSignSilentCallback;
+export default pure(AuthenticationSignSilentCallback);
