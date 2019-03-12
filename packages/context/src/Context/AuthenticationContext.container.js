@@ -8,6 +8,8 @@ import {
   lifecycle,
   withProps,
   fromRenderProps,
+  branch,
+  renderComponent,
 } from 'recompose';
 
 import {
@@ -80,12 +82,7 @@ export const onAccessTokenExpired = props => async () => {
   await props.oidcState.userManager.signinSilent();
 };
 
-export const setDefaultState = ({
-  configuration,
-  loggerLevel,
-  logger,
-  isEnabled,
-}) => {
+export const setDefaultState = ({ configuration, loggerLevel, logger, isEnabled }) => {
   setLogger(loggerLevel, logger);
   return {
     oidcUser: undefined,
@@ -146,9 +143,7 @@ export const AuthenticationProviderComponentWithInit = WrappedComponent => {
 
     shouldComponentUpdate(nextProps) {
       // Hack to avoid resfreshing user before logout
-      oidcLog.info(
-        `Protected component update : ${!nextProps.oidcState.isFrozen}`,
-      );
+      oidcLog.info(`Protected component update : ${!nextProps.oidcState.isFrozen}`);
       return !nextProps.oidcState.isFrozen;
     }
 
@@ -160,11 +155,7 @@ export const AuthenticationProviderComponentWithInit = WrappedComponent => {
   return ConstructedComponent;
 };
 
-export const withOidcState = withState(
-  'oidcState',
-  'setOidcState',
-  setDefaultState,
-);
+export const withOidcState = withState('oidcState', 'setOidcState', setDefaultState);
 
 export const withOidcHandlers = withHandlers({
   onError,
@@ -192,6 +183,7 @@ export const withLifeCycle = lifecycle({
       this.props.setOidcState({
         ...this.props.oidcState,
         oidcUser: user,
+        isLoading: false,
       });
     }
   },
@@ -205,29 +197,25 @@ export const withLifeCycle = lifecycle({
     events.removeAccessTokenExpired(this.props.onAccessTokenExpired);
   },
 });
-
+const Loading = () => <span>Loading</span>;
 const AuthenticationProviderComponentHOC = compose(
   withRouter,
   withOidcState,
   withOidcHandlers,
   withSecondOidcHandlers,
   withLifeCycle,
+  branch(props => props.oidcState.isLoading, renderComponent(Loading)),
   AuthenticationProviderComponentWithInit,
-  withOidcProps,
+  withOidcProps
 );
 
-const AuthenticationProvider = AuthenticationProviderComponentHOC(
-  AuthenticationProviderComponent,
-);
+const AuthenticationProvider = AuthenticationProviderComponentHOC(AuthenticationProviderComponent);
 
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
 AuthenticationProvider.displayName = 'AuthenticationProvider';
 const AuthenticationConsumer = AuthenticationContext.Consumer;
 
-const withOidcUser = fromRenderProps(
-  AuthenticationConsumer,
-  ({ oidcUser }) => ({ oidcUser }),
-);
+const withOidcUser = fromRenderProps(AuthenticationConsumer, ({ oidcUser }) => ({ oidcUser }));
 
 export { AuthenticationProvider, AuthenticationConsumer, withOidcUser };
