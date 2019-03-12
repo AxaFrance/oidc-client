@@ -37,7 +37,6 @@ const getLocation = href => {
 
 export const getPath = href => {
   const location = getLocation(href);
-  console.log(location);
   let { path } = location;
   const { search, hash } = location;
 
@@ -62,7 +61,6 @@ const OidcRoutes = ({
   const notAuthorizedComponent = notAuthorized || NotAuthorized;
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
   const callbackPath = getPath(configuration.redirect_uri);
-  console.log(configuration);
   return (
     <Switch>
       <Route path={callbackPath} component={Callback} />
