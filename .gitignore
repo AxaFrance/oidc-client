@@ -17,3 +17,4 @@ dist
 .cache
 .npmrc
 examples/**/build/
+.scannerwork/
