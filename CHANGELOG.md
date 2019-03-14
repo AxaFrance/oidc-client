@@ -1,6 +1,13 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v1.3.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.0...v1.3.1-alpha.0)
+> 14 March 2019
+- Fix(context) component should wait user loading [`#170`](https://github.com/AxaGuilDEv/react-oidc/pull/170) by Guillaume Chervet
+- fix(tweet) set up good changelog link [`#169`](https://github.com/AxaGuilDEv/react-oidc/pull/169) by Guillaume Chervet
+- docs(changelog) update to new 1.3.0 [`02de519`](https://github.com/AxaGuilDEv/react-oidc/commit/02de5196b3e7907acfeb631ee27fdea7ed15968a) by Build-CI 
+- chore(release): publish v1.3.1-alpha.0 ***NO_CI*** [`32d880f`](https://github.com/AxaGuilDEv/react-oidc/commit/32d880fb06a6b916d87e90d8f4c6b1d338969d06) by Build-CI 
+
 #### [v1.3.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.2.1...v1.3.0)
 > 12 March 2019
 - fix(context) no state found in storage [`#168`](https://github.com/AxaGuilDEv/react-oidc/pull/168) by Guillaume Chervet
@@ -178,5 +185,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.0...v0.0.0)
-> 12 March 2019
+#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.1-alpha.0...v0.0.0)
+> 14 March 2019
