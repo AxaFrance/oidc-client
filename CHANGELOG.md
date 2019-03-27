@@ -1,6 +1,16 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v1.3.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.1-alpha.0...v1.3.2-alpha.0)
+> 27 March 2019
+- Few changes for multiple Auth requests and callbacks issue [`#180`](https://github.com/AxaGuilDEv/react-oidc/pull/180) by Olivier YOUF
+- fix callback double tap [`35f5609`](https://github.com/AxaGuilDEv/react-oidc/commit/35f56093d6e0aedca493aabde779bef58f49d59d) by Olivier YOUF 
+- fix : flag for waiting auth [`89b32c0`](https://github.com/AxaGuilDEv/react-oidc/commit/89b32c0a411957d1e514602d72b52ddb25b5de97) by Olivier YOUF 
+- Fix : package changes [`b8692f2`](https://github.com/AxaGuilDEv/react-oidc/commit/b8692f29f4fae45fb64e74d1d89fa7cf10f2fc05) by Olivier YOUF 
+- chore(release): publish v1.3.2-alpha.0 ***NO_CI*** [`d814ada`](https://github.com/AxaGuilDEv/react-oidc/commit/d814ada43b9e826d3a5aa9317e4b8f7dcff0671f) by Build-CI 
+- wip : callback [`01af436`](https://github.com/AxaGuilDEv/react-oidc/commit/01af43636e2fc5cb99a08aa154b415857493956b) by Olivier YOUF 
+- docs(changelog) update to new 1.3.1-alpha.0 [`17c8683`](https://github.com/AxaGuilDEv/react-oidc/commit/17c86839884e63cf8c05459839f869f0ef55e019) by Build-CI 
+
 #### [v1.3.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.0...v1.3.1-alpha.0)
 > 14 March 2019
 - Fix(context) component should wait user loading [`#170`](https://github.com/AxaGuilDEv/react-oidc/pull/170) by Guillaume Chervet
@@ -185,5 +195,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.1-alpha.0...v0.0.0)
-> 14 March 2019
+#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.2-alpha.0...v0.0.0)
+> 27 March 2019
