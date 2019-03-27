@@ -1,23 +1,32 @@
-import React, { Fragment } from 'react';
-import { withRouter } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { fromRenderProps, compose, branch, lifecycle, renderComponent } from 'recompose';
-import { AuthenticationConsumer, withOidcUser } from './AuthenticationContext.container';
-import { authenticateUser, getUserManager, oidcLog, isRequireAuthentication } from '../Services';
-import { Authenticating } from '../OidcComponents';
+import React, { Fragment } from "react";
+import { withRouter } from "react-router-dom";
+import PropTypes from "prop-types";
+import {
+  fromRenderProps,
+  compose,
+  branch,
+  lifecycle,
+  renderComponent
+} from "recompose";
+import {
+  AuthenticationConsumer,
+  withOidcUser
+} from "./AuthenticationContext.container";
+import {
+  authenticateUser,
+  getUserManager,
+  oidcLog,
+  isRequireAuthentication
+} from "../Services";
+import { Authenticating } from "../OidcComponents";
 
-const withContext = fromRenderProps(AuthenticationConsumer, ({ isEnabled, authenticating }) => ({
-  isEnabled,
-  authenticating,
-}));
-
-const lifecycleComponent = {
-  async componentDidMount() {
-    oidcLog.info('Protected component mounted');
-    const usermanager = getUserManager();
-    await authenticateUser(usermanager, this.props.location)();
-  },
-};
+const withContext = fromRenderProps(
+  AuthenticationConsumer,
+  ({ isEnabled, authenticating }) => ({
+    isEnabled,
+    authenticating
+  })
+);
 
 const wrapAuthenticating = ({ authenticating }) => {
   const AuthenticatingComponent = authenticating || Authenticating;
@@ -25,11 +34,11 @@ const wrapAuthenticating = ({ authenticating }) => {
 };
 
 wrapAuthenticating.propTypes = {
-  authenticating: PropTypes.node,
+  authenticating: PropTypes.node
 };
 
 wrapAuthenticating.defaultProps = {
-  authenticating: null,
+  authenticating: null
 };
 
 const Dummy = ({ children }) => <Fragment>{children}</Fragment>;
@@ -39,7 +48,13 @@ export const withOidcSecure = compose(
   branch(({ isEnabled }) => !isEnabled, renderComponent(Dummy)),
   withOidcUser,
   withRouter,
-  lifecycle(lifecycleComponent),
+  lifecycle({
+    async componentDidMount() {
+      oidcLog.info("Protected component mounted");
+      const usermanager = getUserManager();
+      await authenticateUser(usermanager, this.props.location)();
+    }
+  }),
   branch(
     ({ oidcUser }) => isRequireAuthentication(oidcUser, false),
     renderComponent(wrapAuthenticating)

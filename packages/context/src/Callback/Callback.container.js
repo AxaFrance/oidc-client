@@ -1,15 +1,13 @@
 import { withRouter } from "react-router-dom";
-import {
-  compose,
-  withProps,
-  lifecycle,
-  withHandlers,
-  pure,
-  withState
-} from "recompose";
+import { compose, withProps, lifecycle, withHandlers, pure } from "recompose";
 
 import { getUserManager, oidcLog } from "../Services";
 import CallbackComponent from "./Callback.component";
+
+let _isCalled = false;
+const _setCalling = val => {
+  _isCalled = val;
+};
 
 export const onRedirectSuccess = ({ history }) => user => {
   oidcLog.info("Successfull Callback");
@@ -28,21 +26,23 @@ export const onRedirectError = ({ history }) => error => {
   history.push(`/authentication/not-authenticated?message=${message}`);
 };
 
-export const componentDidMountFunction = async props => {
+export const componentDidMountFunction = async (props, isCalled, setCall) => {
   try {
+    oidcLog.info("Callback Container Mount");
     let user = await props.userManager.getUser();
-    if (!user || !user.expired) {
+    if (!isCalled && (!user || user.expired)) {
+      setCall(true);
       user = await props.userManager.signinRedirectCallback();
+      props.onRedirectSuccess(user);
     }
-    props.onRedirectSuccess(user);
   } catch (error) {
     props.onRedirectError(error);
   }
 };
 
 const withLifeCycle = lifecycle({
-  async componentDidMount() {
-    componentDidMountFunction(this.props);
+  componentDidMount() {
+    componentDidMountFunction(this.props, _isCalled, _setCalling);
   }
 });
 
