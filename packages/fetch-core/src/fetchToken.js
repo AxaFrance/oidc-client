@@ -11,10 +11,10 @@ export const fetchWithToken = (fetch, getAccessTokenInjected) => async (
 ) => {
   // eslint-disable-next-line
   let headers = new Headers();
-  // eslint-disable-next-line
-  if (options.headers && !(options.headers instanceof Headers)) {
+
+  if (options.headers) {
     // eslint-disable-next-line
-    headers = new Headers(options.headers);
+    headers = !(options.headers instanceof Headers) ? new Headers(options.headers) : options.headers;
   }
 
   const accessToken = getAccessTokenInjected();
