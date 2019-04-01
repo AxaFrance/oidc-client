@@ -1,6 +1,13 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v1.3.3-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.2-alpha.0...v1.3.3-alpha.0)
+> 1 April 2019
+- Fetch Core : Fix for header props [`#182`](https://github.com/AxaGuilDEv/react-oidc/pull/182) by Olivier YOUF
+- chore(release): publish v1.3.3-alpha.0 ***NO_CI*** [`1d9d9e3`](https://github.com/AxaGuilDEv/react-oidc/commit/1d9d9e3ecf855f56e961743d04533c1408bbbeb5) by Build-CI 
+- docs(changelog) update to new 1.3.2-alpha.0 [`100e4be`](https://github.com/AxaGuilDEv/react-oidc/commit/100e4be4321359fdb628bf52c93adae612576564) by Build-CI 
+- fix headers [`01dd579`](https://github.com/AxaGuilDEv/react-oidc/commit/01dd579c63401c99b097726b73658bfa84db7767) by Olivier YOUF 
+
 #### [v1.3.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.1-alpha.0...v1.3.2-alpha.0)
 > 27 March 2019
 - Few changes for multiple Auth requests and callbacks issue [`#180`](https://github.com/AxaGuilDEv/react-oidc/pull/180) by Olivier YOUF
@@ -195,5 +202,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.2-alpha.0...v0.0.0)
-> 27 March 2019
+#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.3-alpha.0...v0.0.0)
+> 1 April 2019
