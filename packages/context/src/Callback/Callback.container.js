@@ -24,7 +24,7 @@ export const CallbackContainerCore = ({
   oidcLog: oidcLogInternal,
 }) => {
   const onSuccess = useCallback(onRedirectSuccess(history, oidcLogInternal), [history]);
-  const onError = useCallback(onRedirectError(history, oidcLog), [history]);
+  const onError = useCallback(onRedirectError(history, oidcLogInternal), [history]);
 
   useEffect(() => {
     getUserManagerInternal()

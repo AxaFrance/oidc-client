@@ -1,16 +1,16 @@
 import React from 'react';
-import * as container from './Callback.container';
-import { render, wait } from 'react-testing-library';
-import 'react-testing-library/cleanup-after-each';
+import { render, wait, cleanup } from '@testing-library/react';
+import { CallbackContainerCore, onRedirectError, onRedirectSuccess } from './Callback.container';
+import '@testing-library/react/cleanup-after-each';
 
-describe("Callback container tests suite", () => {
+describe('Callback container tests suite', () => {
   const history = {
-    push: jest.fn()
+    push: jest.fn(),
   };
   const userMock = {
     state: {
-      url: "/url"
-    }
+      url: '/url',
+    },
   };
   const logger = {
     info: jest.fn(),
@@ -21,20 +21,22 @@ describe("Callback container tests suite", () => {
     jest.clearAllMocks();
   });
 
+  afterEach(cleanup);
+
   it('should push location if exist when call onRedirectSuccess', () => {
-    container.onRedirectSuccess(history, logger)(userMock);
-    expect(history.push).toBeCalledWith('/url');
+    onRedirectSuccess(history, logger)(userMock);
+    expect(history.push).toHaveBeenCalledWith('/url');
   });
 
   it('should not push if exist location doesnt exists when call onRedirectSuccess', () => {
-    container.onRedirectSuccess(history, logger)({ ...userMock, state: {} });
-    expect(history.push).not.toBeCalled();
+    onRedirectSuccess(history, logger)({ ...userMock, state: {} });
+    expect(history.push).not.toHaveBeenCalled();
   });
 
   it('Should push on error message when onError is call', () => {
-    container.onRedirectError(history, logger)({ message: 'errorMessage' });
-    expect(history.push).toBeCalledWith(
-      '/authentication/not-authenticated?message=errorMessage',
+    onRedirectError(history, logger)({ message: 'errorMessage' });
+    expect(history.push).toHaveBeenCalledWith(
+      '/authentication/not-authenticated?message=errorMessage'
     );
   });
 });
@@ -66,39 +68,37 @@ describe('Container integration tests', () => {
   it('should call signinRedirect Callback and OnsucessCallback after all', async () => {
     await wait(() =>
       render(
-        <container.CallbackContainer
+        <CallbackContainerCore
           history={historyMock}
           getUserManager={getUserManager}
           oidcLog={logger}
-        />,
-      ),
+        />
+      )
     );
 
-    expect(signinRedirectCallback).toBeCalled();
-    expect(historyMock.push).toBeCalledWith('http://myurl.me');
-    expect(logger.info).toBeCalledWith('Successfull login Callback');
+    expect(signinRedirectCallback).toHaveBeenCalled();
+    expect(historyMock.push).toHaveBeenCalledWith('http://myurl.me');
+    expect(logger.info).toHaveBeenCalledWith('Successfull login Callback');
   });
 
   it('should call signinRedirect Callback and onError if signin fail', async () => {
-    signinRedirectCallback.mockImplementation(() =>
-      Promise.reject({ message: 'error message' }),
-    );
+    signinRedirectCallback.mockImplementation(() => Promise.reject({ message: 'error message' }));
     await wait(() =>
       render(
-        <container.CallbackContainer
+        <CallbackContainerCore
           history={historyMock}
           getUserManager={getUserManager}
           oidcLog={logger}
-        />,
-      ),
+        />
+      )
     );
 
-    expect(signinRedirectCallback).toBeCalled();
-    expect(historyMock.push).toBeCalledWith(
-      '/authentication/not-authenticated?message=error%20message',
+    expect(signinRedirectCallback).toHaveBeenCalled();
+    expect(historyMock.push).toHaveBeenCalledWith(
+      '/authentication/not-authenticated?message=error%20message'
     );
-    expect(logger.error).toBeCalledWith(
-      'There was an error handling the token callback: error message',
+    expect(logger.error).toHaveBeenCalledWith(
+      'There was an error handling the token callback: error message'
     );
   });
 });

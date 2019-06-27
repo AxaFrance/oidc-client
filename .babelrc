@@ -1,13 +1,14 @@
-{
-  "presets": ["env", "stage-0", "react"],
+ {
+  "presets": ["@babel/env", "@babel/react"],
   "plugins": [
     "babel-plugin-macros",
     [
-      "transform-runtime",
+      "@babel/plugin-transform-runtime",
       {
-        "polyfill": false,
-        "regenerator": true
-      }
-    ]
-  ]
+        "regenerator": true,
+      },
+    ],
+    "@babel/plugin-proposal-class-properties",
+  ],
 }
+
