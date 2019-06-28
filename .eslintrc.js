@@ -84,7 +84,8 @@ module.exports = {
       },
     ],
     'react/forbid-prop-types': [ignore],
-    'no-underscore-dangle': [ignore],
     'react/prop-types': [warn],
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
   },
 };

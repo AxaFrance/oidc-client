@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import {
@@ -13,9 +13,9 @@ import { AuthenticationContext } from './AuthenticationContextCreator';
 
 // for tests
 export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, location) => {
-  const { isEnabled, isLogout, oidcUser, authenticating } = useContext(AuthenticationContext);
+  const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {
-    if (isEnabled && !isLogout) {
+    if (isEnabled) {
       oidcLog.info('Protected component mounted');
       const usermanager = getUserManagerInternal();
       authenticateUserInternal(usermanager, location)();
@@ -23,7 +23,7 @@ export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, 
     return () => {
       oidcLog.info('Protected component unmounted');
     };
-  }, [location, isEnabled, isLogout, authenticateUserInternal, getUserManagerInternal]);
+  }, [location, isEnabled, authenticateUserInternal, getUserManagerInternal]);
   return { oidcUser, authenticating };
 };
 

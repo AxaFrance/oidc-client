@@ -18,7 +18,6 @@ const propTypes = {
     redirect_uri: PropTypes.string.isRequired,
     silent_redirect_uri: PropTypes.string.isRequired,
   }).isRequired,
-  isLogout: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -26,7 +25,6 @@ const defaultProps = {
   notAuthorized: null,
   authenticating: null,
   isEnabled: true,
-  isLogout: false,
 };
 
 const AuthenticationProviderComponent = ({
@@ -41,7 +39,6 @@ const AuthenticationProviderComponent = ({
   authenticating,
   configuration,
   children,
-  isLogout,
 }) => (
   <AuthenticationContext.Provider
     value={{
@@ -52,7 +49,6 @@ const AuthenticationProviderComponent = ({
       logout,
       authenticating,
       isEnabled,
-      isLogout,
     }}
   >
     <OidcRoutes

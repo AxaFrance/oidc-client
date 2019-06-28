@@ -4,21 +4,12 @@
     "publish": {
       "message": "chore(release): publish %s ***NO_CI***",
       "npmClient": "npm",
-      "ignoreChanges": [
-        "ignored-file",
-        "*.md",
-        ".npmrc"
-      ]
+      "ignoreChanges": ["ignored-file", "*.md", ".npmrc"]
     },
     "bootstrap": {
       "ignore": "component-*",
-      "npmClientArgs": [
-        "--no-package-lock"
-      ]
+      "npmClientArgs": ["--no-package-lock"]
     }
   },
-  "packages": [
-    "examples/*",
-    "packages/*"
-  ]
+  "packages": ["examples/*", "packages/*"]
 }

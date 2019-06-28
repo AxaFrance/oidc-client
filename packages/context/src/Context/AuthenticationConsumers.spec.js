@@ -3,18 +3,18 @@ import { renderHook } from '@testing-library/react-hooks';
 import { render } from '@testing-library/react';
 import { AuthenticationContext } from './AuthenticationContextCreator';
 import 'jest-dom/extend-expect';
+import {useOidcSecure, withOidcUser, withOidcSecurewithRouter} from './AuthenticationConsumers';
 
-import * as consumers from './AuthenticationConsumers';
-
-const getWrapper = values => ({ children }) => (
-  <AuthenticationContext.Provider value={values}>{children}</AuthenticationContext.Provider>
-);
 describe('Consumers service tests suite', () => {
   const values = {
     isEnabled: true,
     oidcUser: { user: 'tom' },
-    isLogout: false,
+    authenticating: { param: 'test' },
   };
+
+  const getWrapper = (vals = values) => ({ children }) => (
+    <AuthenticationContext.Provider value={vals}>{children}</AuthenticationContext.Provider>
+  );
   const getUserManager = () => ({
     param: 'Mock version',
   });
@@ -24,23 +24,17 @@ describe('Consumers service tests suite', () => {
     jest.clearAllMocks();
   });
 
-  it('should not call authentication when enabled', () => {
-    renderHook(() => consumers.useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
-      wrapper: getWrapper(values),
+  it('should call authentication when enabled',  () => {
+     renderHook(() => useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
+      wrapper: getWrapper(),
     });
+
     expect(authenticateUser).toHaveBeenCalledWith({ param: 'Mock version' }, '/locationUser');
   });
 
   it('should NOT call authentication when disabled', () => {
-    renderHook(() => consumers.useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
+    renderHook(() => useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
       wrapper: getWrapper({ ...values, isEnabled: false }),
-    });
-    expect(authenticateUser).not.toHaveBeenCalled();
-  });
-
-  it('should NOT call authentication if user logout', () => {
-    renderHook(() => consumers.useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
-      wrapper: getWrapper({ ...values, isLogout: true }),
     });
     expect(authenticateUser).not.toHaveBeenCalled();
   });
@@ -51,7 +45,7 @@ describe('Consumers service tests suite', () => {
         <span data-testid="username">{oidcUser}</span>
       </div>
     );
-    const Component = consumers.withOidcUser(testingComponent);
+    const Component = withOidcUser(testingComponent);
     const { getByTestId, asFragment } = render(<Component />, {
       wrapper: getWrapper({ oidcUser: 'Franck' }),
     });
@@ -63,7 +57,6 @@ describe('Consumers service tests suite', () => {
     const contextMock = {
       isEnabled: true,
       oidcUser: null,
-      isLogout: false,
     };
 
     const mockedProps = {
@@ -73,7 +66,7 @@ describe('Consumers service tests suite', () => {
     };
 
     const testingComponent = () => <div data-testid="componentMount" />;
-    const Component = consumers.withOidcSecurewithRouter(testingComponent);
+    const Component = withOidcSecurewithRouter(testingComponent);
     const { queryByTestId, asFragment } = render(<Component {...mockedProps} />, {
       wrapper: getWrapper({ ...contextMock }),
     });
@@ -85,7 +78,6 @@ describe('Consumers service tests suite', () => {
     const contextMock = {
       isEnabled: true,
       oidcUser: { user: 'tom' },
-      isLogout: false,
     };
 
     const mockedProps = {
@@ -95,11 +87,10 @@ describe('Consumers service tests suite', () => {
     };
 
     const testingComponent = () => <div data-testid="componentMount" />;
-    const Component = consumers.withOidcSecurewithRouter(testingComponent);
+    const Component = withOidcSecurewithRouter(testingComponent);
     const { queryByTestId } = render(<Component {...mockedProps} />, {
       wrapper: getWrapper({ ...contextMock }),
     });
-    const greetingNode = queryByTestId('componentMount');
     expect(queryByTestId('componentMount')).not.toBeNull();
   });
 });

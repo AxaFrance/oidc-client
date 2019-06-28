@@ -14,7 +14,7 @@ module.exports = {
   collectCoverageFrom: ['packages/**/*.{js,jsx}', '!**/dist/**'],
   coverageDirectory: 'coverage',
   testEnvironment: 'jsdom',
-  setupTestFrameworkScriptFile: './scripts/jest.init.js',
+  setupFilesAfterEnv: ['./scripts/jest.init.js'],
   setupFiles: ['raf/polyfill'],
   testURL: 'http://localhost',
   moduleFileExtensions: [/* 'ts', 'tsx', */ 'js', 'jsx', 'json', 'node'],

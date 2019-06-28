@@ -98,7 +98,6 @@ describe('AuthContext tests suite', () => {
       userManager: userManagerMock,
       isLoading: false,
       error: '',
-      isLogout: false
     });
   });
 
@@ -117,12 +116,6 @@ describe('AuthContext tests suite', () => {
 
   it('should set state and call onUserUnload function when call logout', async () => {
     await logout(previousOidcState, setOidcStateMock)('redirection Url');
-    expect(propsMock.setOidcState).toBeCalledWith({
-      ...previousOidcState,
-      isLoading: true,
-      oidcUser: null,
-      isLogout: true
-    });
     expect(services.logoutUser).toBeCalledWith(userManagerMock);
   });
 
