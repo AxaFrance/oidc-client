@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from "react";
-import PropTypes from "prop-types";
-import { withRouter } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 
 import {
   authenticationService,
   authenticateUser,
   logoutUser,
   setLogger,
-  oidcLog
-} from "../Services";
-import AuthenticationProviderComponent from "./AuthenticationContext";
+  oidcLog,
+} from '../Services';
+import AuthenticationProviderComponent from './AuthenticationContext';
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
@@ -24,7 +24,7 @@ const propTypes = {
     silent_redirect_uri: PropTypes.string.isRequired,
     automaticSilentRenew: PropTypes.bool.isRequired,
     loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired
+    triggerAuthFlow: PropTypes.bool.isRequired,
   }).isRequired,
   isEnabled: PropTypes.bool,
   loggerLevel: PropTypes.number,
@@ -32,8 +32,8 @@ const propTypes = {
     info: PropTypes.func.isRequired,
     warn: PropTypes.func.isRequired,
     error: PropTypes.func.isRequired,
-    debug: PropTypes.func.isRequired
-  })
+    debug: PropTypes.func.isRequired,
+  }),
 };
 
 const defaultProps = {
@@ -45,19 +45,14 @@ const defaultProps = {
   logger: console,
 };
 
-export const setDefaultState = ({
-  configuration,
-  loggerLevel,
-  logger,
-  isEnabled,
-}) => {
+export const setDefaultState = ({ configuration, loggerLevel, logger, isEnabled }) => {
   setLogger(loggerLevel, logger);
   return {
     oidcUser: undefined,
     userManager: authenticationService(configuration),
     isLoading: false,
-    error: "",
-    isEnabled
+    error: '',
+    isEnabled,
   };
 };
 
@@ -65,9 +60,9 @@ export const login = (oidcState, setOidcState, location) => async () => {
   setOidcState({
     ...oidcState,
     oidcUser: null,
-    isLoading: true
+    isLoading: true,
   });
-  oidcLog.info("Login requested");
+  oidcLog.info('Login requested');
   await authenticateUser(oidcState.userManager, location)();
 };
 
@@ -76,7 +71,7 @@ export const onError = (oidcState, setOidcState) => error => {
   setOidcState({
     ...oidcState,
     error: error.message,
-    isLoading: false
+    isLoading: false,
   });
 };
 
@@ -94,7 +89,7 @@ export const onUserLoaded = (oidcState, setOidcState) => user => {
   setOidcState({
     ...oidcState,
     oidcUser: user,
-    isLoading: false
+    isLoading: false,
   });
 };
 
@@ -103,7 +98,7 @@ export const onUserUnloaded = (oidcState, setOidcState) => () => {
   setOidcState({
     ...oidcState,
     oidcUser: null,
-    isLoading: false
+    isLoading: false,
   });
 };
 
@@ -112,7 +107,7 @@ export const onAccessTokenExpired = (oidcState, setOidcState) => async () => {
   setOidcState({
     ...oidcState,
     oidcUser: null,
-    isLoading: false
+    isLoading: false,
   });
   await oidcState.userManager.signinSilent();
 };
@@ -130,38 +125,27 @@ const removeEvents = (events, oidcState, setOidcState) => {
   events.removeSilentRenewError(onError(oidcState, setOidcState));
   events.removeUserUnloaded(onUserUnloaded(oidcState, setOidcState));
   events.removeUserSignedOut(onUserUnloaded(oidcState, setOidcState));
-  events.removeAccessTokenExpired(
-    onAccessTokenExpired(oidcState, setOidcState)
-  );
+  events.removeAccessTokenExpired(onAccessTokenExpired(oidcState, setOidcState));
 };
 
 const AuthenticationProviderInt = ({ location, ...otherProps }) => {
   const [oidcState, setOidcState] = useState(() => setDefaultState(otherProps));
-  const {
-    oidcUser,
-    isLoading,
-    error,
-    isEnabled,
-    userManager
-  } = oidcState;
-  const loginCb = useCallback(
-    () => login(oidcState, setOidcState, location)(),
-    [location, oidcState]
-  );
-  const logoutCb = useCallback(
-    () =>  logout(oidcState, setOidcState)(),
-    [oidcState]
-  );
+  const { oidcUser, isLoading, error, isEnabled, userManager } = oidcState;
+  const loginCb = useCallback(() => login(oidcState, setOidcState, location)(), [
+    location,
+    oidcState,
+  ]);
+  const logoutCb = useCallback(() => logout(oidcState, setOidcState)(), [oidcState]);
   useEffect(() => {
     setOidcState({
       ...oidcState,
-      isLoading: true
+      isLoading: true,
     });
     addOidcEvents(userManager.events, oidcState, setOidcState);
     userManager.getUser().then(user =>
       setOidcState({
         ...oidcState,
-        oidcUser: user
+        oidcUser: user,
       })
     );
     return () => removeEvents(userManager.events, oidcState, setOidcState);
@@ -183,6 +167,6 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
 const AuthenticationProvider = withRouter(AuthenticationProviderInt);
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
-AuthenticationProvider.displayName = "AuthenticationProvider";
+AuthenticationProvider.displayName = 'AuthenticationProvider';
 
 export default AuthenticationProvider;

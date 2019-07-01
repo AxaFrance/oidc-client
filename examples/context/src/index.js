@@ -9,7 +9,7 @@ import oidcConfiguration from "./configuration";
 const App = () => (
   <div>
     <Router>
-      <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
+      <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG} isEnabled={false}>
         <Header />
         <Routes />
       </AuthenticationProvider>

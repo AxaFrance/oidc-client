@@ -15,6 +15,7 @@ import { AuthenticationContext } from './AuthenticationContextCreator';
 export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, location) => {
   const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {
+    oidcLog.info('Protection : ', isEnabled);
     if (isEnabled) {
       oidcLog.info('Protected component mounted');
       const usermanager = getUserManagerInternal();
@@ -24,13 +25,19 @@ export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, 
       oidcLog.info('Protected component unmounted');
     };
   }, [location, isEnabled, authenticateUserInternal, getUserManagerInternal]);
-  return { oidcUser, authenticating };
+  return { oidcUser, authenticating, isEnabled };
 };
 
 // for usage
 const OidcSecure = withRouter(({ children, location }) => {
-  const { oidcUser, authenticating } = useOidcSecure(authenticateUser, getUserManager, location);
-  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false), [oidcUser]);
+  const { oidcUser, authenticating, isEnabled } = useOidcSecure(
+    authenticateUser,
+    getUserManager,
+    location
+  );
+  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
+    oidcUser,
+  ]);
   const AuthenticatingComponent = authenticating || Authenticating;
   return requiredAuth ? <AuthenticatingComponent /> : <div>{children}</div>;
 });
@@ -44,12 +51,15 @@ export const withOidcSecurewithRouter = WrappedComponent => ({
   getUserManager: getUserManagerInternal,
   ...otherProps
 }) => {
-  const { oidcUser, authenticating } = useOidcSecure(
+  const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUserInternal,
     getUserManagerInternal,
     location
   );
-  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false), [oidcUser]);
+  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
+    oidcUser,
+  ]);
+
   const AuthenticatingComponent = authenticating || Authenticating;
   return requiredAuth ? <AuthenticatingComponent /> : <WrappedComponent {...otherProps} />;
 };
