@@ -97,9 +97,34 @@ const configuration = {
 export default configuration;
 ```
 
-### How to consume : react api context consumer method (Layout/Header.js)
+### How to consume : Hooks method (Pages/Dashboard/Dashboard.js)
 
-"AuthenticationConsumer" component inject to children "props" the properties :
+"useReactOidc" returns all props from the Hook :
+
+```javascript
+import React from 'react';
+import { useReactOidc } from '@axa-fr/react-oidc-context';
+
+const Dashboard = () => {
+  const { oidcUser } = useReactOidc();
+  const { profile } = oidcUser;
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <p>Protected Dashboard</p>
+      <span>
+        Hello {profile.given_name} {profile.family_name}
+      </span>
+    </div>
+  );
+};
+
+export default Dashboard;
+
+```
+### How to consume : react api context method (Layout/Header.js)
+
+"AuthenticationContext" context contains all props you need
 
 - oidcUser : user information (null if not authenticated)
 - logout: logout function
@@ -107,7 +132,7 @@ export default configuration;
 
 ```javascript
 import React from "react";
-import { AuthenticationConsumer } from "@axa-fr/react-oidc-context";
+import { AuthenticationContext } from "@axa-fr/react-oidc-context";
 import { Link } from "react-router-dom";
 
 const headerStyle = {
@@ -124,7 +149,7 @@ const linkStyle = {
 
 export default () => (
   <header>
-    <AuthenticationConsumer>
+    <AuthenticationContext.Consumer>
       {props => {
         return (
           <div style={headerStyle}>
@@ -154,7 +179,7 @@ export default () => (
           </div>
         );
       }}
-    </AuthenticationConsumer>
+    </AuthenticationContext.Consumer>
   </header>
 );
 ```

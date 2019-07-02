@@ -29,6 +29,11 @@ export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, 
 };
 
 // for usage
+export const useReactOidc = () => {
+  const { isEnabled, login, logout, oidcUser } = useContext(AuthenticationContext);
+  return { isEnabled, login, logout, oidcUser };
+};
+
 const OidcSecure = withRouter(({ children, location }) => {
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUser,
@@ -43,6 +48,7 @@ const OidcSecure = withRouter(({ children, location }) => {
 });
 
 export default OidcSecure;
+
 
 // For non-regression
 export const withOidcSecurewithRouter = WrappedComponent => ({

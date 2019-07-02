@@ -4,6 +4,7 @@ export {
   OidcSecure,
   withOidcSecure,
   AuthenticationContext,
+  useReactOidc,
 } from './Context';
 export {
   isRequireAuthentication,
