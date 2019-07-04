@@ -5,7 +5,7 @@ import { getUserManager, oidcLog, withServices } from '../Services';
 import CallbackComponent from './Callback.component';
 
 export const onRedirectSuccess = (history, oidcLogInternal) => user => {
-  oidcLogInternal.info('Successfull login Callback');
+  oidcLogInternal.info('Successfull login Callback', user);
   if (user.state.url) {
     history.push(user.state.url);
   } else {
@@ -22,9 +22,11 @@ export const CallbackContainerCore = ({
   history,
   getUserManager: getUserManagerInternal,
   oidcLog: oidcLogInternal,
+  onRedirectError: onRedirectErrorInternal,
+  onRedirectSuccess: onRedirectSuccessInternal,
 }) => {
-  const onSuccess = useCallback(onRedirectSuccess(history, oidcLogInternal), [history]);
-  const onError = useCallback(onRedirectError(history, oidcLogInternal), [history]);
+  const onSuccess = useCallback(onRedirectSuccessInternal(history, oidcLogInternal), [history]);
+  const onError = useCallback(onRedirectErrorInternal(history, oidcLogInternal), [history]);
 
   useEffect(() => {
     getUserManagerInternal()
@@ -35,7 +37,12 @@ export const CallbackContainerCore = ({
 };
 
 const CallbackContainer = withRouter(
-  withServices(CallbackContainerCore, { getUserManager, oidcLog })
+  withServices(CallbackContainerCore, {
+    getUserManager,
+    oidcLog,
+    onRedirectSuccess,
+    onRedirectError,
+  })
 );
 
 export default CallbackContainer;

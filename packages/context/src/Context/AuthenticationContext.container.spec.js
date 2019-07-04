@@ -5,7 +5,7 @@ import {
   login,
   logout,
   setDefaultState,
-  onAccessTokenExpired
+  onAccessTokenExpired,
 } from './AuthenticationContext.container';
 import * as services from '../Services';
 
@@ -23,17 +23,17 @@ describe('AuthContext tests suite', () => {
   const userMock = {
     name: 'name',
     token: 'token wyz',
-    anyProp: 'lorem ipsum'
+    anyProp: 'lorem ipsum',
   };
   const configurationMock = {
     configProps1: 'configValue1',
-    configProps2: 'configValue2'
+    configProps2: 'configValue2',
   };
 
   beforeEach(() => {
     userManagerMock = {
       removeUser: jest.fn(),
-      signinSilent: jest.fn()
+      signinSilent: jest.fn(),
     };
     // eslint-disable-next-line
     services.authenticateUser = jest.fn(() => () => jest.fn());
@@ -44,7 +44,7 @@ describe('AuthContext tests suite', () => {
     previousOidcState = {
       prop1: 'value1',
       prop2: 'value2',
-      userManager: userManagerMock
+      userManager: userManagerMock,
     };
     setOidcStateMock = jest.fn();
     onUserUnloadedMockReturn = jest.fn();
@@ -56,42 +56,42 @@ describe('AuthContext tests suite', () => {
       setOidcState: setOidcStateMock,
       configuration: configurationMock,
       location: 'locationMock',
-      onUserUnloaded: onUserUnloadedMock
+      onUserUnloaded: onUserUnloadedMock,
     };
     jest.clearAllMocks();
   });
 
   it('should set state with user when call onUserLoaded', async () => {
     onUserLoaded(previousOidcState, setOidcStateMock)(userMock);
-    expect(propsMock.setOidcState).toBeCalledWith({
+    expect(propsMock.setOidcState).toHaveBeenCalledWith({
       ...previousOidcState,
       isLoading: false,
-      oidcUser: userMock
+      oidcUser: userMock,
     });
   });
 
   it('should set state and redirect to location when call onUserUnload', () => {
     onUserUnloaded(previousOidcState, setOidcStateMock)();
-    expect(propsMock.setOidcState).toBeCalledWith({
+    expect(propsMock.setOidcState).toHaveBeenCalledWith({
       ...previousOidcState,
       isLoading: false,
-      oidcUser: null
+      oidcUser: null,
     });
   });
 
   it('should set state and call silentSignin to location when call onAccessTokenExpired', () => {
     onAccessTokenExpired(previousOidcState, setOidcStateMock)();
-    expect(propsMock.setOidcState).toBeCalledWith({
+    expect(propsMock.setOidcState).toHaveBeenCalledWith({
       ...previousOidcState,
       isLoading: false,
-      oidcUser: null
+      oidcUser: null,
     });
-    expect(userManagerMock.signinSilent).toBeCalled();
+    expect(userManagerMock.signinSilent).toHaveBeenCalled();
   });
 
   it('should set default state when call setDefaultState', () => {
     const defaultState = setDefaultState(propsMock);
-    expect(services.authenticationService).toBeCalledWith(configurationMock);
+    expect(services.authenticationService).toHaveBeenCalledWith(configurationMock);
     expect(defaultState).toEqual({
       isEnabled: true,
       oidcUser: undefined,
@@ -103,30 +103,27 @@ describe('AuthContext tests suite', () => {
 
   it('should set state and call authentication when call login function', async () => {
     await login(previousOidcState, setOidcStateMock, propsMock.location)();
-    expect(propsMock.setOidcState).toBeCalledWith({
+    expect(propsMock.setOidcState).toHaveBeenCalledWith({
       ...previousOidcState,
       isLoading: true,
-      oidcUser: null
+      oidcUser: null,
     });
-    expect(services.authenticateUser).toBeCalledWith(
-      userManagerMock,
-      'locationMock'
-    );
+    expect(services.authenticateUser).toHaveBeenCalledWith(userManagerMock, 'locationMock');
   });
 
   it('should set state and call onUserUnload function when call logout', async () => {
     await logout(previousOidcState, setOidcStateMock)('redirection Url');
-    expect(services.logoutUser).toBeCalledWith(userManagerMock);
+    expect(services.logoutUser).toHaveBeenCalledWith(userManagerMock);
   });
 
   it('should set state with erreor when call onError function', () => {
     onError(previousOidcState, setOidcStateMock)({
-      message: 'error unexcecpted'
+      message: 'error unexpected',
     });
-    expect(propsMock.setOidcState).toBeCalledWith({
+    expect(propsMock.setOidcState).toHaveBeenCalledWith({
       ...previousOidcState,
       isLoading: false,
-      error: 'error unexcecpted'
+      error: 'error unexpected',
     });
   });
 });

@@ -53,9 +53,13 @@ describe('Container integration tests', () => {
     warn: jest.fn(),
   };
   const signinRedirectCallback = jest.fn();
-  const getUserManager = () => ({
+  const onRedirectSuccessMock = jest.fn();
+  const onRedirectErrorMock = jest.fn();
+  const onRedirectSuccessCaller = jest.fn(() => onRedirectSuccessMock);
+  const onRedirectErrorCaller = () => onRedirectErrorMock;
+  const getUserManager = jest.fn(() => ({
     signinRedirectCallback,
-  });
+  }));
   const historyMock = {
     push: jest.fn(),
   };
@@ -72,33 +76,35 @@ describe('Container integration tests', () => {
           history={historyMock}
           getUserManager={getUserManager}
           oidcLog={logger}
+          onRedirectSuccess={onRedirectSuccessCaller}
+          onRedirectError={onRedirectErrorCaller}
         />
       )
     );
 
+    expect(getUserManager).toHaveBeenCalled();
     expect(signinRedirectCallback).toHaveBeenCalled();
-    expect(historyMock.push).toHaveBeenCalledWith('http://myurl.me');
-    expect(logger.info).toHaveBeenCalledWith('Successfull login Callback');
+    expect(onRedirectSuccessMock).toHaveBeenCalledWith(user);
   });
 
   it('should call signinRedirect Callback and onError if signin fail', async () => {
-    signinRedirectCallback.mockImplementation(() => Promise.reject({ message: 'error message' }));
+    const error = { message: 'error message' };
+    signinRedirectCallback.mockImplementation(() => Promise.reject(error));
+
     await wait(() =>
       render(
         <CallbackContainerCore
           history={historyMock}
           getUserManager={getUserManager}
           oidcLog={logger}
+          onRedirectSuccess={onRedirectSuccessCaller}
+          onRedirectError={onRedirectErrorCaller}
         />
       )
     );
 
+    expect(getUserManager).toHaveBeenCalled();
     expect(signinRedirectCallback).toHaveBeenCalled();
-    expect(historyMock.push).toHaveBeenCalledWith(
-      '/authentication/not-authenticated?message=error%20message'
-    );
-    expect(logger.error).toHaveBeenCalledWith(
-      'There was an error handling the token callback: error message'
-    );
+    expect(onRedirectErrorMock).toHaveBeenCalledWith(error);
   });
 });
