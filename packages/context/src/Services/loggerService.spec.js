@@ -31,13 +31,13 @@ describe('LoggerService tests suite', () => {
   it('Should not call logger debug when call debug and level is under the debug level', () => {
     loggerService.setLogger(1, fakeConsole);
     loggerService.oidcLog.debug('message 1', 'message 2');
-    expect(fakeConsole.debug).not.toBeCalled();
+    expect(fakeConsole.debug).not.toHaveBeenCalled();
   });
 
   it('Should call logger debug with correct message when call debug and level is upper or equal the debug level', () => {
     loggerService.setLogger(4, fakeConsole);
     loggerService.oidcLog.debug('message 1', 'message 2');
-    expect(fakeConsole.debug).toBeCalledWith(
+    expect(fakeConsole.debug).toHaveBeenCalledWith(
       'DEBUG [react-context-oidc] :',
       'message 1',
       'message 2'
@@ -47,13 +47,13 @@ describe('LoggerService tests suite', () => {
   it('Should not call logger info when call info and level is under the info level', () => {
     loggerService.setLogger(1, fakeConsole);
     loggerService.oidcLog.info('message 1', 'message 2');
-    expect(fakeConsole.info).not.toBeCalled();
+    expect(fakeConsole.info).not.toHaveBeenCalled();
   });
 
   it('Should call logger debug with correct message when call info and level is upper or equal the info level', () => {
     loggerService.setLogger(3, fakeConsole);
     loggerService.oidcLog.info('message 1', 'message 2');
-    expect(fakeConsole.info).toBeCalledWith(
+    expect(fakeConsole.info).toHaveBeenCalledWith(
       'INFO [react-context-oidc] :',
       'message 1',
       'message 2'
@@ -63,13 +63,13 @@ describe('LoggerService tests suite', () => {
   it('Should not call logger warn when call info and level is under the warn level', () => {
     loggerService.setLogger(1, fakeConsole);
     loggerService.oidcLog.warn('message 1', 'message 2');
-    expect(fakeConsole.warn).not.toBeCalled();
+    expect(fakeConsole.warn).not.toHaveBeenCalled();
   });
 
   it('Should call logger debug with correct message when call warn and level is upper or equal the warn level', () => {
     loggerService.setLogger(2, fakeConsole);
     loggerService.oidcLog.warn('message 1', 'message 2');
-    expect(fakeConsole.warn).toBeCalledWith(
+    expect(fakeConsole.warn).toHaveBeenCalledWith(
       'WARN [react-context-oidc] :',
       'message 1',
       'message 2'
@@ -79,13 +79,13 @@ describe('LoggerService tests suite', () => {
   it('Should not call logger error when call info and level is under the error level', () => {
     loggerService.setLogger(0, fakeConsole);
     loggerService.oidcLog.error('message 1', 'message 2');
-    expect(fakeConsole.error).not.toBeCalled();
+    expect(fakeConsole.error).not.toHaveBeenCalled();
   });
 
   it('Should call logger debug with correct message when call error and level is upper or equal the error level', () => {
     loggerService.setLogger(1, fakeConsole);
     loggerService.oidcLog.error('message 1', 'message 2');
-    expect(fakeConsole.error).toBeCalledWith(
+    expect(fakeConsole.error).toHaveBeenCalledWith(
       'ERROR [react-context-oidc] :',
       'message 1',
       'message 2'

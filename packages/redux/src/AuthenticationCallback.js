@@ -1,22 +1,22 @@
-import * as React from "react";
-import { CallbackComponent } from "redux-oidc";
-import { withRouter } from "react-router-dom";
-import { compose, withProps, pure } from "recompose";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
-import { getUserManager } from "./authenticationService";
-import { logError } from "./logger";
+import * as React from 'react';
+import { CallbackComponent } from 'redux-oidc';
+import { withRouter } from 'react-router-dom';
+import { compose, withProps, pure } from 'recompose';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { getUserManager } from './authenticationService';
+import { logError } from './logger';
 
 const propTypes = {
   history: PropTypes.object.isRequired,
-  userManager: PropTypes.object.isRequired
+  userManager: PropTypes.object.isRequired,
 };
 
 export const success = logErrorInjected => history => user => {
   if (user && user.state) {
     history.push(user.state.url);
   } else {
-    logErrorInjected("urlBeforeSignin is null or undefined");
+    logErrorInjected('urlBeforeSignin is null or undefined');
   }
 };
 

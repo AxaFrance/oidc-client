@@ -149,7 +149,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
       })
     );
     return () => removeEvents(userManager.events, oidcState, setOidcState);
-  }, []);
+  }, [oidcState, userManager]);
 
   return (
     <AuthenticationProviderComponent

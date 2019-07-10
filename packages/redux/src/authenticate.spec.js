@@ -35,13 +35,13 @@ describe('redux.authenticate', () => {
 
   it('trySilentAuthenticate should call signinSilent method', async () => {
     const mockCallback = jest.fn();
-    const _signinSilent = () =>
+    const signinSilentInt = () =>
       new Promise(resolve => {
         mockCallback();
         resolve({});
       });
 
-    const getUserManager = () => ({ signinSilent: _signinSilent });
+    const getUserManager = () => ({ signinSilent: signinSilentInt });
     await signinSilent(getUserManager)();
 
     expect(mockCallback.mock.calls).toHaveLength(1);

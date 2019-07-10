@@ -21,6 +21,6 @@ describe('AuthenticationService tests suite', () => {
     authenticationService.setUserManager(undefined);
     const fakeConf = { fake: 'conf' };
     authenticationService.authenticationService(fakeConf);
-    expect(UserManager).toBeCalledWith(fakeConf);
+    expect(UserManager).toHaveBeenCalledWith(fakeConf);
   });
 });

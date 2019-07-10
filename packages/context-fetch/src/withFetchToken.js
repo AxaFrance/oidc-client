@@ -8,7 +8,7 @@ const enhance = fetch =>
     withProps(({ oidcUser }) => ({
       user: oidcUser,
     })),
-    withProps(fetchToken(fetch)),
+    withProps(fetchToken(fetch))
   );
 
 export default enhance;
