@@ -1,87 +1,110 @@
-import * as container from "./Callback.container";
+import React from 'react';
+import { render, wait, cleanup } from '@testing-library/react';
+import { CallbackContainerCore, onRedirectError, onRedirectSuccess } from './Callback.container';
+import '@testing-library/react/cleanup-after-each';
 
-jest.mock("../Services");
-
-describe("Callback container tests suite", () => {
+describe('Callback container tests suite', () => {
   const history = {
-    push: jest.fn()
+    push: jest.fn(),
   };
   const userMock = {
     state: {
-      url: "/url"
-    }
+      url: '/url',
+    },
+  };
+  const logger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
   };
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should push location if exist when call onRedirectSuccess", () => {
-    container.onRedirectSuccess({ history })(userMock);
-    expect(history.push).toBeCalledWith("/url");
+  afterEach(cleanup);
+
+  it('should push location if exist when call onRedirectSuccess', () => {
+    onRedirectSuccess(history, logger)(userMock);
+    expect(history.push).toHaveBeenCalledWith('/url');
   });
 
-  it("should not push if exist location doesnt exists when call onRedirectSuccess", () => {
-    container.onRedirectSuccess({ history })({ ...userMock, state: {} });
-    expect(history.push).not.toBeCalled();
+  it('should not push if exist location doesnt exists when call onRedirectSuccess', () => {
+    onRedirectSuccess(history, logger)({ ...userMock, state: {} });
+    expect(history.push).not.toHaveBeenCalled();
   });
 
-  it("Should push on error message when onError is call", () => {
-    container.onRedirectError({ history })({ message: "errorMessage" });
-    expect(history.push).toBeCalledWith(
-      "/authentication/not-authenticated?message=errorMessage"
+  it('Should push on error message when onError is call', () => {
+    onRedirectError(history, logger)({ message: 'errorMessage' });
+    expect(history.push).toHaveBeenCalledWith(
+      '/authentication/not-authenticated?message=errorMessage'
     );
   });
+});
 
-  it("Should call signinRedirectCallback and onRedirectSuccess when call componentDidMount", async () => {
-    const propsMock = {
-      userManager: {
-        signinRedirectCallback: jest.fn(() => userMock),
-        getUser: () => ({
-          expired: true
-        })
-      },
-      onRedirectSuccess: jest.fn(),
-      onRedirectError: jest.fn()
-    };
-    await container.componentDidMountFunction(propsMock, false, () => {});
-    expect(propsMock.userManager.signinRedirectCallback).toBeCalled();
-    expect(propsMock.onRedirectSuccess).toBeCalledWith(userMock);
+describe('Container integration tests', () => {
+  const user = {
+    state: {
+      url: 'http://myurl.me',
+    },
+  };
+  const logger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  };
+  const signinRedirectCallback = jest.fn();
+  const onRedirectSuccessMock = jest.fn();
+  const onRedirectErrorMock = jest.fn();
+  const onRedirectSuccessCaller = jest.fn(() => onRedirectSuccessMock);
+  const onRedirectErrorCaller = () => onRedirectErrorMock;
+  const getUserManager = jest.fn(() => ({
+    signinRedirectCallback,
+  }));
+  const historyMock = {
+    push: jest.fn(),
+  };
+
+  beforeEach(() => {
+    signinRedirectCallback.mockImplementation(() => Promise.resolve(user));
+    jest.clearAllMocks();
   });
 
-  it("Should not call signinRedirectCallback and onRedirectSuccess when call componentDidMount with flag set to true", async () => {
-    const propsMock = {
-      userManager: {
-        signinRedirectCallback: jest.fn(() => userMock),
-        getUser: () => ({
-          expired: false
-        })
-      },
-      onRedirectSuccess: jest.fn(),
-      onRedirectError: jest.fn()
-    };
-    await container.componentDidMountFunction(propsMock, true, () => {});
-    expect(propsMock.userManager.signinRedirectCallback).not.toBeCalled();
-    expect(propsMock.onRedirectSuccess).not.toBeCalled();
-  });
-
-  it("Should call signinRedirectCallback and onRedirectError when call componentDidMount and throw error", async () => {
-    const propsMock = {
-      userManager: {
-        signinRedirectCallback: jest.fn(() => {
-          throw new Error("woops error");
-        }),
-        getUser: () => ({
-          expired: true
-        })
-      },
-      onRedirectSuccess: jest.fn(),
-      onRedirectError: jest.fn()
-    };
-    await container.componentDidMountFunction(propsMock, false, () => {});
-    expect(propsMock.userManager.signinRedirectCallback).toBeCalled();
-    expect(propsMock.onRedirectError).toBeCalled();
-    expect(propsMock.onRedirectError.mock.calls[0][0].message).toEqual(
-      "woops error"
+  it('should call signinRedirect Callback and OnsucessCallback after all', async () => {
+    await wait(() =>
+      render(
+        <CallbackContainerCore
+          history={historyMock}
+          getUserManager={getUserManager}
+          oidcLog={logger}
+          onRedirectSuccess={onRedirectSuccessCaller}
+          onRedirectError={onRedirectErrorCaller}
+        />
+      )
     );
+
+    expect(getUserManager).toHaveBeenCalled();
+    expect(signinRedirectCallback).toHaveBeenCalled();
+    expect(onRedirectSuccessMock).toHaveBeenCalledWith(user);
+  });
+
+  it('should call signinRedirect Callback and onError if signin fail', async () => {
+    const error = { message: 'error message' };
+    signinRedirectCallback.mockImplementation(() => Promise.reject(error));
+
+    await wait(() =>
+      render(
+        <CallbackContainerCore
+          history={historyMock}
+          getUserManager={getUserManager}
+          oidcLog={logger}
+          onRedirectSuccess={onRedirectSuccessCaller}
+          onRedirectError={onRedirectErrorCaller}
+        />
+      )
+    );
+
+    expect(getUserManager).toHaveBeenCalled();
+    expect(signinRedirectCallback).toHaveBeenCalled();
+    expect(onRedirectErrorMock).toHaveBeenCalledWith(error);
   });
 });

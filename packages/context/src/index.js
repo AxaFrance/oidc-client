@@ -1,9 +1,10 @@
 export {
   AuthenticationProvider,
-  AuthenticationConsumer,
   withOidcUser,
   OidcSecure,
   withOidcSecure,
+  AuthenticationContext,
+  useReactOidc,
 } from './Context';
 export {
   isRequireAuthentication,

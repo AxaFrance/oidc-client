@@ -20,15 +20,12 @@
     "prepare": "node ../../scripts/prepare.js"
   },
   "peerDependencies": {
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2"
-  },
-  "dependencies": {
-    "oidc-client": "^1.7.0",
-    "prop-types": "~15.6.2",
-    "react-router": "^4.3.1",
-    "react-router-dom": "^4.3.1",
-    "recompose": "^0.30.0"
+    "oidc-client": ">=1.8.2",
+    "prop-types": ">=15.7.2",
+    "react": ">=16.8.6",
+    "react-dom": ">=16.8.6",
+    "react-router": ">=5.0.1",
+    "react-router-dom": ">=5.0.1"
   },
   "license": "MIT",
   "publishConfig": {

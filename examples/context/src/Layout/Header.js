@@ -1,5 +1,5 @@
 import React from 'react';
-import { AuthenticationConsumer } from '@axa-fr/react-oidc-context';
+import { AuthenticationContext } from '@axa-fr/react-oidc-context';
 import { Link } from 'react-router-dom';
 
 const headerStyle = {
@@ -16,7 +16,7 @@ const linkStyle = {
 
 export default () => (
   <header>
-    <AuthenticationConsumer>
+    <AuthenticationContext.Consumer>
       {props => {
         return (
           <div style={headerStyle}>
@@ -46,6 +46,6 @@ export default () => (
           </div>
         );
       }}
-    </AuthenticationConsumer>
+    </AuthenticationContext.Consumer>
   </header>
 );

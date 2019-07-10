@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Consumers service tests suite withOidcSecurewithRouter should call authentication and AuthenticatingComponent during authentication process 1`] = `
+<DocumentFragment>
+  <div>
+    <div
+      class="container"
+    >
+      <h1>
+        Authentification en cours
+      </h1>
+      <p>
+        Vous allez être redirigé sur la page de login
+      </p>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Consumers service tests suite withOidcUser should inject oidcUser if user connected 1`] = `
+<DocumentFragment>
+  <div>
+    <span
+      data-testid="username"
+    >
+      Franck
+    </span>
+  </div>
+</DocumentFragment>
+`;

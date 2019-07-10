@@ -5,12 +5,13 @@ const shell = require('shelljs');
 
 function getCommand(watch) {
   const babel = path.join(__dirname, '..', 'node_modules', '.bin', 'babel');
+  const config = path.join(__dirname, '..', 'babel.config.js');
 
   const args = [
-    '--ignore __mocks__/,**.spec.js,tests/*,__tests__/,**.test.js,stories/,**.story.js,**.stories.js,__snapshots__,**.tsx,**.ts',
     './src --out-dir ./dist',
-    '--plugins "transform-runtime"',
+    '--ignore __mocks__,**/*.spec.js,tests,.__tests__,**/*.test.js,**/stories,**/*.story.js,**/**.stories.js,**/__snapshots__,**/*.tsx,**/*.ts',
     '--source-maps',
+    `--config-file ${config}`,
     '--copy-files',
   ];
 
@@ -32,7 +33,7 @@ function handleExit(code, errorCallback) {
 }
 
 function babelify(options = {}) {
-  const { watch = false, silent = true, errorCallback } = options;
+  const { watch = false, silent = false, errorCallback } = options;
 
   if (!fs.existsSync('src')) {
     if (!silent) console.log('No src dir');

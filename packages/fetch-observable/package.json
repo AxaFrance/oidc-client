@@ -8,13 +8,9 @@
     "type": "git",
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
   },
-  "dependencies": {
-    "recompose": "^0.30.0",
-    "rxjs": "^6.3.3"
-  },
   "peerDependencies": {
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2"
+    "recompose": "~0.30.0",
+    "rxjs": "^6.3.3"
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"

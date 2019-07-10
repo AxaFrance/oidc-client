@@ -1,16 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Authenticating test suite renders correctly 1`] = `
-<div>
-  <div
-    className="container"
-  >
-    <h1>
-      Authentification en cours
-    </h1>
-    <p>
-      Vous allez être redirigé sur la page de login
-    </p>
+<DocumentFragment>
+  <div>
+    <div
+      class="container"
+    >
+      <h1>
+        Authentification en cours
+      </h1>
+      <p>
+        Vous allez être redirigé sur la page de login
+      </p>
+    </div>
   </div>
-</div>
+</DocumentFragment>
 `;
