@@ -32,7 +32,7 @@ export const CallbackContainerCore = ({
     getUserManagerInternal()
       .signinRedirectCallback()
       .then(onSuccess, onError);
-  }, []);
+  }, [getUserManagerInternal, onError, onSuccess]);
   return <CallbackComponent />;
 };
 

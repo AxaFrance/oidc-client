@@ -11,7 +11,7 @@ module.exports = {
     'prettier',
     'prettier/react',
   ],
-  plugins: ['prettier', 'jest', 'import', 'react', 'jsx-a11y', 'json'],
+  plugins: ['prettier', 'jest', 'import', 'react', 'jsx-a11y', 'json', 'react-hooks'],
   parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 8,
@@ -23,6 +23,7 @@ module.exports = {
   env: {
     es6: true,
     node: true,
+    browser: true,
     'jest/globals': true,
   },
   settings: {

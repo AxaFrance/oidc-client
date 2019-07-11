@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { render } from '@testing-library/react';
 import { AuthenticationContext } from './AuthenticationContextCreator';
 import 'jest-dom/extend-expect';
-import {useOidcSecure, withOidcUser, withOidcSecurewithRouter} from './AuthenticationConsumers';
+import { useOidcSecure, withOidcUser, withOidcSecurewithRouter } from './AuthenticationConsumers';
 
 describe('Consumers service tests suite', () => {
   const values = {
@@ -24,8 +24,8 @@ describe('Consumers service tests suite', () => {
     jest.clearAllMocks();
   });
 
-  it('should call authentication when enabled',  () => {
-     renderHook(() => useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
+  it('should call authentication when enabled', () => {
+    renderHook(() => useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
       wrapper: getWrapper(),
     });
 

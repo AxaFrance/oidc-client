@@ -41,6 +41,7 @@ const OidcSecure = withRouter(({ children, location }) => {
     location
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
+    isEnabled,
     oidcUser,
   ]);
   const AuthenticatingComponent = authenticating || Authenticating;
@@ -48,7 +49,6 @@ const OidcSecure = withRouter(({ children, location }) => {
 });
 
 export default OidcSecure;
-
 
 // For non-regression
 export const withOidcSecurewithRouter = WrappedComponent => ({
@@ -63,6 +63,7 @@ export const withOidcSecurewithRouter = WrappedComponent => ({
     location
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
+    isEnabled,
     oidcUser,
   ]);
 

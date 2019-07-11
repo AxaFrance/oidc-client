@@ -7,14 +7,12 @@
     "react-dom": "^16.8.3",
     "react-scripts": "2.1.5"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
   },
   "browserslist": [
     ">0.2%",
