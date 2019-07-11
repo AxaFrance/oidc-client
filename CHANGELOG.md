@@ -1,6 +1,23 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v2.0.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.3...v2.0.0-alpha.0)
+> 11 July 2019
+- fix(packages) : rebuild packages for package lock [`#229`](https://github.com/AxaGuilDEv/react-oidc/pull/229) by Olivier YOUF
+- Feature/hooks [`#225`](https://github.com/AxaGuilDEv/react-oidc/pull/225) by Olivier YOUF
+- fix(packages) : resolves missing scripts [`043a66e`](https://github.com/AxaGuilDEv/react-oidc/commit/043a66eee2f3862e1a0ab5b4155fd2475206fa35) by Olivier YOUF 
+- upgrading React Context + Hooks [`dafe353`](https://github.com/AxaGuilDEv/react-oidc/commit/dafe353e93456cbb2d4feba5f20cbc563029e50c) by Olivier YOUF 
+- babel 7 migration [`d4a8b09`](https://github.com/AxaGuilDEv/react-oidc/commit/d4a8b099fb5f1cf47a57f418b93f12f9afd04efb) by Olivier YOUF 
+- refacto : Package managament &amp; dependency [`d8e8d39`](https://github.com/AxaGuilDEv/react-oidc/commit/d8e8d394cfcad14bc2bec0b58a13d440aa9a6702) by Olivier YOUF 
+- fix(lint) : fix lint return and deps [`c275ea3`](https://github.com/AxaGuilDEv/react-oidc/commit/c275ea3daaff745b691f083788c0155f6c89bb3c) by Olivier YOUF 
+- fix : fix isEnabled flag [`fe5779c`](https://github.com/AxaGuilDEv/react-oidc/commit/fe5779c5d47986223cafab81ca09bfb3f5b7a83b) by Olivier YOUF 
+- PR remarks [`8b6ed4d`](https://github.com/AxaGuilDEv/react-oidc/commit/8b6ed4d3e3a1a0600d9d7011a551c07c500f82cf) by Olivier YOUF 
+- feat : new hooks function to get oidc props [`e7c4530`](https://github.com/AxaGuilDEv/react-oidc/commit/e7c45303167c37b5322955f1274e6cf90bd698cf) by Olivier YOUF 
+- chore(release): publish v2.0.0-alpha.0 ***NO_CI*** [`06e5a77`](https://github.com/AxaGuilDEv/react-oidc/commit/06e5a7743225a652142defc6dd658fa9c45f8d26) by Build-CI 
+- refacto(packags) : bump babel [`fcf3169`](https://github.com/AxaGuilDEv/react-oidc/commit/fcf31694c9235da8c9d0b6d5d11f226efb65af43) by Olivier YOUF 
+- docs(changelog) update to new 1.3.3 [`eea8716`](https://github.com/AxaGuilDEv/react-oidc/commit/eea8716a1b2e8ac098c0f388682f1e1f166f22ca) by Build-CI 
+- override conf for example [`c6342f5`](https://github.com/AxaGuilDEv/react-oidc/commit/c6342f57d2952676d96b0990099c2741c63ac736) by Olivier YOUF 
+
 #### [v1.3.3](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.3-alpha.0...v1.3.3)
 > 4 April 2019
 - chore(release): publish v1.3.3 ***NO_CI*** [`3e011c2`](https://github.com/AxaGuilDEv/react-oidc/commit/3e011c2ca20c48a0b3e308c8e42ba96fd30b4ef8) by Build-CI 
@@ -207,5 +224,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.3...v0.0.0)
-> 4 April 2019
+#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.0-alpha.0...v0.0.0)
+> 11 July 2019
