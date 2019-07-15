@@ -62,31 +62,43 @@ describe('AuthContext tests suite', () => {
   });
 
   it('should set state with user when call onUserLoaded', async () => {
-    onUserLoaded(previousOidcState, setOidcStateMock)(userMock);
-    expect(propsMock.setOidcState).toHaveBeenCalledWith({
-      ...previousOidcState,
+    onUserLoaded(setOidcStateMock)(userMock);
+    expect(setOidcStateMock).toHaveBeenCalledWith(expect.any(Function));
+    const newState = setOidcStateMock.mock.calls[0][0](previousOidcState);
+    expect(newState).toEqual({
       isLoading: false,
-      oidcUser: userMock,
+      oidcUser: { anyProp: 'lorem ipsum', name: 'name', token: 'token wyz' },
+      prop1: 'value1',
+      prop2: 'value2',
+      userManager: userManagerMock,
     });
   });
 
   it('should set state and redirect to location when call onUserUnload', () => {
-    onUserUnloaded(previousOidcState, setOidcStateMock)();
-    expect(propsMock.setOidcState).toHaveBeenCalledWith({
-      ...previousOidcState,
+    onUserUnloaded(setOidcStateMock)();
+    expect(setOidcStateMock).toHaveBeenCalledWith(expect.any(Function));
+    const newState = setOidcStateMock.mock.calls[0][0](previousOidcState);
+    expect(newState).toEqual({
       isLoading: false,
       oidcUser: null,
+      prop1: 'value1',
+      prop2: 'value2',
+      userManager: userManagerMock,
     });
   });
 
   it('should set state and call silentSignin to location when call onAccessTokenExpired', () => {
-    onAccessTokenExpired(previousOidcState, setOidcStateMock)();
-    expect(propsMock.setOidcState).toHaveBeenCalledWith({
-      ...previousOidcState,
+    onAccessTokenExpired(setOidcStateMock, userManagerMock.signinSilent)();
+    expect(setOidcStateMock).toHaveBeenCalledWith(expect.any(Function));
+    expect(userManagerMock.signinSilent).toHaveBeenCalled();
+    const newState = setOidcStateMock.mock.calls[0][0](previousOidcState);
+    expect(newState).toEqual({
       isLoading: false,
       oidcUser: null,
+      prop1: 'value1',
+      prop2: 'value2',
+      userManager: userManagerMock,
     });
-    expect(userManagerMock.signinSilent).toHaveBeenCalled();
   });
 
   it('should set default state when call setDefaultState', () => {
@@ -102,28 +114,36 @@ describe('AuthContext tests suite', () => {
   });
 
   it('should set state and call authentication when call login function', async () => {
-    await login(previousOidcState, setOidcStateMock, propsMock.location)();
-    expect(propsMock.setOidcState).toHaveBeenCalledWith({
-      ...previousOidcState,
+    await login(userManagerMock, setOidcStateMock, propsMock.location)();
+    expect(setOidcStateMock).toHaveBeenCalledWith(expect.any(Function));
+    expect(services.authenticateUser).toHaveBeenCalledWith(userManagerMock, 'locationMock');
+    const newState = setOidcStateMock.mock.calls[0][0](previousOidcState);
+    expect(newState).toEqual({
       isLoading: true,
       oidcUser: null,
+      prop1: 'value1',
+      prop2: 'value2',
+      userManager: userManagerMock,
     });
-    expect(services.authenticateUser).toHaveBeenCalledWith(userManagerMock, 'locationMock');
   });
 
   it('should set state and call onUserUnload function when call logout', async () => {
-    await logout(previousOidcState, setOidcStateMock)('redirection Url');
+    await logout(userManagerMock, setOidcStateMock)('redirection Url');
     expect(services.logoutUser).toHaveBeenCalledWith(userManagerMock);
   });
 
   it('should set state with erreor when call onError function', () => {
-    onError(previousOidcState, setOidcStateMock)({
+    onError(setOidcStateMock)({
       message: 'error unexpected',
     });
-    expect(propsMock.setOidcState).toHaveBeenCalledWith({
-      ...previousOidcState,
+    expect(setOidcStateMock).toHaveBeenCalledWith(expect.any(Function));
+    const newState = setOidcStateMock.mock.calls[0][0](previousOidcState);
+    expect(newState).toEqual({
       isLoading: false,
       error: 'error unexpected',
+      prop1: 'value1',
+      prop2: 'value2',
+      userManager: userManagerMock,
     });
   });
 });

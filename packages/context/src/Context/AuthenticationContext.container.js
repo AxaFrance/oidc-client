@@ -56,100 +56,102 @@ export const setDefaultState = ({ configuration, loggerLevel, logger, isEnabled 
   };
 };
 
-export const login = (oidcState, setOidcState, location) => async () => {
-  setOidcState({
+export const login = (userManager, setOidcState, location) => async () => {
+  setOidcState(oidcState => ({
     ...oidcState,
     oidcUser: null,
     isLoading: true,
-  });
+  }));
   oidcLog.info('Login requested');
-  await authenticateUser(oidcState.userManager, location)();
+  await authenticateUser(userManager, location)();
 };
 
-export const onError = (oidcState, setOidcState) => error => {
+export const onError = setOidcState => error => {
   oidcLog.error(`Error : ${error.message}`);
-  setOidcState({
+  setOidcState(oidcState => ({
     ...oidcState,
     error: error.message,
     isLoading: false,
-  });
+  }));
 };
 
-export const logout = (oidcState, setOidcState) => async () => {
+export const logout = (userManager, setOidcState) => async () => {
   try {
     oidcLog.info('Logout successfull');
-    await logoutUser(oidcState.userManager);
+    await logoutUser(userManager);
   } catch (error) {
-    onError(setOidcState, oidcState)(error);
+    onError(setOidcState)(error);
   }
 };
 
-export const onUserLoaded = (oidcState, setOidcState) => user => {
+export const onUserLoaded = setOidcState => user => {
   oidcLog.info(`User Loaded`);
-  setOidcState({
+  setOidcState(oidcState => ({
     ...oidcState,
     oidcUser: user,
     isLoading: false,
-  });
+  }));
 };
 
-export const onUserUnloaded = (oidcState, setOidcState) => () => {
+export const onUserUnloaded = setOidcState => () => {
   oidcLog.info(`User unloaded `);
-  setOidcState({
+  setOidcState(oidcState => ({
     ...oidcState,
     oidcUser: null,
     isLoading: false,
-  });
+  }));
 };
 
-export const onAccessTokenExpired = (oidcState, setOidcState) => async () => {
+export const onAccessTokenExpired = (setOidcState, signinSilent) => async () => {
   oidcLog.info(`AccessToken Expired `);
-  setOidcState({
+  setOidcState(oidcState => ({
     ...oidcState,
     oidcUser: null,
     isLoading: false,
-  });
-  await oidcState.userManager.signinSilent();
+  }));
+  await signinSilent();
 };
 
-const addOidcEvents = (events, oidcState, setOidcState) => {
-  events.addUserLoaded(onUserLoaded(oidcState, setOidcState));
-  events.addSilentRenewError(onError(oidcState, setOidcState));
-  events.addUserUnloaded(onUserUnloaded(oidcState, setOidcState));
-  events.addUserSignedOut(onUserUnloaded(oidcState, setOidcState));
-  events.addAccessTokenExpired(onAccessTokenExpired(oidcState, setOidcState));
+const addOidcEvents = (events, setOidcState, signinSilent) => {
+  events.addUserLoaded(onUserLoaded(setOidcState));
+  events.addSilentRenewError(onError(setOidcState));
+  events.addUserUnloaded(onUserUnloaded(setOidcState));
+  events.addUserSignedOut(onUserUnloaded(setOidcState));
+  events.addAccessTokenExpired(onAccessTokenExpired(setOidcState, signinSilent));
 };
 
-const removeEvents = (events, oidcState, setOidcState) => {
-  events.removeUserLoaded(onUserLoaded(oidcState, setOidcState));
-  events.removeSilentRenewError(onError(oidcState, setOidcState));
-  events.removeUserUnloaded(onUserUnloaded(oidcState, setOidcState));
-  events.removeUserSignedOut(onUserUnloaded(oidcState, setOidcState));
-  events.removeAccessTokenExpired(onAccessTokenExpired(oidcState, setOidcState));
+const removeEvents = (events, setOidcState, signinSilent) => {
+  events.removeUserLoaded(onUserLoaded(setOidcState));
+  events.removeSilentRenewError(onError(setOidcState));
+  events.removeUserUnloaded(onUserUnloaded(setOidcState));
+  events.removeUserSignedOut(onUserUnloaded(setOidcState));
+  events.removeAccessTokenExpired(onAccessTokenExpired(setOidcState, signinSilent));
 };
 
 const AuthenticationProviderInt = ({ location, ...otherProps }) => {
   const [oidcState, setOidcState] = useState(() => setDefaultState(otherProps));
   const { oidcUser, isLoading, error, isEnabled, userManager } = oidcState;
-  const loginCb = useCallback(() => login(oidcState, setOidcState, location)(), [
+  const loginCb = useCallback(() => login(oidcState.userManager, setOidcState, location)(), [
     location,
-    oidcState,
+    oidcState.userManager,
   ]);
-  const logoutCb = useCallback(() => logout(oidcState, setOidcState)(), [oidcState]);
+  const logoutCb = useCallback(() => logout(oidcState.userManager, setOidcState)(), [
+    oidcState.userManager,
+  ]);
   useEffect(() => {
-    setOidcState({
-      ...oidcState,
+    setOidcState(state => ({
+      ...state,
       isLoading: true,
-    });
-    addOidcEvents(userManager.events, oidcState, setOidcState);
+    }));
+    addOidcEvents(userManager.events, setOidcState, userManager.signinSilent);
     userManager.getUser().then(user =>
-      setOidcState({
-        ...oidcState,
+      setOidcState(state => ({
+        ...state,
         oidcUser: user,
-      })
+      }))
     );
-    return () => removeEvents(userManager.events, oidcState, setOidcState);
-  }, [oidcState, userManager]);
+    return () => removeEvents(userManager.events, setOidcState, userManager.signinSilent);
+  }, [userManager]);
 
   return (
     <AuthenticationProviderComponent
