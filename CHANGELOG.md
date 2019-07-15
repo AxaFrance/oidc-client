@@ -1,6 +1,14 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v2.0.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.0-alpha.0...v2.0.1-alpha.0)
+> 15 July 2019
+- Fix/infiniteloop [`#238`](https://github.com/AxaGuilDEv/react-oidc/pull/238) by Olivier YOUF
+- fix(infiniteLoop) : package upgrade [`e98e7d6`](https://github.com/AxaGuilDEv/react-oidc/commit/e98e7d6febdc820dc66122db43d443a8eb3d7d26) by Olivier YOUF 
+- fix(infiniteLoop) : change hooks to avoid infinite loop [`2168254`](https://github.com/AxaGuilDEv/react-oidc/commit/21682540fdf9a71e178942ee31b711a1f2c1575d) by Olivier YOUF 
+- chore(release): publish v2.0.1-alpha.0 ***NO_CI*** [`d906ddf`](https://github.com/AxaGuilDEv/react-oidc/commit/d906ddf3b2d269a362604e0a1418699bd4d10371) by Build-CI 
+- docs(changelog) update to new 2.0.0-alpha.0 [`2b07917`](https://github.com/AxaGuilDEv/react-oidc/commit/2b0791737eaf7c42b96ba77900d1bf10aa6a1e09) by Build-CI 
+
 #### [v2.0.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.3...v2.0.0-alpha.0)
 > 11 July 2019
 - fix(packages) : rebuild packages for package lock [`#229`](https://github.com/AxaGuilDEv/react-oidc/pull/229) by Olivier YOUF
@@ -224,5 +232,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.0-alpha.0...v0.0.0)
-> 11 July 2019
+#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.1-alpha.0...v0.0.0)
+> 15 July 2019
