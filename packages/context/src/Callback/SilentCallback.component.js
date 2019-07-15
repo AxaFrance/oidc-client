@@ -1,6 +1,5 @@
 import React from 'react';
 import { UserManager } from 'oidc-client';
-import { pure } from 'recompose';
 import { oidcLog } from '../Services';
 
 export class SilentCallback extends React.Component {
@@ -13,4 +12,4 @@ export class SilentCallback extends React.Component {
   render = () => <div />;
 }
 
-export default pure(SilentCallback);
+export default SilentCallback;
