@@ -65,7 +65,8 @@ const propTypes = {
     silent_redirect_uri: PropTypes.string.isRequired,
     automaticSilentRenew: PropTypes.bool.isRequired,
     loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired
+    triggerAuthFlow: PropTypes.bool.isRequired,
+    post_logout_redirect_uri: PropTypes.string // optional
   }).isRequired,
   isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
   loggerLevel: PropTypes.number,
