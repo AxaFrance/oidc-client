@@ -75,6 +75,40 @@ describe("redux.authenticate", () => {
     expect(mockSilentCallback.mock.calls).toHaveLength(1);
   });
 
+  it("authenticateUserPure should call signinSilent that fail and then signinRedirect method", async () => {
+    const isRequireAuthenticationMock = () => false;
+    const mockRedirectCallback = jest.fn();
+    const signinRedirect = () =>
+      new Promise(resolve => {
+        mockRedirectCallback();
+        resolve({});
+      });
+    const mockSilentCallback = jest.fn();
+    const signinSilentMock = () =>
+      new Promise((resolve, reject) => {
+        mockSilentCallback();
+        reject(new Error("signinSilent fail"));
+      });
+    const location = { pathname: "/test", search: "user" };
+    const localStorage = { setItem: () => {} };
+    const userManager = {
+      getUser: () =>
+        new Promise(resolve => {
+          resolve({ expired: true });
+        }),
+      signinRedirect,
+      signinSilent: signinSilentMock
+    };
+    await authenticateUserPure(isRequireAuthenticationMock)(
+      userManager,
+      location,
+      localStorage
+    )();
+
+    expect(mockRedirectCallback.mock.calls).toHaveLength(1);
+    expect(mockSilentCallback.mock.calls).toHaveLength(1);
+  });
+
   it("trySilentAuthenticate should call signinSilent method", async () => {
     const mockCallback = jest.fn();
     const signinSilentInt = () =>
