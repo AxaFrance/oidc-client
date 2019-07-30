@@ -5,9 +5,18 @@ export const authenticateUserPure = isRequireAuthenticationInjected => (
   location
 ) => async (isForce = false) => {
   const user = await userManager.getUser();
+  const currentUrl =
+    location.pathname + (location.search ? location.search : "");
+  const signinRedirect = () =>
+    userManager.signinRedirect({ data: { url: currentUrl } });
   if (isRequireAuthenticationInjected({ user, isForce })) {
-    const currentUrl = location.pathname + (location.search ? location.search : '');
-    await userManager.signinRedirect({ data: { url: currentUrl } });
+    await signinRedirect();
+  } else if (user && user.expired) {
+    try {
+      await userManager.signinSilent();
+    } catch {
+      await signinRedirect();
+    }
   }
 };
 
