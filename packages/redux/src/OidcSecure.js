@@ -1,26 +1,37 @@
-import React, { Fragment } from 'react';
+import React, { useEffect } from "react";
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { compose, lifecycle, branch } from 'recompose';
-import { withRouter } from 'react-router-dom';
-import Authenticating from './Authenticating';
-import { isRequireAuthentication, authenticateUser } from './authenticate';
-import { getLocalStorage } from './localStorage';
-import { getUserManager } from './authenticationService';
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { compose, lifecycle, branch } from "recompose";
+import { withRouter } from "react-router-dom";
+import Authenticating from "./Authenticating";
+import { isRequireSignin, authenticateUser } from "./authenticate";
+import { getLocalStorage } from "./localStorage";
+import { getUserManager } from "./authenticationService";
 
 const mapStateToProps = state => ({
-  user: state.oidc.user,
+  user: state.oidc.user
 });
 
-const lifecycleComponent = {
-  async componentDidMount() {
-    const usermanager = getUserManager();
-    await authenticateUser(usermanager, this.props.location, getLocalStorage())();
-  },
+const authenticate = location =>
+  authenticateUser(getUserManager(), location, getLocalStorage());
+
+const withAuthenticationLiveCycle = (useEffect, authenticate) => ({
+  location
+}) => {
+  useEffect(async () => {
+    await authenticate(location)();
+  }, []);
+
+  return <Authenticating />;
 };
 
-const wrapAuthenticating = () => () => <Authenticating />;
+const AuthenticationLiveCycle = withAuthenticationLiveCycle(
+  useEffect,
+  authenticate
+);
+
+const wrapAuthenticating = () => () => <AuthenticationLiveCycle />;
 
 export const oidcSecure = compose(
   connect(
@@ -28,31 +39,30 @@ export const oidcSecure = compose(
     null
   ),
   withRouter,
-  lifecycle(lifecycleComponent),
-  branch(isRequireAuthentication, wrapAuthenticating)
+  branch(isRequireSignin, wrapAuthenticating)
 );
 
 const propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node
 };
 
 const defaultProps = {
-  children: null,
+  children: null
 };
 
-const Dummy = ({ children }) => <Fragment>{children}</Fragment>;
+const Dummy = ({ children }) => <>{children}</>;
 
 Dummy.propTypes = propTypes;
 Dummy.defaultProps = defaultProps;
 
 const propTypesOidcSecure = {
   isEnabled: PropTypes.bool,
-  children: PropTypes.node,
+  children: PropTypes.node
 };
 
 const defaultPropsOidcSecure = {
   isEnabled: true,
-  children: null,
+  children: null
 };
 
 const OidcSecure = props => {
