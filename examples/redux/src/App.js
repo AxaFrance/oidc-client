@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { Route, Switch, Link } from 'react-router-dom';
-import { OidcSecure, oidcSecure } from '@axa-fr/react-oidc-redux';
-import { withAuthentication } from '@axa-fr/react-oidc-redux-fetch';
-import User from './User';
-import configuration from './configuration';
-import { compose, withProps } from 'recompose';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { Route, Switch, Link } from "react-router-dom";
+import { OidcSecure, oidcSecure } from "@axa-fr/react-oidc-redux";
+import { withAuthentication } from "@axa-fr/react-oidc-redux-fetch";
+import User from "./User";
+import configuration from "./configuration";
+import { compose, withProps } from "recompose";
 
 const fetch = status => (url, options) => {
   return new Promise(resolve => {
@@ -26,8 +26,8 @@ const enhance401 = compose(
     handleClick: e => {
       e.preventDefault();
       props
-        .fetch('http://www.demo.url')
-        .then(() => alert('fetch end'))
+        .fetch("http://www.demo.url")
+        .then(() => alert("fetch end"))
         .catch(e => alert(e));
     }
   }))
@@ -47,8 +47,8 @@ const enhance403 = compose(
     handleClick: e => {
       e.preventDefault();
       props
-        .fetch('http://www.demo.url')
-        .then(() => alert('fetch end'))
+        .fetch("http://www.demo.url")
+        .then(() => alert("fetch end"))
         .catch(e => alert(e));
     }
   }))

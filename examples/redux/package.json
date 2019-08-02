@@ -7,18 +7,17 @@
   "dependencies": {
     "@axa-fr/react-oidc-redux": "^2.0.2",
     "@axa-fr/react-oidc-redux-fetch": "^2.0.2",
-    "oidc-client": "^1.5.1",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3",
+    "oidc-client": "1.8.2",
+    "react": "16.8.3",
+    "react-dom": "16.8.3",
     "react-redux": "~5.1.1",
     "react-router-dom": "^4.3.1",
-    "recompose": "~0.30.0",
-    "redux": "^4.0.0",
-    "redux-oidc": "^3.0.0",
-    "redux-thunk": "^2.3.0"
+    "recompose": "0.30.0",
+    "redux": "^4.0.4",
+    "redux-oidc": "^3.1.4"
   },
   "devDependencies": {
-    "react-scripts": "^2.1.1"
+    "react-scripts": "3.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

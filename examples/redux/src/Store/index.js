@@ -1,20 +1,16 @@
 // tslint:disable:no-any
-import { applyMiddleware, compose, createStore } from 'redux';
-import thunk from 'redux-thunk';
+import { applyMiddleware, compose, createStore } from "redux";
 
-import rootReducer from './reducer';
+import rootReducer from "./reducer";
 
-const composeEnhancers =window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 let store;
 
 export const configureStore = () => {
-  store = createStore(
-    rootReducer,
-    composeEnhancers(applyMiddleware(thunk)),
-  );
+  store = createStore(rootReducer);
 
   return store;
 };
 
-export const getStore = () => (store);
+export const getStore = () => store;
