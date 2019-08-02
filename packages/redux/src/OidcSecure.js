@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { compose, lifecycle, branch } from "recompose";
+import { compose, branch } from "recompose";
 import { withRouter } from "react-router-dom";
 import Authenticating from "./Authenticating";
 import { isRequireSignin, authenticateUser } from "./authenticate";
@@ -16,11 +16,11 @@ const mapStateToProps = state => ({
 const authenticate = location =>
   authenticateUser(getUserManager(), location, getLocalStorage());
 
-const withAuthenticationLiveCycle = (useEffect, authenticate) => ({
+const withAuthenticationLiveCycle = (useEffect_, authenticate_) => ({
   location
 }) => {
-  useEffect(async () => {
-    await authenticate(location)();
+  useEffect_(async () => {
+    await authenticate_(location)();
   }, []);
 
   return <Authenticating />;
