@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v2.0.2](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2-alpha.0...v2.0.2)
+> 30 July 2019
+- fix(redux) token renew [`#258`](https://github.com/AxaGuilDEv/react-oidc/pull/258) by Guillaume Chervet
+- chore(release): publish v2.0.2 ***NO_CI*** [`8e50a29`](https://github.com/AxaGuilDEv/react-oidc/commit/8e50a29d6302b3c0487dd5102fe115458760705a) by Build-CI 
+- docs(changelog) update to new 2.0.2-alpha.0 [`df80867`](https://github.com/AxaGuilDEv/react-oidc/commit/df808675ee9d524f15d2c1f493d8cfe5a36d926e) by Build-CI 
+
 #### [v2.0.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.1-alpha.0...v2.0.2-alpha.0)
 > 25 July 2019
 - doc : add optionnal parameter for post logout uri redirect [`#253`](https://github.com/AxaGuilDEv/react-oidc/pull/253) by Olivier YOUF
@@ -238,5 +244,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2-alpha.0...v0.0.0)
-> 25 July 2019
+### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2...v0.0.0)
+> 30 July 2019
