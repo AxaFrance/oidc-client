@@ -1,6 +1,15 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v2.0.3](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2...v2.0.3)
+> 2 August 2019
+- fix(redux) token renew [`#260`](https://github.com/AxaGuilDEv/react-oidc/pull/260) by Guillaume Chervet
+- fix(redux) token renew [`#260`](https://github.com/AxaGuilDEv/react-oidc/pull/260) by Guillaume Chervet
+- chore(build) add and regenerate package.lock [`ef392f1`](https://github.com/AxaGuilDEv/react-oidc/commit/ef392f1c2294a150444dc370531ba17f46d30701) by guillaume chervet 
+- chore(package) fix package version [`0a2a2bf`](https://github.com/AxaGuilDEv/react-oidc/commit/0a2a2bf84740fac0586cdd137ae5cf47102957ac) by guillaume chervet 
+- chore(release): publish v2.0.3 ***NO_CI*** [`bcac2f4`](https://github.com/AxaGuilDEv/react-oidc/commit/bcac2f4e37e6bc280fed9e6690224d552f8ee229) by Build-CI 
+- docs(changelog) update to new 2.0.2 [`ff075a4`](https://github.com/AxaGuilDEv/react-oidc/commit/ff075a4b400a074d376a4c07f4a751e6914f6cb4) by Build-CI 
+
 #### [v2.0.2](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2-alpha.0...v2.0.2)
 > 30 July 2019
 - fix(redux) token renew [`#258`](https://github.com/AxaGuilDEv/react-oidc/pull/258) by Guillaume Chervet
@@ -244,5 +253,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2...v0.0.0)
-> 30 July 2019
+### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.3...v0.0.0)
+> 2 August 2019
