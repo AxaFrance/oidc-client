@@ -6,7 +6,6 @@ import { compose, branch } from "recompose";
 import { withRouter } from "react-router-dom";
 import Authenticating from "./Authenticating";
 import { isRequireSignin, authenticateUser } from "./authenticate";
-import { getLocalStorage } from "./localStorage";
 import { getUserManager } from "./authenticationService";
 
 const mapStateToProps = state => ({
@@ -14,13 +13,13 @@ const mapStateToProps = state => ({
 });
 
 const authenticate = location =>
-  authenticateUser(getUserManager(), location, getLocalStorage());
+  authenticateUser(getUserManager(), location);
 
 const withAuthenticationLiveCycle = (useEffect_, authenticate_) => ({
   location
 }) => {
-  useEffect_(async () => {
-    await authenticate_(location)();
+  useEffect_(() => {
+    authenticate_(location)();
   }, []);
 
   return <Authenticating />;
@@ -31,7 +30,7 @@ const AuthenticationLiveCycle = withAuthenticationLiveCycle(
   authenticate
 );
 
-const wrapAuthenticating = () => () => <AuthenticationLiveCycle />;
+const wrapAuthenticating = () => (props) => <AuthenticationLiveCycle {...props} />;
 
 export const oidcSecure = compose(
   connect(
