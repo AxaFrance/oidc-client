@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v2.0.4](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.3...v2.0.4)
+> 5 August 2019
+- fix(redux) upgrade react router version [`#261`](https://github.com/AxaGuilDEv/react-oidc/pull/261) by Guillaume Chervet
+- chore(release): publish v2.0.4 ***NO_CI*** [`2b63d3e`](https://github.com/AxaGuilDEv/react-oidc/commit/2b63d3ee4a925b045c1a711b2a92cace4448d3b0) by Build-CI 
+- docs(changelog) update to new 2.0.3 [`dba7b1d`](https://github.com/AxaGuilDEv/react-oidc/commit/dba7b1d899ab58c7351ffe065e0ad4b01fb3ef21) by Build-CI 
+
 #### [v2.0.3](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2...v2.0.3)
 > 2 August 2019
 - fix(redux) token renew [`#260`](https://github.com/AxaGuilDEv/react-oidc/pull/260) by Guillaume Chervet
@@ -253,5 +259,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.3...v0.0.0)
-> 2 August 2019
+### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.4...v0.0.0)
+> 5 August 2019
