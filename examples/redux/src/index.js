@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
 import { configureStore } from './Store';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import registerServiceWorker from './registerServiceWorker';
 import configuration from './configuration';
 
@@ -23,11 +23,11 @@ if (!authenticationConfig) {
 }
 
 const Start = (<Provider store={store}>
-    <BrowserRouter>
+    <Router>
         <Oidc store={store} configuration={authenticationConfig.config} isEnabled={isEnabled} >
             <App />
         </Oidc>
-    </BrowserRouter>
+    </Router>
 </Provider>);
 
 ReactDOM.render(Start, document.getElementById('root'));
