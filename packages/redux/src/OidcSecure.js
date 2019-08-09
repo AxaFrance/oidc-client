@@ -1,44 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { compose, branch } from "recompose";
+import { compose } from "recompose";
 import { withRouter } from "react-router-dom";
 import Authenticating from "./Authenticating";
 import { isRequireSignin, authenticateUser } from "./authenticate";
-import { getUserManager } from "./authenticationService";
+import { getUserManager } from './authenticationService';
+
+const AuthenticationLiveCycle =  ({
+  location, user, children
+}) => {
+
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticating(isRequireSignin({user}));
+    if(isAuthenticating) {
+      const userManager = getUserManager();
+      authenticateUser(userManager, location, user).then(()=> setIsAuthenticating(false));
+    }
+  }, []);
+
+  return isAuthenticating ? <Authenticating /> : <>{children}</>;
+};
 
 const mapStateToProps = state => ({
   user: state.oidc.user
 });
-
-const authenticate = location =>
-  authenticateUser(getUserManager(), location);
-
-const withAuthenticationLiveCycle = (useEffect_, authenticate_) => ({
-  location
-}) => {
-  useEffect_(() => {
-    authenticate_(location)();
-  }, []);
-
-  return <Authenticating />;
-};
-
-const AuthenticationLiveCycle = withAuthenticationLiveCycle(
-  useEffect,
-  authenticate
-);
-
-const wrapAuthenticating = () => (props) => <AuthenticationLiveCycle {...props} />;
 
 export const oidcSecure = compose(
   connect(
     mapStateToProps,
     null
   ),
-  withRouter,
-  branch(isRequireSignin, wrapAuthenticating)
+  withRouter
 );
 
 const propTypes = {
@@ -67,7 +63,7 @@ const defaultPropsOidcSecure = {
 const OidcSecure = props => {
   const { isEnabled, children } = props;
   if (isEnabled) {
-    const Secure = oidcSecure(Dummy);
+    const Secure = oidcSecure(AuthenticationLiveCycle);
     return <Secure>{children}</Secure>;
   }
   return <Dummy {...props} />;
