@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -11,16 +11,13 @@ import { getUserManager } from './authenticationService';
 const AuthenticationLiveCycle =  ({
   location, user, children
 }) => {
-
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
-
+  const isAuthenticating = isRequireSignin({user});
   useEffect(() => {
-    setIsAuthenticating(isRequireSignin({user}));
-    if(isAuthenticating) {
-      const userManager = getUserManager();
-      authenticateUser(userManager, location, user).then(()=> setIsAuthenticating(false));
-    }
-  }, []);
+            if (isAuthenticating) {
+              const userManager = getUserManager();
+              authenticateUser(userManager, location, user)();
+            }
+  }, [isAuthenticating]);
 
   return isAuthenticating ? <Authenticating /> : <>{children}</>;
 };
