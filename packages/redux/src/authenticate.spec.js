@@ -41,18 +41,14 @@ describe("redux.authenticate", () => {
         resolve({});
       });
     const location = { pathname: "/test", search: "user" };
-    const localStorage = { setItem: () => {} };
     const userManager = {
-      getUser: () =>
-        new Promise(resolve => {
-          resolve({});
-        }),
       signinRedirect
     };
+    const user =  {};
     await authenticateUserPure(isRequireAuthenticationMock)(
       userManager,
-      location,
-      localStorage
+      location, 
+        user
     )();
 
     expect(mockCallback.mock.calls).toHaveLength(1);
@@ -73,19 +69,15 @@ describe("redux.authenticate", () => {
         resolve({});
       });
     const location = { pathname: "/test", search: "user" };
-    const localStorage = { setItem: () => {} };
     const userManager = {
-      getUser: () =>
-        new Promise(resolve => {
-          resolve({ expired: true });
-        }),
       signinRedirect,
       signinSilent: signinSilentMock
     };
+    const user = { expired: true };
     await authenticateUserPure(isRequireAuthenticationMock)(
       userManager,
       location,
-      localStorage
+        user
     )();
 
     expect(mockRedirectCallback.mock.calls).toHaveLength(0);
@@ -107,19 +99,15 @@ describe("redux.authenticate", () => {
         reject(new Error("signinSilent fail"));
       });
     const location = { pathname: "/test", search: "user" };
-    const localStorage = { setItem: () => {} };
     const userManager = {
-      getUser: () =>
-        new Promise(resolve => {
-          resolve({ expired: true });
-        }),
       signinRedirect,
       signinSilent: signinSilentMock
     };
+    const user = { expired: true };
     await authenticateUserPure(isRequireAuthenticationMock)(
       userManager,
       location,
-      localStorage
+        user
     )();
 
     expect(mockRedirectCallback.mock.calls).toHaveLength(1);

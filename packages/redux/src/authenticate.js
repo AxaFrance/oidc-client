@@ -1,13 +1,11 @@
 export const isRequireAuthentication = ({ user, isForce }) => isForce || !user;
 
 export const isRequireSignin = ({ user, isForce }) =>
-  isForce || !user || (user && !!user.expired);
+  isForce || !user || (user && user.expired === true);
 
 export const authenticateUserPure = isRequireAuthenticationInjected => (
-  userManager,
-  location
+    userManager, location, user
 ) => async (isForce = false) => {
-  const user = await userManager.getUser();
   const currentUrl =
     location.pathname + (location.search ? location.search : "");
   const signinRedirect = () =>
@@ -23,8 +21,8 @@ export const authenticateUserPure = isRequireAuthenticationInjected => (
   }
 };
 
-export const authenticateUser = (userManager, location) =>
-  authenticateUserPure(isRequireAuthentication)(userManager, location);
+export const authenticateUser = (userManager, location, user) =>
+  authenticateUserPure(isRequireAuthentication)(userManager, location, user);
 
 export const signinSilent = getUserManager => (data = undefined) =>
   getUserManager().signinSilent(data);
