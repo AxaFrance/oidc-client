@@ -1,6 +1,6 @@
 {
   "name": "vanilla",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "private": true,
   "dependencies": {
     "react": "^16.8.3",
