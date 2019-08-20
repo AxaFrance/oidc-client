@@ -1,6 +1,13 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v2.0.8](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.7...v2.0.8)
+> 20 August 2019
+- fix(redux) F5 always re-auth [`#278`](https://github.com/AxaGuilDEv/react-oidc/pull/278) by Guillaume Chervet
+- fix(redux) sample react route problem [`#277`](https://github.com/AxaGuilDEv/react-oidc/pull/277) by Guillaume Chervet
+- chore(release): publish v2.0.8 ***NO_CI*** [`ebe2d7d`](https://github.com/AxaGuilDEv/react-oidc/commit/ebe2d7de2a76557b0bd95110afdf7b63192ead46) by Build-CI 
+- docs(changelog) update to new 2.0.7 [`5264289`](https://github.com/AxaGuilDEv/react-oidc/commit/5264289a48a6c0fd863757cf57b3e4bec89a6fe1) by Build-CI 
+
 #### [v2.0.7](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.6...v2.0.7)
 > 13 August 2019
 - fix(redux) workflow [`#271`](https://github.com/AxaGuilDEv/react-oidc/pull/271) by Guillaume Chervet
@@ -277,5 +284,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.7...v0.0.0)
-> 13 August 2019
+### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.8...v0.0.0)
+> 20 August 2019
