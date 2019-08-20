@@ -9,21 +9,23 @@ import { isRequireSignin, authenticateUser } from "./authenticate";
 import { getUserManager } from './authenticationService';
 
 const AuthenticationLiveCycle =  ({
-  location, user, children
+  location, oidc, children
 }) => {
-  const isAuthenticating = isRequireSignin({user});
+  const {isLoadingUser, user} = oidc;
+  const isShouldAuthenticate = !isLoadingUser && isRequireSignin({user});
+  const isLoading = isLoadingUser || isShouldAuthenticate;
   useEffect(() => {
-            if (isAuthenticating) {
+            if (isShouldAuthenticate) {
               const userManager = getUserManager();
               authenticateUser(userManager, location, user)();
             }
-  }, [isAuthenticating]);
+  }, [isShouldAuthenticate]);
 
-  return isAuthenticating ? <Authenticating /> : <>{children}</>;
+  return isLoading ? <Authenticating /> : <>{children}</>;
 };
 
 const mapStateToProps = state => ({
-  user: state.oidc.user
+  oidc: state.oidc
 });
 
 export const oidcSecure = compose(
@@ -57,10 +59,11 @@ const defaultPropsOidcSecure = {
   children: null
 };
 
+const Secure = oidcSecure(AuthenticationLiveCycle);
+
 const OidcSecure = props => {
   const { isEnabled, children } = props;
   if (isEnabled) {
-    const Secure = oidcSecure(AuthenticationLiveCycle);
     return <Secure>{children}</Secure>;
   }
   return <Dummy {...props} />;
