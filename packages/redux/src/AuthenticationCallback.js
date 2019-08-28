@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { CallbackComponent } from 'redux-oidc';
-import { withRouter } from 'react-router-dom';
+import { withRouter } from '@axa-fr/react-oidc-core';
 import { compose, withProps, pure } from 'recompose';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';

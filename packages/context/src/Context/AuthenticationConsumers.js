@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo } from 'react';
-import withRouter from '../withRouter';
-
+import { withRouter, Authenticating } from '@axa-fr/react-oidc-core';
 import {
   authenticateUser,
   getUserManager,
@@ -8,7 +7,6 @@ import {
   isRequireAuthentication,
   withServices,
 } from '../Services';
-import { Authenticating } from '../OidcComponents';
 import { AuthenticationContext } from './AuthenticationContextCreator';
 
 // for tests
@@ -38,7 +36,7 @@ const OidcSecure = withRouter(({ children, location }) => {
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUser,
     getUserManager,
-    location
+    location,
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
@@ -60,7 +58,7 @@ export const withOidcSecurewithRouter = WrappedComponent => ({
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUserInternal,
     getUserManagerInternal,
-    location
+    location,
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
@@ -76,7 +74,7 @@ export const withOidcSecure = WrappedComponent =>
     withServices(withOidcSecurewithRouter(WrappedComponent), {
       authenticateUser,
       getUserManager,
-    })
+    }),
   );
 
 export const withOidcUser = Component => props => {

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import withRouter from '../withRouter';
+import { withRouter } from '@axa-fr/react-oidc-core';
 
 import { getUserManager, oidcLog, withServices } from '../Services';
 import CallbackComponent from './Callback.component';
@@ -21,13 +21,12 @@ export const onRedirectError = (history, oidcLogInternal) => ({ message }) => {
 export const CallbackContainerCore = ({
   history,
   getUserManager: getUserManagerInternal,
-  oidcLog: oidcLogInternal
+  oidcLog: oidcLogInternal,
 }) => {
   const onSuccess = onRedirectSuccess(history, oidcLogInternal);
   const onError = onRedirectError(history, oidcLogInternal);
 
   useEffect(() => {
-    debugger
     getUserManagerInternal()
       .signinRedirectCallback()
       .then(onSuccess, onError);
@@ -38,8 +37,8 @@ export const CallbackContainerCore = ({
 const CallbackContainer = withRouter(
   withServices(CallbackContainerCore, {
     getUserManager,
-    oidcLog
-  })
+    oidcLog,
+  }),
 );
 
 export default React.memo(CallbackContainer);

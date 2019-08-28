@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
 import { compose, lifecycle } from 'recompose';
 import PropTypes from 'prop-types';
@@ -26,7 +26,7 @@ export const OidcBase = props => {
   const { isEnabled, children, store, notAuthenticated, notAuthorized } = props;
 
   if (!isEnabled) {
-    return <Fragment>{children}</Fragment>;
+    return <>{children}</>;
   }
 
   return (

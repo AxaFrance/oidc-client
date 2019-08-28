@@ -8,11 +8,7 @@ export { OidcProvider, loadUser, reducer };
 export { isRequireAuthentication, authenticateUser, signinSilent };
 export { authenticationService, getUserManager };
 
-export { default as Authenticating } from './Authenticating';
 export { default as AuthenticationCallback } from './AuthenticationCallback';
-export { default as NotAuthenticated } from './NotAuthenticated';
-export { default as NotAuthorized } from './NotAuthorized';
-export { default as AuthenticationRoutes } from './AuthenticationRoutes';
 export { default as AuthenticationSignSilentCallback } from './AuthenticationSignSilentCallback';
 
 export { default as OidcRoutes } from './OidcRoutes';

@@ -16,7 +16,7 @@
     }
   },
   "packages": [
-    "examples/**/*",
-    "packages/*"
+    "packages/*",
+    "examples/**/*"
   ]
 }

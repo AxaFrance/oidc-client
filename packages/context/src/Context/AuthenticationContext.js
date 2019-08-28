@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { AuthenticationContext } from './AuthenticationContextCreator';
 import { OidcRoutes } from '../Routes';
+import { AuthenticationContext } from './AuthenticationContextCreator';
 
 const propTypes = {
   notAuthenticated: PropTypes.node,

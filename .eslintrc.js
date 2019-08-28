@@ -8,7 +8,7 @@ module.exports = {
     'airbnb',
     'plugin:jest/recommended',
     'plugin:import/react-native',
-    'prettier',
+    'plugin:prettier/recommended',
     'prettier/react',
   ],
   plugins: ['prettier', 'jest', 'import', 'react', 'jsx-a11y', 'json', 'react-hooks'],

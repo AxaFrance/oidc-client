@@ -1,18 +1,16 @@
 {
-  "name": "@axa-fr/react-oidc-fetch-core",
+  "name": "@axa-fr/react-oidc-core",
   "version": "2.0.8",
-  "private": false,
+  "description": "A core package for Axa React Oidc packages",
+  "homepage": "https://github.com/AxaGuilDEv/react-oidc#readme",
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+    "url": "git+https://github.com/AxaGuilDEv/react-oidc.git"
   },
-  "peerDependencies": {
-    "recompose": "~0.30.0"
-  },
-  "dependencies": {
-    "@axa-fr/react-oidc-core": "^2.0.8"
+  "bugs": {
+    "url": "https://github.com/AxaGuilDEv/react-oidc/issues"
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"

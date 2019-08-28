@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import withRouter from '../withRouter';
+import { withRouter } from '@axa-fr/react-oidc-core';
 
 import {
   authenticationService,
@@ -120,11 +120,11 @@ export const useAuthenticateContextHook = (
   addOidcEventsInternal,
   removeOidcEventsInternal,
   setLoggerInternal,
-  authenticationServiceInternal
+  authenticationServiceInternal,
 ) => {
   const [oidcState, dispatch] = useReducer(
     oidcReducer,
-    setDefaultState(props, authenticationServiceInternal)
+    setDefaultState(props, authenticationServiceInternal),
   );
   const { userManager, ...oidcProps } = oidcState;
   const loginCb = useCallback(() => login(userManager, dispatch, location)(), [
@@ -160,7 +160,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
     addOidcEvents,
     removeOidcEvents,
     setLogger,
-    authenticationService
+    authenticationService,
   );
   return <AuthenticationProviderComponent {...otherProps} {...oidcProps} />;
 };

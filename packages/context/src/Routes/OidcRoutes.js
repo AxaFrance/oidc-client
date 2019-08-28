@@ -1,24 +1,35 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { Callback, SilentCallback } from "../Callback";
-import { NotAuthenticated, NotAuthorized } from "../OidcComponents";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { NotAuthenticated, NotAuthorized } from '@axa-fr/react-oidc-core';
+import { Callback, SilentCallback } from '../Callback';
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
-  children: PropTypes.node
+  configuration: PropTypes.shape({
+    client_id: PropTypes.string.isRequired,
+    redirect_uri: PropTypes.string.isRequired,
+    response_type: PropTypes.string.isRequired,
+    scope: PropTypes.string.isRequired,
+    authority: PropTypes.string.isRequired,
+    silent_redirect_uri: PropTypes.string.isRequired,
+    automaticSilentRenew: PropTypes.bool.isRequired,
+    loadUserInfo: PropTypes.bool.isRequired,
+    triggerAuthFlow: PropTypes.bool.isRequired,
+  }).isRequired,
+  children: PropTypes.node,
 };
 
 const defaultProps = {
   notAuthenticated: null,
   notAuthorized: null,
-  children: null
+  children: null,
 };
 
 const getLocation = href => {
   const match = href.match(
     // eslint-disable-next-line no-useless-escape
-    /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
+    /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/,
   );
   return (
     match && {
@@ -29,7 +40,7 @@ const getLocation = href => {
       port: match[4],
       path: match[5],
       search: match[6],
-      hash: match[7]
+      hash: match[7],
     }
   );
 };
@@ -50,12 +61,7 @@ export const getPath = href => {
   return path;
 };
 
-const OidcRoutes = ({
-  notAuthenticated,
-  notAuthorized,
-  configuration,
-  children
-}) => {
+const OidcRoutes = ({ notAuthenticated, notAuthorized, configuration, children }) => {
   const [path, setPath] = useState(window.location.pathname);
 
   const setNewPath = () => setPath(window.location.pathname);
@@ -76,13 +82,12 @@ const OidcRoutes = ({
       return <Callback />;
     case silentCallbackPath:
       return <SilentCallback />;
-    case "/authentication/not-authenticated":
+    case '/authentication/not-authenticated':
       return <NotAuthenticatedComponent />;
-    case "/authentication/not-authorized":
+    case '/authentication/not-authorized':
       return <NotAuthorizedComponent />;
     default:
       return <>{children}</>;
-      break;
   }
 };
 

@@ -1,5 +1,5 @@
 import { compose, withProps } from 'recompose';
-import { withRouter } from 'react-router-dom';
+import { withRouter } from '@axa-fr/react-oidc-core';
 
 export const fetchWithRedirectionOn403 = (fetch, history) => async (
   url,
