@@ -3,14 +3,9 @@ module.exports = api => {
   return {
     presets: ['@babel/env', '@babel/react'],
     plugins: [
-      'babel-plugin-macros',
-      [
-        '@babel/plugin-transform-runtime',
-        {
-          regenerator: true,
-        },
-      ],
-      '@babel/plugin-proposal-class-properties',
+      //'babel-plugin-macros',
+      '@babel/plugin-transform-runtime',
+      '@babel/plugin-proposal-class-properties'
     ],
   };
 };

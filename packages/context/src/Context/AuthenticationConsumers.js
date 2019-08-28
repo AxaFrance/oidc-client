@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo } from 'react';
-import { withRouter } from 'react-router-dom';
+import withRouter from '../withRouter';
 
 import {
   authenticateUser,

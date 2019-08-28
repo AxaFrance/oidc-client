@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from 'react';
-import { withRouter } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import withRouter from '../withRouter';
 
 import { getUserManager, oidcLog, withServices } from '../Services';
 import CallbackComponent from './Callback.component';
@@ -21,14 +21,13 @@ export const onRedirectError = (history, oidcLogInternal) => ({ message }) => {
 export const CallbackContainerCore = ({
   history,
   getUserManager: getUserManagerInternal,
-  oidcLog: oidcLogInternal,
-  onRedirectError: onRedirectErrorInternal,
-  onRedirectSuccess: onRedirectSuccessInternal,
+  oidcLog: oidcLogInternal
 }) => {
-  const onSuccess = useCallback(onRedirectSuccessInternal(history, oidcLogInternal), [history]);
-  const onError = useCallback(onRedirectErrorInternal(history, oidcLogInternal), [history]);
+  const onSuccess = onRedirectSuccess(history, oidcLogInternal);
+  const onError = onRedirectError(history, oidcLogInternal);
 
   useEffect(() => {
+    debugger
     getUserManagerInternal()
       .signinRedirectCallback()
       .then(onSuccess, onError);
@@ -39,10 +38,8 @@ export const CallbackContainerCore = ({
 const CallbackContainer = withRouter(
   withServices(CallbackContainerCore, {
     getUserManager,
-    oidcLog,
-    onRedirectSuccess,
-    onRedirectError,
+    oidcLog
   })
 );
 
-export default CallbackContainer;
+export default React.memo(CallbackContainer);

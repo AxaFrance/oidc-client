@@ -1,19 +1,18 @@
-import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Callback, SilentCallback } from '../Callback';
-import { NotAuthenticated, NotAuthorized } from '../OidcComponents';
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { Callback, SilentCallback } from "../Callback";
+import { NotAuthenticated, NotAuthorized } from "../OidcComponents";
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
-  children: PropTypes.node,
+  children: PropTypes.node
 };
 
 const defaultProps = {
   notAuthenticated: null,
   notAuthorized: null,
-  children: null,
+  children: null
 };
 
 const getLocation = href => {
@@ -30,7 +29,7 @@ const getLocation = href => {
       port: match[4],
       path: match[5],
       search: match[6],
-      hash: match[7],
+      hash: match[7]
     }
   );
 };
@@ -51,23 +50,43 @@ export const getPath = href => {
   return path;
 };
 
-const OidcRoutes = ({ notAuthenticated, notAuthorized, configuration, children }) => {
-  const notAuthenticatedComponent = notAuthenticated || NotAuthenticated;
-  const notAuthorizedComponent = notAuthorized || NotAuthorized;
+const OidcRoutes = ({
+  notAuthenticated,
+  notAuthorized,
+  configuration,
+  children
+}) => {
+  const [path, setPath] = useState(window.location.pathname);
+
+  const setNewPath = () => setPath(window.location.pathname);
+  useEffect(() => {
+    setNewPath();
+    window.addEventListener('popstate', setNewPath, false);
+    return () => window.removeEventListener('popstate', setNewPath, false);
+  });
+
+  const NotAuthenticatedComponent = notAuthenticated || NotAuthenticated;
+  const NotAuthorizedComponent = notAuthorized || NotAuthorized;
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
   const callbackPath = getPath(configuration.redirect_uri);
-  return (
-    <Switch>
-      <Route path={callbackPath} component={Callback} />
-      <Route path={silentCallbackPath} component={SilentCallback} />
-      <Route path="/authentication/not-authenticated" component={notAuthenticatedComponent} />
-      <Route path="/authentication/not-authorized" component={notAuthorizedComponent} />
-      <Route render={() => children} />
-    </Switch>
-  );
+
+  // TODO: useEffect pour rerender quand la location change
+  switch (path) {
+    case callbackPath:
+      return <Callback />;
+    case silentCallbackPath:
+      return <SilentCallback />;
+    case "/authentication/not-authenticated":
+      return <NotAuthenticatedComponent />;
+    case "/authentication/not-authorized":
+      return <NotAuthorizedComponent />;
+    default:
+      return <>{children}</>;
+      break;
+  }
 };
 
 OidcRoutes.propTypes = propTypes;
 OidcRoutes.defaultProps = defaultProps;
 
-export default OidcRoutes;
+export default React.memo(OidcRoutes);

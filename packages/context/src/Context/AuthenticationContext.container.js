@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
+import withRouter from '../withRouter';
 
 import {
   authenticationService,
