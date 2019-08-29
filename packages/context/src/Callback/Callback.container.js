@@ -38,7 +38,7 @@ const CallbackContainer = withRouter(
   withServices(CallbackContainerCore, {
     getUserManager,
     oidcLog,
-  }),
+  })
 );
 
 export default React.memo(CallbackContainer);

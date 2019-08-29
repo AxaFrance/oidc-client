@@ -2,21 +2,9 @@ import * as React from 'react';
 import renderer from 'react-test-renderer';
 import OidcRoutes, { getPath } from './OidcRoutes';
 
-jest.mock('react-router-dom', () => ({
-  Route: 'Route',
-  Switch: 'Switch',
-}));
-jest.mock('../OidcComponents', () => ({
-  NotAuthenticated: 'NotAuthenticated',
-  NotAuthorized: 'NotAuthorized',
-}));
 jest.mock('../Callback', () => ({
   Callback: 'Callback',
   SilentCallback: 'SilentCallback',
-}));
-jest.mock('react-router', () => ({
-  Route: 'Route',
-  Switch: 'Switch',
 }));
 
 describe('Authenticating test suite', () => {

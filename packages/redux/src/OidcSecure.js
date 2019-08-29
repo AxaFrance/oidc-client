@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
-import { Authenticating } from '@axa-fr/react-oidc-core';
+import { Authenticating, withRouter } from '@axa-fr/react-oidc-core';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
-import { withRouter } from 'react-router-dom';
 import { isRequireSignin, authenticateUser } from './authenticate';
 import { getUserManager } from './authenticationService';
 

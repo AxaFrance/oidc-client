@@ -7,15 +7,8 @@ const propTypes = {
   notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
   configuration: PropTypes.shape({
-    client_id: PropTypes.string.isRequired,
     redirect_uri: PropTypes.string.isRequired,
-    response_type: PropTypes.string.isRequired,
-    scope: PropTypes.string.isRequired,
-    authority: PropTypes.string.isRequired,
     silent_redirect_uri: PropTypes.string.isRequired,
-    automaticSilentRenew: PropTypes.bool.isRequired,
-    loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired,
   }).isRequired,
   children: PropTypes.node,
 };
@@ -29,7 +22,7 @@ const defaultProps = {
 const getLocation = href => {
   const match = href.match(
     // eslint-disable-next-line no-useless-escape
-    /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/,
+    /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
   );
   return (
     match && {
