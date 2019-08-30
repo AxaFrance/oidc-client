@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { NotAuthenticated, NotAuthorized } from '@axa-fr/react-oidc-core';
-import { Callback, SilentCallback } from '../Callback';
+import { NotAuthenticated, NotAuthorized } from '../default-component';
+import { getPath } from './route-utils';
+import { SilentCallback } from '../callbacks';
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
+  callbackComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
   configuration: PropTypes.shape({
     redirect_uri: PropTypes.string.isRequired,
     silent_redirect_uri: PropTypes.string.isRequired,
@@ -19,42 +21,13 @@ const defaultProps = {
   children: null,
 };
 
-const getLocation = href => {
-  const match = href.match(
-    // eslint-disable-next-line no-useless-escape
-    /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
-  );
-  return (
-    match && {
-      href,
-      protocol: match[1],
-      host: match[2],
-      hostname: match[3],
-      port: match[4],
-      path: match[5],
-      search: match[6],
-      hash: match[7],
-    }
-  );
-};
-
-export const getPath = href => {
-  const location = getLocation(href);
-  let { path } = location;
-  const { search, hash } = location;
-
-  if (search) {
-    path += search;
-  }
-
-  if (hash) {
-    path += hash;
-  }
-
-  return path;
-};
-
-const OidcRoutes = ({ notAuthenticated, notAuthorized, configuration, children }) => {
+const OidcRoutes = ({
+  notAuthenticated,
+  notAuthorized,
+  callbackComponent: CallbackComponent,
+  configuration,
+  children,
+}) => {
   const [path, setPath] = useState(window.location.pathname);
 
   const setNewPath = () => setPath(window.location.pathname);
@@ -72,7 +45,7 @@ const OidcRoutes = ({ notAuthenticated, notAuthorized, configuration, children }
   // TODO: useEffect pour rerender quand la location change
   switch (path) {
     case callbackPath:
-      return <Callback />;
+      return <CallbackComponent />;
     case silentCallbackPath:
       return <SilentCallback />;
     case '/authentication/not-authenticated':

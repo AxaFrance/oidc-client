@@ -1,6 +1,8 @@
-export { default as AuthenticationProvider } from './AuthenticationContext.container';
-export { AuthenticationContext } from './AuthenticationContextCreator';
-export { AuthenticationConsumer } from './AuthenticationContext';
+export {
+  default as AuthenticationProvider,
+  AuthenticationContext,
+} from './AuthenticationContext.container';
+
 export {
   default as OidcSecure,
   withOidcSecure,

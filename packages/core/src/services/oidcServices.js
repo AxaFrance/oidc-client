@@ -29,4 +29,5 @@ export const logoutUser = async userManager => {
   }
 };
 
-export const signinSilent = getUserManager => () => getUserManager().signinSilent();
+export const signinSilent = getUserManager => (data = undefined) =>
+  getUserManager().signinSilent(data);

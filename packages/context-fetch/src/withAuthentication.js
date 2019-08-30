@@ -1,6 +1,8 @@
 import { compose } from 'recompose';
-import { withFetchRedirectionOn403 } from '@axa-fr/react-oidc-fetch-core';
-import withFetchSilentAuthenticateAndRetryOn401 from './withFetchSilentAuthenticateAndRetryOn401';
+import {
+  withFetchRedirectionOn403,
+  withFetchSilentAuthenticateAndRetryOn401,
+} from '@axa-fr/react-oidc-fetch-core';
 import withFetchToken from './withFetchToken';
 
 const enhance = fetch =>

@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
-import { withRouter } from '@axa-fr/react-oidc-core';
-
-import { getUserManager, oidcLog, withServices } from '../Services';
-import CallbackComponent from './Callback.component';
+import { withRouter, getUserManager, oidcLog } from '@axa-fr/react-oidc-core';
+import withServices from '../withServices';
 
 export const onRedirectSuccess = (history, oidcLogInternal) => user => {
   oidcLogInternal.info('Successfull login Callback', user);
@@ -31,7 +29,14 @@ export const CallbackContainerCore = ({
       .signinRedirectCallback()
       .then(onSuccess, onError);
   }, [getUserManagerInternal, onError, onSuccess]);
-  return <CallbackComponent />;
+  return (
+    <div>
+      <div className="container">
+        <h1>Authentification terminée</h1>
+        <p>Vous allez être redirigé sur votre application.</p>
+      </div>
+    </div>
+  );
 };
 
 const CallbackContainer = withRouter(

@@ -1,2 +1,12 @@
-export { default as withRouter } from './withRouter';
-export { Authenticating, NotAuthenticated, NotAuthorized } from './default-component';
+export { withRouter, OidcRoutes } from './routes';
+export { Authenticating } from './default-component';
+export {
+  getUserManager,
+  authenticationService,
+  authenticateUser,
+  signinSilent,
+  logoutUser,
+  isRequireAuthentication,
+  setLogger,
+  oidcLog,
+} from './services';

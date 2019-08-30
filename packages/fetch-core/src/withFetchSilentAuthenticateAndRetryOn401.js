@@ -1,5 +1,5 @@
 import { compose, withProps } from 'recompose';
-import { signinSilent, getUserManager } from '@axa-fr/react-oidc-context';
+import { signinSilent, getUserManager } from '@axa-fr/react-oidc-core';
 
 const fetchWithSilentAuthenticateAndRetryOn401 = (fetch, trySilentAuthenticateInjected) => async (
   url,

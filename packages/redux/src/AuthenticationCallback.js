@@ -1,31 +1,29 @@
 import * as React from 'react';
 import { CallbackComponent } from 'redux-oidc';
-import { withRouter } from '@axa-fr/react-oidc-core';
+import { withRouter, getUserManager, oidcLog } from '@axa-fr/react-oidc-core';
 import { compose, withProps, pure } from 'recompose';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { getUserManager } from './authenticationService';
-import { logError } from './logger';
 
 const propTypes = {
   history: PropTypes.object.isRequired,
   userManager: PropTypes.object.isRequired,
 };
 
-export const success = logErrorInjected => history => user => {
+export const success = oidcLogInjected => history => user => {
   if (user && user.state) {
     history.push(user.state.url);
   } else {
-    logErrorInjected('urlBeforeSignin is null or undefined');
+    oidcLogInjected.error('urlBeforeSignin is null or undefined');
   }
 };
 
 const AuthenticationCallback = ({ history, userManager }) => {
-  const successCallback = user => success(logError)(history)(user);
+  const successCallback = user => success(oidcLog)(history)(user);
 
   const errorCallback = error => {
     const { message } = error;
-    logError(`There was an error handling the token callback: ${message}`);
+    oidcLog.error(`There was an error handling the token callback: ${message}`);
     history.push(`/authentication/not-authenticated?message=${message}`);
   };
 

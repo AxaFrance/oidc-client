@@ -1,15 +1,16 @@
 import React, { useContext, useEffect, useMemo } from 'react';
-import { withRouter, Authenticating } from '@axa-fr/react-oidc-core';
 import {
-  authenticateUser,
+  withRouter,
+  Authenticating,
   getUserManager,
-  oidcLog,
+  authenticateUser,
   isRequireAuthentication,
-  withServices,
-} from '../Services';
-import { AuthenticationContext } from './AuthenticationContextCreator';
+  oidcLog,
+} from '@axa-fr/react-oidc-core';
+import withServices from '../withServices';
+import { AuthenticationContext } from './AuthenticationContext.container';
 
-// for tests
+// export use only for unit tests
 export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, location) => {
   const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {
@@ -36,7 +37,7 @@ const OidcSecure = withRouter(({ children, location }) => {
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUser,
     getUserManager,
-    location,
+    location
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
@@ -58,7 +59,7 @@ export const withOidcSecurewithRouter = WrappedComponent => ({
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUserInternal,
     getUserManagerInternal,
-    location,
+    location
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
@@ -74,7 +75,7 @@ export const withOidcSecure = WrappedComponent =>
     withServices(withOidcSecurewithRouter(WrappedComponent), {
       authenticateUser,
       getUserManager,
-    }),
+    })
   );
 
 export const withOidcUser = Component => props => {

@@ -4,13 +4,6 @@ import renderer from 'react-test-renderer';
 
 import Oidc from './Oidc';
 
-// I used __esModule to mock a module with default and named exports
-// cf: https://github.com/facebook/jest/issues/5579#issuecomment-397406174
-jest.mock('./authenticationService', () => ({
-  __esModule: true,
-  default: jest.fn(),
-  getUserManager: jest.fn(),
-}));
 jest.mock('redux-oidc', () => ({
   OidcProvider: jest.fn(() => <p>Render Something</p>),
   loadUser: jest.fn(),
