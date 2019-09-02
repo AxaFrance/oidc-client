@@ -15,7 +15,6 @@ describe('SilentCallbackcomponent test', () => {
 
   it('Should call silent callback when construct', () => {
     oidc.UserManager.mockImplementation(() => userManagerMock);
-    // eslint-disable-next-line
     let component;
     act(() => {
       component = renderer.create(<SilentCallback logger={loggerMock} />);
