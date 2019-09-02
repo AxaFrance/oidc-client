@@ -1,31 +1,32 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { compose } from "recompose";
-import { withRouter } from "react-router-dom";
-import Authenticating from "./Authenticating";
-import { isRequireSignin, authenticateUser } from "./authenticate";
-import { getUserManager } from './authenticationService';
+import PropTypes from 'prop-types';
+import {
+  Authenticating,
+  withRouter,
+  getUserManager,
+  isRequireAuthentication,
+  authenticateUser,
+} from '@axa-fr/react-oidc-core';
+import { connect } from 'react-redux';
+import { compose } from 'recompose';
 
-const AuthenticationLiveCycle =  ({
-  location, oidc, children
-}) => {
-  const {isLoadingUser, user} = oidc;
-  const isShouldAuthenticate = !isLoadingUser && isRequireSignin({user});
+const AuthenticationLiveCycle = ({ location, oidc, children }) => {
+  const { isLoadingUser, user } = oidc;
+  const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
   const isLoading = isLoadingUser || isShouldAuthenticate;
   useEffect(() => {
-            if (isShouldAuthenticate) {
-              const userManager = getUserManager();
-              authenticateUser(userManager, location, user)();
-            }
-  }, [isShouldAuthenticate]);
+    if (isShouldAuthenticate) {
+      const userManager = getUserManager();
+      authenticateUser(userManager, location, user)();
+    }
+  }, [isShouldAuthenticate, location, user]);
 
   return isLoading ? <Authenticating /> : <>{children}</>;
 };
 
 const mapStateToProps = state => ({
-  oidc: state.oidc
+  oidc: state.oidc,
 });
 
 export const oidcSecure = compose(
@@ -36,27 +37,14 @@ export const oidcSecure = compose(
   withRouter
 );
 
-const propTypes = {
-  children: PropTypes.node
-};
-
-const defaultProps = {
-  children: null
-};
-
-const Dummy = ({ children }) => <>{children}</>;
-
-Dummy.propTypes = propTypes;
-Dummy.defaultProps = defaultProps;
-
 const propTypesOidcSecure = {
   isEnabled: PropTypes.bool,
-  children: PropTypes.node
+  children: PropTypes.node,
 };
 
 const defaultPropsOidcSecure = {
   isEnabled: true,
-  children: null
+  children: null,
 };
 
 const Secure = oidcSecure(AuthenticationLiveCycle);
@@ -66,7 +54,7 @@ const OidcSecure = props => {
   if (isEnabled) {
     return <Secure>{children}</Secure>;
   }
-  return <Dummy {...props} />;
+  return <>{children}</>;
 };
 
 OidcSecure.propTypes = propTypesOidcSecure;

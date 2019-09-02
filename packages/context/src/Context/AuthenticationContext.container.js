@@ -1,15 +1,11 @@
-import React, { useEffect, useReducer, useCallback } from 'react';
+import React, { useEffect, useCallback, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
+import { withRouter, authenticationService, setLogger, OidcRoutes } from '@axa-fr/react-oidc-core';
 
-import {
-  authenticationService,
-  authenticateUser,
-  logoutUser,
-  setLogger,
-  oidcLog,
-} from '../Services';
-import AuthenticationProviderComponent from './AuthenticationContext';
+import { Callback } from '../Callback';
+import { addOidcEvents, removeOidcEvents, oidcReducer, login, logout } from './OidcEvents';
+
+export const AuthenticationContext = React.createContext(null);
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
@@ -45,14 +41,6 @@ const defaultProps = {
   logger: console,
 };
 
-export const oidcReducer = (oidcState, action) =>
-  ({
-    ON_ERROR: { ...oidcState, error: action.message, isLoading: false },
-    ON_LOAD_USER: { ...oidcState, oidcUser: action.user, isLoading: false },
-    ON_UNLOAD_USER: { ...oidcState, oidcUser: null, isLoading: false },
-    ON_LOADING: { ...oidcState, isLoading: true },
-  }[action.type] || oidcState);
-
 export const setDefaultState = ({ configuration, isEnabled }, authenticationServiceInternal) => {
   return {
     oidcUser: undefined,
@@ -63,106 +51,50 @@ export const setDefaultState = ({ configuration, isEnabled }, authenticationServ
   };
 };
 
-export const onError = dispatch => error => {
-  oidcLog.error(`Error : ${error.message}`);
-  dispatch({ type: 'ON_ERROR', message: error.message });
-};
-
-export const onUserLoaded = dispatch => user => {
-  oidcLog.info(`User Loaded`);
-  dispatch({ type: 'ON_LOAD_USER', user });
-};
-
-export const onUserUnloaded = dispatch => () => {
-  oidcLog.info(`User unloaded `);
-  dispatch({ type: 'ON_UNLOAD_USER' });
-};
-
-export const onAccessTokenExpired = (dispatch, signinSilent) => async () => {
-  oidcLog.info(`AccessToken Expired `);
-  dispatch({ type: 'ON_UNLOAD_USER' });
-  await signinSilent();
-};
-
-export const addOidcEvents = (events, dispatch, signinSilent) => {
-  events.addUserLoaded(onUserLoaded(dispatch));
-  events.addSilentRenewError(onError(dispatch));
-  events.addUserUnloaded(onUserUnloaded(dispatch));
-  events.addUserSignedOut(onUserUnloaded(dispatch));
-  events.addAccessTokenExpired(onAccessTokenExpired(dispatch, signinSilent));
-};
-
-export const removeOidcEvents = (events, dispatch, signinSilent) => {
-  events.removeUserLoaded(onUserLoaded(dispatch));
-  events.removeSilentRenewError(onError(dispatch));
-  events.removeUserUnloaded(onUserUnloaded(dispatch));
-  events.removeUserSignedOut(onUserUnloaded(dispatch));
-  events.removeAccessTokenExpired(onAccessTokenExpired(dispatch, signinSilent));
-};
-
-export const logout = (userManager, dispatch) => async () => {
-  try {
-    oidcLog.info('Logout successfull');
-    await logoutUser(userManager);
-  } catch (error) {
-    onError(dispatch)(error);
-  }
-};
-export const login = (userManager, dispatch, location) => async () => {
-  dispatch({ type: 'ON_LOADING' });
-  oidcLog.info('Login requested');
-  await authenticateUser(userManager, location)();
-};
-
-export const useAuthenticateContextHook = (
-  props,
-  location,
-  addOidcEventsInternal,
-  removeOidcEventsInternal,
-  setLoggerInternal,
-  authenticationServiceInternal
-) => {
+const AuthenticationProviderInt = ({ location, ...otherProps }) => {
   const [oidcState, dispatch] = useReducer(
     oidcReducer,
-    setDefaultState(props, authenticationServiceInternal)
+    setDefaultState(otherProps, authenticationService)
   );
-  const { userManager, ...oidcProps } = oidcState;
-  const loginCb = useCallback(() => login(userManager, dispatch, location)(), [
-    location,
-    userManager,
-  ]);
-  const logoutCb = useCallback(() => logout(userManager, dispatch)(), [userManager]);
-  useEffect(() => {
-    setLoggerInternal(props.loggerLevel, props.logger);
-    dispatch({ type: 'ON_LOADING' });
-    addOidcEventsInternal(userManager.events, dispatch, userManager.signinSilent);
-    userManager.getUser().then(user => dispatch({ type: 'ON_LOAD_USER', user }));
-    return () => removeOidcEventsInternal(userManager.events, dispatch, userManager.signinSilent);
-  }, [
-    addOidcEventsInternal,
-    props.logger,
-    props.loggerLevel,
-    removeOidcEventsInternal,
-    setLoggerInternal,
-    userManager,
-  ]);
-  return {
-    ...oidcProps,
-    login: loginCb,
-    logout: logoutCb,
-  };
-};
 
-const AuthenticationProviderInt = ({ location, ...otherProps }) => {
-  const oidcProps = useAuthenticateContextHook(
-    otherProps,
-    location,
-    addOidcEvents,
-    removeOidcEvents,
-    setLogger,
-    authenticationService
+  useEffect(() => {
+    setLogger(otherProps.loggerLevel, otherProps.logger);
+    dispatch({ type: 'ON_LOADING' });
+    addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager.signinSilent);
+    oidcState.userManager.getUser().then(user => dispatch({ type: 'ON_LOAD_USER', user }));
+    return () =>
+      removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager.signinSilent);
+  }, [otherProps.logger, otherProps.loggerLevel, oidcState.userManager]);
+
+  const { oidcUser, isLoading, error, isEnabled } = oidcState;
+  const { authenticating, notAuthenticated, notAuthorized, configuration, children } = otherProps;
+  return (
+    <AuthenticationContext.Provider
+      value={{
+        isLoading,
+        oidcUser,
+        error,
+        authenticating,
+        isEnabled,
+        login: useCallback(() => login(oidcState.userManager, dispatch, location)(), [
+          location,
+          oidcState.userManager,
+        ]),
+        logout: useCallback(() => logout(oidcState.userManager, dispatch)(), [
+          oidcState.userManager,
+        ]),
+      }}
+    >
+      <OidcRoutes
+        notAuthenticated={notAuthenticated}
+        notAuthorized={notAuthorized}
+        callbackComponent={Callback}
+        configuration={configuration}
+      >
+        {children}
+      </OidcRoutes>
+    </AuthenticationContext.Provider>
   );
-  return <AuthenticationProviderComponent {...otherProps} {...oidcProps} />;
 };
 
 const AuthenticationProvider = withRouter(AuthenticationProviderInt);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderHook } from '@testing-library/react-hooks';
 import { render } from '@testing-library/react';
-import { AuthenticationContext } from './AuthenticationContextCreator';
+import { AuthenticationContext } from './AuthenticationContext.container';
 import '@testing-library/jest-dom/extend-expect';
 import { useOidcSecure, withOidcUser, withOidcSecurewithRouter } from './AuthenticationConsumers';
 

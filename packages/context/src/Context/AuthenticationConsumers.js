@@ -1,17 +1,16 @@
 import React, { useContext, useEffect, useMemo } from 'react';
-import { withRouter } from 'react-router-dom';
-
 import {
-  authenticateUser,
+  withRouter,
+  Authenticating,
   getUserManager,
-  oidcLog,
+  authenticateUser,
   isRequireAuthentication,
-  withServices,
-} from '../Services';
-import { Authenticating } from '../OidcComponents';
-import { AuthenticationContext } from './AuthenticationContextCreator';
+  oidcLog,
+} from '@axa-fr/react-oidc-core';
+import withServices from '../withServices';
+import { AuthenticationContext } from './AuthenticationContext.container';
 
-// for tests
+// export use only for unit tests
 export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, location) => {
   const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {

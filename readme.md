@@ -53,7 +53,8 @@ Two version of the component with different "State management" are available :
 
 ## How It Works
 
-These components encapsulate the use of "react-router-dom" and "oidc client" in order to hide workfow complexity.
+These components encapsulate the use of "oidc client" in order to hide workfow complexity.
+Internally, native History API is used to be router library agnostic.
 
 ## Concept
 

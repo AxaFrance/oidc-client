@@ -30,17 +30,17 @@ const App = () => (
 
 Arguments :
 
-- _settings_ : oidc settings. See [oidc-client wiki](https://github.com/IdentityModel/oidc-client-js/wiki#configuration) for further information.
+- _configuration_ : oidc settings. See [oidc-client wiki](https://github.com/IdentityModel/oidc-client-js/wiki#configuration) for further information.
 - _logger_ : Specify a logger (see logger section). Console by default console is used.
 - _loggerLevel_ : Specify a level of verbose. None level by default.
 
-React-context-oidc need the rooter (for the oidc flow redirections). So you had to wrap your application in a react router.
+React-context-oidc is agnostic router, based on native history API, (for the oidc flow redirections). So you can use any router into your application.
 
 ### Logger
 
 React-context-oidc propose to set the logger and the level logger.
 
-In the provider you can spécify a logger and a level logger.
+In the provider you can specify a logger and a logger level.
 
 - _logger_ : Like for de oidc-client package, logger is a object that support debug, info, warn and error methods that accepts a list a message to print. By default the standard console object is used.
 - _loggerLevel_ : verbosity of react-context-oidc Logger and oidc-client logger. You can set a number (0 : None, 1 : Error, 2 : Warn, 3: Info, 4: Debug) or using `oidcLog.NONE`, `oidcLog.ERROR` , `oidcLog.WARN` , `oidcLog.INFO` or `oidcLog.DEBUG`. By default None is selected.

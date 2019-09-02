@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authenticating test suite renders correctly 1`] = `"http://url.com"`;

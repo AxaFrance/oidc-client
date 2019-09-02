@@ -12,4 +12,4 @@ export {
   signinSilent,
   oidcLog,
   getUserManager,
-} from './Services';
+} from '@axa-fr/react-oidc-core';

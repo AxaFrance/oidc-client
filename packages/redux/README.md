@@ -12,8 +12,8 @@ npm install @axa-fr/react-oidc-redux --save
 
 ### Application startup (index.js)
 
-"BrowserRouter" should be declared before "AuthentificationProvider".
-The library need it to manage and normalise http redirection.
+The library is router agnostic and use native History API.
+
 The default routes used internally :
 
 - www.your-app.fr/authentication/callback

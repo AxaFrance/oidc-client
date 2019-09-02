@@ -1,6 +1,5 @@
 {
   "extends": ["tslint-plugin-prettier", "tslint-config-prettier"],
-  "rulesDirectory": ["node_modules/codelyzer"],
   "rules": {
     "prettier": {
       "severity": "warning",

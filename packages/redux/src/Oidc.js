@@ -1,14 +1,13 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
 import { compose, lifecycle } from 'recompose';
 import PropTypes from 'prop-types';
-import OidcRoutes from './OidcRoutes';
-import authenticationService, { getUserManager } from './authenticationService';
+import { OidcRoutes, authenticationService, getUserManager } from '@axa-fr/react-oidc-core';
+import AuthenticationCallback from './AuthenticationCallback';
 
 const propTypes = {
   notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
-  // eslint-disable-next-line
   configuration: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
@@ -23,15 +22,20 @@ const defaultPropsObject = {
 };
 
 export const OidcBase = props => {
-  const { isEnabled, children, store, notAuthenticated, notAuthorized } = props;
+  const { isEnabled, children, store, configuration, notAuthenticated, notAuthorized } = props;
 
   if (!isEnabled) {
-    return <Fragment>{children}</Fragment>;
+    return <>{children}</>;
   }
 
   return (
     <OidcProvider store={store} userManager={getUserManager()}>
-      <OidcRoutes notAuthenticated={notAuthenticated} notAuthorized={notAuthorized}>
+      <OidcRoutes
+        configuration={configuration}
+        notAuthenticated={notAuthenticated}
+        notAuthorized={notAuthorized}
+        callbackComponent={AuthenticationCallback}
+      >
         {children}
       </OidcRoutes>
     </OidcProvider>

@@ -11,6 +11,9 @@
   "peerDependencies": {
     "recompose": "~0.30.0"
   },
+  "dependencies": {
+    "@axa-fr/react-oidc-core": "^2.0.8"
+  },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
   },

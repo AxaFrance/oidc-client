@@ -16,14 +16,15 @@
     "openid",
     "oauth2"
   ],
+  "dependencies": {
+    "@axa-fr/react-oidc-core": "^2.0.8"
+  },
   "peerDependencies": {
     "oidc-client": ">=1.8.2",
     "prop-types": ">=15.7.2",
     "react": ">=16.8.6",
     "react-dom": ">=16.8.6",
     "react-redux": "^5.0.7",
-    "react-router": ">=5.0.1",
-    "react-router-dom": ">=5.0.1",
     "recompose": "^0.30.0",
     "redux-oidc": "^3.0.0"
   },

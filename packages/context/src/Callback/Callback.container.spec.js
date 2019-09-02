@@ -53,10 +53,6 @@ describe('Container integration tests', () => {
     warn: jest.fn(),
   };
   const signinRedirectCallback = jest.fn();
-  const onRedirectSuccessMock = jest.fn();
-  const onRedirectErrorMock = jest.fn();
-  const onRedirectSuccessCaller = jest.fn(() => onRedirectSuccessMock);
-  const onRedirectErrorCaller = () => onRedirectErrorMock;
   const getUserManager = jest.fn(() => ({
     signinRedirectCallback,
   }));
@@ -76,15 +72,13 @@ describe('Container integration tests', () => {
           history={historyMock}
           getUserManager={getUserManager}
           oidcLog={logger}
-          onRedirectSuccess={onRedirectSuccessCaller}
-          onRedirectError={onRedirectErrorCaller}
         />
       )
     );
 
     expect(getUserManager).toHaveBeenCalled();
     expect(signinRedirectCallback).toHaveBeenCalled();
-    expect(onRedirectSuccessMock).toHaveBeenCalledWith(user);
+    expect(historyMock.push).toHaveBeenCalledWith(user.state.url);
   });
 
   it('should call signinRedirect Callback and onError if signin fail', async () => {
@@ -97,14 +91,15 @@ describe('Container integration tests', () => {
           history={historyMock}
           getUserManager={getUserManager}
           oidcLog={logger}
-          onRedirectSuccess={onRedirectSuccessCaller}
-          onRedirectError={onRedirectErrorCaller}
         />
       )
     );
 
     expect(getUserManager).toHaveBeenCalled();
     expect(signinRedirectCallback).toHaveBeenCalled();
-    expect(onRedirectErrorMock).toHaveBeenCalledWith(error);
+    const routeCalled = `/authentication/not-authenticated?message=${encodeURIComponent(
+      error.message
+    )}`;
+    expect(historyMock.push).toHaveBeenCalledWith(routeCalled);
   });
 });

@@ -1,8 +1,6 @@
-import React, { useEffect, useCallback } from 'react';
-import { withRouter } from 'react-router-dom';
-
-import { getUserManager, oidcLog, withServices } from '../Services';
-import CallbackComponent from './Callback.component';
+import React, { useEffect } from 'react';
+import { withRouter, getUserManager, oidcLog } from '@axa-fr/react-oidc-core';
+import withServices from '../withServices';
 
 export const onRedirectSuccess = (history, oidcLogInternal) => user => {
   oidcLogInternal.info('Successfull login Callback', user);
@@ -22,27 +20,30 @@ export const CallbackContainerCore = ({
   history,
   getUserManager: getUserManagerInternal,
   oidcLog: oidcLogInternal,
-  onRedirectError: onRedirectErrorInternal,
-  onRedirectSuccess: onRedirectSuccessInternal,
 }) => {
-  const onSuccess = useCallback(onRedirectSuccessInternal(history, oidcLogInternal), [history]);
-  const onError = useCallback(onRedirectErrorInternal(history, oidcLogInternal), [history]);
+  const onSuccess = onRedirectSuccess(history, oidcLogInternal);
+  const onError = onRedirectError(history, oidcLogInternal);
 
   useEffect(() => {
     getUserManagerInternal()
       .signinRedirectCallback()
       .then(onSuccess, onError);
   }, [getUserManagerInternal, onError, onSuccess]);
-  return <CallbackComponent />;
+  return (
+    <div>
+      <div className="container">
+        <h1>Authentification terminée</h1>
+        <p>Vous allez être redirigé sur votre application.</p>
+      </div>
+    </div>
+  );
 };
 
 const CallbackContainer = withRouter(
   withServices(CallbackContainerCore, {
     getUserManager,
     oidcLog,
-    onRedirectSuccess,
-    onRedirectError,
   })
 );
 
-export default CallbackContainer;
+export default React.memo(CallbackContainer);
