@@ -42,7 +42,6 @@ const OidcRoutes = ({
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
   const callbackPath = getPath(configuration.redirect_uri);
 
-  // TODO: useEffect pour rerender quand la location change
   switch (path) {
     case callbackPath:
       return <CallbackComponent />;
