@@ -1,6 +1,13 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.8...v3.0.0-alpha.0)
+> 2 September 2019
+- feat(router) Agnostic router [`#290`](https://github.com/AxaGuilDEv/react-oidc/pull/290) by Arnaud Foraison
+- fix(licence)set correct entity name [`#285`](https://github.com/AxaGuilDEv/react-oidc/pull/285) by Guillaume Chervet
+- chore(release): publish v3.0.0-alpha.0 ***NO_CI*** [`6192d98`](https://github.com/AxaGuilDEv/react-oidc/commit/6192d98c63cd30ee2b69561bd78c4c313353dff7) by Build-CI 
+- docs(changelog) update to new 2.0.8 [`db610e3`](https://github.com/AxaGuilDEv/react-oidc/commit/db610e36a5874fc05ee3130eb116223b8122aa29) by Build-CI 
+
 #### [v2.0.8](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.7...v2.0.8)
 > 20 August 2019
 - fix(redux) F5 always re-auth [`#278`](https://github.com/AxaGuilDEv/react-oidc/pull/278) by Guillaume Chervet
@@ -284,5 +291,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.8...v0.0.0)
-> 20 August 2019
+#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.0-alpha.0...v0.0.0)
+> 2 September 2019
