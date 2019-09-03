@@ -14,7 +14,7 @@ const store = configureStore();
 const origin = document.location.origin;
 
 const isEnabled = configuration.isEnabled;
-if (!configuration.configurations.length <= 0) {
+if (configuration.configurations.length <= 0) {
     throw new Error(`No configuration found`);
 }
 const authenticationConfig = origin ? configuration.configurations.find(m => m.origin === origin) : configuration.configurations[0];
