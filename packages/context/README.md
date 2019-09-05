@@ -48,7 +48,7 @@ const App = () => (
 render(<App />, document.getElementById("root"));
 ```
 
-"AuthentificationProvider" accept the following properties :
+`AuthenticationProvider` accept the following properties :
 
 ```javascript
 const propTypes = {
