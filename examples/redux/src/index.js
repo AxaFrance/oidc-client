@@ -7,6 +7,7 @@ import { configureStore } from './Store';
 import { BrowserRouter as Router } from 'react-router-dom';
 import registerServiceWorker from './registerServiceWorker';
 import configuration from './configuration';
+import ComponentOverride from './ComponentOverride';
 
 import { Oidc } from '@axa-fr/react-oidc-redux';
 
@@ -15,20 +16,29 @@ const origin = document.location.origin;
 
 const isEnabled = configuration.isEnabled;
 if (configuration.configurations.length <= 0) {
-    throw new Error(`No configuration found`);
+  throw new Error(`No configuration found`);
 }
-const authenticationConfig = origin ? configuration.configurations.find(m => m.origin === origin) : configuration.configurations[0];
+const authenticationConfig = origin
+  ? configuration.configurations.find(m => m.origin === origin)
+  : configuration.configurations[0];
 if (!authenticationConfig) {
-    throw new Error(`Configuration not found for origin ${origin}`);
+  throw new Error(`Configuration not found for origin ${origin}`);
 }
 
-const Start = (<Provider store={store}>
+const Start = (
+  <Provider store={store}>
     <Router>
-        <Oidc store={store} configuration={authenticationConfig.config} isEnabled={isEnabled} >
-            <App />
-        </Oidc>
+      <Oidc
+        store={store}
+        configuration={authenticationConfig.config}
+        isEnabled={isEnabled}
+        callbackComponentOverride={ComponentOverride}
+      >
+        <App />
+      </Oidc>
     </Router>
-</Provider>);
+  </Provider>
+);
 
 ReactDOM.render(Start, document.getElementById('root'));
 registerServiceWorker();
