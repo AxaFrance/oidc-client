@@ -53,10 +53,6 @@ export const setDefaultState = ({ configuration, isEnabled }, authenticationServ
   };
 };
 
-const withComponentOverrideProps = (Component, customProps) => props => (
-  <Component callbackComponentOverride={customProps} {...props} />
-);
-
 const AuthenticationProviderInt = ({ location, ...otherProps }) => {
   const [oidcState, dispatch] = useReducer(
     oidcReducer,
@@ -102,7 +98,8 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
       <OidcRoutes
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
-        callbackComponent={withComponentOverrideProps(CallbackComponent, callbackComponentOverride)}
+        callbackComponent={CallbackComponent}
+        callbackComponentOverride={callbackComponentOverride}
         configuration={configuration}
       >
         {children}
