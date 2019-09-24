@@ -12,10 +12,10 @@
   "keywords": [
     "oidc",
     "redux",
-    "react-component",
-    "react-hoc",
+    "OpenID Connect",
     "openid",
-    "oauth2"
+    "oauth2",
+    "react-component"
   ],
   "peerDependencies": {
     "react": ">=16.8.6",

@@ -12,9 +12,10 @@
   "keywords": [
     "oidc",
     "redux",
-    "react-component",
+    "OpenID Connect",
     "openid",
-    "oauth2"
+    "oauth2",
+    "react-component"
   ],
   "dependencies": {
     "@axa-fr/react-oidc-core": "^3.0.0-alpha.0"
