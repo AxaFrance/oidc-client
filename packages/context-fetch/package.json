@@ -12,10 +12,10 @@
   "keywords": [
     "oidc",
     "context-api",
-    "react-component",
-    "react-hoc",
+    "OpenID Connect",
     "openid",
-    "oauth2"
+    "oauth2",
+    "react-component"
   ],
   "peerDependencies": {
     "recompose": "~0.30.0"

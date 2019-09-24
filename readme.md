@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  A set of react components and HOC to make Oidc ((Open ID Connect)) client easy. It aim to simplify OAuth authentication between multiples providers.
+  A set of react components and HOC to make Oidc (OpenID Connect) client easy. It aim to simplify OAuth authentication between multiples providers.
 </p>
 
 - [About](#about)

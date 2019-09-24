@@ -12,9 +12,10 @@
   "keywords": [
     "oidc",
     "context-api",
-    "react-component",
+    "OpenID Connect",
     "openid",
-    "oauth2"
+    "oauth2",
+    "react-component"
   ],
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
