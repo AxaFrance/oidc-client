@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { withRouter, getUserManager, oidcLog } from '@axa-fr/react-oidc-core';
+import { withRouter, getUserManager, oidcLog, Callback } from '@axa-fr/react-oidc-core';
 import withServices from '../withServices';
 
 export const onRedirectSuccess = (history, oidcLogInternal) => user => {
@@ -20,6 +20,7 @@ export const CallbackContainerCore = ({
   history,
   getUserManager: getUserManagerInternal,
   oidcLog: oidcLogInternal,
+  callbackComponentOverride: CallbackComponentOverride,
 }) => {
   const onSuccess = onRedirectSuccess(history, oidcLogInternal);
   const onError = onRedirectError(history, oidcLogInternal);
@@ -29,14 +30,7 @@ export const CallbackContainerCore = ({
       .signinRedirectCallback()
       .then(onSuccess, onError);
   }, [getUserManagerInternal, onError, onSuccess]);
-  return (
-    <div>
-      <div className="container">
-        <h1>Authentification terminée</h1>
-        <p>Vous allez être redirigé sur votre application.</p>
-      </div>
-    </div>
-  );
+  return CallbackComponentOverride ? <CallbackComponentOverride /> : <Callback />;
 };
 
 const CallbackContainer = withRouter(

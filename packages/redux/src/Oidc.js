@@ -12,6 +12,7 @@ const propTypes = {
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
+  callbackComponentOverride: PropTypes.node,
 };
 
 const defaultPropsObject = {
@@ -19,10 +20,23 @@ const defaultPropsObject = {
   notAuthorized: null,
   isEnabled: true,
   children: null,
+  callbackComponentOverride: null,
 };
 
+const withComponentOverrideProps = (Component, customProps) => props => (
+  <Component callbackComponentOverride={customProps} {...props} />
+);
+
 export const OidcBase = props => {
-  const { isEnabled, children, store, configuration, notAuthenticated, notAuthorized } = props;
+  const {
+    isEnabled,
+    children,
+    store,
+    callbackComponentOverride,
+    configuration,
+    notAuthenticated,
+    notAuthorized,
+  } = props;
 
   if (!isEnabled) {
     return <>{children}</>;
@@ -34,7 +48,10 @@ export const OidcBase = props => {
         configuration={configuration}
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
-        callbackComponent={AuthenticationCallback}
+        callbackComponent={withComponentOverrideProps(
+          AuthenticationCallback,
+          callbackComponentOverride
+        )}
       >
         {children}
       </OidcRoutes>

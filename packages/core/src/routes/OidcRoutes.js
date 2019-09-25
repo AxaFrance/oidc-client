@@ -8,6 +8,7 @@ const propTypes = {
   notAuthenticated: PropTypes.node,
   notAuthorized: PropTypes.node,
   callbackComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
+  callbackComponentOverride: PropTypes.node,
   configuration: PropTypes.shape({
     redirect_uri: PropTypes.string.isRequired,
     silent_redirect_uri: PropTypes.string.isRequired,
@@ -19,12 +20,14 @@ const defaultProps = {
   notAuthenticated: null,
   notAuthorized: null,
   children: null,
+  callbackComponentOverride: null,
 };
 
 const OidcRoutes = ({
   notAuthenticated,
   notAuthorized,
   callbackComponent: CallbackComponent,
+  callbackComponentOverride,
   configuration,
   children,
 }) => {
@@ -44,7 +47,7 @@ const OidcRoutes = ({
 
   switch (path) {
     case callbackPath:
-      return <CallbackComponent />;
+      return <CallbackComponent callbackComponentOverride={callbackComponentOverride} />;
     case silentCallbackPath:
       return <SilentCallback />;
     case '/authentication/not-authenticated':

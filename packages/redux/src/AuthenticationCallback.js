@@ -8,6 +8,11 @@ import PropTypes from 'prop-types';
 const propTypes = {
   history: PropTypes.object.isRequired,
   userManager: PropTypes.object.isRequired,
+  callbackComponentOverride: PropTypes.node,
+};
+
+const defaultProps = {
+  callbackComponentOverride: null,
 };
 
 export const success = oidcLogInjected => history => user => {
@@ -18,7 +23,11 @@ export const success = oidcLogInjected => history => user => {
   }
 };
 
-const AuthenticationCallback = ({ history, userManager }) => {
+const AuthenticationCallback = ({
+  history,
+  userManager,
+  callbackComponentOverride: CallbackComponentOverride,
+}) => {
   const successCallback = user => success(oidcLog)(history)(user);
 
   const errorCallback = error => {
@@ -33,12 +42,17 @@ const AuthenticationCallback = ({ history, userManager }) => {
       errorCallback={errorCallback}
       successCallback={successCallback}
     >
-      <p>Authentification en cours vous allez être redirigé.</p>
+      {CallbackComponentOverride ? (
+        <CallbackComponentOverride />
+      ) : (
+        <p>Authentification en cours vous allez être redirigé.</p>
+      )}
     </CallbackComponent>
   );
 };
 
 AuthenticationCallback.propTypes = propTypes;
+AuthenticationCallback.defaultProps = defaultProps;
 
 const wrapUserManager = () => ({ userManager: getUserManager() });
 

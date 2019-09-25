@@ -1,5 +1,5 @@
 export { withRouter, OidcRoutes } from './routes';
-export { Authenticating } from './default-component';
+export { Authenticating, Callback } from './default-component';
 export {
   getUserManager,
   authenticationService,

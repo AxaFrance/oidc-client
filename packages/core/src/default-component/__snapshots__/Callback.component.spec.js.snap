@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Callback.component test suite renders correctly 1`] = `
+<DocumentFragment>
+  <div>
+    <div
+      class="container"
+    >
+      <h1>
+        Authentification terminée
+      </h1>
+      <p>
+        Vous allez être redirigé sur votre application.
+      </p>
+    </div>
+  </div>
+</DocumentFragment>
+`;
