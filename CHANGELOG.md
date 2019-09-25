@@ -1,6 +1,15 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.0-alpha.0...v3.0.1-alpha.0)
+> 25 September 2019
+- feat(all) Add callback component [`#303`](https://github.com/AxaGuilDEv/react-oidc/pull/303) by Madebymaurice
+- doc(package) add better keword and update licence [`#304`](https://github.com/AxaGuilDEv/react-oidc/pull/304) by Guillaume Chervet
+- docs: fixed a typo on AuthenticationProvider [`#295`](https://github.com/AxaGuilDEv/react-oidc/pull/295) by Jean-Lou Piermé
+- fix(sample:redux) typo to get the condition working [`#292`](https://github.com/AxaGuilDEv/react-oidc/pull/292) by Markus Lasermann
+- chore(release): publish v3.0.1-alpha.0 ***NO_CI*** [`3a6de2e`](https://github.com/AxaGuilDEv/react-oidc/commit/3a6de2ef2af3a7a51ee191a0c003907ba7fbcd7e) by Build-CI 
+- docs(changelog) update to new 3.0.0-alpha.0 [`1953c47`](https://github.com/AxaGuilDEv/react-oidc/commit/1953c479773b6181a3e0acf308e63bdc4d12cf8b) by Build-CI 
+
 #### [v3.0.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.8...v3.0.0-alpha.0)
 > 2 September 2019
 - feat(router) Agnostic router [`#290`](https://github.com/AxaGuilDEv/react-oidc/pull/290) by Arnaud Foraison
@@ -291,5 +300,5 @@ All notable changes to this project will be documented in this file.
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
 
-#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.0-alpha.0...v0.0.0)
-> 2 September 2019
+#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.1-alpha.0...v0.0.0)
+> 25 September 2019
