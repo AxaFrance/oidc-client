@@ -6,13 +6,13 @@ import { OidcRoutes, authenticationService, getUserManager } from '@axa-fr/react
 import AuthenticationCallback from './AuthenticationCallback';
 
 const propTypes = {
-  notAuthenticated: PropTypes.node,
-  notAuthorized: PropTypes.node,
+  notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   configuration: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
-  callbackComponentOverride: PropTypes.node,
+  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
 };
 
 const defaultPropsObject = {

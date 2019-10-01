@@ -2,16 +2,17 @@ import React, { useEffect, useCallback, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter, authenticationService, setLogger, OidcRoutes } from '@axa-fr/react-oidc-core';
 
-import { Callback as CallbackComponent } from '../Callback';
+import { Callback } from '../Callback';
 import { addOidcEvents, removeOidcEvents, oidcReducer, login, logout } from './OidcEvents';
+import withServices from '../withServices';
 
 export const AuthenticationContext = React.createContext(null);
 
 const propTypes = {
-  notAuthenticated: PropTypes.node,
-  notAuthorized: PropTypes.node,
-  authenticating: PropTypes.node,
-  callbackComponentOverride: PropTypes.node,
+  notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  authenticating: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired,
     redirect_uri: PropTypes.string.isRequired,
@@ -53,6 +54,10 @@ export const setDefaultState = ({ configuration, isEnabled }, authenticationServ
   };
 };
 
+const withComponentOverrideProps = (Component, customProps) => props => (
+  <Component callbackComponentOverride={customProps} {...props} />
+);
+
 const AuthenticationProviderInt = ({ location, ...otherProps }) => {
   const [oidcState, dispatch] = useReducer(
     oidcReducer,
@@ -76,7 +81,12 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
     callbackComponentOverride,
     configuration,
     children,
+    Callback: CallbackInt,
   } = otherProps;
+
+  const CallbackComponent = callbackComponentOverride
+    ? withComponentOverrideProps(CallbackInt, callbackComponentOverride)
+    : CallbackInt;
 
   return (
     <AuthenticationContext.Provider
@@ -99,7 +109,6 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
         callbackComponent={CallbackComponent}
-        callbackComponentOverride={callbackComponentOverride}
         configuration={configuration}
       >
         {children}
@@ -108,7 +117,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
   );
 };
 
-const AuthenticationProvider = withRouter(AuthenticationProviderInt);
+const AuthenticationProvider = withRouter(withServices(AuthenticationProviderInt, { Callback }));
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
 AuthenticationProvider.displayName = 'AuthenticationProvider';
