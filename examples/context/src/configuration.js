@@ -1,9 +1,9 @@
 const configuration = {
-  client_id: 'implicit',
+  client_id: 'spa.short',
   redirect_uri: 'http://localhost:3000/authentication/callback',
-  response_type: 'id_token token',
+  response_type: 'code',
   post_logout_redirect_uri: 'http://localhost:3000/',
-  scope: 'openid profile email',
+  scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
   automaticSilentRenew: true,
