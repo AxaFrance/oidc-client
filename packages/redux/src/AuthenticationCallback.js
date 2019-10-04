@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 const propTypes = {
   history: PropTypes.object.isRequired,
   userManager: PropTypes.object.isRequired,
-  callbackComponentOverride: PropTypes.node,
+  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
 };
 
 const defaultProps = {

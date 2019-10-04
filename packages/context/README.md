@@ -49,10 +49,10 @@ render(<App />, document.getElementById('root'));
 
 ```javascript
 const propTypes = {
-  notAuthenticated: PropTypes.node, // react component displayed during authentication
-  notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
-  authenticating: PropTypes.node, // react component displayed when about to redirect user to be authenticated
-  callbackComponentOverride: PropTypes.node, // react component displayed when user is connected
+  notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed during authentication
+  notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed in case user is not Authorised
+  authenticating: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed when about to redirect user to be authenticated
+  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed when user is connected
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
     redirect_uri: PropTypes.string.isRequired,
@@ -93,6 +93,30 @@ const configuration = {
 };
 
 export default configuration;
+```
+
+### Polyfill
+
+oidc-client needs some polyfills to works on Internet Explorer. You can use [core-js](https://github.com/zloirock/core-js) to help you. See [Context Sample](../../examples/context). In the sample we use some polyfills
+
+```javascript
+import 'core-js/es/array/from';
+import 'core-js/es/array/find'; 
+import 'core-js/es/array/includes'; 
+import 'core-js/es/array/find-index'; 
+import 'core-js/es/array/map';
+
+import 'core-js/es/object/assign';
+
+import 'core-js/es/promise';
+import 'core-js/es/map';
+
+import 'core-js/es/string/repeat';
+import 'core-js/es/string/pad-start';
+import 'core-js/es/string/pad-end';
+import 'core-js/es/string/starts-with';
+
+import 'whatwg-fetch';
 ```
 
 ### How to consume : Hooks method (Pages/Dashboard/Dashboard.js)
