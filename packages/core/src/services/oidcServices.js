@@ -20,8 +20,6 @@ export const authenticateUser = (userManager, location, history, user=null) => a
   }
   const url = location.pathname + (location.search || '');
   
-  console.log('oidcUser', oidcUser);
-  console.log('isRequireSignin', isRequireSignin(oidcUser, isForce));
   if (isRequireSignin(oidcUser, isForce)) {
     oidcLog.info('authenticate user...');
     userRequested = true;
