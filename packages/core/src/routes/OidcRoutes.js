@@ -5,8 +5,8 @@ import { getPath } from './route-utils';
 import { SilentCallback } from '../callbacks';
 
 const propTypes = {
-  notAuthenticated: PropTypes.node,
-  notAuthorized: PropTypes.node,
+  notAuthenticated: PropTypes.elementType,
+  notAuthorized: PropTypes.elementType,
   callbackComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
   configuration: PropTypes.shape({
     redirect_uri: PropTypes.string.isRequired,

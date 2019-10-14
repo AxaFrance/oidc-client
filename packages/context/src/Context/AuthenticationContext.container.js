@@ -9,10 +9,10 @@ import withServices from '../withServices';
 export const AuthenticationContext = React.createContext(null);
 
 const propTypes = {
-  notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  authenticating: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  notAuthenticated: PropTypes.elementType,
+  notAuthorized: PropTypes.elementType,
+  authenticating: PropTypes.elementType,
+  callbackComponentOverride: PropTypes.elementType,
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired,
     redirect_uri: PropTypes.string.isRequired,
