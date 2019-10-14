@@ -25,7 +25,7 @@ const OidcRoutes = ({
   notAuthenticated,
   notAuthorized,
   callbackComponent: CallbackComponent,
-  sessionLostComponent: SessionLostComponent,
+  sessionLost,
   configuration,
   children,
 }) => {
@@ -40,7 +40,7 @@ const OidcRoutes = ({
 
   const NotAuthenticatedComponent = notAuthenticated || NotAuthenticated;
   const NotAuthorizedComponent = notAuthorized || NotAuthorized;
-  const SessionLostComponent = SessionLostComponent || SessionLost;
+  const SessionLostComponent = sessionLost || SessionLost;
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
   const callbackPath = getPath(configuration.redirect_uri);
 

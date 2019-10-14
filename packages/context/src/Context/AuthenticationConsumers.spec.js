@@ -25,11 +25,12 @@ describe('Consumers service tests suite', () => {
   });
 
   it('should call authentication when enabled', () => {
-    renderHook(() => useOidcSecure(authenticateUser, getUserManager, '/locationUser'), {
+    const history = { push : () => {} };
+    renderHook(() => useOidcSecure(authenticateUser, getUserManager, '/locationUser', history), {
       wrapper: getWrapper(),
     });
 
-    expect(authenticateUser).toHaveBeenCalledWith({ param: 'Mock version' }, '/locationUser');
+    expect(authenticateUser).toHaveBeenCalledWith({ param: 'Mock version' }, '/locationUser', history);
   });
 
   it('should NOT call authentication when disabled', () => {

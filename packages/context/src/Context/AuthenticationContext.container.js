@@ -112,7 +112,7 @@ const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
         callbackComponent={CallbackComponent}
-        sessionLostComponent={sessionLostComponent}
+        sessionLost={sessionLostComponent}
         configuration={configuration}
       >
         {children}

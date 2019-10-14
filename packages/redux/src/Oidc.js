@@ -38,6 +38,7 @@ export const OidcBase = props => {
     configuration,
     notAuthenticated,
     notAuthorized,
+    sessionLostComponent,  
   } = props;
 
   if (!isEnabled) {
@@ -50,6 +51,7 @@ export const OidcBase = props => {
         configuration={configuration}
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
+        sessionLost={sessionLostComponent}
         callbackComponent={withComponentOverrideProps(
           AuthenticationCallback,
           callbackComponentOverride
