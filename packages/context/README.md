@@ -95,6 +95,30 @@ const configuration = {
 export default configuration;
 ```
 
+### Polyfill
+
+oidc-client needs some polyfills to works on Internet Explorer. You can use [core-js](https://github.com/zloirock/core-js) to help you. See [Context Sample](../../examples/context). In the sample we use some polyfills
+
+```javascript
+import 'core-js/es/array/from';
+import 'core-js/es/array/find'; 
+import 'core-js/es/array/includes'; 
+import 'core-js/es/array/find-index'; 
+import 'core-js/es/array/map';
+
+import 'core-js/es/object/assign';
+
+import 'core-js/es/promise';
+import 'core-js/es/map';
+
+import 'core-js/es/string/repeat';
+import 'core-js/es/string/pad-start';
+import 'core-js/es/string/pad-end';
+import 'core-js/es/string/starts-with';
+
+import 'whatwg-fetch';
+```
+
 ### How to consume : Hooks method (Pages/Dashboard/Dashboard.js)
 
 "useReactOidc" returns all props from the Hook :

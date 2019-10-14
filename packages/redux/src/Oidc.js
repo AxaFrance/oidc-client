@@ -63,7 +63,7 @@ OidcBase.propTypes = propTypes;
 OidcBase.defaultProps = defaultPropsObject;
 
 const lifecycleComponent = {
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const { isEnabled, store, configuration } = this.props;
     if (isEnabled) {
       const userManager = authenticationService(configuration);
