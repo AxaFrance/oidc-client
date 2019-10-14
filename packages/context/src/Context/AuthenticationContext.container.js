@@ -13,6 +13,7 @@ const propTypes = {
   notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   authenticating: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  sessionLostComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired,
     redirect_uri: PropTypes.string.isRequired,
@@ -39,6 +40,7 @@ const defaultProps = {
   notAuthorized: null,
   authenticating: null,
   callbackComponentOverride: null,
+  sessionLostComponent: null,
   isEnabled: true,
   loggerLevel: 0,
   logger: console,
@@ -58,7 +60,7 @@ const withComponentOverrideProps = (Component, customProps) => props => (
   <Component callbackComponentOverride={customProps} {...props} />
 );
 
-const AuthenticationProviderInt = ({ location, ...otherProps }) => {
+const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
   const [oidcState, dispatch] = useReducer(
     oidcReducer,
     setDefaultState(otherProps, authenticationService)
@@ -79,6 +81,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
     notAuthenticated,
     notAuthorized,
     callbackComponentOverride,
+    sessionLostComponent,  
     configuration,
     children,
     Callback: CallbackInt,
@@ -96,7 +99,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
         error,
         authenticating,
         isEnabled,
-        login: useCallback(() => login(oidcState.userManager, dispatch, location)(), [
+        login: useCallback(() => login(oidcState.userManager, dispatch, location, history)(), [
           location,
           oidcState.userManager,
         ]),
@@ -109,6 +112,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
         callbackComponent={CallbackComponent}
+        sessionLostComponent={sessionLostComponent}
         configuration={configuration}
       >
         {children}

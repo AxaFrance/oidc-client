@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { NotAuthenticated, NotAuthorized } from '../default-component';
+import { NotAuthenticated, NotAuthorized, SessionLost } from '../default-component';
 import { getPath } from './route-utils';
 import { SilentCallback } from '../callbacks';
 
@@ -25,6 +25,7 @@ const OidcRoutes = ({
   notAuthenticated,
   notAuthorized,
   callbackComponent: CallbackComponent,
+  sessionLostComponent: SessionLostComponent,
   configuration,
   children,
 }) => {
@@ -39,6 +40,7 @@ const OidcRoutes = ({
 
   const NotAuthenticatedComponent = notAuthenticated || NotAuthenticated;
   const NotAuthorizedComponent = notAuthorized || NotAuthorized;
+  const SessionLostComponent = SessionLostComponent || SessionLost;
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
   const callbackPath = getPath(configuration.redirect_uri);
 
@@ -51,6 +53,8 @@ const OidcRoutes = ({
       return <NotAuthenticatedComponent />;
     case '/authentication/not-authorized':
       return <NotAuthorizedComponent />;
+    case '/authentication/session-lost':
+      return <SessionLostComponent />;  
     default:
       return <>{children}</>;
   }

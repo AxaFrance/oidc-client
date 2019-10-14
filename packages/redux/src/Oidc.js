@@ -8,19 +8,21 @@ import AuthenticationCallback from './AuthenticationCallback';
 const propTypes = {
   notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  sessionLostComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   configuration: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
-  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
 };
 
 const defaultPropsObject = {
   notAuthenticated: null,
   notAuthorized: null,
+  callbackComponentOverride: null,
+  sessionLostComponent: null,
   isEnabled: true,
   children: null,
-  callbackComponentOverride: null,
 };
 
 const withComponentOverrideProps = (Component, customProps) => props => (
