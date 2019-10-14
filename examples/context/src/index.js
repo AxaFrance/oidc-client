@@ -1,4 +1,6 @@
 import React from 'react';
+import './ie.polyfills';
+
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthenticationProvider, oidcLog } from '@axa-fr/react-oidc-context';

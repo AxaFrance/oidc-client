@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WithRouter test Suite should withRouter add location and history 1`] = `
+<DocumentFragment>
+  <div
+    history="[object Object]"
+    location="location"
+  >
+    Component Mock
+  </div>
+</DocumentFragment>
+`;
