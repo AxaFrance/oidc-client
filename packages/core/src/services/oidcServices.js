@@ -2,7 +2,7 @@ import { oidcLog } from './loggerService';
 
 let userRequested = false;
 
-export const isRequireAuthentication= ({ user, isForce }) =>
+export const isRequireAuthentication= () => true;
     isForce || !user || (user && user.expired === true);
 
 export const isRequireSignin  = (oidcUser, isForce) =>

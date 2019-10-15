@@ -64,7 +64,7 @@ export const withOidcSecurewithRouter = WrappedComponent => ({
     location,
     history
   );
-  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
+  const requiredAuth =  useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
     oidcUser,
   ]);

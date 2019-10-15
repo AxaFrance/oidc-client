@@ -64,6 +64,7 @@ describe('Consumers service tests suite', () => {
       location: '/myurl',
       authenticateUser,
       getUserManager,
+      history : {push: () => {}}
     };
 
     const testingComponent = () => <div data-testid="componentMount" />;
@@ -85,6 +86,7 @@ describe('Consumers service tests suite', () => {
       location: '/myurl',
       authenticateUser,
       getUserManager,
+      history : {push: () => {}}
     };
 
     const testingComponent = () => <div data-testid="componentMount" />;
