@@ -49,10 +49,10 @@ render(<App />, document.getElementById('root'));
 
 ```javascript
 const propTypes = {
-  notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed during authentication
-  notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed in case user is not Authorised
-  authenticating: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed when about to redirect user to be authenticated
-  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // react component displayed when user is connected
+  notAuthenticated: PropTypes.elementType, // react component displayed during authentication
+  notAuthorized: PropTypes.elementType, // react component displayed in case user is not Authorised
+  authenticating: PropTypes.elementType, // react component displayed when about to redirect user to be authenticated
+  callbackComponentOverride: PropTypes.elementType, // react component displayed when user is connected
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
     redirect_uri: PropTypes.string.isRequired,
