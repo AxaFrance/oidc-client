@@ -5,7 +5,7 @@ jest.mock('./loggerService');
 describe('authenticate testing', () => {
   const userMock = {};
   let userManagerMock;
-  
+
   const locationMock = {
     pathname: '/pathname',
   };
@@ -20,7 +20,7 @@ describe('authenticate testing', () => {
 
     jest.clearAllMocks();
   });
-  
+
   it('authenticateUser should not call signinredirect with a user ', async () => {
     await authenticateUser(userManagerMock, locationMock)();
     expect(userManagerMock.getUser).toHaveBeenCalled();
@@ -34,27 +34,32 @@ describe('authenticate testing', () => {
       data: { url: '/pathname' },
     });
   });
-  
+
   it('authenticateUser should call signinsilent with user', async () => {
     const userManagerMockLocal = {
       signinSilent: jest.fn(),
     };
-    await authenticateUser(userManagerMockLocal, locationMock, null, { expired: true} )(false);
+    await authenticateUser(userManagerMockLocal, locationMock, null, { expired: true })(false);
     expect(userManagerMockLocal.signinSilent).toHaveBeenCalled();
   });
 
   it('authenticateUser should call history.push with user', async () => {
     const userManagerMockLocal = {
-      signinSilent: jest.fn(() => new Promise(function(resolve, reject) {
-        setTimeout(function() {
-          reject( 'session expired');
-        }, 300);
-      })),
+      signinSilent: jest.fn(
+        () =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              reject(new Error('session expired'));
+            }, 300);
+          })
+      ),
     };
     const historyMock = {
-      push :jest.fn(),
+      push: jest.fn(),
     };
-    await authenticateUser(userManagerMockLocal, locationMock, historyMock, { expired: true})(false);
+    await authenticateUser(userManagerMockLocal, locationMock, historyMock, { expired: true })(
+      false
+    );
     expect(userManagerMockLocal.signinSilent).toHaveBeenCalled();
     expect(historyMock.push).toHaveBeenCalled();
   });
