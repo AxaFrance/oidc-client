@@ -10,6 +10,7 @@
     "@axa-fr/react-oidc-context-fetch": "^3.0.1-alpha.0",
     "oidc-client": "^1.8.2",
     "react": "^16.8.6",
+    "react-app-rewired": "^2.1.3",
     "react-dom": "^16.8.6",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
@@ -19,7 +20,7 @@
     "react-scripts": "^3.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-app-rewired start",
     "build": "react-scripts build"
   },
   "browserslist": [
