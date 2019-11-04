@@ -23,6 +23,16 @@ const propTypes = {
     automaticSilentRenew: PropTypes.bool.isRequired,
     loadUserInfo: PropTypes.bool.isRequired,
     triggerAuthFlow: PropTypes.bool.isRequired,
+    metadata : PropTypes.shape({
+      issuer: PropTypes.string,
+      jwks_uri: PropTypes.string,
+      authorization_endpoint: PropTypes.string,
+      token_endpoint: PropTypes.string,
+      userinfo_endpoint: PropTypes.string,
+      end_session_endpoint: PropTypes.string,
+      revocation_endpoint: PropTypes.string,
+      introspection_endpoint: PropTypes.string
+    }),
   }).isRequired,
   isEnabled: PropTypes.bool,
   loggerLevel: PropTypes.number,
