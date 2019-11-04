@@ -1,6 +1,12 @@
 import React, { useEffect, useCallback, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter, authenticationService, setLogger, OidcRoutes } from '@axa-fr/react-oidc-core';
+import {
+  withRouter,
+  authenticationService,
+  setLogger,
+  OidcRoutes,
+  configurationPropTypes,
+} from '@axa-fr/react-oidc-core';
 
 import { Callback } from '../Callback';
 import { addOidcEvents, removeOidcEvents, oidcReducer, login, logout } from './OidcEvents';
@@ -13,27 +19,7 @@ const propTypes = {
   notAuthorized: PropTypes.elementType,
   authenticating: PropTypes.elementType,
   callbackComponentOverride: PropTypes.elementType,
-  configuration: PropTypes.shape({
-    client_id: PropTypes.string.isRequired,
-    redirect_uri: PropTypes.string.isRequired,
-    response_type: PropTypes.string.isRequired,
-    scope: PropTypes.string.isRequired,
-    authority: PropTypes.string.isRequired,
-    silent_redirect_uri: PropTypes.string.isRequired,
-    automaticSilentRenew: PropTypes.bool.isRequired,
-    loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired,
-    metadata : PropTypes.shape({
-      issuer: PropTypes.string,
-      jwks_uri: PropTypes.string,
-      authorization_endpoint: PropTypes.string,
-      token_endpoint: PropTypes.string,
-      userinfo_endpoint: PropTypes.string,
-      end_session_endpoint: PropTypes.string,
-      revocation_endpoint: PropTypes.string,
-      introspection_endpoint: PropTypes.string
-    }),
-  }).isRequired,
+  configuration: configurationPropTypes,
   isEnabled: PropTypes.bool,
   loggerLevel: PropTypes.number,
   logger: PropTypes.shape({

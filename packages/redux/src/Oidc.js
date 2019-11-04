@@ -2,33 +2,13 @@ import React from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
 import { compose, lifecycle } from 'recompose';
 import PropTypes from 'prop-types';
-import { OidcRoutes, authenticationService, getUserManager } from '@axa-fr/react-oidc-core';
+import { OidcRoutes, authenticationService, getUserManager, configurationPropTypes } from '@axa-fr/react-oidc-core';
 import AuthenticationCallback from './AuthenticationCallback';
 
 const propTypes = {
   notAuthenticated: PropTypes.elementType,
   notAuthorized: PropTypes.elementType,
-  configuration: PropTypes.shape({
-        client_id: PropTypes.string.isRequired,
-        redirect_uri: PropTypes.string.isRequired,
-        response_type: PropTypes.string.isRequired,
-        scope: PropTypes.string.isRequired,
-        authority: PropTypes.string.isRequired,
-        silent_redirect_uri: PropTypes.string.isRequired,
-        automaticSilentRenew: PropTypes.bool.isRequired,
-        loadUserInfo: PropTypes.bool.isRequired,
-        triggerAuthFlow: PropTypes.bool.isRequired,
-        metadata : PropTypes.shape({
-          issuer: PropTypes.string,
-          jwks_uri: PropTypes.string,
-          authorization_endpoint: PropTypes.string,
-          token_endpoint: PropTypes.string,
-          userinfo_endpoint: PropTypes.string,
-          end_session_endpoint: PropTypes.string,
-          revocation_endpoint: PropTypes.string,
-          introspection_endpoint: PropTypes.string
-        })
-      }).isRequired,
+  configuration: configurationPropTypes,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
