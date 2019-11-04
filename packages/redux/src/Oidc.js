@@ -8,6 +8,7 @@ import AuthenticationCallback from './AuthenticationCallback';
 const propTypes = {
   notAuthenticated: PropTypes.elementType,
   notAuthorized: PropTypes.elementType,
+  // eslint-disable-next-line react/require-default-props
   configuration: configurationPropTypes,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
