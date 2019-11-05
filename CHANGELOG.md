@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.3-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.2-alpha.0...v3.0.3-alpha.0)
+> 5 November 2019
+- fix(redux) oidcSecure hoc was not working [`#331`](https://github.com/AxaGuilDEv/react-oidc/pull/331) by Guillaume Chervet
+- chore(release): publish v3.0.3-alpha.0 ***NO_CI*** [`9b8de3b`](https://github.com/AxaGuilDEv/react-oidc/commit/9b8de3bf60b0d5d58caf12513be1bd742d2936df) by Build-CI 
+- docs(changelog) update to new 3.0.2-alpha.0 [`5f22a9f`](https://github.com/AxaGuilDEv/react-oidc/commit/5f22a9fe09da0b803abd0c7698638acdfe6620f9) by Build-CI 
+
 #### [v3.0.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.1-alpha.0...v3.0.2-alpha.0)
 > 15 October 2019
 - Fix component prop type validation to use elementType [`#321`](https://github.com/AxaGuilDEv/react-oidc/pull/321) by Henri Koskenranta
