@@ -63,10 +63,9 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
   useEffect(() => {
     setLogger(otherProps.loggerLevel, otherProps.logger);
     dispatch({ type: 'ON_LOADING' });
-    addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager.signinSilent);
+    addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
     oidcState.userManager.getUser().then(user => dispatch({ type: 'ON_LOAD_USER', user }));
-    return () =>
-      removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager.signinSilent);
+    return () => removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
   }, [otherProps.logger, otherProps.loggerLevel, oidcState.userManager]);
 
   const { oidcUser, isLoading, error, isEnabled } = oidcState;

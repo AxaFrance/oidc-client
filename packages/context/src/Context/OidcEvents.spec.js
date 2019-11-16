@@ -135,7 +135,7 @@ describe('reducer tests suite', () => {
   });
 
   it('should set state and call silentSignin to location when call onAccessTokenExpired', () => {
-    onAccessTokenExpired(dispatch, userManagerMock.signinSilent)();
+    onAccessTokenExpired(dispatch, userManagerMock)();
     expect(dispatch).toHaveBeenCalledWith({ type: 'ON_UNLOAD_USER' });
     expect(userManagerMock.signinSilent).toHaveBeenCalled();
   });
