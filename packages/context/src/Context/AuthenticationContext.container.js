@@ -98,6 +98,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
         logout: useCallback(() => logout(oidcState.userManager, dispatch)(), [
           oidcState.userManager,
         ]),
+        events: oidcState.userManager.events,
       }}
     >
       <OidcRoutes

@@ -161,6 +161,7 @@ export default Dashboard;
 - oidcUser : user information (null if not authenticated)
 - logout: logout function
 - login: login function
+- events: returns events from oidc-client (see [oidc client section about events](https://github.com/IdentityModel/oidc-client-js/wiki#events))
 
 ```javascript
 import React from 'react';
