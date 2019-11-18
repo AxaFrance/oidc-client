@@ -79,9 +79,13 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
     Callback: CallbackInt,
   } = otherProps;
 
-  const CallbackComponent = callbackComponentOverride
-    ? withComponentOverrideProps(CallbackInt, callbackComponentOverride)
-    : CallbackInt;
+  const CallbackComponent = React.useMemo(
+    () =>
+      callbackComponentOverride
+        ? withComponentOverrideProps(CallbackInt, callbackComponentOverride)
+        : CallbackInt,
+    [CallbackInt, callbackComponentOverride]
+  );
 
   return (
     <AuthenticationContext.Provider
