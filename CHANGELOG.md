@@ -1,6 +1,14 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.4-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.3-alpha.0...v3.0.4-alpha.0)
+> 18 November 2019
+- fix(context): avoid errors on console with custom callback [`#341`](https://github.com/AxaGuilDEv/react-oidc/pull/341) by Olivier YOUF
+- fix(context): Fix silent crash [`#340`](https://github.com/AxaGuilDEv/react-oidc/pull/340) by Olivier YOUF
+- doc(oidc-metadata): add document about metadata [`#330`](https://github.com/AxaGuilDEv/react-oidc/pull/330) by Guillaume Chervet
+- chore(release): publish v3.0.4-alpha.0 ***NO_CI*** [`f8d7557`](https://github.com/AxaGuilDEv/react-oidc/commit/f8d755783d2b4cfbee0cdaabe6f27178d3200080) by Build-CI 
+- docs(changelog) update to new 3.0.3-alpha.0 [`6b0fc09`](https://github.com/AxaGuilDEv/react-oidc/commit/6b0fc0961c90ec3200e3995482fe748d1fbe5e1d) by Build-CI 
+
 #### [v3.0.3-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.2-alpha.0...v3.0.3-alpha.0)
 > 5 November 2019
 - fix(redux) oidcSecure hoc was not working [`#331`](https://github.com/AxaGuilDEv/react-oidc/pull/331) by Guillaume Chervet
