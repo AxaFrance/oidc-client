@@ -61,20 +61,20 @@ const propTypes = {
     scope: PropTypes.string.isRequired,
     authority: PropTypes.string.isRequired,
     silent_redirect_uri: PropTypes.string.isRequired,
-    automaticSilentRenew: PropTypes.bool.isRequired,
-    loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired,
+    automaticSilentRenew: PropTypes.bool, //optional, by default to true
+    loadUserInfo: PropTypes.bool, //optional, by default to true
+    triggerAuthFlow: PropTypes.bool, //optional, by default to true
     post_logout_redirect_uri: PropTypes.string, // optional
-    metadata : PropTypes.shape({
-          issuer: PropTypes.string,
-          jwks_uri: PropTypes.string,
-          authorization_endpoint: PropTypes.string,
-          token_endpoint: PropTypes.string,
-          userinfo_endpoint: PropTypes.string,
-          end_session_endpoint: PropTypes.string,
-          revocation_endpoint: PropTypes.string,
-          introspection_endpoint: PropTypes.string
-        }),
+    metadata: PropTypes.shape({
+      issuer: PropTypes.string,
+      jwks_uri: PropTypes.string,
+      authorization_endpoint: PropTypes.string,
+      token_endpoint: PropTypes.string,
+      userinfo_endpoint: PropTypes.string,
+      end_session_endpoint: PropTypes.string,
+      revocation_endpoint: PropTypes.string,
+      introspection_endpoint: PropTypes.string,
+    }),
   }).isRequired,
   isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
   loggerLevel: PropTypes.number,
@@ -84,8 +84,20 @@ const propTypes = {
     error: PropTypes.func.isRequired,
     debug: PropTypes.func.isRequired,
   }),
+  UserStore: PropTypes.func,
 };
 ```
+
+Through the UseStore you can specify a class that can be use to store the user object. This class must define :
+
+```javascript
+  getItem(key: string): any;
+  setItem(key: string, value: any): any;
+  removeItem(key: string): any;
+  key(index: number): any;
+  length?: number;
+```
+It could also be window.localStorage or window.sessionStorage. By default, without any userStore, the sessionStorage will be use.
 
 See bellow a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
 
@@ -112,9 +124,9 @@ oidc-client needs some polyfills to works on Internet Explorer. You can use [cor
 
 ```javascript
 import 'core-js/es/array/from';
-import 'core-js/es/array/find'; 
-import 'core-js/es/array/includes'; 
-import 'core-js/es/array/find-index'; 
+import 'core-js/es/array/find';
+import 'core-js/es/array/includes';
+import 'core-js/es/array/find-index';
 import 'core-js/es/array/map';
 
 import 'core-js/es/object/assign';

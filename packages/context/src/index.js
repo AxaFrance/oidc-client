@@ -12,4 +12,5 @@ export {
   signinSilent,
   oidcLog,
   getUserManager,
+  InMemoryWebStorage,
 } from '@axa-fr/react-oidc-core';

@@ -1,4 +1,4 @@
-import { UserManager } from 'oidc-client';
+import { UserManager, WebStorageStateStore, InMemoryWebStorage } from 'oidc-client';
 
 let userManager;
 
@@ -8,10 +8,23 @@ export const setUserManager = userManagerToSet => {
 
 export const getUserManager = () => userManager;
 
-export const authenticationService = config => {
+export const authenticationServiceInternal = WebStorageStateStoreInt => (
+  configuration,
+  UserStore
+) => {
   if (userManager) {
     return userManager;
   }
-  userManager = new UserManager(config);
+  const overridenConfiguration = { ...configuration };
+
+  if (UserStore) {
+    overridenConfiguration.userStore = new WebStorageStateStoreInt({ store: new UserStore() });
+  }
+  console.log('overridenConfiguration', overridenConfiguration);
+  userManager = new UserManager(overridenConfiguration);
   return userManager;
 };
+
+export const authenticationService = authenticationServiceInternal(WebStorageStateStore);
+
+export { InMemoryWebStorage };

@@ -1,5 +1,9 @@
 import { UserManager } from 'oidc-client';
-import * as authenticationService from './authenticationService';
+import {
+  setUserManager,
+  getUserManager,
+  authenticationServiceInternal,
+} from './authenticationService';
 
 jest.mock('oidc-client', () => ({
   UserManager: jest.fn(),
@@ -9,18 +13,37 @@ describe('AuthenticationService tests suite', () => {
   const userManagerMock = {
     test: 'mock',
   };
+
+  const WebStorageStateStoreMock = jest.fn().mockImplementation(store => store);
+
+  const InMemoryWebStorageMock = jest.fn().mockImplementation(() => ({
+    foo: 'bar',
+  }));
+
   beforeEach(() => {
-    authenticationService.setUserManager(userManagerMock);
+    setUserManager(undefined);
+    jest.clearAllMocks();
   });
+
   it('getUserManager should return the userManager object', () => {
-    const userManager = authenticationService.getUserManager();
+    setUserManager(userManagerMock);
+    const userManager = getUserManager();
     expect(userManager).toBe(userManagerMock);
   });
 
   it('Should return userManager when initiate with a config object', () => {
-    authenticationService.setUserManager(undefined);
     const fakeConf = { fake: 'conf' };
-    authenticationService.authenticationService(fakeConf);
+    authenticationServiceInternal(WebStorageStateStoreMock)(fakeConf);
     expect(UserManager).toHaveBeenCalledWith(fakeConf);
+  });
+
+  it('should oveeride store conf with storeJwtInMemory set to true', () => {
+    const fakeConf = { fake: 'conf', storeJwtInMemory: true };
+    authenticationServiceInternal(WebStorageStateStoreMock)(fakeConf, InMemoryWebStorageMock);
+    expect(UserManager).toHaveBeenCalledWith({
+      fake: 'conf',
+      storeJwtInMemory: true,
+      userStore: { store: { foo: 'bar' } },
+    });
   });
 });

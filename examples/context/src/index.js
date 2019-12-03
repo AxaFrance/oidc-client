@@ -3,7 +3,7 @@ import './ie.polyfills';
 
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AuthenticationProvider, oidcLog } from '@axa-fr/react-oidc-context';
+import { AuthenticationProvider, oidcLog, InMemoryWebStorage } from '@axa-fr/react-oidc-context';
 import CustomCallback from './Pages/CustomCallback';
 import Header from './Layout/Header';
 import Routes from './Router';
@@ -16,6 +16,7 @@ const App = () => (
       loggerLevel={oidcLog.DEBUG}
       isEnabled={true}
       callbackComponentOverride={CustomCallback}
+      UserStore={InMemoryWebStorage}
     >
       <Router>
         <Header />

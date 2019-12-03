@@ -6,6 +6,7 @@ import {
   setLogger,
   OidcRoutes,
   configurationPropTypes,
+  configurationDefaultProps,
 } from '@axa-fr/react-oidc-core';
 
 import { Callback } from '../Callback';
@@ -29,6 +30,7 @@ const propTypes = {
     error: PropTypes.func.isRequired,
     debug: PropTypes.func.isRequired,
   }),
+  UserStore: PropTypes.func,
 };
 
 const defaultProps = {
@@ -40,12 +42,17 @@ const defaultProps = {
   isEnabled: true,
   loggerLevel: 0,
   logger: console,
+  configuration: configurationDefaultProps,
 };
 
-export const setDefaultState = ({ configuration, isEnabled }, authenticationServiceInternal) => {
+export const setDefaultState = authenticationServiceInternal => ({
+  configuration,
+  isEnabled,
+  UserStore,
+}) => {
   return {
     oidcUser: undefined,
-    userManager: authenticationServiceInternal(configuration),
+    userManager: authenticationServiceInternal(configuration, UserStore),
     isLoading: false,
     error: '',
     isEnabled,
@@ -56,11 +63,13 @@ const withComponentOverrideProps = (Component, customProps) => props => (
   <Component callbackComponentOverride={customProps} {...props} />
 );
 
-const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
-  const [oidcState, dispatch] = useReducer(
-    oidcReducer,
-    setDefaultState(otherProps, authenticationService)
-  );
+const AuthenticationProviderInt = ({
+  location,
+  history,
+  setDefaultState: setDefaultStateInternal,
+  ...otherProps
+}) => {
+  const [oidcState, dispatch] = useReducer(oidcReducer, setDefaultStateInternal(otherProps));
 
   useEffect(() => {
     setLogger(otherProps.loggerLevel, otherProps.logger);
@@ -76,7 +85,7 @@ const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
     notAuthenticated,
     notAuthorized,
     callbackComponentOverride,
-    sessionLostComponent,  
+    sessionLostComponent,
     configuration,
     children,
     Callback: CallbackInt,
@@ -99,6 +108,7 @@ const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
         authenticating,
         isEnabled,
         login: useCallback(() => login(oidcState.userManager, dispatch, location, history)(), [
+          history,
           location,
           oidcState.userManager,
         ]),
@@ -121,7 +131,12 @@ const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
   );
 };
 
-const AuthenticationProvider = withRouter(withServices(AuthenticationProviderInt, { Callback }));
+const AuthenticationProvider = withRouter(
+  withServices(AuthenticationProviderInt, {
+    Callback,
+    setDefaultState: setDefaultState(authenticationService),
+  })
+);
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
 AuthenticationProvider.displayName = 'AuthenticationProvider';

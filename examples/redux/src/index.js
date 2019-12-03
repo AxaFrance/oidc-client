@@ -9,7 +9,7 @@ import registerServiceWorker from './registerServiceWorker';
 import configuration from './configuration';
 import ComponentOverride from './ComponentOverride';
 
-import { Oidc } from '@axa-fr/react-oidc-redux';
+import { Oidc, InMemoryWebStorage } from '@axa-fr/react-oidc-redux';
 
 const store = configureStore();
 const origin = document.location.origin;
@@ -33,6 +33,7 @@ const Start = (
         configuration={authenticationConfig.config}
         isEnabled={isEnabled}
         callbackComponentOverride={ComponentOverride}
+        UserStore={InMemoryWebStorage}
       >
         <App />
       </Oidc>
