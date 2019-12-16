@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, wait, cleanup } from '@testing-library/react';
 import { CallbackContainerCore, onRedirectError, onRedirectSuccess } from './Callback.container';
-import '@testing-library/react/cleanup-after-each';
 
 describe('Callback container tests suite', () => {
   const history = {
