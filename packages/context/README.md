@@ -49,10 +49,11 @@ render(<App />, document.getElementById('root'));
 
 ```javascript
 const propTypes = {
-  notAuthenticated: PropTypes.node, // react component displayed during authentication
-  notAuthorized: PropTypes.node, // react component displayed in case user is not Authorised
-  authenticating: PropTypes.node, // react component displayed when about to redirect user to be authenticated
-  callbackComponentOverride: PropTypes.node, // react component displayed when user is connected
+  notAuthenticated: PropTypes.elementType, // react component displayed during authentication
+  notAuthorized: PropTypes.elementType, // react component displayed in case user is not Authorised
+  authenticating: PropTypes.elementType, // react component displayed when about to redirect user to be authenticated
+  callbackComponentOverride: PropTypes.elementType, // react component displayed when user is connected
+  sessionLostComponent: PropTypes.elementType, // react component displayed when user loose authentication session
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
     redirect_uri: PropTypes.string.isRequired,
@@ -64,6 +65,16 @@ const propTypes = {
     loadUserInfo: PropTypes.bool.isRequired,
     triggerAuthFlow: PropTypes.bool.isRequired,
     post_logout_redirect_uri: PropTypes.string, // optional
+    metadata : PropTypes.shape({
+          issuer: PropTypes.string,
+          jwks_uri: PropTypes.string,
+          authorization_endpoint: PropTypes.string,
+          token_endpoint: PropTypes.string,
+          userinfo_endpoint: PropTypes.string,
+          end_session_endpoint: PropTypes.string,
+          revocation_endpoint: PropTypes.string,
+          introspection_endpoint: PropTypes.string
+        }),
   }).isRequired,
   isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
   loggerLevel: PropTypes.number,
@@ -93,6 +104,30 @@ const configuration = {
 };
 
 export default configuration;
+```
+
+### Polyfill
+
+oidc-client needs some polyfills to works on Internet Explorer. You can use [core-js](https://github.com/zloirock/core-js) to help you. See [Context Sample](../../examples/context). In the sample we use some polyfills
+
+```javascript
+import 'core-js/es/array/from';
+import 'core-js/es/array/find'; 
+import 'core-js/es/array/includes'; 
+import 'core-js/es/array/find-index'; 
+import 'core-js/es/array/map';
+
+import 'core-js/es/object/assign';
+
+import 'core-js/es/promise';
+import 'core-js/es/map';
+
+import 'core-js/es/string/repeat';
+import 'core-js/es/string/pad-start';
+import 'core-js/es/string/pad-end';
+import 'core-js/es/string/starts-with';
+
+import 'whatwg-fetch';
 ```
 
 ### How to consume : Hooks method (Pages/Dashboard/Dashboard.js)

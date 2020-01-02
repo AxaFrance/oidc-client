@@ -4,7 +4,7 @@ const SessionLost = () => (
     <div>
         <div className="container">
             <h1>Session expiré</h1>
-            <p>Votre session est expiré. Veillez vous ré-authentifier.</p>
+            <p>Votre session est expirée. Veuillez vous ré-authentifier.</p>
         </div>
     </div>
 );

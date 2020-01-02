@@ -2,15 +2,16 @@ import React from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
 import { compose, lifecycle } from 'recompose';
 import PropTypes from 'prop-types';
-import { OidcRoutes, authenticationService, getUserManager } from '@axa-fr/react-oidc-core';
+import { OidcRoutes, authenticationService, getUserManager, configurationPropTypes } from '@axa-fr/react-oidc-core';
 import AuthenticationCallback from './AuthenticationCallback';
 
 const propTypes = {
-  notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  sessionLostComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  configuration: PropTypes.object.isRequired,
+  notAuthenticated: PropTypes.elementType,
+  notAuthorized: PropTypes.elementType,
+  callbackComponentOverride: PropTypes.elementType,
+  sessionLostComponent: PropTypes.elementType,
+  // eslint-disable-next-line react/require-default-props
+  configuration: configurationPropTypes,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
@@ -67,7 +68,7 @@ OidcBase.propTypes = propTypes;
 OidcBase.defaultProps = defaultPropsObject;
 
 const lifecycleComponent = {
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const { isEnabled, store, configuration } = this.props;
     if (isEnabled) {
       const userManager = authenticationService(configuration);

@@ -1,6 +1,12 @@
 import React, { useEffect, useCallback, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter, authenticationService, setLogger, OidcRoutes } from '@axa-fr/react-oidc-core';
+import {
+  withRouter,
+  authenticationService,
+  setLogger,
+  OidcRoutes,
+  configurationPropTypes,
+} from '@axa-fr/react-oidc-core';
 
 import { Callback } from '../Callback';
 import { addOidcEvents, removeOidcEvents, oidcReducer, login, logout } from './OidcEvents';
@@ -9,22 +15,12 @@ import withServices from '../withServices';
 export const AuthenticationContext = React.createContext(null);
 
 const propTypes = {
-  notAuthenticated: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  notAuthorized: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  authenticating: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  callbackComponentOverride: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  sessionLostComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  configuration: PropTypes.shape({
-    client_id: PropTypes.string.isRequired,
-    redirect_uri: PropTypes.string.isRequired,
-    response_type: PropTypes.string.isRequired,
-    scope: PropTypes.string.isRequired,
-    authority: PropTypes.string.isRequired,
-    silent_redirect_uri: PropTypes.string.isRequired,
-    automaticSilentRenew: PropTypes.bool.isRequired,
-    loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired,
-  }).isRequired,
+  notAuthenticated: PropTypes.elementType,
+  notAuthorized: PropTypes.elementType,
+  authenticating: PropTypes.elementType,
+  callbackComponentOverride: PropTypes.elementType,
+  sessionLostComponent: PropTypes.elementType,
+  configuration: configurationPropTypes,
   isEnabled: PropTypes.bool,
   loggerLevel: PropTypes.number,
   logger: PropTypes.shape({
@@ -69,10 +65,9 @@ const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
   useEffect(() => {
     setLogger(otherProps.loggerLevel, otherProps.logger);
     dispatch({ type: 'ON_LOADING' });
-    addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager.signinSilent);
+    addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
     oidcState.userManager.getUser().then(user => dispatch({ type: 'ON_LOAD_USER', user }));
-    return () =>
-      removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager.signinSilent);
+    return () => removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
   }, [otherProps.logger, otherProps.loggerLevel, oidcState.userManager]);
 
   const { oidcUser, isLoading, error, isEnabled } = oidcState;
@@ -87,9 +82,13 @@ const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
     Callback: CallbackInt,
   } = otherProps;
 
-  const CallbackComponent = callbackComponentOverride
-    ? withComponentOverrideProps(CallbackInt, callbackComponentOverride)
-    : CallbackInt;
+  const CallbackComponent = React.useMemo(
+    () =>
+      callbackComponentOverride
+        ? withComponentOverrideProps(CallbackInt, callbackComponentOverride)
+        : CallbackInt,
+    [CallbackInt, callbackComponentOverride]
+  );
 
   return (
     <AuthenticationContext.Provider

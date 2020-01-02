@@ -1,6 +1,31 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.4-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.3-alpha.0...v3.0.4-alpha.0)
+> 18 November 2019
+- fix(context): avoid errors on console with custom callback [`#341`](https://github.com/AxaGuilDEv/react-oidc/pull/341) by Olivier YOUF
+- fix(context): Fix silent crash [`#340`](https://github.com/AxaGuilDEv/react-oidc/pull/340) by Olivier YOUF
+- doc(oidc-metadata): add document about metadata [`#330`](https://github.com/AxaGuilDEv/react-oidc/pull/330) by Guillaume Chervet
+- chore(release): publish v3.0.4-alpha.0 ***NO_CI*** [`f8d7557`](https://github.com/AxaGuilDEv/react-oidc/commit/f8d755783d2b4cfbee0cdaabe6f27178d3200080) by Build-CI 
+- docs(changelog) update to new 3.0.3-alpha.0 [`6b0fc09`](https://github.com/AxaGuilDEv/react-oidc/commit/6b0fc0961c90ec3200e3995482fe748d1fbe5e1d) by Build-CI 
+
+#### [v3.0.3-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.2-alpha.0...v3.0.3-alpha.0)
+> 5 November 2019
+- fix(redux) oidcSecure hoc was not working [`#331`](https://github.com/AxaGuilDEv/react-oidc/pull/331) by Guillaume Chervet
+- chore(release): publish v3.0.3-alpha.0 ***NO_CI*** [`9b8de3b`](https://github.com/AxaGuilDEv/react-oidc/commit/9b8de3bf60b0d5d58caf12513be1bd742d2936df) by Build-CI 
+- docs(changelog) update to new 3.0.2-alpha.0 [`5f22a9f`](https://github.com/AxaGuilDEv/react-oidc/commit/5f22a9fe09da0b803abd0c7698638acdfe6620f9) by Build-CI 
+
+#### [v3.0.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.1-alpha.0...v3.0.2-alpha.0)
+> 15 October 2019
+- Fix component prop type validation to use elementType [`#321`](https://github.com/AxaGuilDEv/react-oidc/pull/321) by Henri Koskenranta
+- fix(router) : Add some polyfills for IE [`#314`](https://github.com/AxaGuilDEv/react-oidc/pull/314) by Olivier YOUF
+- chore(mergify) add sonar rules [`#313`](https://github.com/AxaGuilDEv/react-oidc/pull/313) by Guillaume Chervet
+- refactor(context) : remove callback OR in core [`#310`](https://github.com/AxaGuilDEv/react-oidc/pull/310) by Olivier YOUF
+- chore(deps-dev): bump cross-env from 5.2.0 to 6.0.0 [`#306`](https://github.com/AxaGuilDEv/react-oidc/pull/306) by dependabot-preview[bot]
+- chore(deps-dev): bump redux from 4.0.1 to 4.0.4 [`#243`](https://github.com/AxaGuilDEv/react-oidc/pull/243) by dependabot-preview[bot]
+- chore(release): publish v3.0.2-alpha.0 ***NO_CI*** [`1e74a2c`](https://github.com/AxaGuilDEv/react-oidc/commit/1e74a2cdf751debd3e5fe6bb84c55d0850b27ba8) by Build-CI 
+- docs(changelog) update to new 3.0.1-alpha.0 [`75b21af`](https://github.com/AxaGuilDEv/react-oidc/commit/75b21af75f890f3b08c46847dcb7ab7fd52df1ef) by Build-CI 
+
 #### [v3.0.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.0-alpha.0...v3.0.1-alpha.0)
 > 25 September 2019
 - feat(all) Add callback component [`#303`](https://github.com/AxaGuilDEv/react-oidc/pull/303) by Madebymaurice
@@ -186,7 +211,7 @@ All notable changes to this project will be documented in this file.
 #### [v1.1.5-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.0...v1.1.5-alpha.0)
 > 4 January 2019
 -  chore(pipeline-azure) branch variable was a bad one [`#83`](https://github.com/AxaGuilDEv/react-oidc/pull/83) by mergify[bot]
-- fix : Context Fetch&gt;oidcUser transmission [`#80`](https://github.com/AxaGuilDEv/react-oidc/pull/80) by Olivier YOUF
+- fix : Context Fetch&amp;gt;oidcUser transmission [`#80`](https://github.com/AxaGuilDEv/react-oidc/pull/80) by Olivier YOUF
 - fix token expired event [`#81`](https://github.com/AxaGuilDEv/react-oidc/pull/81) by mergify[bot]
 - chore(deps-dev): bump eslint from 5.9.0 to 5.11.1 [`#82`](https://github.com/AxaGuilDEv/react-oidc/pull/82) by mergify[bot]
 - chore(deps-dev): bump @angular/compiler from 7.1.0 to 7.1.4 [`#75`](https://github.com/AxaGuilDEv/react-oidc/pull/75) by mergify[bot]
@@ -299,6 +324,3 @@ All notable changes to this project will be documented in this file.
 - chore(packages) add require attributes to publish inside npm in public with a scope [`bb6f22f`](https://github.com/AxaGuilDEv/react-oidc/commit/bb6f22fe4a2c93156ad5848e1e9e221f5d7f2e57) by Guillaume Chervet 
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
-
-#### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.1-alpha.0...v0.0.0)
-> 25 September 2019

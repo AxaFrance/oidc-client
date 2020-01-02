@@ -29,13 +29,19 @@ const mapStateToProps = state => ({
   oidc: state.oidc,
 });
 
-export const oidcSecure = compose(
-  connect(
-    mapStateToProps,
-    null
-  ),
-  withRouter
+const oidcCompose = compose(
+    connect(
+        mapStateToProps,
+        null
+    ),
+    withRouter
 );
+
+const Secure = oidcCompose(AuthenticationLiveCycle);
+
+export const oidcSecure = Component => props => {
+  return <Secure><Component {...props} /></Secure>;
+};
 
 const propTypesOidcSecure = {
   isEnabled: PropTypes.bool,
@@ -46,8 +52,6 @@ const defaultPropsOidcSecure = {
   isEnabled: true,
   children: null,
 };
-
-const Secure = oidcSecure(AuthenticationLiveCycle);
 
 const OidcSecure = props => {
   const { isEnabled, children } = props;

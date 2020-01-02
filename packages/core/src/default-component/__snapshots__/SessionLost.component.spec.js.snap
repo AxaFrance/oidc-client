@@ -10,7 +10,7 @@ exports[`Session Lost test suite renders correctly 1`] = `
         Session expiré
       </h1>
       <p>
-        Votre session est expiré. Veillez vous ré-authentifier.
+        Votre session est expirée. Veuillez vous ré-authentifier.
       </p>
     </div>
   </div>

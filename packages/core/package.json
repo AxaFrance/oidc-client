@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-core",
-  "version": "3.0.1-alpha.0",
+  "version": "3.0.4-alpha.0",
   "description": "A core package for Axa React Oidc packages",
   "homepage": "https://github.com/AxaGuilDEv/react-oidc#readme",
   "main": "dist/index.js",
@@ -14,6 +14,11 @@
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
+  },
+  "peerDependencies": {
+    "oidc-client": ">=1.8.2",
+    "prop-types": ">=15.7.2",
+    "react": ">=16.8.6"
   },
   "license": "MIT",
   "publishConfig": {
