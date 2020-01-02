@@ -1,6 +1,7 @@
 export { withRouter, OidcRoutes } from './routes';
 export { Authenticating, Callback } from './default-component';
-export { default as configurationPropTypes } from './configurationPropTypes';
+export { configurationPropTypes, configurationDefaultProps } from './configurationPropTypes';
+
 export {
   getUserManager,
   authenticationService,
@@ -10,4 +11,5 @@ export {
   isRequireAuthentication,
   setLogger,
   oidcLog,
+  InMemoryWebStorage,
 } from './services';

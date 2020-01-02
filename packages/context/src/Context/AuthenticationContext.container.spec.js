@@ -24,14 +24,15 @@ describe('AuthContext tests suite', () => {
       configuration: configurationMock,
       location: 'locationMock',
       onUserUnloaded: onUserUnloadedMock,
+      UserStore: 'userStore',
     };
     jest.clearAllMocks();
   });
 
   it('should set default state when call setDefaultState', () => {
     const authenticationServiceMock = jest.fn(() => userManagerMock);
-    const defaultState = setDefaultState(propsMock, authenticationServiceMock);
-    expect(authenticationServiceMock).toHaveBeenCalledWith(configurationMock);
+    const defaultState = setDefaultState(authenticationServiceMock)(propsMock);
+    expect(authenticationServiceMock).toHaveBeenCalledWith(configurationMock, 'userStore');
     expect(defaultState).toEqual({
       isEnabled: true,
       oidcUser: undefined,

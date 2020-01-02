@@ -1,8 +1,12 @@
 import React from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
-import { compose, lifecycle } from 'recompose';
 import PropTypes from 'prop-types';
-import { OidcRoutes, authenticationService, getUserManager, configurationPropTypes } from '@axa-fr/react-oidc-core';
+import {
+  OidcRoutes,
+  authenticationService,
+  getUserManager,
+  configurationPropTypes,
+} from '@axa-fr/react-oidc-core';
 import AuthenticationCallback from './AuthenticationCallback';
 
 const propTypes = {
@@ -15,6 +19,7 @@ const propTypes = {
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
+  UserStore: PropTypes.func,
 };
 
 const defaultPropsObject = {
@@ -24,13 +29,14 @@ const defaultPropsObject = {
   sessionLostComponent: null,
   isEnabled: true,
   children: null,
+  UserStore: null,
 };
 
 const withComponentOverrideProps = (Component, customProps) => props => (
   <Component callbackComponentOverride={customProps} {...props} />
 );
 
-export const OidcBase = props => {
+export const OidcBaseInternal = props => {
   const {
     isEnabled,
     children,
@@ -39,14 +45,23 @@ export const OidcBase = props => {
     configuration,
     notAuthenticated,
     notAuthorized,
-    sessionLostComponent,  
+    sessionLostComponent,
+    UserStore,
+    loadUserInternal,
+    authenticationServiceInternal,
   } = props;
 
-  if (!isEnabled) {
-    return <>{children}</>;
-  }
+  const [ready, setReady] = React.useState(false);
 
-  return (
+  React.useEffect(() => {
+    if (isEnabled) {
+      const userManager = authenticationServiceInternal(configuration, UserStore);
+      loadUserInternal(store, userManager);
+      setReady(true);
+    }
+  }, [UserStore, configuration, isEnabled, store, loadUserInternal, authenticationServiceInternal]);
+
+  return ready ? (
     <OidcProvider store={store} userManager={getUserManager()}>
       <OidcRoutes
         configuration={configuration}
@@ -61,22 +76,26 @@ export const OidcBase = props => {
         {children}
       </OidcRoutes>
     </OidcProvider>
+  ) : (
+    <>{children}</>
   );
 };
+
+OidcBaseInternal.propTypes = {
+  ...propTypes,
+  loadUserInternal: PropTypes.func.isRequired,
+  authenticationServiceInternal: PropTypes.func.isRequired,
+};
+
+const OidcBase = props => (
+  <OidcBaseInternal
+    loadUserInternal={loadUser}
+    authenticationServiceInternal={authenticationService}
+    {...props}
+  />
+);
 
 OidcBase.propTypes = propTypes;
 OidcBase.defaultProps = defaultPropsObject;
 
-const lifecycleComponent = {
-  UNSAFE_componentWillMount() {
-    const { isEnabled, store, configuration } = this.props;
-    if (isEnabled) {
-      const userManager = authenticationService(configuration);
-      loadUser(store, userManager);
-    }
-  },
-};
-
-const enhance = compose(lifecycle(lifecycleComponent));
-
-export default enhance(OidcBase);
+export default OidcBase;
