@@ -19,6 +19,7 @@ const propTypes = {
   notAuthorized: PropTypes.elementType,
   authenticating: PropTypes.elementType,
   callbackComponentOverride: PropTypes.elementType,
+  sessionLostComponent: PropTypes.elementType,
   configuration: configurationPropTypes,
   isEnabled: PropTypes.bool,
   loggerLevel: PropTypes.number,
@@ -35,6 +36,7 @@ const defaultProps = {
   notAuthorized: null,
   authenticating: null,
   callbackComponentOverride: null,
+  sessionLostComponent: null,
   isEnabled: true,
   loggerLevel: 0,
   logger: console,
@@ -54,7 +56,7 @@ const withComponentOverrideProps = (Component, customProps) => props => (
   <Component callbackComponentOverride={customProps} {...props} />
 );
 
-const AuthenticationProviderInt = ({ location, ...otherProps }) => {
+const AuthenticationProviderInt = ({ location, history, ...otherProps }) => {
   const [oidcState, dispatch] = useReducer(
     oidcReducer,
     setDefaultState(otherProps, authenticationService)
@@ -74,6 +76,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
     notAuthenticated,
     notAuthorized,
     callbackComponentOverride,
+    sessionLostComponent,  
     configuration,
     children,
     Callback: CallbackInt,
@@ -95,7 +98,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
         error,
         authenticating,
         isEnabled,
-        login: useCallback(() => login(oidcState.userManager, dispatch, location)(), [
+        login: useCallback(() => login(oidcState.userManager, dispatch, location, history)(), [
           location,
           oidcState.userManager,
         ]),
@@ -109,6 +112,7 @@ const AuthenticationProviderInt = ({ location, ...otherProps }) => {
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
         callbackComponent={CallbackComponent}
+        sessionLost={sessionLostComponent}
         configuration={configuration}
       >
         {children}

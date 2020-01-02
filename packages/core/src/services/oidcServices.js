@@ -1,19 +1,38 @@
 import { oidcLog } from './loggerService';
 
 let userRequested = false;
-export const isRequireAuthentication = (oidcUser, isForce) =>
-  isForce || !oidcUser || oidcUser.expired;
 
-export const authenticateUser = (userManager, location) => async (isForce = false) => {
-  if (!userManager || !userManager.getUser) {
+export const isRequireAuthentication = (user, isForce) =>
+  isForce || !user || (user && user.expired === true);
+
+export const isRequireSignin = (oidcUser, isForce) => isForce || !oidcUser;
+
+export const authenticateUser = (userManager, location, history, user = null) => async (
+  isForce = false
+) => {
+  let oidcUser = user;
+  if (!oidcUser) {
+    oidcUser = await userManager.getUser();
+  }
+  if (userRequested) {
     return;
   }
-  const oidcUser = await userManager.getUser();
-  if (isRequireAuthentication(oidcUser, isForce) && !userRequested) {
+  const url = location.pathname + (location.search || '');
+
+  if (isRequireSignin(oidcUser, isForce)) {
     oidcLog.info('authenticate user...');
-    const url = location.pathname + (location.search || '');
     userRequested = true;
     await userManager.signinRedirect({ data: { url } });
+    userRequested = false;
+  } else if (oidcUser && oidcUser.expired) {
+    userRequested = true;
+    try {
+      await userManager.signinSilent();
+    } catch (error) {
+      userRequested = false;
+      oidcLog.warn(`session lost ${error.toString()}`);
+      history.push(`/authentication/session-lost?url=${encodeURI(url)}`);
+    }
     userRequested = false;
   }
 };

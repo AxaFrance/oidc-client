@@ -11,14 +11,14 @@ import withServices from '../withServices';
 import { AuthenticationContext } from './AuthenticationContext.container';
 
 // export use only for unit tests
-export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, location) => {
+export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, location, history) => {
   const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {
     oidcLog.info('Protection : ', isEnabled);
     if (isEnabled) {
       oidcLog.info('Protected component mounted');
       const usermanager = getUserManagerInternal();
-      authenticateUserInternal(usermanager, location)();
+      authenticateUserInternal(usermanager, location, history)();
     }
     return () => {
       oidcLog.info('Protected component unmounted');
@@ -33,11 +33,12 @@ export const useReactOidc = () => {
   return { isEnabled, login, logout, oidcUser, events };
 };
 
-const OidcSecure = withRouter(({ children, location }) => {
+const OidcSecure = withRouter(({ children, location, history }) => {
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUser,
     getUserManager,
-    location
+    location, 
+    history
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
@@ -52,6 +53,7 @@ export default OidcSecure;
 // For non-regression
 export const withOidcSecurewithRouter = WrappedComponent => ({
   location,
+  history,  
   authenticateUser: authenticateUserInternal,
   getUserManager: getUserManagerInternal,
   ...otherProps
@@ -59,9 +61,10 @@ export const withOidcSecurewithRouter = WrappedComponent => ({
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUserInternal,
     getUserManagerInternal,
-    location
+    location,
+    history
   );
-  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
+  const requiredAuth =  useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
     oidcUser,
   ]);

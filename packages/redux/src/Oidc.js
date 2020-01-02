@@ -8,20 +8,22 @@ import AuthenticationCallback from './AuthenticationCallback';
 const propTypes = {
   notAuthenticated: PropTypes.elementType,
   notAuthorized: PropTypes.elementType,
+  callbackComponentOverride: PropTypes.elementType,
+  sessionLostComponent: PropTypes.elementType,
   // eslint-disable-next-line react/require-default-props
   configuration: configurationPropTypes,
   store: PropTypes.object.isRequired,
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
-  callbackComponentOverride: PropTypes.elementType,
 };
 
 const defaultPropsObject = {
   notAuthenticated: null,
   notAuthorized: null,
+  callbackComponentOverride: null,
+  sessionLostComponent: null,
   isEnabled: true,
   children: null,
-  callbackComponentOverride: null,
 };
 
 const withComponentOverrideProps = (Component, customProps) => props => (
@@ -37,6 +39,7 @@ export const OidcBase = props => {
     configuration,
     notAuthenticated,
     notAuthorized,
+    sessionLostComponent,  
   } = props;
 
   if (!isEnabled) {
@@ -49,6 +52,7 @@ export const OidcBase = props => {
         configuration={configuration}
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
+        sessionLost={sessionLostComponent}
         callbackComponent={withComponentOverrideProps(
           AuthenticationCallback,
           callbackComponentOverride

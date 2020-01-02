@@ -8,6 +8,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "publish": "lerna publish",
+    "start": "npm run example:context",
     "example:redux": "npm -C ./examples/redux run start",
     "example:context": "npm -C ./examples/context run start",
     "example:vanilla": "npm -C ./examples/vanilla run start",

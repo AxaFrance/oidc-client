@@ -53,6 +53,7 @@ const propTypes = {
   notAuthorized: PropTypes.elementType, // react component displayed in case user is not Authorised
   authenticating: PropTypes.elementType, // react component displayed when about to redirect user to be authenticated
   callbackComponentOverride: PropTypes.elementType, // react component displayed when user is connected
+  sessionLostComponent: PropTypes.elementType, // react component displayed when user loose authentication session
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
     redirect_uri: PropTypes.string.isRequired,

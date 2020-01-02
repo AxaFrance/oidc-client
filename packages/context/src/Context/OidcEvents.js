@@ -13,10 +13,10 @@ export const logout = (userManager, dispatch) => async () => {
     onError(dispatch)(error);
   }
 };
-export const login = (userManager, dispatch, location) => async () => {
+export const login = (userManager, dispatch, location, history) => async () => {
   dispatch({ type: 'ON_LOADING' });
   oidcLog.info('Login requested');
-  await authenticateUser(userManager, location)();
+  await authenticateUser(userManager, location, history)();
 };
 
 export const onUserLoaded = dispatch => user => {

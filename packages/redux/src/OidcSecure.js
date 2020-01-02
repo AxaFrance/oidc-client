@@ -11,14 +11,14 @@ import {
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
-const AuthenticationLiveCycle = ({ location, oidc, children }) => {
+const AuthenticationLiveCycle = ({ location, oidc, children, history }) => {
   const { isLoadingUser, user } = oidc;
   const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
   const isLoading = isLoadingUser || isShouldAuthenticate;
   useEffect(() => {
     if (isShouldAuthenticate) {
       const userManager = getUserManager();
-      authenticateUser(userManager, location, user)();
+      authenticateUser(userManager, location, history, user)();
     }
   }, [isShouldAuthenticate, location, user]);
 
