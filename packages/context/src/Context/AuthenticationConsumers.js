@@ -29,8 +29,8 @@ export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, 
 
 // for usage
 export const useReactOidc = () => {
-  const { isEnabled, login, logout, oidcUser } = useContext(AuthenticationContext);
-  return { isEnabled, login, logout, oidcUser };
+  const { isEnabled, login, logout, oidcUser, events } = useContext(AuthenticationContext);
+  return { isEnabled, login, logout, oidcUser, events };
 };
 
 const OidcSecure = withRouter(({ children, location }) => {
