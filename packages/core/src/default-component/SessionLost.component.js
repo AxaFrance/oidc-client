@@ -3,7 +3,7 @@ import React from 'react';
 const SessionLost = () => (
     <div>
         <div className="container">
-            <h1>Session expiré</h1>
+            <h1>Session expirée</h1>
             <p>Votre session est expirée. Veuillez vous ré-authentifier.</p>
         </div>
     </div>
