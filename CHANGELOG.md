@@ -1,6 +1,28 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.5-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.4-alpha.0...v3.0.5-alpha.0)
+> 3 January 2020
+- chore(deps-dev): bump @testing-library/react from 8.0.9 to 9.4.0 [`#358`](https://github.com/AxaGuilDEv/react-oidc/pull/358) by dependabot-preview[bot]
+- chore(deps): [security] bump lodash.template from 4.4.0 to 4.5.0 [`#230`](https://github.com/AxaGuilDEv/react-oidc/pull/230) by dependabot-preview[bot]
+- Can set the JWT in memory [`#354`](https://github.com/AxaGuilDEv/react-oidc/pull/354) by Olivier YOUF
+- fix(all): F5 always re-auth and manage session lost [`#319`](https://github.com/AxaGuilDEv/react-oidc/pull/319) by Olivier YOUF
+- chore(deps): bump enzyme-adapter-react-16 from 1.14.0 to 1.15.2 [`#359`](https://github.com/AxaGuilDEv/react-oidc/pull/359) by dependabot-preview[bot]
+- chore(deps-dev): bump eslint-plugin-prettier from 3.1.1 to 3.1.2 [`#357`](https://github.com/AxaGuilDEv/react-oidc/pull/357) by dependabot-preview[bot]
+- chore(deps-dev): bump redux-oidc from 3.1.5 to 3.1.7 [`#336`](https://github.com/AxaGuilDEv/react-oidc/pull/336) by dependabot-preview[bot]
+- chore(deps-dev): bump typescript from 3.6.3 to 3.7.4 [`#361`](https://github.com/AxaGuilDEv/react-oidc/pull/361) by dependabot-preview[bot]
+- chore(deps-dev): bump @babel/preset-react from 7.0.0 to 7.7.4 [`#347`](https://github.com/AxaGuilDEv/react-oidc/pull/347) by dependabot-preview[bot]
+- chore(deps): [security] bump https-proxy-agent from 2.2.2 to 2.2.4 [`#345`](https://github.com/AxaGuilDEv/react-oidc/pull/345) by dependabot-preview[bot]
+- chore(deps-dev): bump lint-staged from 8.2.1 to 9.5.0 [`#348`](https://github.com/AxaGuilDEv/react-oidc/pull/348) by dependabot-preview[bot]
+- chore(deps-dev): bump react-redux from 5.1.1 to 7.1.3 [`#334`](https://github.com/AxaGuilDEv/react-oidc/pull/334) by dependabot-preview[bot]
+- chore(deps-dev): bump eslint-plugin-jest from 22.17.0 to 23.2.0 [`#362`](https://github.com/AxaGuilDEv/react-oidc/pull/362) by dependabot-preview[bot]
+- feat(context): Add events in useReactOidc hook [`#343`](https://github.com/AxaGuilDEv/react-oidc/pull/343) by Olivier YOUF
+- chore(release): publish v3.0.5-alpha.0 ***NO_CI*** [`6fa041a`](https://github.com/AxaGuilDEv/react-oidc/commit/6fa041af0e1f1fcb9216fd6ed7a287e7fdc73ed6) by Build-CI 
+- fix(sessionlost) typo [`dd69fe6`](https://github.com/AxaGuilDEv/react-oidc/commit/dd69fe67acda1d6f2b7b1933cafa67f3c6133839) by guillaume chervet 
+- fix(sessionlost) typo [`2d8427f`](https://github.com/AxaGuilDEv/react-oidc/commit/2d8427ffd81f39dc65f9ecf26bc65b4244013607) by guillaume chervet 
+- refactor(auth) refresh branch and clean things [`59dedc1`](https://github.com/AxaGuilDEv/react-oidc/commit/59dedc11c7fc10a246ff8c915fa0583be981ab52) by guillaume chervet 
+- docs(changelog) update to new 3.0.4-alpha.0 [`b201e35`](https://github.com/AxaGuilDEv/react-oidc/commit/b201e3563ff1caf9bf940dde2210ef2bfc39ace0) by Build-CI 
+
 #### [v3.0.4-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.3-alpha.0...v3.0.4-alpha.0)
 > 18 November 2019
 - fix(context): avoid errors on console with custom callback [`#341`](https://github.com/AxaGuilDEv/react-oidc/pull/341) by Olivier YOUF
@@ -12,7 +34,11 @@ All notable changes to this project will be documented in this file.
 #### [v3.0.3-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.2-alpha.0...v3.0.3-alpha.0)
 > 5 November 2019
 - fix(redux) oidcSecure hoc was not working [`#331`](https://github.com/AxaGuilDEv/react-oidc/pull/331) by Guillaume Chervet
+- wip [`e5d41f8`](https://github.com/AxaGuilDEv/react-oidc/commit/e5d41f82a1b7d7e1608e84aad4482a5f4ac5fefc) by guillaume chervet 
+- wip [`d03101d`](https://github.com/AxaGuilDEv/react-oidc/commit/d03101d730d6cbecc3a4ee191bfde97137060cdf) by guillaume chervet 
 - chore(release): publish v3.0.3-alpha.0 ***NO_CI*** [`9b8de3b`](https://github.com/AxaGuilDEv/react-oidc/commit/9b8de3bf60b0d5d58caf12513be1bd742d2936df) by Build-CI 
+- maj [`b2d63e8`](https://github.com/AxaGuilDEv/react-oidc/commit/b2d63e8c92e0526abe1ba242759c1716f56bdac6) by guillaume chervet 
+- wip [`5613367`](https://github.com/AxaGuilDEv/react-oidc/commit/5613367e95de9aa5399b9ccdacd268e5d0ef4516) by guillaume chervet 
 - docs(changelog) update to new 3.0.2-alpha.0 [`5f22a9f`](https://github.com/AxaGuilDEv/react-oidc/commit/5f22a9fe09da0b803abd0c7698638acdfe6620f9) by Build-CI 
 
 #### [v3.0.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.1-alpha.0...v3.0.2-alpha.0)
@@ -23,8 +49,11 @@ All notable changes to this project will be documented in this file.
 - refactor(context) : remove callback OR in core [`#310`](https://github.com/AxaGuilDEv/react-oidc/pull/310) by Olivier YOUF
 - chore(deps-dev): bump cross-env from 5.2.0 to 6.0.0 [`#306`](https://github.com/AxaGuilDEv/react-oidc/pull/306) by dependabot-preview[bot]
 - chore(deps-dev): bump redux from 4.0.1 to 4.0.4 [`#243`](https://github.com/AxaGuilDEv/react-oidc/pull/243) by dependabot-preview[bot]
+- fix(all) F5 always re-auth and manage session lost [`ee0c13f`](https://github.com/AxaGuilDEv/react-oidc/commit/ee0c13f437244fad58fa352da9a1a35f8e3eb3f7) by guillaume chervet 
+- wip [`b2a7185`](https://github.com/AxaGuilDEv/react-oidc/commit/b2a71851d0cb91653e1d77e2fe037aa2114e9037) by guillaume chervet 
 - chore(release): publish v3.0.2-alpha.0 ***NO_CI*** [`1e74a2c`](https://github.com/AxaGuilDEv/react-oidc/commit/1e74a2cdf751debd3e5fe6bb84c55d0850b27ba8) by Build-CI 
 - docs(changelog) update to new 3.0.1-alpha.0 [`75b21af`](https://github.com/AxaGuilDEv/react-oidc/commit/75b21af75f890f3b08c46847dcb7ab7fd52df1ef) by Build-CI 
+- wip [`e20c897`](https://github.com/AxaGuilDEv/react-oidc/commit/e20c8975f80f71ac7a6b4eaebf44025744359d93) by guillaume chervet 
 
 #### [v3.0.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.0-alpha.0...v3.0.1-alpha.0)
 > 25 September 2019
