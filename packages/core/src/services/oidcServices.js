@@ -1,6 +1,7 @@
 import { oidcLog } from './loggerService';
 
 let userRequested = false;
+let numberAuthentication = 0;
 
 export const isRequireAuthentication = (user, isForce) =>
   isForce || !user || (user && user.expired === true);
@@ -8,7 +9,7 @@ export const isRequireAuthentication = (user, isForce) =>
 export const isRequireSignin = (oidcUser, isForce) => isForce || !oidcUser;
 
 export const authenticateUser = (userManager, location, history, user = null) => async (
-  isForce = false
+  isForce = false, callbackPath= null,
 ) => {
   let oidcUser = user;
   if (!oidcUser) {
@@ -17,7 +18,8 @@ export const authenticateUser = (userManager, location, history, user = null) =>
   if (userRequested) {
     return;
   }
-  const url = location.pathname + (location.search || '');
+  numberAuthentication++;
+  const url = callbackPath || location.pathname + (location.search || '');
 
   if (isRequireSignin(oidcUser, isForce)) {
     oidcLog.info('authenticate user...');
@@ -29,9 +31,13 @@ export const authenticateUser = (userManager, location, history, user = null) =>
     try {
       await userManager.signinSilent();
     } catch (error) {
-      userRequested = false;
-      oidcLog.warn(`session lost ${error.toString()}`);
-      history.push(`/authentication/session-lost?url=${encodeURI(url)}`);
+      if(numberAuthentication <= 1) {
+        await userManager.signinRedirect({ data: { url} });
+      } else {
+        userRequested = false;
+        oidcLog.warn(`session lost ${error.toString()}`);
+        history.push(`/authentication/session-lost?path=${encodeURI(url)}`);
+      }
     }
     userRequested = false;
   }
