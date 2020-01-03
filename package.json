@@ -63,7 +63,7 @@
     "cross-env": "^6.0.0",
     "enzyme": "^3.10.0",
     "eslint": "^6.2.2",
-    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-jest": "^23.2.0",
