@@ -1,6 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Session Lost test suite renders correctly 1`] = `
+exports[`Session Lost test suite SessionLost renders correctly 1`] = `
+<DocumentFragment>
+  <div>
+    <div
+      class="container"
+    >
+      <h1>
+        Session expirée
+      </h1>
+      <p>
+        Votre session est expirée. Veuillez vous ré-authentifier.
+      </p>
+      <button
+        type="button"
+      >
+        Ré-authentifier
+      </button>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Session Lost test suite SessionLostContainer renders correctly 1`] = `
 <DocumentFragment>
   <div>
     <div

@@ -12,7 +12,7 @@ export const SessionLost = ({ onAuthenticate }) => (
   </div>
 );
 
-const SessionLostContainer = ({ location, history }) => {
+export const SessionLostContainer = ({ location, history }) => {
   const callbackPath = location.search.replace('?path=', '');
   const onAuthenticate = () => {
     authenticateUser(getUserManager(), location, history)(true, callbackPath);
