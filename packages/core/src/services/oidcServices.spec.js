@@ -76,8 +76,6 @@ describe('authenticate testing', () => {
     };
     const history = { push: jest.fn() };
     await authenticateUser(userManagerMockLocal, locationMock, history, { expired: true })(false);
-    //expect(userManagerMock.signinRedirect).toHaveBeenCalled();
-    //expect(history.push).not.toHaveBeenCalled();
     await authenticateUser(userManagerMockLocal, locationMock, history, { expired: true })(false);
     expect(history.push).toHaveBeenCalled();
   });
