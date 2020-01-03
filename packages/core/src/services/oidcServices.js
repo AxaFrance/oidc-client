@@ -18,7 +18,6 @@ export const authenticateUser = (userManager, location, history, user = null) =>
   if (userRequested) {
     return;
   }
-  // eslint-disable-next-line no-plusplus
   numberAuthentication++;
   const url = callbackPath || location.pathname + (location.search || '');
 

@@ -12,7 +12,9 @@ exports[`Session Lost test suite renders correctly 1`] = `
       <p>
         Votre session est expirée. Veuillez vous ré-authentifier.
       </p>
-      <button>
+      <button
+        type="button"
+      >
         Ré-authentifier
       </button>
     </div>
