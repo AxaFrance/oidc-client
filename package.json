@@ -74,7 +74,7 @@
     "eslint-plugin-react-hooks": "^1.6.1",
     "expect": "^24.8.0",
     "fs-extra": "^8.0.1",
-    "inquirer": "^6.4.1",
+    "inquirer": "^7.0.1",
     "jest": "24.8.0",
     "lerna": "^3.19.0",
     "lint-staged": "^9.5.0",
