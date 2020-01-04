@@ -48,6 +48,7 @@ module.exports = {
     ],
     'no-debugger': process.env.NODE_ENV === 'production' ? error : ignore,
     'class-methods-use-this': ignore,
+    'no-plusplus': warn,
     'linebreak-style': 0,
     'import/extensions': [ignore],
     'import/no-unresolved': [ignore],
