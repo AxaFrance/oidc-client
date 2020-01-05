@@ -1,6 +1,21 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.6-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.5-alpha.0...v3.0.6-alpha.0)
+> 5 January 2020
+- fix(SessionLost): complete re-auth automaticaly first time display [`#373`](https://github.com/AxaGuilDEv/react-oidc/pull/373) by Guillaume Chervet
+- chore(deps-dev): bump eslint-plugin-react-hooks from 1.7.0 to 2.3.0 [`#363`](https://github.com/AxaGuilDEv/react-oidc/pull/363) by dependabot-preview[bot]
+- chore(deps-dev): bump redux from 4.0.4 to 4.0.5 [`#372`](https://github.com/AxaGuilDEv/react-oidc/pull/372) by dependabot-preview[bot]
+- chore(deps-dev): bump @babel/cli from 7.7.4 to 7.7.7 [`#369`](https://github.com/AxaGuilDEv/react-oidc/pull/369) by dependabot-preview[bot]
+- chore(deps-dev): bump oidc-client from 1.9.1 to 1.10.1 [`#366`](https://github.com/AxaGuilDEv/react-oidc/pull/366) by dependabot-preview[bot]
+- chore(deps-dev): bump auto-changelog from 1.16.1 to 1.16.2 [`#367`](https://github.com/AxaGuilDEv/react-oidc/pull/367) by dependabot-preview[bot]
+- chore(deps-dev): bump eslint-plugin-import from 2.18.2 to 2.19.1 [`#364`](https://github.com/AxaGuilDEv/react-oidc/pull/364) by dependabot-preview[bot]
+- chore(deps-dev): bump @testing-library/jest-dom from 4.1.0 to 4.2.4 [`#368`](https://github.com/AxaGuilDEv/react-oidc/pull/368) by dependabot-preview[bot]
+- chore(deps): bump @typescript-eslint/parser from 2.3.2 to 2.14.0 [`#371`](https://github.com/AxaGuilDEv/react-oidc/pull/371) by dependabot-preview[bot]
+- chore(deps-dev): bump inquirer from 6.5.2 to 7.0.1 [`#365`](https://github.com/AxaGuilDEv/react-oidc/pull/365) by dependabot-preview[bot]
+- chore(release): publish v3.0.6-alpha.0 ***NO_CI*** [`c871a60`](https://github.com/AxaGuilDEv/react-oidc/commit/c871a60adc3a6a8bbe816e5298e6056563e5b531) by Build-CI 
+- docs(changelog) update to new 3.0.5-alpha.0 [`96a24a9`](https://github.com/AxaGuilDEv/react-oidc/commit/96a24a95d62b1b829958c5769ac0617ccab18cca) by Build-CI 
+
 #### [v3.0.5-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.4-alpha.0...v3.0.5-alpha.0)
 > 3 January 2020
 - chore(deps-dev): bump @testing-library/react from 8.0.9 to 9.4.0 [`#358`](https://github.com/AxaGuilDEv/react-oidc/pull/358) by dependabot-preview[bot]
@@ -138,7 +153,7 @@ All notable changes to this project will be documented in this file.
 - fix(packages) : resolves missing scripts [`043a66e`](https://github.com/AxaGuilDEv/react-oidc/commit/043a66eee2f3862e1a0ab5b4155fd2475206fa35) by Olivier YOUF 
 - upgrading React Context + Hooks [`dafe353`](https://github.com/AxaGuilDEv/react-oidc/commit/dafe353e93456cbb2d4feba5f20cbc563029e50c) by Olivier YOUF 
 - babel 7 migration [`d4a8b09`](https://github.com/AxaGuilDEv/react-oidc/commit/d4a8b099fb5f1cf47a57f418b93f12f9afd04efb) by Olivier YOUF 
-- refacto : Package managament &amp; dependency [`d8e8d39`](https://github.com/AxaGuilDEv/react-oidc/commit/d8e8d394cfcad14bc2bec0b58a13d440aa9a6702) by Olivier YOUF 
+- refacto : Package managament & dependency [`d8e8d39`](https://github.com/AxaGuilDEv/react-oidc/commit/d8e8d394cfcad14bc2bec0b58a13d440aa9a6702) by Olivier YOUF 
 - fix(lint) : fix lint return and deps [`c275ea3`](https://github.com/AxaGuilDEv/react-oidc/commit/c275ea3daaff745b691f083788c0155f6c89bb3c) by Olivier YOUF 
 - fix : fix isEnabled flag [`fe5779c`](https://github.com/AxaGuilDEv/react-oidc/commit/fe5779c5d47986223cafab81ca09bfb3f5b7a83b) by Olivier YOUF 
 - PR remarks [`8b6ed4d`](https://github.com/AxaGuilDEv/react-oidc/commit/8b6ed4d3e3a1a0600d9d7011a551c07c500f82cf) by Olivier YOUF 
@@ -192,7 +207,7 @@ All notable changes to this project will be documented in this file.
 
 #### [v1.2.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.6...v1.2.0)
 > 24 February 2019
-- English - change all instances of &quot;authentified&quot; to be &quot;authenticated&quot; [`#151`](https://github.com/AxaGuilDEv/react-oidc/pull/151) by Paul Hammond
+- English - change all instances of "authentified" to be "authenticated" [`#151`](https://github.com/AxaGuilDEv/react-oidc/pull/151) by Paul Hammond
 - chore(release): publish v1.2.0 ***NO_CI*** [`5f491b7`](https://github.com/AxaGuilDEv/react-oidc/commit/5f491b75962664904720b3404ce80a27ed9967a6) by Build-CI 
 
 #### [v1.1.6](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.5...v1.1.6)
@@ -240,7 +255,7 @@ All notable changes to this project will be documented in this file.
 #### [v1.1.5-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.0...v1.1.5-alpha.0)
 > 4 January 2019
 -  chore(pipeline-azure) branch variable was a bad one [`#83`](https://github.com/AxaGuilDEv/react-oidc/pull/83) by mergify[bot]
-- fix : Context Fetch&amp;gt;oidcUser transmission [`#80`](https://github.com/AxaGuilDEv/react-oidc/pull/80) by Olivier YOUF
+- fix : Context Fetch&gt;oidcUser transmission [`#80`](https://github.com/AxaGuilDEv/react-oidc/pull/80) by Olivier YOUF
 - fix token expired event [`#81`](https://github.com/AxaGuilDEv/react-oidc/pull/81) by mergify[bot]
 - chore(deps-dev): bump eslint from 5.9.0 to 5.11.1 [`#82`](https://github.com/AxaGuilDEv/react-oidc/pull/82) by mergify[bot]
 - chore(deps-dev): bump @angular/compiler from 7.1.0 to 7.1.4 [`#75`](https://github.com/AxaGuilDEv/react-oidc/pull/75) by mergify[bot]
