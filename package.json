@@ -59,7 +59,7 @@
     "chalk": "^2.4.2",
     "codacy-coverage": "^3.4.0",
     "commander": "^2.20.0",
-    "concurrently": "^4.1.1",
+    "concurrently": "^5.0.2",
     "cross-env": "^6.0.0",
     "enzyme": "^3.10.0",
     "eslint": "^6.2.2",
