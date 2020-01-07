@@ -1,4 +1,5 @@
 import { UserManager, WebStorageStateStore, InMemoryWebStorage } from 'oidc-client';
+import { oidcLog } from './loggerService';
 
 let userManager;
 
@@ -15,13 +16,13 @@ export const authenticationServiceInternal = WebStorageStateStoreInt => (
   if (userManager) {
     return userManager;
   }
-  const overridenConfiguration = { ...configuration };
+  const overriddenConfiguration = { ...configuration };
 
   if (UserStore) {
-    overridenConfiguration.userStore = new WebStorageStateStoreInt({ store: new UserStore() });
+    overriddenConfiguration.userStore = new WebStorageStateStoreInt({ store: new UserStore() });
   }
-  console.log('overridenConfiguration', overridenConfiguration);
-  userManager = new UserManager(overridenConfiguration);
+  oidcLog.info('overriddenConfiguration', overriddenConfiguration);
+  userManager = new UserManager(overriddenConfiguration);
   return userManager;
 };
 
