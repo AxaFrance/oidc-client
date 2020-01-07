@@ -2,14 +2,20 @@
 
 exports[`Authenticating test suite renders correctly 1`] = `
 <DocumentFragment>
-  <div>
+  <div
+    class="oidc-authenticating"
+  >
     <div
-      class="container"
+      class="oidc-authenticating__container"
     >
-      <h1>
+      <h1
+        class="oidc-authenticating__title"
+      >
         Authentification en cours
       </h1>
-      <p>
+      <p
+        class="oidc-authenticating__content"
+      >
         Vous allez être redirigé sur la page de login
       </p>
     </div>

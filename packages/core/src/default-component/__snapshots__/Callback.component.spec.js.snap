@@ -2,14 +2,20 @@
 
 exports[`Callback.component test suite renders correctly 1`] = `
 <DocumentFragment>
-  <div>
+  <div
+    class="oidc-callback"
+  >
     <div
-      class="container"
+      class="oidc-callback__container"
     >
-      <h1>
+      <h1
+        class="oidc-callback__title"
+      >
         Authentification terminée
       </h1>
-      <p>
+      <p
+        class="oidc-callback__content"
+      >
         Vous allez être redirigé sur votre application.
       </p>
     </div>

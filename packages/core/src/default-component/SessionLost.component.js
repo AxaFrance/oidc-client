@@ -3,11 +3,11 @@ import withCustomRouter from '../routes/withRouter';
 import { getUserManager, authenticateUser } from '../services';
 
 export const SessionLost = ({ onAuthenticate }) => (
-  <div>
-    <div className="container">
-      <h1>Session expirée</h1>
-      <p>Votre session est expirée. Veuillez vous ré-authentifier.</p>
-      <button type="button" onClick={onAuthenticate}>Ré-authentifier</button>
+  <div className="oidc-session-lost">
+    <div className="oidc-session-lost__container">
+      <h1 className="oidc-session-lost__title">Session expirée</h1>
+      <p className="oidc-session-lost__content">Votre session est expirée. Veuillez vous ré-authentifier.</p>
+      <button className="oidc-session-lost__button" type="button" onClick={onAuthenticate}>Ré-authentifier</button>
     </div>
   </div>
 );
