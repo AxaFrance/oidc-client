@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 const NotAuthenticated = () => (
-  <div>
-    <div className="container">
-      <h1>Authentification</h1>
-      <p>Vous n'êtes pas authentifié.</p>
+  <div className="oidc-not-authenticated">
+    <div className="oidc-not-authenticated__container">
+      <h1 className="oidc-not-authenticated__title">Authentification</h1>
+      <p className="oidc-not-authenticated__content">Vous n'êtes pas authentifié.</p>
     </div>
   </div>
 );

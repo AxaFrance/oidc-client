@@ -2,17 +2,24 @@
 
 exports[`Session Lost test suite SessionLost renders correctly 1`] = `
 <DocumentFragment>
-  <div>
+  <div
+    class="oidc-session-lost"
+  >
     <div
-      class="container"
+      class="oidc-session-lost__container"
     >
-      <h1>
+      <h1
+        class="oidc-session-lost__title"
+      >
         Session expirée
       </h1>
-      <p>
+      <p
+        class="oidc-session-lost__content"
+      >
         Votre session est expirée. Veuillez vous ré-authentifier.
       </p>
       <button
+        class="oidc-session-lost__button"
         type="button"
       >
         Ré-authentifier
@@ -24,17 +31,24 @@ exports[`Session Lost test suite SessionLost renders correctly 1`] = `
 
 exports[`Session Lost test suite SessionLostContainer renders correctly 1`] = `
 <DocumentFragment>
-  <div>
+  <div
+    class="oidc-session-lost"
+  >
     <div
-      class="container"
+      class="oidc-session-lost__container"
     >
-      <h1>
+      <h1
+        class="oidc-session-lost__title"
+      >
         Session expirée
       </h1>
-      <p>
+      <p
+        class="oidc-session-lost__content"
+      >
         Votre session est expirée. Veuillez vous ré-authentifier.
       </p>
       <button
+        class="oidc-session-lost__button"
         type="button"
       >
         Ré-authentifier
