@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.6](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.6-alpha.0...v3.0.6)
+> 7 January 2020
+- feat(components): add bem to default components [`#384`](https://github.com/AxaGuilDEv/react-oidc/pull/384) by Guillaume Chervet
+- chore(release): publish v3.0.6 ***NO_CI*** [`db79cce`](https://github.com/AxaGuilDEv/react-oidc/commit/db79ccec24ddca89f7eb55a84a9684e409c8e548) by Build-CI 
+- docs(changelog) update to new 3.0.6-alpha.0 [`c55f2ed`](https://github.com/AxaGuilDEv/react-oidc/commit/c55f2ed5538e1dd4bd9f9f0ae0d25fdeb1421984) by Build-CI 
+
 #### [v3.0.6-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.5-alpha.0...v3.0.6-alpha.0)
 > 5 January 2020
 - fix(SessionLost): complete re-auth automaticaly first time display [`#373`](https://github.com/AxaGuilDEv/react-oidc/pull/373) by Guillaume Chervet
