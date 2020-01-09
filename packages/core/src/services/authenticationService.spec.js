@@ -7,6 +7,7 @@ import {
 
 jest.mock('oidc-client', () => ({
   UserManager: jest.fn(),
+  Log: {},
 }));
 
 describe('AuthenticationService tests suite', () => {
