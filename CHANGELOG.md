@@ -1,6 +1,13 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.7](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.6...v3.0.7)
+> 7 February 2020
+- chore(deps-dev): bump concurrently from 4.1.2 to 5.1.0 [`#393`](https://github.com/AxaGuilDEv/react-oidc/pull/393) by dependabot-preview[bot]
+- refactor(log): Replace console.log by oidcLog [`#386`](https://github.com/AxaGuilDEv/react-oidc/pull/386) by Cockedey Sébastien
+- chore(release): publish v3.0.7 ***NO_CI*** [`9bdbb89`](https://github.com/AxaGuilDEv/react-oidc/commit/9bdbb8976b173d1fbc8da12e1a623aca61c39d6c) by Build-CI 
+- docs(changelog) update to new 3.0.6 [`46055a6`](https://github.com/AxaGuilDEv/react-oidc/commit/46055a654246bb678e745abb5b57717049850d82) by Build-CI 
+
 #### [v3.0.6](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.6-alpha.0...v3.0.6)
 > 7 January 2020
 - feat(components): add bem to default components [`#384`](https://github.com/AxaGuilDEv/react-oidc/pull/384) by Guillaume Chervet
