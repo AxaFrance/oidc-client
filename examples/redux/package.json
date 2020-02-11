@@ -1,12 +1,12 @@
 {
   "name": "@axa-fr/react-oidc-redux-demo",
-  "version": "3.0.7",
+  "version": "3.0.8-alpha.0",
   "description": "Demo how to use react oidc redux",
   "private": true,
   "main": "src/index.js",
   "dependencies": {
-    "@axa-fr/react-oidc-redux": "^3.0.7",
-    "@axa-fr/react-oidc-redux-fetch": "^3.0.7",
+    "@axa-fr/react-oidc-redux": "^3.0.8-alpha.0",
+    "@axa-fr/react-oidc-redux-fetch": "^3.0.8-alpha.0",
     "oidc-client": "1.8.2",
     "react": "16.8.3",
     "react-app-rewired": "^2.1.3",
