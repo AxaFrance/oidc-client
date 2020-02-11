@@ -10,11 +10,12 @@ export const fetchWithToken = (fetch, getAccessTokenInjected) => async (
   options = { method: 'GET' }
 ) => {
   let headers = new Headers();
+  const optionTmp = { ...options };
 
-  if (options.headers) {
-    headers = !(options.headers instanceof Headers)
-      ? new Headers(options.headers)
-      : options.headers;
+  if (optionTmp.headers) {
+    headers = !(optionTmp.headers instanceof Headers)
+      ? new Headers(optionTmp.headers)
+      : optionTmp.headers;
   }
 
   const accessToken = getAccessTokenInjected();
@@ -23,9 +24,11 @@ export const fetchWithToken = (fetch, getAccessTokenInjected) => async (
   }
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
-    headers.set('Credentials', 'same-origin');
+    if (!optionTmp.credentials) {
+      optionTmp.credentials = 'same-origin';
+    }
   }
-  const newOptions = Object.assign(options, { headers });
+  const newOptions = { ...optionTmp, headers };
   const response = await fetch(url, newOptions);
   return response;
 };
