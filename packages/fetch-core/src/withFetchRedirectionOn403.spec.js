@@ -1,6 +1,6 @@
 import { wrapAuthenticating, fetchWithRedirectionOn403 } from './withFetchRedirectionOn403';
 
-describe('redux-fetch.withFetchRedirectionOn403', () => {
+describe('fetch.withFetchRedirectionOn403', () => {
   it('should return props with new fetch', () => {
     const props = { history: {} };
     const fetch = () => console.log('fetch origin function');
