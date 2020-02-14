@@ -1,10 +1,11 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
-#### [v3.0.8-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.7...v3.0.8-alpha.0)
-> 11 February 2020
-- chore(release): publish v3.0.8-alpha.0 ***NO_CI*** [`9f31e4c`](https://github.com/AxaGuilDEv/react-oidc/commit/9f31e4c8d2c68b5102b21054954c8bbf485ade18) by Build-CI 
-- fix(fetchToken): options override [`6fb6e48`](https://github.com/AxaGuilDEv/react-oidc/commit/6fb6e48319291719c80646a1c1b6b4a50f510f3d) by guillaume chervet 
+#### [v3.0.8](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.7...v3.0.8)
+> 14 February 2020
+- fix(options): options can be overrided [`#399`](https://github.com/AxaGuilDEv/react-oidc/pull/399) by Guillaume Chervet
+- fix(fetchToken): options override [`#398`](https://github.com/AxaGuilDEv/react-oidc/pull/398) by Guillaume Chervet
+- chore(release): publish v3.0.8 ***NO_CI*** [`ecccc47`](https://github.com/AxaGuilDEv/react-oidc/commit/ecccc47cb9ee65cccbb23aac53e215ced26d4914) by Build-CI 
 - docs(changelog) update to new 3.0.7 [`1c2e599`](https://github.com/AxaGuilDEv/react-oidc/commit/1c2e599cc9eeffc287b05b6c2671b270c28ad91e) by Build-CI 
 
 #### [v3.0.7](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.6...v3.0.7)
