@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { withRouter, CreateEvent } from './withRouter';
+import { withRouter, CreateEvent, WindowInternal } from './withRouter';
 
 describe('WithRouter test Suite', () => {
   const generateKeyMock = () => '123ABC';
@@ -13,8 +13,8 @@ describe('WithRouter test Suite', () => {
         return { event, params };
       }),
     };
-    const documentMock = {};
-    const res = CreateEvent(windowMock, documentMock)('event test', paramsMock);
+    const documentMock = {} as Document;
+    const res = CreateEvent(((windowMock as unknown) as WindowInternal), documentMock)('event test', paramsMock);
     expect(res).toEqual({
       event: 'event test',
       params: { bubbles: false, cancelable: false, detail: 'detail' },
@@ -33,14 +33,15 @@ describe('WithRouter test Suite', () => {
     const documentMock = {
       createEvent: jest.fn(() => evtMock),
     };
-    const res = CreateEvent(windowMock, documentMock)('event test', paramsMock);
+    const typedDocumentMock = (documentMock as unknown) as Document
+    const res = CreateEvent(((windowMock as unknown) as WindowInternal), typedDocumentMock)('event test', paramsMock);
     expect(res).toEqual({ ...evtMock });
     expect(documentMock.createEvent).toHaveBeenCalledWith('CustomEvent');
     expect(evtMock.initCustomEvent).toHaveBeenCalledWith('event test', false, false, 'detail');
   });
 
   it('should withRouter add location and history', () => {
-    const Component = props => {
+    const Component = (props: any) => {
       const { history } = props;
       const { push } = history;
       push('/url/page');
@@ -55,7 +56,7 @@ describe('WithRouter test Suite', () => {
       location: 'location',
     };
     const createEvent = jest.fn();
-    const NewComp = withRouter(windowMock, createEvent, generateKeyMock)(Component);
+    const NewComp = withRouter(((windowMock as unknown) as WindowInternal), createEvent, generateKeyMock)(Component);
     const { asFragment } = render(<NewComp />);
     expect(windowMock.history.pushState).toHaveBeenCalledWith(
       { key: '123ABC', state: 'state' },

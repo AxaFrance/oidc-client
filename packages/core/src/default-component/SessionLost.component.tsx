@@ -1,8 +1,12 @@
-import React from 'react';
-import withCustomRouter from '../routes/withRouter';
+import React, { FC, MouseEventHandler } from 'react';
+import withCustomRouter, { OidcHistory } from '../routes/withRouter';
 import { getUserManager, authenticateUser } from '../services';
 
-export const SessionLost = ({ onAuthenticate }) => (
+type SessionLostProps = {
+  onAuthenticate?: MouseEventHandler;
+}
+
+export const SessionLost: FC<SessionLostProps> = ({ onAuthenticate }) => (
   <div className="oidc-session-lost">
     <div className="oidc-session-lost__container">
       <h1 className="oidc-session-lost__title">Session expirée</h1>
@@ -12,7 +16,12 @@ export const SessionLost = ({ onAuthenticate }) => (
   </div>
 );
 
-export const SessionLostContainer = ({ location, history }) => {
+type SessionLostContainerProps = {
+  location: Location;
+  history?: OidcHistory;
+}
+
+export const SessionLostContainer: FC<SessionLostContainerProps> = ({ location, history }) => {
   const callbackPath = location.search.replace('?path=', '');
   const onAuthenticate = () => {
     authenticateUser(getUserManager(), location, history)(true, callbackPath);

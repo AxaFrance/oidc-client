@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { UserManagerSettings } from 'oidc-client';
 import { NotAuthenticated, NotAuthorized, SessionLost } from '../default-component';
 import { getPath } from './route-utils';
 import { SilentCallback } from '../callbacks';
@@ -15,13 +16,20 @@ const propTypes = {
   children: PropTypes.node,
 };
 
-const defaultProps = {
+const defaultProps: Partial<OidcRoutesProps> = {
   notAuthenticated: null,
   notAuthorized: null,
-  children: null,
 };
 
-const OidcRoutes = ({
+type OidcRoutesProps = {
+  notAuthenticated?: ComponentType,
+  notAuthorized?: ComponentType,
+  callbackComponent: ComponentType,
+  sessionLost?: ComponentType,
+  configuration: UserManagerSettings,
+}
+
+const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   notAuthenticated,
   notAuthorized,
   callbackComponent: CallbackComponent,
@@ -54,12 +62,13 @@ const OidcRoutes = ({
     case '/authentication/not-authorized':
       return <NotAuthorizedComponent />;
     case '/authentication/session-lost':
-      return <SessionLostComponent />;  
+      return <SessionLostComponent />;
     default:
       return <>{children}</>;
   }
 };
 
+// @ts-ignore
 OidcRoutes.propTypes = propTypes;
 OidcRoutes.defaultProps = defaultProps;
 

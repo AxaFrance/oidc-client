@@ -1,15 +1,17 @@
 import { oidcLog } from './loggerService';
+import { User, UserManager } from 'oidc-client';
+import { OidcHistory } from '../routes/withRouter';
 
 let userRequested = false;
 let numberAuthentication = 0;
 
-export const isRequireAuthentication = (user, isForce) =>
+export const isRequireAuthentication = (user: User, isForce?: boolean): boolean =>
   isForce || !user || (user && user.expired === true);
 
-export const isRequireSignin = (oidcUser, isForce) => isForce || !oidcUser;
+export const isRequireSignin = (oidcUser: User, isForce?: boolean) => isForce || !oidcUser;
 
-export const authenticateUser = (userManager, location, history, user = null) => async (
-  isForce = false, callbackPath= null,
+export const authenticateUser = (userManager: UserManager, location: Location, history?: OidcHistory, user: User = null) => async (
+  isForce: boolean = false, callbackPath: string = null,
 ) => {
   let oidcUser = user;
   if (!oidcUser) {
@@ -43,7 +45,7 @@ export const authenticateUser = (userManager, location, history, user = null) =>
   }
 };
 
-export const logoutUser = async userManager => {
+export const logoutUser = async (userManager: UserManager) => {
   if (!userManager || !userManager.getUser) {
     return;
   }
@@ -54,5 +56,5 @@ export const logoutUser = async userManager => {
   }
 };
 
-export const signinSilent = getUserManager => (data = undefined) =>
+export const signinSilent = (getUserManager: () => UserManager) => (data: any = undefined) =>
   getUserManager().signinSilent(data);

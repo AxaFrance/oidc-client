@@ -1,4 +1,4 @@
-const getLocation = href => {
+const getLocation = (href: string) => {
   const match = href.match(
     // eslint-disable-next-line no-useless-escape
     /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
@@ -17,7 +17,7 @@ const getLocation = href => {
   );
 };
 
-export const getPath = href => {
+export const getPath = (href: string) => {
   const location = getLocation(href);
   let { path } = location;
   const { search, hash } = location;

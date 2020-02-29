@@ -11,10 +11,15 @@ describe('LoggerService tests suite', () => {
     error: jest.fn(),
   };
   beforeEach(() => {
+    // @ts-ignore
     Log.DEBUG = 4;
+    // @ts-ignore
     Log.INFO = 3;
+    // @ts-ignore
     Log.WARN = 2;
+    // @ts-ignore
     Log.ERROR = 1;
+    // @ts-ignore
     Log.NONE = 0;
   });
 

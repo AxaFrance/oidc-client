@@ -1,10 +1,17 @@
 import { Log } from 'oidc-client';
 
-let oidcLogLevel = Log.DEBUG;
-let oidcLogger = console;
+let oidcLogLevel: number = Log.DEBUG;
 
-export const setLogger = (level, logger) => {
-  const validOidcClientLevels = [
+type Logger = {
+ debug: (message?: any, ...optionalParams: any[]) => void;
+ info: (message?: any, ...optionalParams: any[]) => void;
+ warn: (message?: any, ...optionalParams: any[]) => void;
+ error: (message?: any, ...optionalParams: any[]) => void;
+}
+let oidcLogger: Logger = console;
+
+export const setLogger = (level: number, logger: Logger) => {
+  const validOidcClientLevels: number[] = [
     Log.DEBUG, // 4
     Log.INFO, // 3
     Log.WARN, // 2
@@ -24,25 +31,25 @@ export const setLogger = (level, logger) => {
   Log.logger = logger;
 };
 
-const debug = (...msg) => {
+const debug = (...msg: any[]) => {
   if (oidcLogLevel >= Log.DEBUG) {
     oidcLogger.debug('DEBUG [react-context-oidc] :', ...msg);
   }
 };
 
-const info = (...msg) => {
+const info = (...msg: any[]) => {
   if (oidcLogLevel >= Log.INFO) {
     oidcLogger.info('INFO [react-context-oidc] :', ...msg);
   }
 };
 
-const warn = (...msg) => {
+const warn = (...msg: any[]) => {
   if (oidcLogLevel >= Log.WARN) {
     oidcLogger.warn('WARN [react-context-oidc] :', ...msg);
   }
 };
 
-const error = (...msg) => {
+const error = (...msg: any[]) => {
   if (oidcLogLevel >= Log.ERROR) {
     oidcLogger.error('ERROR [react-context-oidc] :', ...msg);
   }

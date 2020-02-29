@@ -1,17 +1,17 @@
-import { UserManager, WebStorageStateStore, InMemoryWebStorage } from 'oidc-client';
+import { UserManager, WebStorageStateStore, InMemoryWebStorage, UserManagerSettings } from 'oidc-client';
 import { oidcLog } from './loggerService';
 
-let userManager;
+let userManager: UserManager;
 
-export const setUserManager = userManagerToSet => {
+export const setUserManager = (userManagerToSet: UserManager) => {
   userManager = userManagerToSet;
 };
 
 export const getUserManager = () => userManager;
 
-export const authenticationServiceInternal = WebStorageStateStoreInt => (
-  configuration,
-  UserStore
+export const authenticationServiceInternal = (WebStorageStateStoreInt: any) => (
+  configuration: UserManagerSettings,
+  UserStore?: any
 ) => {
   if (userManager) {
     return userManager;

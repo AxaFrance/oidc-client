@@ -7,7 +7,7 @@ module.exports = {
   },
   roots: ['<rootDir>/packages'],
   transform: {
-    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.(j|t)sx?$': 'babel-jest',
   },
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   collectCoverage: false,
@@ -17,5 +17,5 @@ module.exports = {
   setupFilesAfterEnv: ['./scripts/jest.init.js'],
   setupFiles: ['raf/polyfill'],
   testURL: 'http://localhost',
-  moduleFileExtensions: [/* 'ts', 'tsx', */ 'js', 'jsx', 'json', 'node'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
