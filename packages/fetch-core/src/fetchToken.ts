@@ -1,13 +1,17 @@
-const getAccessToken = user => () => {
+import { User } from 'oidc-client';
+
+const getAccessToken = (user: User | null) => (): string | null => {
   if (user) {
     return user.access_token;
   }
   return null;
 };
 
-export const fetchWithToken = (fetch, getAccessTokenInjected) => async (
-  url,
-  options = { method: 'GET' }
+type Fetch = typeof window.fetch;
+
+export const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => string | null) => async (
+  url: RequestInfo,
+  options: RequestInit = { method: 'GET' }
 ) => {
   let headers = new Headers();
   const optionTmp = { ...options };
@@ -29,20 +33,23 @@ export const fetchWithToken = (fetch, getAccessTokenInjected) => async (
     }
   }
   const newOptions = { ...optionTmp, headers };
-  const response = await fetch(url, newOptions);
-  return response;
+  return await fetch(url, newOptions);
 };
 
-export const fetchWrapper = fetchWithTokenInjected => getAccessTokenInjected => (
-  fetch = undefined
-) => props => {
+type ComponentWithFetchProps = {
+  fetch: Fetch
+  user?: User | null
+}
+
+export const fetchWrapper = (fetchWithTokenInjected: typeof fetchWithToken) => (getAccessTokenInjected: typeof getAccessToken) => (
+  fetch: Fetch = undefined
+) => (props: ComponentWithFetchProps) => {
   const previousFetch = fetch || props.fetch;
   const newFetch = fetchWithTokenInjected(previousFetch, getAccessTokenInjected(props.user));
-  const newProps = {
+  return {
     fetch: newFetch,
   };
-  return newProps;
 };
 
-export default (fetch = undefined) => props =>
+export default (fetch: Fetch = undefined) => (props: ComponentWithFetchProps) =>
   fetchWrapper(fetchWithToken)(getAccessToken)(fetch)(props);

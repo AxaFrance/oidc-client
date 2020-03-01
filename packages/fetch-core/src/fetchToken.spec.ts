@@ -8,9 +8,9 @@ describe('redux-fetch.fetchToken', () => {
       new Promise(resolve => {
         resolve(response);
       });
-    const headers = {};
-    const has = key => key in headers;
-    const set = (key, value) => {
+    const headers: Record<any, any> = {};
+    const has = (key: string): boolean => key in headers;
+    const set = (key: string, value: any) => {
       headers[key] = value;
     };
     global.Headers = () => ({

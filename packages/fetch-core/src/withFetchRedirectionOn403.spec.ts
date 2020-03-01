@@ -3,9 +3,9 @@ import { wrapAuthenticating, fetchWithRedirectionOn403 } from './withFetchRedire
 describe('fetch.withFetchRedirectionOn403', () => {
   it('should return props with new fetch', () => {
     const props = { history: {} };
-    const fetch = () => console.log('fetch origin function');
-    const newFetch = () => console.log('fetch new function');
-    const fetchWithRedirectionOn403Mock = () => newFetch;
+    const fetch: any = () => console.log('fetch origin function');
+    const newFetch: any = () => console.log('fetch new function');
+    const fetchWithRedirectionOn403Mock: any = () => newFetch;
     const newProps = wrapAuthenticating(fetchWithRedirectionOn403Mock)(fetch)(props);
     expect(newProps.fetch).toBe(newFetch);
     const newProps2 = wrapAuthenticating(fetchWithRedirectionOn403Mock)()(props);
@@ -14,15 +14,15 @@ describe('fetch.withFetchRedirectionOn403', () => {
 
   it('should navigate on not-authorized page', async () => {
     const history = { push: jest.fn() };
-    const response = { status: 403 };
-    const fetch = () =>
+    const response: any = { status: 403 };
+    const fetch: any = () =>
       new Promise(resolve => {
         resolve(response);
       });
-    await fetchWithRedirectionOn403(fetch, history)();
+    await fetchWithRedirectionOn403(fetch, history)('/some/url');
     expect(history.push.mock.calls[0][0]).toBe('/authentication/not-authorized');
     response.status = 200;
-    await fetchWithRedirectionOn403(fetch, history)();
+    await fetchWithRedirectionOn403(fetch, history)('/some/url');
     expect(history.push.mock.calls).toHaveLength(1);
   });
 });

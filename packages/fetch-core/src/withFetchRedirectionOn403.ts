@@ -1,9 +1,9 @@
 import { compose, withProps } from 'recompose';
 import { withRouter } from '@axa-fr/react-oidc-core';
 
-export const fetchWithRedirectionOn403 = (fetch, history) => async (
-  url,
-  options = { method: 'GET' }
+export const fetchWithRedirectionOn403 = (fetch: typeof window.fetch, history: OidcHistory) => async (
+  url: RequestInfo,
+  options: RequestInit = { method: 'GET' }
 ) => {
   const response = await fetch(url, options);
   if (response.status === 403) {
@@ -12,19 +12,18 @@ export const fetchWithRedirectionOn403 = (fetch, history) => async (
   return response;
 };
 
-export const wrapAuthenticating = fetchWithRedirectionOn403Injected => (
-  fetch = undefined
-) => props => {
+export const wrapAuthenticating = (fetchWithRedirectionOn403Injected: typeof fetchWithRedirectionOn403) => (
+  fetch: typeof window.fetch = undefined
+) => (props: any) => {
   const { history } = props;
   const previousFetch = fetch || props.fetch;
   const newFetch = fetchWithRedirectionOn403Injected(previousFetch, history);
-  const newProps = {
+  return {
     fetch: newFetch,
   };
-  return newProps;
 };
 
-const enhance = (fetch = undefined) =>
+const enhance = (fetch: typeof window.fetch = undefined) =>
   compose(
     withRouter,
     withProps(wrapAuthenticating(fetchWithRedirectionOn403)(fetch))

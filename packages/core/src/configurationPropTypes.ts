@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 
 export const configurationPropTypes = PropTypes.shape({
   client_id: PropTypes.string.isRequired,

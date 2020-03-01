@@ -11,7 +11,7 @@ module.exports = {
   },
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   collectCoverage: false,
-  collectCoverageFrom: ['packages/**/*.{js,jsx}', '!**/dist/**'],
+  collectCoverageFrom: ['packages/**/*.{js,jsx,ts,tsx}', '!**/dist/**'],
   coverageDirectory: 'coverage',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['./scripts/jest.init.js'],
