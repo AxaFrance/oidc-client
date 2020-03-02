@@ -32,7 +32,7 @@ export const authenticateUser = (userManager, location, history, user = null) =>
       await userManager.signinSilent();
     } catch (error) {
       if(numberAuthentication <= 1) {
-        await userManager.signinRedirect({ data: { url} });
+        await userManager.signinRedirect({ data: { url } });
       } else {
         userRequested = false;
         oidcLog.warn(`session lost ${error.toString()}`);

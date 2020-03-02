@@ -23,7 +23,7 @@ export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, 
     return () => {
       oidcLog.info('Protected component unmounted');
     };
-  }, [location, isEnabled, authenticateUserInternal, getUserManagerInternal]);
+  }, [oidcUser, location, isEnabled, authenticateUserInternal, getUserManagerInternal]);
   return { oidcUser, authenticating, isEnabled };
 };
 

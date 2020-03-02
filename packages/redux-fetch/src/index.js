@@ -1,5 +1,6 @@
 export { default as withAuthentication } from './withAuthentication';
 export {
+  withFetchRedirectionOn401,
   withFetchRedirectionOn403,
   withFetchSilentAuthenticateAndRetryOn401,
 } from '@axa-fr/react-oidc-fetch-core';
