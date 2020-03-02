@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.0.9-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.8...v3.0.9-alpha.0)
+> 2 March 2020
+- chore(release): publish v3.0.9-alpha.0 ***NO_CI*** [`ee81179`](https://github.com/AxaGuilDEv/react-oidc/commit/ee811799c0ea5805bd9a56baca2742932dd98efd) by Build-CI 
+- docs(changelog) update to new 3.0.8 [`f28c0ed`](https://github.com/AxaGuilDEv/react-oidc/commit/f28c0ede0d3bba884085b1269b94eee3a223e50e) by Build-CI 
+- fix(context) sessions lost block user on auth screen [`b30525c`](https://github.com/AxaGuilDEv/react-oidc/commit/b30525cbc18145bda1cdda122e5404f1f016c608) by guillaume chervet 
+
 #### [v3.0.8](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.7...v3.0.8)
 > 14 February 2020
 - fix(options): options can be overrided [`#399`](https://github.com/AxaGuilDEv/react-oidc/pull/399) by Guillaume Chervet
