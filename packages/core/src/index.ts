@@ -1,4 +1,4 @@
-export { withRouter, OidcRoutes } from './routes';
+export { withRouter, OidcHistory, OidcRoutes } from './routes';
 export { Authenticating, Callback } from './default-component';
 export { configurationPropTypes, configurationDefaultProps } from './configurationPropTypes';
 
