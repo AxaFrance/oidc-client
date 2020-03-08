@@ -6,6 +6,7 @@ import {
   authenticationService,
   getUserManager,
   configurationPropTypes,
+  UserStoreType
 } from '@axa-fr/react-oidc-core';
 import AuthenticationCallback from './AuthenticationCallback';
 
@@ -95,7 +96,7 @@ type OidcBaseProps = PropsWithChildren<{
   configuration: any,
   store: any,
   isEnabled: boolean,
-  UserStore: any,
+  UserStore: UserStoreType,
 }>;
 
 const OidcBase: FC<OidcBaseProps> = (props) => (

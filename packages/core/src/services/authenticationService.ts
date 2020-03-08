@@ -9,9 +9,12 @@ export const setUserManager = (userManagerToSet: UserManager) => {
 
 export const getUserManager = () => userManager;
 
-export const authenticationServiceInternal = (WebStorageStateStoreInt: any) => (
+// typeof oidc-client.WebStorageStateStoreSettings.store
+export type UserStoreType = any;
+
+export const authenticationServiceInternal = (WebStorageStateStoreInt: typeof WebStorageStateStore) => (
   configuration: UserManagerSettings,
-  UserStore?: any
+  UserStore?: UserStoreType
 ) => {
   if (userManager) {
     return userManager;

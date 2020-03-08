@@ -8,6 +8,7 @@ import {
   configurationPropTypes,
   configurationDefaultProps,
   ReactOidcHistory,
+  UserStoreType
 } from '@axa-fr/react-oidc-core';
 import { User } from 'oidc-client';
 
@@ -51,7 +52,7 @@ export const setDefaultState = (authenticationServiceInternal: typeof authentica
   configuration,
   isEnabled,
   UserStore,
-}: {configuration: any, isEnabled: boolean, UserStore: any}): OidcState => {
+}: {configuration: any, isEnabled: boolean, UserStore?: UserStoreType}): OidcState => {
   return {
     oidcUser: undefined,
     userManager: authenticationServiceInternal(configuration, UserStore),

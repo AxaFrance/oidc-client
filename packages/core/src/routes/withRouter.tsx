@@ -38,8 +38,10 @@ export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Do
   return evt;
 };
 
+type WindowHistoryState = typeof window.history.state;
+
 export interface ReactOidcHistory {
-  push: (url?: string | null, stateHistory?: any) => void;
+  push: (url?: string | null, stateHistory?: WindowHistoryState) => void;
 }
 
 export const withRouter = (
@@ -48,7 +50,7 @@ export const withRouter = (
   generateKeyInternal: typeof generateKey
 ) => (Component: React.ComponentType) => (props: any) => {
   const oidcHistory: ReactOidcHistory = {
-    push: (url?: string | null, stateHistory?: any): void => {
+    push: (url?: string | null, stateHistory?: WindowHistoryState): void => {
       const key = generateKeyInternal();
       const state = stateHistory || windowInternal.history.state;
       windowInternal.history.pushState({ key, state }, null, url);
