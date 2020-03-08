@@ -1,5 +1,5 @@
 import React, { FC, MouseEventHandler } from 'react';
-import withCustomRouter, { OidcHistory } from '../routes/withRouter';
+import withCustomRouter, { ReactOidcHistory } from '../routes/withRouter';
 import { getUserManager, authenticateUser } from '../services';
 
 type SessionLostProps = {
@@ -18,7 +18,7 @@ export const SessionLost: FC<SessionLostProps> = ({ onAuthenticate }) => (
 
 type SessionLostContainerProps = {
   location: Location;
-  history?: OidcHistory;
+  history?: ReactOidcHistory;
 }
 
 export const SessionLostContainer: FC<SessionLostContainerProps> = ({ location, history }) => {

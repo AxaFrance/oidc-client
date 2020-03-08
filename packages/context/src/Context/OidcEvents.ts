@@ -1,5 +1,5 @@
 import { Dispatch } from 'react';
-import { oidcLog, authenticateUser, logoutUser, OidcHistory } from '@axa-fr/react-oidc-core';
+import { oidcLog, authenticateUser, logoutUser, ReactOidcHistory } from '@axa-fr/react-oidc-core';
 import { User, UserManager, UserManagerEvents } from 'oidc-client';
 
 export type OidcState = {
@@ -28,7 +28,7 @@ export const logout = (userManager: UserManager, dispatch: Dispatch<OidcAction>)
     onError(dispatch)(error);
   }
 };
-export const login = (userManager: UserManager, dispatch: Dispatch<OidcAction>, location: Location, history: OidcHistory) => async () => {
+export const login = (userManager: UserManager, dispatch: Dispatch<OidcAction>, location: Location, history: ReactOidcHistory) => async () => {
   dispatch({ type: 'ON_LOADING' });
   oidcLog.info('Login requested');
   await authenticateUser(userManager, location, history)();

@@ -6,13 +6,13 @@ import {
   authenticateUser,
   isRequireAuthentication,
   oidcLog,
-  OidcHistory,
+  ReactOidcHistory,
 } from '@axa-fr/react-oidc-core';
 import withServices from '../withServices';
 import { AuthenticationContext } from './AuthenticationContext.container';
 
 // export use only for unit tests
-export const useOidcSecure = (authenticateUserInternal: typeof authenticateUser, getUserManagerInternal: typeof getUserManager, location: Location, history: OidcHistory) => {
+export const useOidcSecure = (authenticateUserInternal: typeof authenticateUser, getUserManagerInternal: typeof getUserManager, location: Location, history: ReactOidcHistory) => {
   const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {
     oidcLog.info('Protection : ', isEnabled);
@@ -36,7 +36,7 @@ export const useReactOidc = () => {
 
 type WithRouterComponentProps = PropsWithChildren<{
   location: Location,
-  history: OidcHistory
+  history: ReactOidcHistory
 }>;
 
 const OidcSecure = withRouter(({ children, location, history }: WithRouterComponentProps) => {
@@ -59,7 +59,7 @@ export default OidcSecure;
 // For non-regression
 type WithOidcSecurewithRouterProps = PropsWithChildren<{
   location: Location,
-  history: OidcHistory,
+  history: ReactOidcHistory,
   authenticateUser: typeof authenticateUser,
   getUserManager: typeof getUserManager
 }>;

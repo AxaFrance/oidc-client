@@ -1,6 +1,6 @@
 import { oidcLog } from './loggerService';
 import { User, UserManager } from 'oidc-client';
-import { OidcHistory } from '../routes/withRouter';
+import { ReactOidcHistory } from '../routes/withRouter';
 
 let userRequested = false;
 let numberAuthentication = 0;
@@ -10,7 +10,7 @@ export const isRequireAuthentication = (user: User, isForce?: boolean): boolean 
 
 export const isRequireSignin = (oidcUser: User, isForce?: boolean) => isForce || !oidcUser;
 
-export const authenticateUser = (userManager: UserManager, location: Location, history?: OidcHistory, user: User = null) => async (
+export const authenticateUser = (userManager: UserManager, location: Location, history?: ReactOidcHistory, user: User = null) => async (
   isForce: boolean = false, callbackPath: string = null,
 ) => {
   let oidcUser = user;

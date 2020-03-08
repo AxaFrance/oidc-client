@@ -6,7 +6,7 @@ import {
   withRouter,
   getUserManager,
   isRequireAuthentication,
-  authenticateUser, OidcHistory,
+  authenticateUser, ReactOidcHistory,
 } from '@axa-fr/react-oidc-core';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
@@ -14,7 +14,7 @@ import { UserState } from 'redux-oidc';
 
 type AuthenticationLiveCycleProps = PropsWithChildren<{
   location: Location,
-  history: OidcHistory,
+  history: ReactOidcHistory,
   oidc: UserState
 }>;
 

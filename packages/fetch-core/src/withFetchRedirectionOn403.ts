@@ -1,7 +1,7 @@
 import { compose, withProps } from 'recompose';
-import { withRouter, OidcHistory } from '@axa-fr/react-oidc-core';
+import { withRouter, ReactOidcHistory } from '@axa-fr/react-oidc-core';
 
-export const fetchWithRedirectionOn403 = (fetch: typeof window.fetch, history: OidcHistory) => async (
+export const fetchWithRedirectionOn403 = (fetch: typeof window.fetch, history: ReactOidcHistory) => async (
   url: RequestInfo,
   options: RequestInit = { method: 'GET' }
 ) => {

@@ -7,7 +7,7 @@ import {
   OidcRoutes,
   configurationPropTypes,
   configurationDefaultProps,
-  OidcHistory,
+  ReactOidcHistory,
 } from '@axa-fr/react-oidc-core';
 import { User } from 'oidc-client';
 
@@ -77,7 +77,7 @@ type Logger = {
 
 type AuthenticationProviderIntProps = PropsWithChildren<{
   location: Location,
-  history: OidcHistory,
+  history: ReactOidcHistory,
   setDefaultState: typeof setDefaultState,
   loggerLevel: number,
   logger: Logger,

@@ -2,7 +2,7 @@
 import { withRouter } from '@axa-fr/react-oidc-core';
 import { wrapAuthenticating } from './withFetchRedirectionOn403';
 
-export const fetchWithRedirectionOn401 = (fetch: typeof window.fetch, history: OidcHistory) => async (
+export const fetchWithRedirectionOn401 = (fetch: typeof window.fetch, history: ReactOidcHistory) => async (
   url: RequestInfo,
   options: RequestInit = { method: 'GET' }
 ) => {

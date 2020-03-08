@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ComponentType, FC } from 'react';
 import { User, UserManager } from 'oidc-client';
 import { CallbackComponent } from 'redux-oidc';
-import { withRouter, getUserManager, oidcLog, OidcHistory } from '@axa-fr/react-oidc-core';
+import { withRouter, getUserManager, oidcLog, ReactOidcHistory } from '@axa-fr/react-oidc-core';
 import { compose, withProps, pure } from 'recompose';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -17,7 +17,7 @@ const defaultProps: Partial<AuthenticationCallbackProps> = {
   callbackComponentOverride: null,
 };
 
-export const success = (oidcLogInjected: {error: (msg: string) => void}) => (history: OidcHistory) => (user: User | null) => {
+export const success = (oidcLogInjected: {error: (msg: string) => void}) => (history: ReactOidcHistory) => (user: User | null) => {
   if (user && user.state) {
     history.push(user.state.url);
   } else {
@@ -26,7 +26,7 @@ export const success = (oidcLogInjected: {error: (msg: string) => void}) => (his
 };
 
 type AuthenticationCallbackProps = {
-  history: OidcHistory,
+  history: ReactOidcHistory,
   userManager: UserManager,
   callbackComponentOverride?: ComponentType
 }
