@@ -1,6 +1,8 @@
 import * as React from 'react';
+import { ComponentType, FC } from 'react';
+import { User, UserManager } from 'oidc-client';
 import { CallbackComponent } from 'redux-oidc';
-import { withRouter, getUserManager, oidcLog } from '@axa-fr/react-oidc-core';
+import { withRouter, getUserManager, oidcLog, OidcHistory } from '@axa-fr/react-oidc-core';
 import { compose, withProps, pure } from 'recompose';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -11,11 +13,11 @@ const propTypes = {
   callbackComponentOverride: PropTypes.elementType,
 };
 
-const defaultProps = {
+const defaultProps: Partial<AuthenticationCallbackProps> = {
   callbackComponentOverride: null,
 };
 
-export const success = oidcLogInjected => history => user => {
+export const success = (oidcLogInjected: {error: (msg: string) => void}) => (history: OidcHistory) => (user: User | null) => {
   if (user && user.state) {
     history.push(user.state.url);
   } else {
@@ -23,14 +25,20 @@ export const success = oidcLogInjected => history => user => {
   }
 };
 
-const AuthenticationCallback = ({
+type AuthenticationCallbackProps = {
+  history: OidcHistory,
+  userManager: UserManager,
+  callbackComponentOverride?: ComponentType
+}
+
+const AuthenticationCallback: FC<AuthenticationCallbackProps> = ({
   history,
   userManager,
   callbackComponentOverride: CallbackComponentOverride,
 }) => {
-  const successCallback = user => success(oidcLog)(history)(user);
+  const successCallback = (user: User | null) => success(oidcLog)(history)(user);
 
-  const errorCallback = error => {
+  const errorCallback = (error: Error) => {
     const { message } = error;
     oidcLog.error(`There was an error handling the token callback: ${message}`);
     history.push(`/authentication/not-authenticated?message=${message}`);
@@ -51,6 +59,7 @@ const AuthenticationCallback = ({
   );
 };
 
+// @ts-ignore
 AuthenticationCallback.propTypes = propTypes;
 AuthenticationCallback.defaultProps = defaultProps;
 

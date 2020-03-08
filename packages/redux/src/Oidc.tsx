@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentType, FC, PropsWithChildren } from 'react';
 import { OidcProvider, loadUser } from 'redux-oidc';
 import PropTypes from 'prop-types';
 import {
@@ -22,7 +22,7 @@ const propTypes = {
   UserStore: PropTypes.func,
 };
 
-const defaultPropsObject = {
+const defaultPropsObject: Partial<OidcBaseProps> = {
   notAuthenticated: null,
   notAuthorized: null,
   callbackComponentOverride: null,
@@ -32,11 +32,11 @@ const defaultPropsObject = {
   UserStore: null,
 };
 
-const withComponentOverrideProps = (Component, customProps) => props => (
+const withComponentOverrideProps = (Component: ComponentType, customProps: any) => (props: any) => (
   <Component callbackComponentOverride={customProps} {...props} />
 );
 
-export const OidcBaseInternal = props => {
+export const OidcBaseInternal = (props: any) => {
   const {
     isEnabled,
     children,
@@ -87,7 +87,18 @@ OidcBaseInternal.propTypes = {
   authenticationServiceInternal: PropTypes.func.isRequired,
 };
 
-const OidcBase = props => (
+type OidcBaseProps = PropsWithChildren<{
+  notAuthenticated?: ComponentType | null,
+  notAuthorized?: ComponentType | null,
+  callbackComponentOverride?: ComponentType | null,
+  sessionLostComponent?: ComponentType | null,
+  configuration: any,
+  store: any,
+  isEnabled: boolean,
+  UserStore: any,
+}>;
+
+const OidcBase: FC<OidcBaseProps> = (props) => (
   <OidcBaseInternal
     loadUserInternal={loadUser}
     authenticationServiceInternal={authenticationService}
@@ -95,6 +106,7 @@ const OidcBase = props => (
   />
 );
 
+// @ts-ignore
 OidcBase.propTypes = propTypes;
 OidcBase.defaultProps = defaultPropsObject;
 

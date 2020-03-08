@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ComponentType, FC, PropsWithChildren, useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import {
@@ -6,12 +6,19 @@ import {
   withRouter,
   getUserManager,
   isRequireAuthentication,
-  authenticateUser,
+  authenticateUser, OidcHistory,
 } from '@axa-fr/react-oidc-core';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
+import { UserState } from 'redux-oidc';
 
-const AuthenticationLiveCycle = ({ location, oidc, children, history }) => {
+type AuthenticationLiveCycleProps = PropsWithChildren<{
+  location: Location,
+  history: OidcHistory,
+  oidc: UserState
+}>;
+
+const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, oidc, children, history }) => {
   const { isLoadingUser, user } = oidc;
   const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
   const isLoading = isLoadingUser || isShouldAuthenticate;
@@ -25,7 +32,7 @@ const AuthenticationLiveCycle = ({ location, oidc, children, history }) => {
   return isLoading ? <Authenticating /> : <>{children}</>;
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   oidc: state.oidc,
 });
 
@@ -39,7 +46,7 @@ const oidcCompose = compose(
 
 const Secure = oidcCompose(AuthenticationLiveCycle);
 
-export const oidcSecure = Component => props => {
+export const oidcSecure = (Component: ComponentType) => (props: any) => {
   return <Secure><Component {...props} /></Secure>;
 };
 
@@ -50,10 +57,13 @@ const propTypesOidcSecure = {
 
 const defaultPropsOidcSecure = {
   isEnabled: true,
-  children: null,
 };
 
-const OidcSecure = props => {
+type OidcSecureProps = PropsWithChildren<{
+  isEnabled?: boolean
+}>;
+
+const OidcSecure: FC<OidcSecureProps> = (props) => {
   const { isEnabled, children } = props;
   if (isEnabled) {
     return <Secure>{children}</Secure>;

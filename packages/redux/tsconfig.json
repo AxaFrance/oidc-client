@@ -1,13 +1,8 @@
 {
-  "compileOnSave": false,
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "jsx": "react",
-    "skipLibCheck": true,
-    "noImplicitAny": true,
-    "target": "es5",
-    "lib": ["es2016", "dom"]
-  }
+    "jsx": "react"
+  },
+  "include": ["./src/index.ts"]
 }
