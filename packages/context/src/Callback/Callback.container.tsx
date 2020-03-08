@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import { withRouter, getUserManager, oidcLog, Callback } from '@axa-fr/react-oidc-core';
+import React, { ComponentType, FC, useEffect } from 'react';
+import { withRouter, getUserManager, oidcLog, Callback, OidcHistory } from '@axa-fr/react-oidc-core';
+import { User, UserManager } from 'oidc-client';
 import withServices from '../withServices';
 
-export const onRedirectSuccess = (history, oidcLogInternal) => user => {
+export const onRedirectSuccess = (history: OidcHistory, oidcLogInternal: typeof oidcLog) => (user: User) => {
   oidcLogInternal.info('Successfull login Callback', user);
   if (user.state.url) {
     history.push(user.state.url);
@@ -11,12 +12,18 @@ export const onRedirectSuccess = (history, oidcLogInternal) => user => {
   }
 };
 
-export const onRedirectError = (history, oidcLogInternal) => ({ message }) => {
+export const onRedirectError = (history: OidcHistory, oidcLogInternal: typeof oidcLog) => ({ message }: { message: string }) => {
   oidcLogInternal.error(`There was an error handling the token callback: ${message}`);
   history.push(`/authentication/not-authenticated?message=${encodeURIComponent(message)}`);
 };
 
-export const CallbackContainerCore = ({
+type CallbackContainerCoreProps = {
+  history: OidcHistory,
+  getUserManager: () => UserManager | undefined,
+  oidcLog: typeof oidcLog,
+  callbackComponentOverride: ComponentType
+}
+export const CallbackContainerCore: FC<CallbackContainerCoreProps> = ({
   history,
   getUserManager: getUserManagerInternal,
   oidcLog: oidcLogInternal,

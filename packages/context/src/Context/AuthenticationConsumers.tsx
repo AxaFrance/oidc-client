@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { ComponentType, PropsWithChildren, useContext, useEffect, useMemo } from 'react';
 import {
   withRouter,
   Authenticating,
@@ -6,12 +6,13 @@ import {
   authenticateUser,
   isRequireAuthentication,
   oidcLog,
+  OidcHistory,
 } from '@axa-fr/react-oidc-core';
 import withServices from '../withServices';
 import { AuthenticationContext } from './AuthenticationContext.container';
 
 // export use only for unit tests
-export const useOidcSecure = (authenticateUserInternal, getUserManagerInternal, location, history) => {
+export const useOidcSecure = (authenticateUserInternal: typeof authenticateUser, getUserManagerInternal: typeof getUserManager, location: Location, history: OidcHistory) => {
   const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {
     oidcLog.info('Protection : ', isEnabled);
@@ -33,11 +34,16 @@ export const useReactOidc = () => {
   return { isEnabled, login, logout, oidcUser, events };
 };
 
-const OidcSecure = withRouter(({ children, location, history }) => {
+type WithRouterComponentProps = PropsWithChildren<{
+  location: Location,
+  history: OidcHistory
+}>;
+
+const OidcSecure = withRouter(({ children, location, history }: WithRouterComponentProps) => {
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUser,
     getUserManager,
-    location, 
+    location,
     history
   );
   const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
@@ -51,13 +57,20 @@ const OidcSecure = withRouter(({ children, location, history }) => {
 export default OidcSecure;
 
 // For non-regression
-export const withOidcSecurewithRouter = WrappedComponent => ({
+type WithOidcSecurewithRouterProps = PropsWithChildren<{
+  location: Location,
+  history: OidcHistory,
+  authenticateUser: typeof authenticateUser,
+  getUserManager: typeof getUserManager
+}>;
+
+export const withOidcSecurewithRouter = (WrappedComponent: ComponentType) => ({
   location,
-  history,  
+  history,
   authenticateUser: authenticateUserInternal,
   getUserManager: getUserManagerInternal,
   ...otherProps
-}) => {
+}: WithOidcSecurewithRouterProps) => {
   const { oidcUser, authenticating, isEnabled } = useOidcSecure(
     authenticateUserInternal,
     getUserManagerInternal,
@@ -73,7 +86,7 @@ export const withOidcSecurewithRouter = WrappedComponent => ({
   return requiredAuth ? <AuthenticatingComponent /> : <WrappedComponent {...otherProps} />;
 };
 
-export const withOidcSecure = WrappedComponent =>
+export const withOidcSecure = (WrappedComponent: ComponentType) =>
   withRouter(
     withServices(withOidcSecurewithRouter(WrappedComponent), {
       authenticateUser,
@@ -81,10 +94,12 @@ export const withOidcSecure = WrappedComponent =>
     })
   );
 
-export const withOidcUser = Component => props => {
+type WithOidcUserComponentProps = PropsWithChildren<{}>
+export const withOidcUser = (Component: ComponentType) => (props: WithOidcUserComponentProps) => {
   const { oidcUser } = useContext(AuthenticationContext);
   const { children } = props;
   return (
+    // @ts-ignore
     <Component {...props} oidcUser={oidcUser}>
       {children}
     </Component>

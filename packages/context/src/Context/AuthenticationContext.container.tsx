@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from 'react';
+import React, { useEffect, useCallback, useReducer, FC, ComponentType, PropsWithChildren } from 'react';
 import PropTypes from 'prop-types';
 import {
   withRouter,
@@ -7,10 +7,12 @@ import {
   OidcRoutes,
   configurationPropTypes,
   configurationDefaultProps,
+  OidcHistory,
 } from '@axa-fr/react-oidc-core';
+import { User } from 'oidc-client';
 
 import { Callback } from '../Callback';
-import { addOidcEvents, removeOidcEvents, oidcReducer, login, logout } from './OidcEvents';
+import { addOidcEvents, removeOidcEvents, oidcReducer, login, logout, OidcState } from './OidcEvents';
 import withServices from '../withServices';
 
 export const AuthenticationContext = React.createContext(null);
@@ -33,7 +35,7 @@ const propTypes = {
   UserStore: PropTypes.func,
 };
 
-const defaultProps = {
+const defaultProps: Partial<AuthenticationProviderIntProps> = {
   notAuthenticated: null,
   notAuthorized: null,
   authenticating: null,
@@ -45,11 +47,11 @@ const defaultProps = {
   configuration: configurationDefaultProps,
 };
 
-export const setDefaultState = authenticationServiceInternal => ({
+export const setDefaultState = (authenticationServiceInternal: typeof authenticationService) => ({
   configuration,
   isEnabled,
   UserStore,
-}) => {
+}: {configuration: any, isEnabled: boolean, UserStore: any}): OidcState => {
   return {
     oidcUser: undefined,
     userManager: authenticationServiceInternal(configuration, UserStore),
@@ -59,23 +61,50 @@ export const setDefaultState = authenticationServiceInternal => ({
   };
 };
 
-const withComponentOverrideProps = (Component, customProps) => props => (
+type WithComponentOverrideProps = {
+  callbackComponentOverride: ComponentType
+}
+const withComponentOverrideProps = (Component: ComponentType<WithComponentOverrideProps>, customProps: ComponentType) => (props: WithComponentOverrideProps) => (
   <Component callbackComponentOverride={customProps} {...props} />
 );
+
+type Logger = {
+  debug: (message?: any, ...optionalParams: any[]) => void;
+  info: (message?: any, ...optionalParams: any[]) => void;
+  warn: (message?: any, ...optionalParams: any[]) => void;
+  error: (message?: any, ...optionalParams: any[]) => void;
+}
+
+type AuthenticationProviderIntProps = PropsWithChildren<{
+  location: Location,
+  history: OidcHistory,
+  setDefaultState: typeof setDefaultState,
+  loggerLevel: number,
+  logger: Logger,
+  Callback: ComponentType<WithComponentOverrideProps>,
+  notAuthenticated: ComponentType,
+  notAuthorized: ComponentType,
+  authenticating: ComponentType,
+  callbackComponentOverride: ComponentType,
+  sessionLostComponent: ComponentType,
+  isEnabled?: boolean
+  configuration: any
+}>;
 
 const AuthenticationProviderInt = ({
   location,
   history,
   setDefaultState: setDefaultStateInternal,
   ...otherProps
-}) => {
+}: AuthenticationProviderIntProps) => {
+  // @ts-ignore
   const [oidcState, dispatch] = useReducer(oidcReducer, setDefaultStateInternal(otherProps));
 
   useEffect(() => {
     setLogger(otherProps.loggerLevel, otherProps.logger);
     dispatch({ type: 'ON_LOADING' });
     addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
-    oidcState.userManager.getUser().then(user => dispatch({ type: 'ON_LOAD_USER', user }));
+    oidcState.userManager.getUser().then((user: User | null) => dispatch({ type: 'ON_LOAD_USER', user }));
     return () => removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
   }, [otherProps.logger, otherProps.loggerLevel, oidcState.userManager]);
 
@@ -91,7 +120,8 @@ const AuthenticationProviderInt = ({
     Callback: CallbackInt,
   } = otherProps;
 
-  const CallbackComponent = React.useMemo(
+  // @ts-ignore
+  const CallbackComponent: ComponentType = React.useMemo(
     () =>
       callbackComponentOverride
         ? withComponentOverrideProps(CallbackInt, callbackComponentOverride)
@@ -131,7 +161,7 @@ const AuthenticationProviderInt = ({
   );
 };
 
-const AuthenticationProvider = withRouter(
+const AuthenticationProvider:FC = withRouter(
   withServices(AuthenticationProviderInt, {
     Callback,
     setDefaultState: setDefaultState(authenticationService),
