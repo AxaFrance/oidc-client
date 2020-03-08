@@ -5,7 +5,9 @@ import {
 } from '@axa-fr/react-oidc-fetch-core';
 import withFetchToken from './withFetchToken';
 
-const enhance = fetch =>
+type WindowFetch = typeof fetch;
+
+const enhance = (fetch: WindowFetch) =>
   compose(
     withFetchToken(fetch),
     withFetchSilentAuthenticateAndRetryOn401(),
