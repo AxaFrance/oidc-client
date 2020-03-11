@@ -1,14 +1,10 @@
-import { Log } from 'oidc-client';
+import { Log, Logger } from 'oidc-client';
 
 let oidcLogLevel: number = Log.DEBUG;
 
-type Logger = {
- debug: (message?: any, ...optionalParams: any[]) => void;
- info: (message?: any, ...optionalParams: any[]) => void;
- warn: (message?: any, ...optionalParams: any[]) => void;
- error: (message?: any, ...optionalParams: any[]) => void;
-}
-let oidcLogger: Logger = console;
+export type ReactOidcLogger = Logger;
+
+let oidcLogger: ReactOidcLogger = console;
 
 export const setLogger = (level: number, logger: Logger) => {
   const validOidcClientLevels: number[] = [
