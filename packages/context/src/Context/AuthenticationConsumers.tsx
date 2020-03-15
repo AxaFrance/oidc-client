@@ -12,7 +12,12 @@ import withServices from '../withServices';
 import { AuthenticationContext } from './AuthenticationContext.container';
 
 // export use only for unit tests
-export const useOidcSecure = (authenticateUserInternal: typeof authenticateUser, getUserManagerInternal: typeof getUserManager, location: Location, history: ReactOidcHistory) => {
+export const useOidcSecure = (
+  authenticateUserInternal: typeof authenticateUser,
+  getUserManagerInternal: typeof getUserManager,
+  location: Location,
+  history: ReactOidcHistory
+) => {
   const { isEnabled, oidcUser, authenticating } = useContext(AuthenticationContext);
   useEffect(() => {
     oidcLog.info('Protection : ', isEnabled);
@@ -35,8 +40,8 @@ export const useReactOidc = () => {
 };
 
 type WithRouterComponentProps = PropsWithChildren<{
-  location: Location,
-  history: ReactOidcHistory
+  location: Location;
+  history: ReactOidcHistory;
 }>;
 
 const OidcSecure = withRouter(({ children, location, history }: WithRouterComponentProps) => {
@@ -58,10 +63,10 @@ export default OidcSecure;
 
 // For non-regression
 type WithOidcSecurewithRouterProps = PropsWithChildren<{
-  location: Location,
-  history: ReactOidcHistory,
-  authenticateUser: typeof authenticateUser,
-  getUserManager: typeof getUserManager
+  location: Location;
+  history: ReactOidcHistory;
+  authenticateUser: typeof authenticateUser;
+  getUserManager: typeof getUserManager;
 }>;
 
 export const withOidcSecurewithRouter = (WrappedComponent: ComponentType) => ({
@@ -77,7 +82,7 @@ export const withOidcSecurewithRouter = (WrappedComponent: ComponentType) => ({
     location,
     history
   );
-  const requiredAuth =  useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
+  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
     isEnabled,
     oidcUser,
   ]);
@@ -94,7 +99,7 @@ export const withOidcSecure = (WrappedComponent: ComponentType) =>
     })
   );
 
-type WithOidcUserComponentProps = PropsWithChildren<{}>
+type WithOidcUserComponentProps = PropsWithChildren<{}>;
 export const withOidcUser = (Component: ComponentType) => (props: WithOidcUserComponentProps) => {
   const { oidcUser } = useContext(AuthenticationContext);
   const { children } = props;

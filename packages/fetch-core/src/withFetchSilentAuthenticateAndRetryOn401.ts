@@ -4,7 +4,10 @@ import { User } from 'oidc-client';
 
 type TrySigninSilent = (args?: any) => Promise<User>;
 
-const fetchWithSilentAuthenticateAndRetryOn401 = (fetch: typeof window.fetch, trySilentAuthenticateInjected: TrySigninSilent) => async (
+const fetchWithSilentAuthenticateAndRetryOn401 = (
+  fetch: typeof window.fetch,
+  trySilentAuthenticateInjected: TrySigninSilent
+) => async (
   url: RequestInfo,
   options: RequestInit = { method: 'GET' },
   isRetry: boolean = true
@@ -35,6 +38,7 @@ const wrapAuthenticating = (fetch: typeof window.fetch = undefined) => (props: a
   };
 };
 
-const enhance = (fetch: typeof window.fetch = undefined) => compose(withProps(wrapAuthenticating(fetch)));
+const enhance = (fetch: typeof window.fetch = undefined) =>
+  compose(withProps(wrapAuthenticating(fetch)));
 
 export default enhance;

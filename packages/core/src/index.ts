@@ -12,5 +12,5 @@ export {
   setLogger,
   oidcLog,
   InMemoryWebStorage,
-  UserStoreType
+  UserStoreType,
 } from './services';

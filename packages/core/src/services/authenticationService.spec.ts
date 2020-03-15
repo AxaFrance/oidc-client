@@ -11,9 +11,9 @@ jest.mock('oidc-client', () => ({
 }));
 
 describe('AuthenticationService tests suite', () => {
-  const userManagerMock = (({
+  const userManagerMock = ({
     test: 'mock',
-  }) as unknown) as UserManager;
+  } as unknown) as UserManager;
 
   const WebStorageStateStoreMock = jest.fn().mockImplementation(store => store);
 
@@ -33,13 +33,13 @@ describe('AuthenticationService tests suite', () => {
   });
 
   it('Should return userManager when initiate with a config object', () => {
-    const fakeConf = (({ fake: 'conf' }) as unknown) as UserManagerSettings;
+    const fakeConf = ({ fake: 'conf' } as unknown) as UserManagerSettings;
     authenticationServiceInternal(WebStorageStateStoreMock)(fakeConf);
     expect(UserManager).toHaveBeenCalledWith(fakeConf);
   });
 
   it('should oveeride store conf with storeJwtInMemory set to true', () => {
-    const fakeConf = (({ fake: 'conf', storeJwtInMemory: true }) as unknown) as UserManagerSettings;
+    const fakeConf = ({ fake: 'conf', storeJwtInMemory: true } as unknown) as UserManagerSettings;
     authenticationServiceInternal(WebStorageStateStoreMock)(fakeConf, InMemoryWebStorageMock);
     expect(UserManager).toHaveBeenCalledWith({
       fake: 'conf',

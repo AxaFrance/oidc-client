@@ -6,7 +6,7 @@ import {
   authenticationService,
   getUserManager,
   configurationPropTypes,
-  UserStoreType
+  UserStoreType,
 } from '@axa-fr/react-oidc-core';
 import AuthenticationCallback from './AuthenticationCallback';
 
@@ -89,17 +89,17 @@ OidcBaseInternal.propTypes = {
 };
 
 type OidcBaseProps = PropsWithChildren<{
-  notAuthenticated?: ComponentType | null,
-  notAuthorized?: ComponentType | null,
-  callbackComponentOverride?: ComponentType | null,
-  sessionLostComponent?: ComponentType | null,
-  configuration: any,
-  store: any,
-  isEnabled: boolean,
-  UserStore: UserStoreType,
+  notAuthenticated?: ComponentType | null;
+  notAuthorized?: ComponentType | null;
+  callbackComponentOverride?: ComponentType | null;
+  sessionLostComponent?: ComponentType | null;
+  configuration: any;
+  store: any;
+  isEnabled: boolean;
+  UserStore: UserStoreType;
 }>;
 
-const OidcBase: FC<OidcBaseProps> = (props) => (
+const OidcBase: FC<OidcBaseProps> = props => (
   <OidcBaseInternal
     loadUserInternal={loadUser}
     authenticationServiceInternal={authenticationService}

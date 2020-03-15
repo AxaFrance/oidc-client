@@ -34,7 +34,7 @@ describe('reducer tests suite', () => {
 
   const propsMock = {
     isEnabled: true,
-    history: {push : () => {}},
+    history: { push: () => {} },
     configuration: {},
     location: 'locationMock',
     onUserUnloaded: jest.fn(() => jest.fn()),
@@ -179,7 +179,11 @@ describe('reducer tests suite', () => {
   it('should set state and call authentication when call login function', async () => {
     await login(userManagerMock, dispatch, propsMock.location, propsMock.history)();
     expect(dispatch).toHaveBeenCalledWith({ type: 'ON_LOADING' });
-    expect(core.authenticateUser).toHaveBeenCalledWith(userManagerMock, 'locationMock', propsMock.history);
+    expect(core.authenticateUser).toHaveBeenCalledWith(
+      userManagerMock,
+      'locationMock',
+      propsMock.history
+    );
   });
 
   it('should set state and call onUserUnload function when call logout', async () => {

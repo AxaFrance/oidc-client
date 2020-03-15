@@ -3,7 +3,7 @@ import { UserManager } from 'oidc-client';
 import { oidcLog } from '../services';
 
 interface SilentCallbackProps {
-  logger?: typeof oidcLog
+  logger?: typeof oidcLog;
 }
 
 const SilentCallback: FC<SilentCallbackProps> = ({ logger }) => {

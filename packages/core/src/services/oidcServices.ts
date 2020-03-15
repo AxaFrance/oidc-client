@@ -10,9 +10,12 @@ export const isRequireAuthentication = (user: User, isForce?: boolean): boolean 
 
 export const isRequireSignin = (oidcUser: User, isForce?: boolean) => isForce || !oidcUser;
 
-export const authenticateUser = (userManager: UserManager, location: Location, history?: ReactOidcHistory, user: User = null) => async (
-  isForce: boolean = false, callbackPath: string = null,
-) => {
+export const authenticateUser = (
+  userManager: UserManager,
+  location: Location,
+  history?: ReactOidcHistory,
+  user: User = null
+) => async (isForce: boolean = false, callbackPath: string = null) => {
   let oidcUser = user;
   if (!oidcUser) {
     oidcUser = await userManager.getUser();
@@ -33,8 +36,8 @@ export const authenticateUser = (userManager: UserManager, location: Location, h
     try {
       await userManager.signinSilent();
     } catch (error) {
-      if(numberAuthentication <= 1) {
-        await userManager.signinRedirect({ data: { url} });
+      if (numberAuthentication <= 1) {
+        await userManager.signinRedirect({ data: { url } });
       } else {
         userRequested = false;
         oidcLog.warn(`session lost ${error.toString()}`);

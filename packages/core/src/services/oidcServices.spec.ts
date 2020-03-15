@@ -7,17 +7,17 @@ describe('authenticate testing', () => {
   const userMock = {};
   let userManagerMock: UserManager;
 
-  const locationMock = (({
+  const locationMock = ({
     pathname: '/pathname',
-  }) as unknown) as Location;
+  } as unknown) as Location;
 
   beforeEach(() => {
-    userManagerMock = (({
+    userManagerMock = ({
       getUser: jest.fn(() => userMock),
       signinRedirect: jest.fn(),
       signinSilent: jest.fn(),
       signoutRedirect: jest.fn(),
-    }) as unknown) as UserManager;
+    } as unknown) as UserManager;
 
     jest.clearAllMocks();
   });
@@ -37,10 +37,10 @@ describe('authenticate testing', () => {
   });
 
   it('authenticateUser should call signin redirect with force to true with url= path + search', async () => {
-    const localLocationMock = (({
+    const localLocationMock = ({
       pathname: '/pathname',
       search: '?toto=tutu',
-    }) as unknown) as Location;
+    } as unknown) as Location;
     await authenticateUser(userManagerMock, localLocationMock)(true);
     expect(userManagerMock.getUser).toHaveBeenCalled();
     expect(userManagerMock.signinRedirect).toHaveBeenCalledWith({
@@ -49,7 +49,7 @@ describe('authenticate testing', () => {
   });
 
   it('authenticateUser should call signin redirect with force to true with url = callbackUrl', async () => {
-    await authenticateUser(userManagerMock, locationMock)(true, "/injectedpath");
+    await authenticateUser(userManagerMock, locationMock)(true, '/injectedpath');
     expect(userManagerMock.getUser).toHaveBeenCalled();
     expect(userManagerMock.signinRedirect).toHaveBeenCalledWith({
       data: { url: '/injectedpath' },
@@ -57,26 +57,28 @@ describe('authenticate testing', () => {
   });
 
   it('authenticateUser should call signinsilent with user', async () => {
-    const userManagerMockLocal = (({
+    const userManagerMockLocal = ({
       signinSilent: jest.fn(),
-    }) as unknown) as UserManager;
-    const expiredUserMock = (({ expired: true }) as unknown) as User;
+    } as unknown) as UserManager;
+    const expiredUserMock = ({ expired: true } as unknown) as User;
     await authenticateUser(userManagerMockLocal, locationMock, null, expiredUserMock)(false);
     expect(userManagerMockLocal.signinSilent).toHaveBeenCalled();
   });
 
-  it('authenticateUser should call signinsilent that fail and should call first signinRedirect and then should call history.push', async () => {
+  it(
+    'authenticateUser should call signinsilent that fail and should call first signinRedirect and then should call history.push',
+    async () => {
     const sleep = (ms: number) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     };
-    const userManagerMockLocal = (({
+    const userManagerMockLocal = ({
       signinSilent: jest.fn(async () => {
         await sleep(200);
         throw new Error('error');
       }),
       signinRedirect: jest.fn(),
-    }) as unknown) as UserManager;
-    const expiredUserMock = (({ expired: true }) as unknown) as User;
+    } as unknown) as UserManager;
+    const expiredUserMock = ({ expired: true } as unknown) as User;
     const history = { push: jest.fn() };
     await authenticateUser(userManagerMockLocal, locationMock, history, expiredUserMock)(false);
     await authenticateUser(userManagerMockLocal, locationMock, history, expiredUserMock)(false);
@@ -84,7 +86,7 @@ describe('authenticate testing', () => {
   });
 
   it('authenticateUser should call history.push with user', async () => {
-    const userManagerMockLocal = (({
+    const userManagerMockLocal = ({
       signinSilent: jest.fn(
         () =>
           new Promise((resolve, reject) => {
@@ -93,14 +95,12 @@ describe('authenticate testing', () => {
             }, 300);
           })
       ),
-    }) as unknown) as UserManager;
-    const expiredUserMock = (({ expired: true }) as unknown) as User;
+    } as unknown) as UserManager;
+    const expiredUserMock = ({ expired: true } as unknown) as User;
     const historyMock = {
       push: jest.fn(),
     };
-    await authenticateUser(userManagerMockLocal, locationMock, historyMock, expiredUserMock)(
-      false
-    );
+    await authenticateUser(userManagerMockLocal, locationMock, historyMock, expiredUserMock)(false);
     expect(userManagerMockLocal.signinSilent).toHaveBeenCalled();
     expect(historyMock.push).toHaveBeenCalled();
   });

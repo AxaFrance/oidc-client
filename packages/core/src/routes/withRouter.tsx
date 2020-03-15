@@ -7,22 +7,25 @@ const generateKey = () =>
 
 // Exported only for test
 export type WindowInternal = Window & {
-  CustomEvent?: new<T>(typeArg: string, eventInitDict?: CustomEventInit<T>) => CustomEvent<T>
+  CustomEvent?: new <T>(typeArg: string, eventInitDict?: CustomEventInit<T>) => CustomEvent<T>;
   Event: typeof Event;
-}
+};
 
 type IPrototype = {
   prototype: any;
-}
+};
 
 type InitCustomEventParams<T = any> = {
-  bubbles: boolean
-  cancelable: boolean
-  detail: T
-}
+  bubbles: boolean;
+  cancelable: boolean;
+  detail: T;
+};
 
 // IE Polyfill for CustomEvent
-export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Document) => (event: string, params: InitCustomEventParams): CustomEvent => {
+export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Document) => (
+  event: string,
+  params: InitCustomEventParams
+): CustomEvent => {
   if (typeof windowInternal.CustomEvent === 'function') {
     return new windowInternal.CustomEvent(event, params);
   }

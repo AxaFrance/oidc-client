@@ -2,18 +2,19 @@ import { Dispatch } from 'react';
 import { oidcLog, authenticateUser, logoutUser, ReactOidcHistory } from '@axa-fr/react-oidc-core';
 import { User, UserManager, UserManagerEvents } from 'oidc-client';
 
-export type OidcState = {
-  oidcUser?: User | null,
-  userManager: UserManager,
-  isLoading: boolean,
-  error: string,
-  isEnabled: boolean,
+export interface OidcState {
+  oidcUser?: User | null;
+  userManager: UserManager;
+  isLoading: boolean;
+  error: string;
+  isEnabled: boolean;
 }
 
-type OidcAction = { type: 'ON_LOADING' }
-  | { type: 'ON_ERROR', message: string }
-  | { type: 'ON_LOAD_USER', user: User | null }
-  | { type: 'ON_UNLOAD_USER' }
+type OidcAction =
+  | { type: 'ON_LOADING' }
+  | { type: 'ON_ERROR'; message: string }
+  | { type: 'ON_LOAD_USER'; user: User | null }
+  | { type: 'ON_UNLOAD_USER' };
 
 export const onError = (dispatch: Dispatch<OidcAction>) => (error: Error) => {
   oidcLog.error(`Error : ${error.message}`);
@@ -28,7 +29,12 @@ export const logout = (userManager: UserManager, dispatch: Dispatch<OidcAction>)
     onError(dispatch)(error);
   }
 };
-export const login = (userManager: UserManager, dispatch: Dispatch<OidcAction>, location: Location, history: ReactOidcHistory) => async () => {
+export const login = (
+  userManager: UserManager,
+  dispatch: Dispatch<OidcAction>,
+  location: Location,
+  history: ReactOidcHistory
+) => async () => {
   dispatch({ type: 'ON_LOADING' });
   oidcLog.info('Login requested');
   await authenticateUser(userManager, location, history)();
@@ -44,13 +50,20 @@ export const onUserUnloaded = (dispatch: Dispatch<OidcAction>) => () => {
   dispatch({ type: 'ON_UNLOAD_USER' });
 };
 
-export const onAccessTokenExpired = (dispatch: Dispatch<OidcAction>, userManager: UserManager) => async () => {
+export const onAccessTokenExpired = (
+  dispatch: Dispatch<OidcAction>,
+  userManager: UserManager
+) => async () => {
   oidcLog.info(`AccessToken Expired `);
   dispatch({ type: 'ON_UNLOAD_USER' });
   await userManager.signinSilent();
 };
 
-export const addOidcEvents = (events: UserManagerEvents, dispatch: Dispatch<OidcAction>, userManager: UserManager) => {
+export const addOidcEvents = (
+  events: UserManagerEvents,
+  dispatch: Dispatch<OidcAction>,
+  userManager: UserManager
+) => {
   events.addUserLoaded(onUserLoaded(dispatch));
   events.addSilentRenewError(onError(dispatch));
   events.addUserUnloaded(onUserUnloaded(dispatch));
@@ -58,7 +71,11 @@ export const addOidcEvents = (events: UserManagerEvents, dispatch: Dispatch<Oidc
   events.addAccessTokenExpired(onAccessTokenExpired(dispatch, userManager));
 };
 
-export const removeOidcEvents = (events: UserManagerEvents, dispatch: Dispatch<OidcAction>, userManager: UserManager) => {
+export const removeOidcEvents = (
+  events: UserManagerEvents,
+  dispatch: Dispatch<OidcAction>,
+  userManager: UserManager
+) => {
   events.removeUserLoaded(onUserLoaded(dispatch));
   events.removeSilentRenewError(onError(dispatch));
   events.removeUserUnloaded(onUserUnloaded(dispatch));

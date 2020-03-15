@@ -25,12 +25,16 @@ describe('Consumers service tests suite', () => {
   });
 
   it('should call authentication when enabled', () => {
-    const history = { push : () => {} };
+    const history = { push: () => {} };
     renderHook(() => useOidcSecure(authenticateUser, getUserManager, '/locationUser', history), {
       wrapper: getWrapper(),
     });
 
-    expect(authenticateUser).toHaveBeenCalledWith({ param: 'Mock version' }, '/locationUser', history);
+    expect(authenticateUser).toHaveBeenCalledWith(
+      { param: 'Mock version' },
+      '/locationUser',
+      history
+    );
   });
 
   it('should NOT call authentication when disabled', () => {
@@ -64,7 +68,7 @@ describe('Consumers service tests suite', () => {
       location: '/myurl',
       authenticateUser,
       getUserManager,
-      history : {push: () => {}}
+      history: { push: () => {} },
     };
 
     const testingComponent = () => <div data-testid="componentMount" />;
@@ -86,7 +90,7 @@ describe('Consumers service tests suite', () => {
       location: '/myurl',
       authenticateUser,
       getUserManager,
-      history : {push: () => {}}
+      history: { push: () => {} },
     };
 
     const testingComponent = () => <div data-testid="componentMount" />;

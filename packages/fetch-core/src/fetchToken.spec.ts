@@ -28,10 +28,10 @@ describe('redux-fetch.fetchToken', () => {
     const response = { status: 200 };
     let receivedOptions = null;
     const fetch = (url, options) =>
-        new Promise(resolve => {
-          receivedOptions = options;
-          resolve(response);
-        });
+      new Promise(resolve => {
+        receivedOptions = options;
+        resolve(response);
+      });
     const headers = {};
     const has = key => key in headers;
     const set = (key, value) => {

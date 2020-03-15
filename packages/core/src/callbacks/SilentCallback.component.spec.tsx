@@ -7,11 +7,11 @@ import { oidcLog } from '../services';
 jest.mock('oidc-client');
 
 describe('SilentCallbackcomponent test', () => {
-  const userManagerMock = new oidc.UserManager({})
+  const userManagerMock = new oidc.UserManager({});
   userManagerMock.signinSilentCallback = jest.fn();
-  const loggerMock = (({
+  const loggerMock = ({
     info: jest.fn(),
-  }) as unknown) as typeof oidcLog;
+  } as unknown) as typeof oidcLog;
 
   it('Should call silent callback when construct', () => {
     (oidc.UserManager as jest.Mock<oidc.UserManager>).mockImplementation(() => userManagerMock);

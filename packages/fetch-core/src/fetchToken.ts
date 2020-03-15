@@ -36,14 +36,14 @@ export const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => strin
   return await fetch(url, newOptions);
 };
 
-type ComponentWithFetchProps = {
-  fetch: Fetch
-  user?: User | null
+interface ComponentWithFetchProps {
+  fetch: Fetch;
+  user?: User | null;
 }
 
-export const fetchWrapper = (fetchWithTokenInjected: typeof fetchWithToken) => (getAccessTokenInjected: typeof getAccessToken) => (
-  fetch: Fetch = undefined
-) => (props: ComponentWithFetchProps) => {
+export const fetchWrapper = (fetchWithTokenInjected: typeof fetchWithToken) => (
+  getAccessTokenInjected: typeof getAccessToken
+) => (fetch: Fetch = undefined) => (props: ComponentWithFetchProps) => {
   const previousFetch = fetch || props.fetch;
   const newFetch = fetchWithTokenInjected(previousFetch, getAccessTokenInjected(props.user));
   return {

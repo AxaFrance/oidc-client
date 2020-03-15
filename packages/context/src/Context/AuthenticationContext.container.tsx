@@ -1,4 +1,11 @@
-import React, { useEffect, useCallback, useReducer, FC, ComponentType, PropsWithChildren } from 'react';
+import React, {
+  useEffect,
+  useCallback,
+  useReducer,
+  FC,
+  ComponentType,
+  PropsWithChildren,
+} from 'react';
 import PropTypes from 'prop-types';
 import {
   withRouter,
@@ -8,12 +15,19 @@ import {
   configurationPropTypes,
   configurationDefaultProps,
   ReactOidcHistory,
-  UserStoreType
+  UserStoreType,
 } from '@axa-fr/react-oidc-core';
 import { User } from 'oidc-client';
 
 import { Callback } from '../Callback';
-import { addOidcEvents, removeOidcEvents, oidcReducer, login, logout, OidcState } from './OidcEvents';
+import {
+  addOidcEvents,
+  removeOidcEvents,
+  oidcReducer,
+  login,
+  logout,
+  OidcState,
+} from './OidcEvents';
 import withServices from '../withServices';
 
 export const AuthenticationContext = React.createContext(null);
@@ -52,7 +66,11 @@ export const setDefaultState = (authenticationServiceInternal: typeof authentica
   configuration,
   isEnabled,
   UserStore,
-}: {configuration: any, isEnabled: boolean, UserStore?: UserStoreType}): OidcState => {
+}: {
+  configuration: any;
+  isEnabled: boolean;
+  UserStore?: UserStoreType;
+}): OidcState => {
   return {
     oidcUser: undefined,
     userManager: authenticationServiceInternal(configuration, UserStore),
@@ -63,9 +81,12 @@ export const setDefaultState = (authenticationServiceInternal: typeof authentica
 };
 
 type WithComponentOverrideProps = {
-  callbackComponentOverride: ComponentType
-}
-const withComponentOverrideProps = (Component: ComponentType<WithComponentOverrideProps>, customProps: ComponentType) => (props: WithComponentOverrideProps) => (
+  callbackComponentOverride: ComponentType;
+};
+const withComponentOverrideProps = (
+  Component: ComponentType<WithComponentOverrideProps>,
+  customProps: ComponentType
+) => (props: WithComponentOverrideProps) => (
   <Component callbackComponentOverride={customProps} {...props} />
 );
 
@@ -74,22 +95,22 @@ type Logger = {
   info: (message?: any, ...optionalParams: any[]) => void;
   warn: (message?: any, ...optionalParams: any[]) => void;
   error: (message?: any, ...optionalParams: any[]) => void;
-}
+};
 
 type AuthenticationProviderIntProps = PropsWithChildren<{
-  location: Location,
-  history: ReactOidcHistory,
-  setDefaultState: typeof setDefaultState,
-  loggerLevel: number,
-  logger: Logger,
-  Callback: ComponentType<WithComponentOverrideProps>,
-  notAuthenticated: ComponentType,
-  notAuthorized: ComponentType,
-  authenticating: ComponentType,
-  callbackComponentOverride: ComponentType,
-  sessionLostComponent: ComponentType,
-  isEnabled?: boolean
-  configuration: any
+  location: Location;
+  history: ReactOidcHistory;
+  setDefaultState: typeof setDefaultState;
+  loggerLevel: number;
+  logger: Logger;
+  Callback: ComponentType<WithComponentOverrideProps>;
+  notAuthenticated: ComponentType;
+  notAuthorized: ComponentType;
+  authenticating: ComponentType;
+  callbackComponentOverride: ComponentType;
+  sessionLostComponent: ComponentType;
+  isEnabled?: boolean;
+  configuration: any;
 }>;
 
 const AuthenticationProviderInt = ({
@@ -105,7 +126,9 @@ const AuthenticationProviderInt = ({
     setLogger(otherProps.loggerLevel, otherProps.logger);
     dispatch({ type: 'ON_LOADING' });
     addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
-    oidcState.userManager.getUser().then((user: User | null) => dispatch({ type: 'ON_LOAD_USER', user }));
+    oidcState.userManager
+      .getUser()
+      .then((user: User | null) => dispatch({ type: 'ON_LOAD_USER', user }));
     return () => removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
   }, [otherProps.logger, otherProps.loggerLevel, oidcState.userManager]);
 
@@ -162,7 +185,7 @@ const AuthenticationProviderInt = ({
   );
 };
 
-const AuthenticationProvider:FC = withRouter(
+const AuthenticationProvider: FC = withRouter(
   withServices(AuthenticationProviderInt, {
     Callback,
     setDefaultState: setDefaultState(authenticationService),

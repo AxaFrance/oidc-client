@@ -22,12 +22,12 @@ const defaultProps: Partial<OidcRoutesProps> = {
 };
 
 type OidcRoutesProps = {
-  notAuthenticated?: ComponentType,
-  notAuthorized?: ComponentType,
-  callbackComponent: ComponentType,
-  sessionLost?: ComponentType,
-  configuration: UserManagerSettings,
-}
+  notAuthenticated?: ComponentType;
+  notAuthorized?: ComponentType;
+  callbackComponent: ComponentType;
+  sessionLost?: ComponentType;
+  configuration: UserManagerSettings;
+};
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   notAuthenticated,
