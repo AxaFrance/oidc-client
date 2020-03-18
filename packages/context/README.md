@@ -88,7 +88,7 @@ const propTypes = {
 };
 ```
 
-Through the UseStore you can specify a class that can be use to store the user object. This class must define :
+Through the UserStore you can specify a class that can be used to store the user object. This class must define :
 
 ```javascript
   getItem(key: string): any;
@@ -97,9 +97,9 @@ Through the UseStore you can specify a class that can be use to store the user o
   key(index: number): any;
   length?: number;
 ```
-It could also be window.localStorage or window.sessionStorage. By default, without any userStore, the sessionStorage will be use.
+It could also be window.localStorage or window.sessionStorage. By default, without any userStore, the sessionStorage will be used.
 
-See bellow a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
+See below a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
 
 ```javascript
 const configuration = {

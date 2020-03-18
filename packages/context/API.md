@@ -51,7 +51,7 @@ When the user is connected, Api Context Consummer `AuthenticationConsumer` provi
 
 - _oidcUser_ : Object for the currently authenticated user returned by oidc Client (see [oidc client Wiki](https://github.com/IdentityModel/oidc-client-js/wiki#user))
 - _login_ : Function without parameter that launch the redirect authentication
-- _logout_ : Function without function that launch te redirect logout
+- _logout_ : Function without parameter that launch the redirect logout
 - _error_ : Error if happens
 - _isLoading_ : True when the component is loading
 
