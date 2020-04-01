@@ -17,7 +17,7 @@ import {
   ReactOidcHistory,
   UserStoreType,
 } from '@axa-fr/react-oidc-core';
-import { User } from 'oidc-client';
+import { User, UserManagerEvents } from 'oidc-client';
 
 import { Callback } from '../Callback';
 import {
@@ -27,6 +27,7 @@ import {
   login,
   logout,
   OidcState,
+  OidcCustomEvents,
 } from './OidcEvents';
 import withServices from '../withServices';
 
@@ -48,6 +49,15 @@ const propTypes = {
     debug: PropTypes.func.isRequired,
   }),
   UserStore: PropTypes.func,
+  customEvents: PropTypes.shape({
+    onUserLoaded: PropTypes.func,
+    onUserUnloaded: PropTypes.func,
+    onSilentRenewError: PropTypes.func,
+    onUserSignedOut: PropTypes.func,
+    onUserSessionChanged: PropTypes.func,
+    onAccessTokenExpiring: PropTypes.func,
+    onAccessTokenExpired: PropTypes.func
+  }),
 };
 
 const defaultProps: Partial<AuthenticationProviderIntProps> = {
@@ -60,6 +70,7 @@ const defaultProps: Partial<AuthenticationProviderIntProps> = {
   loggerLevel: 0,
   logger: console,
   configuration: configurationDefaultProps,
+  customEvents: null,
 };
 
 export const setDefaultState = (authenticationServiceInternal: typeof authenticationService) => ({
@@ -111,6 +122,7 @@ type AuthenticationProviderIntProps = PropsWithChildren<{
   sessionLostComponent: ComponentType;
   isEnabled?: boolean;
   configuration: any;
+  customEvents?: OidcCustomEvents;
 }>;
 
 const AuthenticationProviderInt = ({
@@ -125,12 +137,17 @@ const AuthenticationProviderInt = ({
   useEffect(() => {
     setLogger(otherProps.loggerLevel, otherProps.logger);
     dispatch({ type: 'ON_LOADING' });
-    addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
+    addOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager, otherProps.customEvents);
     oidcState.userManager
       .getUser()
       .then((user: User | null) => dispatch({ type: 'ON_LOAD_USER', user }));
-    return () => removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager);
-  }, [otherProps.logger, otherProps.loggerLevel, oidcState.userManager]);
+    return () => removeOidcEvents(oidcState.userManager.events, dispatch, oidcState.userManager, otherProps.customEvents);
+  }, [
+    otherProps.logger,
+    otherProps.loggerLevel,
+    oidcState.userManager,
+    otherProps.customEvents,
+  ]);
 
   const { oidcUser, isLoading, error, isEnabled } = oidcState;
   const {

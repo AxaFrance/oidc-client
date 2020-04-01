@@ -10,6 +10,16 @@ export interface OidcState {
   isEnabled: boolean;
 }
 
+export interface OidcCustomEvents {
+  onUserLoaded?: UserManagerEvents.UserLoadedCallback;
+  onUserUnloaded?: UserManagerEvents.UserUnloadedCallback;
+  onSilentRenewError?: UserManagerEvents.SilentRenewErrorCallback;
+  onUserSignedOut?: UserManagerEvents.UserSignedOutCallback;
+  onUserSessionChanged?: UserManagerEvents.UserSessionChangedCallback;
+  onAccessTokenExpiring?: (...ev: any[]) => void;
+  onAccessTokenExpired?: (...ev: any[]) => void;
+}
+
 type OidcAction =
   | { type: 'ON_LOADING' }
   | { type: 'ON_ERROR'; message: string }
@@ -62,25 +72,83 @@ export const onAccessTokenExpired = (
 export const addOidcEvents = (
   events: UserManagerEvents,
   dispatch: Dispatch<OidcAction>,
-  userManager: UserManager
+  userManager: UserManager,
+  customEvents?: OidcCustomEvents
 ) => {
   events.addUserLoaded(onUserLoaded(dispatch));
   events.addSilentRenewError(onError(dispatch));
   events.addUserUnloaded(onUserUnloaded(dispatch));
   events.addUserSignedOut(onUserUnloaded(dispatch));
   events.addAccessTokenExpired(onAccessTokenExpired(dispatch, userManager));
+
+  if (customEvents && customEvents.onUserLoaded != null) {
+    events.addUserLoaded(customEvents.onUserLoaded);
+  }
+
+  if (customEvents && customEvents.onUserUnloaded != null) {
+    events.addUserUnloaded(customEvents.onUserUnloaded);
+  }
+
+  if (customEvents && customEvents.onAccessTokenExpiring != null) {
+    events.addAccessTokenExpiring(customEvents.onAccessTokenExpiring);
+  }
+
+  if (customEvents && customEvents.onAccessTokenExpired != null) {
+    events.addAccessTokenExpired(customEvents.onAccessTokenExpired);
+  }
+
+  if (customEvents && customEvents.onSilentRenewError != null) {
+    events.addSilentRenewError(customEvents.onSilentRenewError);
+  }
+
+  if (customEvents && customEvents.onUserSignedOut != null) {
+    events.addUserSignedOut(customEvents.onUserSignedOut);
+  }
+
+  if (customEvents && customEvents.onUserSessionChanged != null) {
+    events.addUserSessionChanged(customEvents.onUserSessionChanged);
+  }
 };
 
 export const removeOidcEvents = (
   events: UserManagerEvents,
   dispatch: Dispatch<OidcAction>,
-  userManager: UserManager
+  userManager: UserManager,
+  customEvents?: OidcCustomEvents
 ) => {
   events.removeUserLoaded(onUserLoaded(dispatch));
   events.removeSilentRenewError(onError(dispatch));
   events.removeUserUnloaded(onUserUnloaded(dispatch));
   events.removeUserSignedOut(onUserUnloaded(dispatch));
   events.removeAccessTokenExpired(onAccessTokenExpired(dispatch, userManager));
+
+  if (customEvents && customEvents.onUserLoaded != null) {
+    events.removeUserLoaded(customEvents.onUserLoaded);
+  }
+
+  if (customEvents && customEvents.onUserUnloaded != null) {
+    events.removeUserUnloaded(customEvents.onUserUnloaded);
+  }
+
+  if (customEvents && customEvents.onAccessTokenExpiring != null) {
+    events.removeAccessTokenExpiring(customEvents.onAccessTokenExpiring);
+  }
+
+  if (customEvents && customEvents.onAccessTokenExpired != null) {
+    events.removeAccessTokenExpired(customEvents.onAccessTokenExpired);
+  }
+
+  if (customEvents && customEvents.onSilentRenewError != null) {
+    events.removeSilentRenewError(customEvents.onSilentRenewError);
+  }
+
+  if (customEvents && customEvents.onUserSignedOut != null) {
+    events.removeUserSignedOut(customEvents.onUserSignedOut);
+  }
+
+  if (customEvents && customEvents.onUserSessionChanged != null) {
+    events.removeUserSessionChanged(customEvents.onUserSessionChanged);
+  }
 };
 
 export const oidcReducer = (oidcState: OidcState, action: OidcAction): OidcState =>

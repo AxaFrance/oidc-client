@@ -140,40 +140,124 @@ describe('reducer tests suite', () => {
     expect(userManagerMock.signinSilent).toHaveBeenCalled();
   });
 
-  it('should mount all events when call addOidcEvents', () => {
+  it('should mount all events (including custom ones) when calling addOidcEvents', () => {
     const eventsMock = {
       addUserLoaded: jest.fn(),
       addSilentRenewError: jest.fn(),
       addUserUnloaded: jest.fn(),
       addUserSignedOut: jest.fn(),
       addAccessTokenExpired: jest.fn(),
+      addAccessTokenExpiring: jest.fn(),
+      addUserSessionChanged: jest.fn(),
     };
+
     const setStateMock = jest.fn();
     const signinSilentMock = 'signinSilentMock';
-    addOidcEvents(eventsMock, setStateMock, signinSilentMock);
-    expect(eventsMock.addUserLoaded).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.addSilentRenewError).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.addUserUnloaded).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.addUserSignedOut).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.addAccessTokenExpired).toHaveBeenCalledWith(expect.any(Function));
+
+    const customEvents = {
+      onUserLoaded: jest.fn(),
+      onUserUnloaded: jest.fn(),
+      onSilentRenewError: jest.fn(),
+      onUserSignedOut: jest.fn(),
+      onUserSessionChanged: jest.fn(),
+      onAccessTokenExpiring: jest.fn(),
+      onAccessTokenExpired: jest.fn(),
+    };
+
+    addOidcEvents(eventsMock, setStateMock, signinSilentMock, customEvents);
+
+    expect(eventsMock.addUserLoaded.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onUserLoaded],
+    ]);
+
+    expect(eventsMock.addSilentRenewError.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onSilentRenewError],
+    ]);
+
+    expect(eventsMock.addUserUnloaded.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onUserUnloaded],
+    ]);
+
+    expect(eventsMock.addUserSignedOut.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onUserSignedOut],
+    ]);
+
+    expect(eventsMock.addAccessTokenExpired.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onAccessTokenExpired],
+    ]);
+
+    expect(eventsMock.addAccessTokenExpiring).toHaveBeenCalledWith(
+      customEvents.onAccessTokenExpiring
+    );
+
+    expect(eventsMock.addUserSessionChanged).toHaveBeenCalledWith(
+      customEvents.onUserSessionChanged
+    );
   });
 
-  it('should remove all events when call removeOidcEvents', () => {
+  it('should remove all events (including custom ones) when calling removeOidcEvents', () => {
     const eventsMock = {
       removeUserLoaded: jest.fn(),
       removeSilentRenewError: jest.fn(),
       removeUserUnloaded: jest.fn(),
       removeUserSignedOut: jest.fn(),
       removeAccessTokenExpired: jest.fn(),
+      removeAccessTokenExpiring: jest.fn(),
+      removeUserSessionChanged: jest.fn(),
     };
+
     const setStateMock = jest.fn();
     const signinSilentMock = 'signinSilentMock';
-    removeOidcEvents(eventsMock, setStateMock, signinSilentMock);
-    expect(eventsMock.removeUserLoaded).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.removeSilentRenewError).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.removeUserUnloaded).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.removeUserSignedOut).toHaveBeenCalledWith(expect.any(Function));
-    expect(eventsMock.removeAccessTokenExpired).toHaveBeenCalledWith(expect.any(Function));
+
+    const customEvents = {
+      onUserLoaded: jest.fn(),
+      onUserUnloaded: jest.fn(),
+      onSilentRenewError: jest.fn(),
+      onUserSignedOut: jest.fn(),
+      onUserSessionChanged: jest.fn(),
+      onAccessTokenExpiring: jest.fn(),
+      onAccessTokenExpired: jest.fn(),
+    };
+
+    removeOidcEvents(eventsMock, setStateMock, signinSilentMock, customEvents);
+
+    expect(eventsMock.removeUserLoaded.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onUserLoaded],
+    ]);
+
+    expect(eventsMock.removeSilentRenewError.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onSilentRenewError],
+    ]);
+
+    expect(eventsMock.removeUserUnloaded.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onUserUnloaded],
+    ]);
+
+    expect(eventsMock.removeUserSignedOut.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onUserSignedOut],
+    ]);
+
+    expect(eventsMock.removeAccessTokenExpired.mock.calls).toEqual([
+      [expect.any(Function)],
+      [customEvents.onAccessTokenExpired],
+    ]);
+
+    expect(eventsMock.removeAccessTokenExpiring).toHaveBeenCalledWith(
+      customEvents.onAccessTokenExpiring
+    );
+
+    expect(eventsMock.removeUserSessionChanged).toHaveBeenCalledWith(
+      customEvents.onUserSessionChanged
+    );
   });
 
   it('should set state and call authentication when call login function', async () => {
