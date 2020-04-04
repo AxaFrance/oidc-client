@@ -25,7 +25,6 @@ const configuration = {
   silent_redirect_uri: "http://localhost:3000/authentication/silent_callback",
   automaticSilentRenew: true,
   loadUserInfo: true,
-  triggerAuthFlow: true
 };
 
 // vanillaOidc.init(configuration) must always be the root of your application because it is used to manage all routes callback
@@ -74,7 +73,6 @@ const configuration = {
   silent_redirect_uri: "http://localhost:3000/authentication/silent_callback",
   automaticSilentRenew: true,
   loadUserInfo: true,
-  triggerAuthFlow: true
 };
 
 var modules = ["ms.experience.weather"];

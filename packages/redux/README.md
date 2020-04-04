@@ -46,7 +46,6 @@ const configuration = {
     silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
     automaticSilentRenew: true,
     loadUserInfo: true,
-    triggerAuthFlow: true,
   },
 };
 
@@ -85,7 +84,6 @@ const propTypes = {
     silent_redirect_uri: PropTypes.string.isRequired,
     automaticSilentRenew: PropTypes.bool.isRequired,
     loadUserInfo: PropTypes.bool.isRequired,
-    triggerAuthFlow: PropTypes.bool.isRequired,
     metadata: PropTypes.shape({
       issuer: PropTypes.string,
       jwks_uri: PropTypes.string,
