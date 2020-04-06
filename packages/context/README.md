@@ -33,17 +33,18 @@ import oidcConfiguration from './configuration';
 
 const App = () => (
   <div>
-    <Router>
-      <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
+    <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
+      <Router>
         <Header />
         <Routes />
-      </AuthenticationProvider>
-    </Router>
+      </Router>
+    </AuthenticationProvider>
   </div>
 );
 
 render(<App />, document.getElementById('root'));
 ```
+Note that it is important to place the `AuthenticationProvider` around the router to avoid problems with components that do not render.
 
 `AuthenticationProvider` accept the following properties :
 
