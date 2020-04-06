@@ -13,7 +13,6 @@ const configuration = {
         silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
         automaticSilentRenew: true,
         loadUserInfo: true,
-        triggerAuthFlow: true,
         checkSessionInterval: 60,
       }
     },
@@ -29,7 +28,6 @@ const configuration = {
         silent_redirect_uri: 'http://127.0.0.1:3000/authentication/silent_callback',
         automaticSilentRenew: true,
         loadUserInfo: true,
-        triggerAuthFlow: true,
       }
     }
   ]

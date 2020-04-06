@@ -63,7 +63,6 @@ const propTypes = {
     silent_redirect_uri: PropTypes.string.isRequired,
     automaticSilentRenew: PropTypes.bool, //optional, by default to true
     loadUserInfo: PropTypes.bool, //optional, by default to true
-    triggerAuthFlow: PropTypes.bool, //optional, by default to true
     post_logout_redirect_uri: PropTypes.string, // optional
     metadata: PropTypes.shape({
       issuer: PropTypes.string,
@@ -112,7 +111,6 @@ const configuration = {
   silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
   automaticSilentRenew: true,
   loadUserInfo: true,
-  triggerAuthFlow: true,
 };
 
 export default configuration;

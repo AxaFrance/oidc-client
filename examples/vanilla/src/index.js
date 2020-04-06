@@ -7,8 +7,7 @@ const configuration = {
   authority: "https://demo.identityserver.io",
   silent_redirect_uri: "http://localhost:3000/authentication/silent_callback",
   automaticSilentRenew: true,
-  loadUserInfo: true,
-  triggerAuthFlow: true
+  loadUserInfo: true
 };
 
 var body = document.getElementsByTagName("body")[0];

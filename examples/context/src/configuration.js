@@ -8,7 +8,6 @@ const configuration = {
   silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
   automaticSilentRenew: true,
   loadUserInfo: true,
-  triggerAuthFlow: true,
 };
 
 export default configuration;
