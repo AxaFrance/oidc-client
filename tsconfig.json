@@ -6,6 +6,12 @@
     "skipLibCheck": true,
     "noImplicitAny": true,
     "target": "es5",
-    "lib": ["es2016", "dom"]
+    "lib": ["es2016", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@axa-fr/react-oidc-context": ["packages/context/dist"],
+      "@axa-fr/react-oidc-core": ["packages/core/dist"],
+      "@axa-fr/react-oidc-fetch-core": ["packages/fetch-core/dist"]
+    }
   }
 }
