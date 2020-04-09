@@ -10,4 +10,6 @@ const throwError = message => {
 };
 
 global.console.error = throwError;
-global.console.warn = throwError;
+// Need nw PR to Remove recompose wich occurs warning with latest React package
+// https://github.com/AxaGuilDEv/react-oidc/issues/430
+// global.console.warn = throwError;
