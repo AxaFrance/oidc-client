@@ -1,9 +1,9 @@
 import React from 'react';
 import { renderHook } from '@testing-library/react-hooks';
 import { render } from '@testing-library/react';
-import { AuthenticationContext } from './AuthenticationContext.container';
 import '@testing-library/jest-dom/extend-expect';
 import { useOidcSecure, withOidcUser, withOidcSecurewithRouter } from './AuthenticationConsumers';
+import { AuthenticationContext } from './AuthenticationContext';
 
 describe('Consumers service tests suite', () => {
   const values = {
@@ -30,11 +30,7 @@ describe('Consumers service tests suite', () => {
       wrapper: getWrapper(),
     });
 
-    expect(authenticateUser).toHaveBeenCalledWith(
-      { param: 'Mock version' },
-      '/locationUser',
-      history
-    );
+    expect(authenticateUser).toHaveBeenCalledWith({ param: 'Mock version' }, '/locationUser', history);
   });
 
   it('should NOT call authentication when disabled', () => {

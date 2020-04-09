@@ -9,7 +9,7 @@ import {
   ReactOidcHistory,
 } from '@axa-fr/react-oidc-core';
 import withServices from '../withServices';
-import { AuthenticationContext } from './AuthenticationContext.container';
+import { AuthenticationContext } from './AuthenticationContext';
 
 // export use only for unit tests
 export const useOidcSecure = (
@@ -45,16 +45,8 @@ type WithRouterComponentProps = PropsWithChildren<{
 }>;
 
 const OidcSecure = withRouter(({ children, location, history }: WithRouterComponentProps) => {
-  const { oidcUser, authenticating, isEnabled } = useOidcSecure(
-    authenticateUser,
-    getUserManager,
-    location,
-    history
-  );
-  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
-    isEnabled,
-    oidcUser,
-  ]);
+  const { oidcUser, authenticating, isEnabled } = useOidcSecure(authenticateUser, getUserManager, location, history);
+  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [isEnabled, oidcUser]);
   const AuthenticatingComponent = authenticating || Authenticating;
   return requiredAuth ? <AuthenticatingComponent /> : <div>{children}</div>;
 });
@@ -76,16 +68,8 @@ export const withOidcSecurewithRouter = (WrappedComponent: ComponentType) => ({
   getUserManager: getUserManagerInternal,
   ...otherProps
 }: WithOidcSecurewithRouterProps) => {
-  const { oidcUser, authenticating, isEnabled } = useOidcSecure(
-    authenticateUserInternal,
-    getUserManagerInternal,
-    location,
-    history
-  );
-  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [
-    isEnabled,
-    oidcUser,
-  ]);
+  const { oidcUser, authenticating, isEnabled } = useOidcSecure(authenticateUserInternal, getUserManagerInternal, location, history);
+  const requiredAuth = useMemo(() => isRequireAuthentication(oidcUser, false) && isEnabled, [isEnabled, oidcUser]);
 
   const AuthenticatingComponent = authenticating || Authenticating;
   return requiredAuth ? <AuthenticatingComponent /> : <WrappedComponent {...otherProps} />;
