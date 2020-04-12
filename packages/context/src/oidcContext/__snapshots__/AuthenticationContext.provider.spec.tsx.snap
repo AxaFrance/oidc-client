@@ -74,7 +74,7 @@ exports[`AuthContext tests suite should mount provider without error 2`] = `
 </DocumentFragment>
 `;
 
-exports[`AuthContext tests suite should mount provider without error 3`] = `
+exports[`AuthContext tests suite should mount provider without error without callbackComponentOverride 1`] = `
 <DocumentFragment>
   <div>
     <span

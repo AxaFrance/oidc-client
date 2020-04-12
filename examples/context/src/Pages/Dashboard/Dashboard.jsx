@@ -5,7 +5,7 @@ const Dashboard = () => {
   const { oidcUser, logout, events } = useReactOidc();
   const { profile } = oidcUser;
   const addUserEvent = user => console.log(`********* User Loaded :${user.profile} *********`);
-  
+
   React.useEffect(() => {
     events.addUserLoaded(addUserEvent);
     return () => {

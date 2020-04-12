@@ -87,7 +87,6 @@ const propsMocks = {
   logoutUserInt: jest.fn(),
 };
 
-// @ts-ignore
 const getWrapper = props => ({ children }) => <AuthenticationProviderInt {...props}>{children}</AuthenticationProviderInt>;
 
 describe('AuthContext tests suite', () => {
@@ -105,7 +104,7 @@ describe('AuthContext tests suite', () => {
     expect(asFragment()).toMatchSnapshot();
   });
 
-  it('should mount provider without error', async () => {
+  it('should mount provider without error without callbackComponentOverride', async () => {
     const { asFragment } = render(<AppTest />, {
       wrapper: getWrapper({ ...propsMocks, callbackComponentOverride: undefined }),
     });

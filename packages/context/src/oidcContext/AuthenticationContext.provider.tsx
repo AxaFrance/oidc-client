@@ -91,7 +91,7 @@ export const AuthenticationProviderInt = ({
   notAuthorized,
   callbackComponentOverride,
   children,
-  //Injected
+  // Injected
   authenticationServiceInt,
   CallbackInt,
   setLoggerInt,
@@ -101,24 +101,25 @@ export const AuthenticationProviderInt = ({
   logoutUserInt,
 }: AuthenticationProviderIntProps) => {
   const userManager = authenticationServiceInt(configuration, UserStore);
-  const { oidcState, ...oidcFunctions } = useAuthenticationContextState(userManager);
+  const { oidcState, loadUser, onError, onLoading, unloadUser } = useAuthenticationContextState(userManager);
+  const oidcFunctions = { loadUser, onError, onLoading, unloadUser };
   const { addOidcEvents, removeOidcEvents } = useOidcEvents(oidcLogInt, userManager, oidcFunctions);
 
   useEffect(() => {
-    let mount = true;
+    onLoading();
     setLoggerInt(loggerLevel, logger);
-    oidcFunctions.onLoading();
     addOidcEvents();
+    let mount = true;
     userManager.getUser().then((user: User | null) => {
       if (mount) {
-        oidcFunctions.loadUser(user);
+        loadUser(user);
       }
     });
     return () => {
-      mount = false;
       removeOidcEvents();
+      mount = false;
     };
-  }, [logger, loggerLevel, oidcState.userManager]);
+  }, [addOidcEvents, loadUser, logger, loggerLevel, onLoading, removeOidcEvents, setLoggerInt, userManager]);
 
   const CallbackComponent = React.useMemo(
     () => (callbackComponentOverride ? withComponentOverrideProps(CallbackInt, callbackComponentOverride) : CallbackInt),
@@ -126,20 +127,19 @@ export const AuthenticationProviderInt = ({
   );
 
   const loginCallback = useCallback(async () => {
-    oidcFunctions.onLoading();
+    onLoading();
     oidcLogInt.info('Login requested');
     await authenticateUserInt(userManager, location, history)();
-  }, []);
+  }, [authenticateUserInt, history, location, oidcLogInt, onLoading, userManager]);
 
   const logoutCallback = useCallback(async () => {
     try {
       await logoutUserInt(userManager);
       oidcLogInt.info('Logout successfull');
     } catch (error) {
-      oidcFunctions.onError(error.message);
+      onError(error.message);
     }
-  }, []);
-
+  }, [logoutUserInt, oidcLogInt, onError, userManager]);
   return (
     <AuthenticationContext.Provider
       value={{
@@ -165,7 +165,15 @@ export const AuthenticationProviderInt = ({
 };
 
 const AuthenticationProvider: FC = withRouter(
-  withServices(AuthenticationProviderInt, { CallbackInt: Callback, authenticationServiceInt: authenticationService })
+  withServices(AuthenticationProviderInt, {
+    CallbackInt: Callback,
+    authenticationServiceInt: authenticationService,
+    setLoggerInt: setLogger,
+    OidcRoutesInt: OidcRoutes,
+    oidcLogInt: oidcLog,
+    authenticateUserInt: authenticateUser,
+    logoutUserInt: logoutUser,
+  })
 );
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
