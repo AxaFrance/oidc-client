@@ -106,7 +106,7 @@
   "private": true,
   "dependencies": {
     "enzyme-adapter-react-16": "^1.14.0",
-    "tslint": "^5.20.1",
+    "tslint": "^6.1.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0"
   }
