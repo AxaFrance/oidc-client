@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AuthContext tests suite should mount provider without error 1`] = `
+<DocumentFragment>
+  <div>
+    <span
+      data-testid="oidcUser"
+    >
+      null
+    </span>
+    <span
+      data-testid="isLoading"
+    >
+      true
+    </span>
+    <span
+      data-testid="error"
+    >
+      ""
+    </span>
+    <span
+      data-testid="isEnabled"
+    >
+      true
+    </span>
+    <button
+      type="button"
+    >
+      login
+    </button>
+    <button
+      type="button"
+    >
+      logout
+    </button>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`AuthContext tests suite should mount provider without error 2`] = `
+<DocumentFragment>
+  <div>
+    <span
+      data-testid="oidcUser"
+    >
+      {"firstname":"Jean","token":"SQSDFsdqfsdf234AEFZF"}
+    </span>
+    <span
+      data-testid="isLoading"
+    >
+      false
+    </span>
+    <span
+      data-testid="error"
+    >
+      ""
+    </span>
+    <span
+      data-testid="isEnabled"
+    >
+      true
+    </span>
+    <button
+      type="button"
+    >
+      login
+    </button>
+    <button
+      type="button"
+    >
+      logout
+    </button>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`AuthContext tests suite should mount provider without error without callbackComponentOverride 1`] = `
+<DocumentFragment>
+  <div>
+    <span
+      data-testid="oidcUser"
+    >
+      {"firstname":"Jean","token":"SQSDFsdqfsdf234AEFZF"}
+    </span>
+    <span
+      data-testid="isLoading"
+    >
+      false
+    </span>
+    <span
+      data-testid="error"
+    >
+      ""
+    </span>
+    <span
+      data-testid="isEnabled"
+    >
+      true
+    </span>
+    <button
+      type="button"
+    >
+      login
+    </button>
+    <button
+      type="button"
+    >
+      logout
+    </button>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`AuthContext tests suite should return correct component 1`] = `
+<DocumentFragment>
+  <div>
+    <div>
+      <div>
+        Custom callback
+      </div>
+    </div>
+    <span
+      data-testid="oidcUser"
+    >
+      {"prop1":"value1","prop2":"value2"}
+    </span>
+  </div>
+</DocumentFragment>
+`;

@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`oidcUser tests suite withOidcUser should inject oidcUser if user connected 1`] = `
+<DocumentFragment>
+  <div>
+    <span
+      data-testid="username"
+    >
+      Franck
+    </span>
+  </div>
+</DocumentFragment>
+`;
