@@ -22,6 +22,7 @@ describe('useAuthenticationContextState hook tests suite', () => {
     expect(result.current.oidcState).toEqual({
       error: '',
       isLoading: false,
+      isLoggingOut: false,
       oidcUser: null,
       userManager: { getUser: expect.any(Function) },
     });
@@ -34,6 +35,7 @@ describe('useAuthenticationContextState hook tests suite', () => {
     expect(result.current.oidcState).toEqual({
       error: 'Error occured #10298',
       isLoading: false,
+      isLoggingOut: false,
       oidcUser: null,
       userManager: { getUser: expect.any(Function) },
     });
@@ -46,6 +48,7 @@ describe('useAuthenticationContextState hook tests suite', () => {
     expect(result.current.oidcState).toEqual({
       error: '',
       isLoading: false,
+      isLoggingOut: false,
       oidcUser: { firstname: 'Jean', id_token: 'qsDQd23eDEzed' },
       userManager: { getUser: expect.any(Function) },
     });
@@ -58,6 +61,7 @@ describe('useAuthenticationContextState hook tests suite', () => {
     expect(result.current.oidcState).toEqual({
       error: '',
       isLoading: true,
+      isLoggingOut: false,
       oidcUser: null,
       userManager: { getUser: expect.any(Function) },
     });
@@ -70,6 +74,7 @@ describe('useAuthenticationContextState hook tests suite', () => {
     expect(result.current.oidcState).toEqual({
       error: '',
       isLoading: false,
+      isLoggingOut: false,
       oidcUser: { firstname: 'Jean', id_token: 'qsDQd23eDEzed' },
       userManager: { getUser: expect.any(Function) },
     });
@@ -77,6 +82,20 @@ describe('useAuthenticationContextState hook tests suite', () => {
     expect(result.current.oidcState).toEqual({
       error: '',
       isLoading: false,
+      isLoggingOut: false,
+      oidcUser: null,
+      userManager: { getUser: expect.any(Function) },
+    });
+  });
+
+  it('should change state whan call onLogout', () => {
+    // @ts-ignore
+    const { result } = renderHook(() => useAuthenticationContextState(userManagerMock));
+    act(() => result.current.onLogout());
+    expect(result.current.oidcState).toEqual({
+      error: '',
+      isLoading: false,
+      isLoggingOut: true,
       oidcUser: null,
       userManager: { getUser: expect.any(Function) },
     });
