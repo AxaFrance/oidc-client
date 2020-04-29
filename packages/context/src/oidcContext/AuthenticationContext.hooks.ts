@@ -8,6 +8,7 @@ export interface OidcState {
   userManager: UserManager;
   isLoading: boolean;
   error: string;
+  isLoggingOut: boolean;
 }
 
 export interface UseAuthenticationContextStateType {
@@ -15,6 +16,7 @@ export interface UseAuthenticationContextStateType {
   loadUser: Function;
   onLoading: Function;
   unloadUser: Function;
+  onLogout: Function;
   oidcState: OidcState;
 }
 
@@ -22,12 +24,14 @@ const ON_LOADING = 'ON_LOADING';
 const ON_ERROR = 'ON_ERROR';
 const ON_LOAD_USER = 'ON_LOAD_USER';
 const ON_UNLOAD_USER = 'ON_UNLOAD_USER';
+const ON_LOGOUT = 'ON_LOGOUT';
 
 type OidcAction =
   | { type: 'ON_LOADING' }
   | { type: 'ON_ERROR'; message: string }
   | { type: 'ON_LOAD_USER'; user: User | null }
-  | { type: 'ON_UNLOAD_USER' };
+  | { type: 'ON_UNLOAD_USER' }
+  | { type: 'ON_LOGOUT' };
 
 const getDefaultState = (userManagerInt: UserManager): OidcState => {
   return {
@@ -35,6 +39,7 @@ const getDefaultState = (userManagerInt: UserManager): OidcState => {
     userManager: userManagerInt,
     isLoading: false,
     error: '',
+    isLoggingOut: false,
   };
 };
 
@@ -48,15 +53,18 @@ const oidcReducer = (oidcState: OidcState, action: OidcAction): OidcState => {
       return { ...oidcState, oidcUser: action.user, isLoading: false };
     case ON_UNLOAD_USER:
       return { ...oidcState, oidcUser: null, isLoading: false };
+    case ON_LOGOUT:
+      return { ...oidcState, isLoggingOut: true };
     default:
       return oidcState;
   }
 };
 
-const onError = (dispatch: Dispatch<OidcAction>) => (message: string) => dispatch({ type: ON_ERROR, message });
-const loadUser = (dispatch: Dispatch<OidcAction>) => (user: User | null) => dispatch({ type: ON_LOAD_USER, user });
-const onLoading = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: ON_LOADING });
-const unloadUser = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: ON_UNLOAD_USER });
+const onError = (dispatch: Dispatch<OidcAction>) => (message: string) => dispatch({ type: 'ON_ERROR', message });
+const loadUser = (dispatch: Dispatch<OidcAction>) => (user: User | null) => dispatch({ type: 'ON_LOAD_USER', user });
+const onLoading = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: 'ON_LOADING' });
+const unloadUser = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: 'ON_UNLOAD_USER' });
+const onLogout = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: 'ON_LOGOUT' });
 
 export const useAuthenticationContextState = (userManagerInt: UserManager): UseAuthenticationContextStateType => {
   const defaultState = getDefaultState(userManagerInt);
@@ -67,6 +75,7 @@ export const useAuthenticationContextState = (userManagerInt: UserManager): UseA
     loadUser: useCallback(user => loadUser(dispatch)(user), []),
     onLoading: useCallback(() => onLoading(dispatch)(), []),
     unloadUser: useCallback(() => unloadUser(dispatch)(), []),
+    onLogout: useCallback(() => onLogout(dispatch)(), []),
     oidcState,
   };
 };

@@ -101,8 +101,8 @@ export const AuthenticationProviderInt = ({
   logoutUserInt,
 }: AuthenticationProviderIntProps) => {
   const userManager = authenticationServiceInt(configuration, UserStore);
-  const { oidcState, loadUser, onError, onLoading, unloadUser } = useAuthenticationContextState(userManager);
-  const oidcFunctions = { loadUser, onError, onLoading, unloadUser };
+  const { oidcState, loadUser, onError, onLoading, unloadUser, onLogout } = useAuthenticationContextState(userManager);
+  const oidcFunctions = { loadUser, onError, onLoading, unloadUser, onLogout };
   const { addOidcEvents, removeOidcEvents } = useOidcEvents(oidcLogInt, userManager, oidcFunctions);
 
   useEffect(() => {
@@ -134,12 +134,13 @@ export const AuthenticationProviderInt = ({
 
   const logoutCallback = useCallback(async () => {
     try {
+      onLogout();
       await logoutUserInt(userManager);
       oidcLogInt.info('Logout successfull');
     } catch (error) {
       onError(error.message);
     }
-  }, [logoutUserInt, oidcLogInt, onError, userManager]);
+  }, [logoutUserInt, oidcLogInt, onError, onLogout, userManager]);
   return (
     <AuthenticationContext.Provider
       value={{
