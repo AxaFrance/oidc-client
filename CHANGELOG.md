@@ -388,3 +388,28 @@ All notable changes to this project will be documented in this file.
 - chore(packages) add require attributes to publish inside npm in public with a scope [`bb6f22f`](https://github.com/AxaGuilDEv/react-oidc/commit/bb6f22fe4a2c93156ad5848e1e9e221f5d7f2e57) by Guillaume Chervet 
 - chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
 - Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
+
+### [v0.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.8...v0.0.0)
+> 29 April 2020
+- fix: add logout action [`#439`](https://github.com/AxaGuilDEv/react-oidc/pull/439) by Olivier YOUF
+- refactor(context): Refactor/containers providers [`#432`](https://github.com/AxaGuilDEv/react-oidc/pull/432) by Olivier YOUF
+- Typescript migration [`#410`](https://github.com/AxaGuilDEv/react-oidc/pull/410) by Olivier YOUF
+- Remove all occurences of 'triggerAuthFlow' [`#425`](https://github.com/AxaGuilDEv/react-oidc/pull/425) by Olivier YOUF
+- Overrides the react-redux dependency [`#424`](https://github.com/AxaGuilDEv/react-oidc/pull/424) by Olivier YOUF
+- Fix minor typos in docs [`#414`](https://github.com/AxaGuilDEv/react-oidc/pull/414) by Tommi Laukkanen
+- Remove all occurences of 'triggerAuthFlow' [`#392`](https://github.com/AxaGuilDEv/react-oidc/issues/392) by Vincent Ricard
+- Upgrade Jest [`7281ee1`](https://github.com/AxaGuilDEv/react-oidc/commit/7281ee1e5a7d3f19f6381a427ce5bfa4332829ef) by Vincent Ricard 
+- Migration of packages/core [`9f518a5`](https://github.com/AxaGuilDEv/react-oidc/commit/9f518a50f7867a702d4174e764d169de9b21a5c6) by Vincent Ricard 
+- Format code with prettier and fix lint errors [`52ae362`](https://github.com/AxaGuilDEv/react-oidc/commit/52ae362769572e29155403695d8bb5de26ea4c26) by Vincent Ricard 
+- WIP [`b123a42`](https://github.com/AxaGuilDEv/react-oidc/commit/b123a4206ec4b7b134714d8f9e70434682a01c99) by Vincent Ricard 
+- WIP context package [`0fa40e9`](https://github.com/AxaGuilDEv/react-oidc/commit/0fa40e99a3d42ebdcf472bbd6d0ba7cca55c25c7) by Vincent Ricard 
+- WIP redux package [`b251bcc`](https://github.com/AxaGuilDEv/react-oidc/commit/b251bcc452a1362e54463d3f4c86b9f883c973f2) by Vincent Ricard 
+- Rename OidcHistory into ReactOidcHistory [`760c77f`](https://github.com/AxaGuilDEv/react-oidc/commit/760c77f511536eaf49f7e1e3b702a741c0723d36) by Vincent Ricard 
+- chore(release): publish v3.0.9-alpha.0 ***NO_CI*** [`61c8884`](https://github.com/AxaGuilDEv/react-oidc/commit/61c8884393c0df5ae37b0c8b113cb92a942602aa) by Build-CI 
+- WIP [`0282c3c`](https://github.com/AxaGuilDEv/react-oidc/commit/0282c3c81cfb1ecc4be57408f3dd6e7a2bc72fe7) by Vincent Ricard 
+- Fix some tests [`6a7b09c`](https://github.com/AxaGuilDEv/react-oidc/commit/6a7b09c90d47203eb5cfe5bafb71e3371def176f) by Vincent Ricard 
+- Add specific type ofr UserStore [`1b44db5`](https://github.com/AxaGuilDEv/react-oidc/commit/1b44db5d9a9c433b27571e73335bfc18fec4f97f) by Vincent Ricard 
+- WIP redux-fetch package [`a8bed40`](https://github.com/AxaGuilDEv/react-oidc/commit/a8bed40cead711a707ae1dfdb5ca36e77a43935d) by Vincent Ricard 
+- WIP context-fetch package [`fd6f8f2`](https://github.com/AxaGuilDEv/react-oidc/commit/fd6f8f2872c12f6d4abdec36f0915524b64cab17) by Vincent Ricard 
+- docs(changelog) update to new 3.0.8 [`f28c0ed`](https://github.com/AxaGuilDEv/react-oidc/commit/f28c0ede0d3bba884085b1269b94eee3a223e50e) by Build-CI 
+- Revert a useless modification in fetch-core/package.json [`fa101b8`](https://github.com/AxaGuilDEv/react-oidc/commit/fa101b865ba386cdef4ebf1479ab357ce8e0288c) by Vincent Ricard 
