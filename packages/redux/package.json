@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-redux",
-  "version": "3.0.8",
+  "version": "3.0.9-alpha.0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
@@ -18,7 +18,7 @@
     "react-component"
   ],
   "dependencies": {
-    "@axa-fr/react-oidc-core": "^3.0.8"
+    "@axa-fr/react-oidc-core": "^3.0.9-alpha.0"
   },
   "peerDependencies": {
     "oidc-client": ">=1.8.2",
