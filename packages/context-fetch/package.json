@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-context-fetch",
-  "version": "3.0.9-alpha.0",
+  "version": "3.1.0-alpha.0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
@@ -21,8 +21,8 @@
     "recompose": "~0.30.0"
   },
   "dependencies": {
-    "@axa-fr/react-oidc-context": "^3.0.9-alpha.0",
-    "@axa-fr/react-oidc-fetch-core": "^3.0.9-alpha.0"
+    "@axa-fr/react-oidc-context": "^3.1.0-alpha.0",
+    "@axa-fr/react-oidc-fetch-core": "^3.1.0-alpha.0"
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
