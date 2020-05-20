@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.0-alpha.0...v3.1.1-alpha.0)
+> 20 May 2020
+- fix(context): Memoize the child component [`#451`](https://github.com/AxaGuilDEv/react-oidc/pull/451) by Olivier YOUF
+- chore(release): publish v3.1.1-alpha.0 ***NO_CI*** [`dc8ee89`](https://github.com/AxaGuilDEv/react-oidc/commit/dc8ee8944258e33430be309cb09d5c55f71fc13b) by Build-CI 
+- docs(changelog) update to new 3.1.0-alpha.0 [`6a33c46`](https://github.com/AxaGuilDEv/react-oidc/commit/6a33c46beaa3f32c56c516811d6961362e761b20) by Build-CI 
+
 #### [v3.1.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.8...v3.1.0-alpha.0)
 > 12 May 2020
 - fix: add logout action [`#439`](https://github.com/AxaGuilDEv/react-oidc/pull/439) by Olivier YOUF
