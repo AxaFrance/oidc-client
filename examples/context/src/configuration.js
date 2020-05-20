@@ -1,5 +1,5 @@
 const configuration = {
-  client_id: 'spa',
+  client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:3000/authentication/callback',
   response_type: 'code',
   post_logout_redirect_uri: 'http://localhost:3000/',

@@ -49,6 +49,7 @@ export const useOidcSecure = (
     isRequireAuthenticationInternal,
     oidcUser,
   ]);
+
   const AuthenticatingComponent: ComponentType = authenticating || AuthenticatingInternal;
   return requiredAuth ? AuthenticatingComponent : WrappedComponent;
 };
@@ -63,7 +64,7 @@ export const OidcSecureWithInjectedFunctions = ({
   AuthenticatingInternal,
 }: OidcComponentProps) => {
   const userManager = getUserManagerInternal();
-  const WrappedComponent = () => <>{children}</>;
+  const WrappedComponent = useMemo(() => () => <>{children}</>, [children]);
   const ReactOidcComponent = useOidcSecure(
     authenticateUserInternal,
     userManager,
@@ -88,7 +89,7 @@ export const withOidcSecureWithInjectedFunctions = (WrappedComponent: ComponentT
   ...otherProps
 }: OidcComponentProps) => {
   const userManager = getUserManagerInternal();
-  const OverrideWrappedComponent = () => <WrappedComponent {...otherProps} />;
+  const OverrideWrappedComponent = useMemo(() => () => <WrappedComponent {...otherProps} />, [otherProps]);
 
   const ReactOidcComponent = useOidcSecure(
     authenticateUserInternal,
