@@ -1,6 +1,11 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.1](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.1-alpha.0...v3.1.1)
+> 25 May 2020
+- chore(release): publish v3.1.1 ***NO_CI*** [`1500b7e`](https://github.com/AxaGuilDEv/react-oidc/commit/1500b7e28914afb913ea4fc3e6b87ee707999fc3) by Build-CI 
+- docs(changelog) update to new 3.1.1-alpha.0 [`90ea0c9`](https://github.com/AxaGuilDEv/react-oidc/commit/90ea0c954531093f6f7a5cd221cf4d986468fd7c) by Build-CI 
+
 #### [v3.1.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.0-alpha.0...v3.1.1-alpha.0)
 > 20 May 2020
 - fix(context): Memoize the child component [`#451`](https://github.com/AxaGuilDEv/react-oidc/pull/451) by Olivier YOUF
