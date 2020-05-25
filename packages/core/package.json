@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-core",
-  "version": "3.1.1-alpha.0",
+  "version": "3.1.1",
   "description": "A core package for Axa React Oidc packages",
   "homepage": "https://github.com/AxaGuilDEv/react-oidc#readme",
   "main": "dist/index.js",
