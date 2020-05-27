@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, FC, ComponentType, PropsWithChildren } from 'react';
+import React, { useEffect, useCallback, ComponentType, PropsWithChildren } from 'react';
 import PropTypes from 'prop-types';
 import { User, Logger, UserManagerSettings } from 'oidc-client';
 import {
@@ -165,7 +165,22 @@ export const AuthenticationProviderInt = ({
   );
 };
 
-const AuthenticationProvider: FC = withRouter(
+type AuthenticationProviderProps = Pick<AuthenticationProviderIntProps,
+  | 'location'
+  | 'history'
+  | 'configuration'
+  | 'isEnabled'
+  | 'UserStore'
+  | 'loggerLevel'
+  | 'logger'
+  | 'sessionLostComponent'
+  | 'authenticating'
+  | 'notAuthenticated'
+  | 'notAuthorized'
+  | 'callbackComponentOverride'
+  >
+
+const AuthenticationProvider: ComponentType<AuthenticationProviderProps> = withRouter(
   withServices(AuthenticationProviderInt, {
     CallbackInt: Callback,
     authenticationServiceInt: authenticationService,
@@ -176,6 +191,7 @@ const AuthenticationProvider: FC = withRouter(
     logoutUserInt: logoutUser,
   })
 );
+// @ts-ignore
 AuthenticationProvider.propTypes = propTypes;
 AuthenticationProvider.defaultProps = defaultProps;
 AuthenticationProvider.displayName = 'AuthenticationProvider';

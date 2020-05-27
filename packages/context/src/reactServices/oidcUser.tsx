@@ -1,16 +1,22 @@
-import React, { ComponentType, PropsWithChildren, useContext } from 'react';
+import React, { useContext } from 'react';
 import { User } from 'oidc-client';
 
 import { AuthenticationContext } from '../oidcContext';
 
-type WithOidcUserComponentProps = PropsWithChildren<{ oidcUser: User }>;
+export type WithOidcUserProps = { oidcUser: User | null };
 
-export const withOidcUser = (Component: ComponentType<WithOidcUserComponentProps>) => (props: WithOidcUserComponentProps) => {
-  const { oidcUser } = useContext(AuthenticationContext);
-  const { children } = props;
-  return (
-    <Component {...props} oidcUser={oidcUser}>
-      {children}
-    </Component>
-  );
-};
+export function withOidcUser<T extends WithOidcUserProps = WithOidcUserProps>(
+  WrappedComponent: React.ComponentType<T>
+) {
+  const displayName =
+    WrappedComponent.displayName || WrappedComponent.name || "Component";
+
+  const ComponentWithOidcUser = (props: Omit<T, keyof WithOidcUserProps>) => {
+    const { oidcUser } = useContext(AuthenticationContext);
+    return <WrappedComponent oidcUser={oidcUser} {...(props as T)} />;
+  };
+
+  ComponentWithOidcUser.displayName = `withOidcUser(${displayName})`;
+
+  return ComponentWithOidcUser;
+}
