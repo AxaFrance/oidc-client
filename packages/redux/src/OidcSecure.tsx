@@ -1,8 +1,8 @@
-import React, { ComponentType, FC, PropsWithChildren, useEffect } from 'react';
+import React, { ComponentType, FC, PropsWithChildren, useEffect, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import {
-  Authenticating,
+  Authenticating as DefaultAuthenticatingComponent,
   withRouter,
   getUserManager,
   isRequireAuthentication,
@@ -17,14 +17,10 @@ type AuthenticationLiveCycleProps = PropsWithChildren<{
   location: Location;
   history: ReactOidcHistory;
   oidc: UserState;
+  authenticatingComponent: ComponentType;
 }>;
 
-const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({
-  location,
-  oidc,
-  children,
-  history,
-}) => {
+const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, oidc, children, history, authenticatingComponent }) => {
   const { isLoadingUser, user } = oidc;
   const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
   const isLoading = isLoadingUser || isShouldAuthenticate;
@@ -35,7 +31,9 @@ const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({
     }
   }, [isShouldAuthenticate, location, user]);
 
-  return isLoading ? <Authenticating /> : <>{children}</>;
+  const AuthenticatingComponent: ComponentType = useMemo(() => authenticatingComponent || DefaultAuthenticatingComponent, []);
+
+  return isLoading ? <AuthenticatingComponent /> : <>{children}</>;
 };
 
 const mapStateToProps = (state: any) => ({
@@ -71,12 +69,13 @@ const defaultPropsOidcSecure = {
 
 type OidcSecureProps = PropsWithChildren<{
   isEnabled?: boolean;
+  authenticatingComponent: ComponentType;
 }>;
 
 const OidcSecure: FC<OidcSecureProps> = props => {
-  const { isEnabled, children } = props;
+  const { isEnabled, children, ...configProps } = props;
   if (isEnabled) {
-    return <Secure>{children}</Secure>;
+    return <Secure {...configProps}>{children}</Secure>;
   }
   return <>{children}</>;
 };
