@@ -20,7 +20,6 @@ type OidcComponentProps = PropsWithChildren<{
   getUserManagerInternal: typeof getUserManager;
   isRequireAuthenticationInternal: typeof isRequireAuthentication;
   AuthenticatingInternal: typeof Authenticating;
-  children?: ComponentType;
 }>;
 
 export const useOidcSecure = (
@@ -79,42 +78,6 @@ export const OidcSecureWithInjectedFunctions = ({
   return <ReactOidcComponent />;
 };
 
-export const withOidcSecureWithInjectedFunctions = (WrappedComponent: ComponentType) => ({
-  location,
-  history,
-  authenticateUserInternal,
-  getUserManagerInternal,
-  isRequireAuthenticationInternal,
-  AuthenticatingInternal,
-  ...otherProps
-}: OidcComponentProps) => {
-  const userManager = getUserManagerInternal();
-  const OverrideWrappedComponent = useMemo(() => () => <WrappedComponent {...otherProps} />, [otherProps]);
-
-  const ReactOidcComponent = useOidcSecure(
-    authenticateUserInternal,
-    userManager,
-    location,
-    history,
-    oidcLog,
-    AuthenticatingInternal,
-    isRequireAuthenticationInternal,
-    OverrideWrappedComponent
-  );
-
-  return <ReactOidcComponent />;
-};
-
-export const withOidcSecure = (WrappedComponent: ComponentType) =>
-  withRouter(
-    withServices(withOidcSecureWithInjectedFunctions(WrappedComponent), {
-      authenticateUserInternal: authenticateUser,
-      getUserManagerInternal: getUserManager,
-      isRequireAuthenticationInternal: isRequireAuthentication,
-      AuthenticatingInternal: Authenticating,
-    })
-  );
-
 const OidcSecure = withRouter(
   withServices(OidcSecureWithInjectedFunctions, {
     authenticateUserInternal: authenticateUser,
@@ -122,6 +85,12 @@ const OidcSecure = withRouter(
     isRequireAuthenticationInternal: isRequireAuthentication,
     AuthenticatingInternal: Authenticating,
   })
+);
+
+export const withOidcSecure = (WrappedComponent: ComponentType) => (props: PropsWithChildren<any>) => (
+  <OidcSecure>
+    <WrappedComponent {...props} />
+  </OidcSecure>
 );
 
 export default OidcSecure;

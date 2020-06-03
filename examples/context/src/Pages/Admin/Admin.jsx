@@ -1,8 +1,8 @@
 import React from 'react';
-import { withOidcUser, OidcSecure } from '@axa-fr/react-oidc-context';
+import { useReactOidc } from '@axa-fr/react-oidc-context';
 
-const Admin = ({ oidcUser }) => {
-
+const Admin = () => {
+  const { oidcUser } = useReactOidc();
   return (
     <>
       <h1>Admin</h1>
@@ -13,4 +13,4 @@ const Admin = ({ oidcUser }) => {
 };
 
 // adding the oidc user in the props
-export default withOidcUser(Admin);
+export default Admin;

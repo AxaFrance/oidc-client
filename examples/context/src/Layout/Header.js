@@ -38,6 +38,16 @@ export default () => (
                     Admin
                   </Link>
                 </li>
+                <li>
+                  <Link style={linkStyle} to="/protected1">
+                    Direct Protected
+                  </Link>
+                </li>
+                <li>
+                  <Link style={linkStyle} to="/protected2">
+                    HOC Protected
+                  </Link>
+                </li>
                 <button onClick={props.logout}>logout</button>
               </ul>
             ) : (

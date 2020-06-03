@@ -17,23 +17,3 @@ exports[`OidcSecure tests suite OidcSecureWithInjectedFunctions should show comp
   />
 </DocumentFragment>
 `;
-
-exports[`OidcSecure tests suite withOidcSecureWithInjectedFunctions should call authentication and AuthenticatingComponent during authentication process 1`] = `
-<DocumentFragment>
-  <div>
-    <span>
-      Default authenticating page
-    </span>
-  </div>
-</DocumentFragment>
-`;
-
-exports[`OidcSecure tests suite withOidcSecureWithInjectedFunctions should show component if user connected 1`] = `
-<DocumentFragment>
-  <div
-    data-testid="componentMount"
-  >
-    ValSupp
-  </div>
-</DocumentFragment>
-`;

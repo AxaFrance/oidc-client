@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
-import { useOidcSecure, withOidcSecureWithInjectedFunctions, OidcSecureWithInjectedFunctions } from './OidcSecure';
+import { useOidcSecure, OidcSecureWithInjectedFunctions } from './OidcSecure';
 import { AuthenticationContext } from '../oidcContext';
 import { oidcContext } from '../oidcContext/AuthenticationContext';
 
@@ -195,36 +195,6 @@ describe('OidcSecure tests suite', () => {
         wrapper: getWrapper({ ...contextMock }),
       }
     );
-    expect(asFragment()).toMatchSnapshot();
-    expect(queryByTestId('componentMount')).not.toBeNull();
-  });
-
-  it('withOidcSecureWithInjectedFunctions should call authentication and AuthenticatingComponent during authentication process', () => {
-    const contextMock = {
-      ...values,
-      isEnabled: true,
-      oidcUser: null,
-      authenticating: undefined,
-    };
-
-    const HocComponent = withOidcSecureWithInjectedFunctions(TestingComponent);
-    const { asFragment } = render(<HocComponent {...mockedProps} props1="ValSupp" />, {
-      wrapper: getWrapper({ ...contextMock }),
-    });
-    expect(asFragment()).toMatchSnapshot();
-  });
-
-  it('withOidcSecureWithInjectedFunctions should show component if user connected', () => {
-    const contextMock = {
-      ...values,
-      isEnabled: true,
-      oidcUser: { user: 'tom' },
-    };
-    const HocComponent = withOidcSecureWithInjectedFunctions(TestingComponent);
-
-    const { queryByTestId, asFragment } = render(<HocComponent {...mockedProps} props1="ValSupp" />, {
-      wrapper: getWrapper({ ...contextMock }),
-    });
     expect(asFragment()).toMatchSnapshot();
     expect(queryByTestId('componentMount')).not.toBeNull();
   });
