@@ -1,4 +1,4 @@
-import React, { ComponentType, FC, PropsWithChildren, useEffect, useMemo } from 'react';
+import React, { ComponentType, FC, PropsWithChildren, useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import {
@@ -31,7 +31,7 @@ const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, o
     }
   }, [isShouldAuthenticate, location, user]);
 
-  const AuthenticatingComponent: ComponentType = useMemo(() => authenticatingComponent || DefaultAuthenticatingComponent, []);
+  const AuthenticatingComponent: ComponentType = authenticatingComponent || DefaultAuthenticatingComponent;
 
   return isLoading ? <AuthenticatingComponent /> : <>{children}</>;
 };
