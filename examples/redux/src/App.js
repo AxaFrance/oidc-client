@@ -92,7 +92,7 @@ const CustomAuthenticatingComponent = () => (
 );
 
 const ProtectedChild = () => (
-  <OidcSecure isEnabled={configuration.isEnabled} authenticatingComponent={CustomAuthenticatingComponent}>
+  <OidcSecure isEnabled={configuration.isEnabled} authenticating={CustomAuthenticatingComponent}>
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />

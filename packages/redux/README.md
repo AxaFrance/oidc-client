@@ -162,9 +162,9 @@ You can use `OidcSecure` wrapper component or `oidcSecure` HOC function.
    */
   isEnabled?: boolean;
   /**
-   * Overriding Auhthenticating Component
+   * Custom Authenticating Component
    */
-  authenticatingComponent?: ComponentType;
+  authenticating?: ComponentType;
 };
 ```
 

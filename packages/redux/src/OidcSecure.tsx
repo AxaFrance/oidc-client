@@ -17,10 +17,10 @@ type AuthenticationLiveCycleProps = PropsWithChildren<{
   location: Location;
   history: ReactOidcHistory;
   oidc: UserState;
-  authenticatingComponent: ComponentType;
+  authenticating: ComponentType;
 }>;
 
-const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, oidc, children, history, authenticatingComponent }) => {
+const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, oidc, children, history, authenticating }) => {
   const { isLoadingUser, user } = oidc;
   const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
   const isLoading = isLoadingUser || isShouldAuthenticate;
@@ -31,7 +31,7 @@ const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, o
     }
   }, [isShouldAuthenticate, location, user]);
 
-  const AuthenticatingComponent: ComponentType = authenticatingComponent || DefaultAuthenticatingComponent;
+  const AuthenticatingComponent: ComponentType = authenticating || DefaultAuthenticatingComponent;
 
   return isLoading ? <AuthenticatingComponent /> : <>{children}</>;
 };
@@ -73,9 +73,9 @@ type OidcSecureProps = PropsWithChildren<{
    */
   isEnabled?: boolean;
   /**
-   * Overriding Auhthenticating Component
+   * Custom Authenticating Component
    */
-  authenticatingComponent?: ComponentType;
+  authenticating?: ComponentType;
 }>;
 
 const OidcSecure: FC<OidcSecureProps> = props => {
