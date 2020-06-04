@@ -68,8 +68,14 @@ const defaultPropsOidcSecure = {
 };
 
 type OidcSecureProps = PropsWithChildren<{
+  /**
+   * Enable secure authentication for component
+   */
   isEnabled?: boolean;
-  authenticatingComponent: ComponentType;
+  /**
+   * Overriding Auhthenticating Component
+   */
+  authenticatingComponent?: ComponentType;
 }>;
 
 const OidcSecure: FC<OidcSecureProps> = props => {
