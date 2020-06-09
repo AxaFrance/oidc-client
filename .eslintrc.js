@@ -63,12 +63,6 @@ module.exports = {
     'import/default': error,
     'import/named': error,
     'import/namespace': error,
-    'react/jsx-filename-extension': [
-      warn,
-      {
-        extensions: ['.js', '.jsx'],
-      },
-    ],
     'react/no-unescaped-entities': ignore,
     'jsx-a11y/label-has-for': [
       error,
