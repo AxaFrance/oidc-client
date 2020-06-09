@@ -50,12 +50,11 @@ const init = (config, document = window.document) => {
       .then(() => {
         return { type: "callback" };
       });
-  } else if (
-    _document.location.toString().includes(config.silent_redirect_uri)
-  ) {
-    return _userManager.signinSilentCallback().then(() => {
-      type: "callback";
-    });
+  }
+  if (_document.location.toString().includes(config.silent_redirect_uri)) {
+    return _userManager.signinSilentCallback().then(() => ({
+      type: "callback"
+    }));
   }
   return _userManager.getUser().then(user => {
     state.oidcUser = user;
