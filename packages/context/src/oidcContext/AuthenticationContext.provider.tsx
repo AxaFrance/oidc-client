@@ -165,20 +165,15 @@ export const AuthenticationProviderInt = ({
   );
 };
 
-type AuthenticationProviderProps = Pick<AuthenticationProviderIntProps,
-  | 'location'
-  | 'history'
-  | 'configuration'
-  | 'isEnabled'
-  | 'UserStore'
-  | 'loggerLevel'
-  | 'logger'
-  | 'sessionLostComponent'
-  | 'authenticating'
-  | 'notAuthenticated'
-  | 'notAuthorized'
-  | 'callbackComponentOverride'
-  >
+type AuthenticationProviderProps = Omit<AuthenticationProviderIntProps,
+  | 'authenticationServiceInt'
+  | 'CallbackInt'
+  | 'setLoggerInt'
+  | 'OidcRoutesInt'
+  | 'oidcLogInt'
+  | 'authenticateUserInt'
+  | 'logoutUserInt'
+>
 
 const AuthenticationProvider: ComponentType<AuthenticationProviderProps> = withRouter(
   withServices(AuthenticationProviderInt, {
