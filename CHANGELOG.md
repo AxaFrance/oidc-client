@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.2](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.1...v3.1.2)
+> 11 June 2020
+- fix(context): Renrender children aftersilent signin [`#464`](https://github.com/AxaGuilDEv/react-oidc/pull/464) by Olivier YOUF
+- chore(release): publish v3.1.2 ***NO_CI*** [`6dbcbc8`](https://github.com/AxaGuilDEv/react-oidc/commit/6dbcbc860df7ee6697983d1024950312a2c8eea4) by Build-CI 
+- docs(changelog) update to new 3.1.1 [`dd8b685`](https://github.com/AxaGuilDEv/react-oidc/commit/dd8b685650d08c2d2a480e7406b5d2f09c0ddc50) by Build-CI 
+
 #### [v3.1.1](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.1-alpha.0...v3.1.1)
 > 25 May 2020
 - chore(release): publish v3.1.1 ***NO_CI*** [`1500b7e`](https://github.com/AxaGuilDEv/react-oidc/commit/1500b7e28914afb913ea4fc3e6b87ee707999fc3) by Build-CI 
