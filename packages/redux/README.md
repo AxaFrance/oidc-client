@@ -109,6 +109,7 @@ Through the UseStore you can specify a class that can be use to store the user o
   key(index: number): any;
   length?: number;
 ```
+
 It could also be window.localStorage or window.sessionStorage. By default, without any userStore, the sessionStorage will be use.
 
 See bellow a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
@@ -150,6 +151,25 @@ export default combineReducers({
 
 ### How to secure a component (App.js)
 
+You can use `OidcSecure` wrapper component or `oidcSecure` HOC function.
+
+`OidcSecure` accepte the following props:
+
+```javascript
+{
+  /**
+   * Enable secure authentication for component
+   */
+  isEnabled?: boolean;
+  /**
+   * Custom Authenticating Component
+   */
+  authenticating?: ComponentType;
+};
+```
+
+Example:
+
 ```javascript
 import React, { Component } from 'react';
 import logo from './logo.svg';
@@ -158,8 +178,10 @@ import { Route, Switch } from 'react-router-dom';
 import { OidcSecure, oidcSecure } from '@axa-fr/react-oidc-redux';
 import User from './User';
 
+const CustomAuthenticatingComponent = () => <div>Authenticating ...</div>;
+
 const ProtectedChild = () => (
-  <OidcSecure>
+  <OidcSecure authenticating={CustomAuthenticatingComponent}>
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
