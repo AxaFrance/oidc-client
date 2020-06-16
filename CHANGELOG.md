@@ -1,11 +1,29 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.3](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.2...v3.1.3)
+> 16 June 2020
+- style: remove overwritten property jsx-filename-extension [`#468`](https://github.com/AxaGuilDEv/react-oidc/pull/468) by Olivier YOUF
+- fix(Vanilla): return type callback with signinSilent [`#469`](https://github.com/AxaGuilDEv/react-oidc/pull/469) by Olivier YOUF
+- feat(react-oidc-redux): Adding Redux Authenticating component [`#463`](https://github.com/AxaGuilDEv/react-oidc/pull/463) by Olivier YOUF
+- Fix types for AuthenticationProvider and withOidcUser [`#457`](https://github.com/AxaGuilDEv/react-oidc/pull/457) by Olivier YOUF
+- chore(release): publish v3.1.3 ***NO_CI*** [`5b4db53`](https://github.com/AxaGuilDEv/react-oidc/commit/5b4db533b3edaa60b273dd05dd822b6687793165) by Build-CI 
+- Replace Pick with Omit [`7f160b7`](https://github.com/AxaGuilDEv/react-oidc/commit/7f160b708bb51dd43389571fd6f0d8e66b5cd2f8) by Vincent Ricard 
+- docs(changelog) update to new 3.1.2 [`faa73a7`](https://github.com/AxaGuilDEv/react-oidc/commit/faa73a7c9cc015ac4dd10289819d06d071ef7ca7) by Build-CI 
+
 #### [v3.1.2](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.1...v3.1.2)
 > 11 June 2020
 - fix(context): Renrender children aftersilent signin [`#464`](https://github.com/AxaGuilDEv/react-oidc/pull/464) by Olivier YOUF
 - chore(release): publish v3.1.2 ***NO_CI*** [`6dbcbc8`](https://github.com/AxaGuilDEv/react-oidc/commit/6dbcbc860df7ee6697983d1024950312a2c8eea4) by Build-CI 
+- Add usage example to demo [`e3bb8b0`](https://github.com/AxaGuilDEv/react-oidc/commit/e3bb8b03e13048f99672050946bb2379dde417a4) by Viet VO 
+- Fix types for AuthenticationProvider and withOidcUser [`5004289`](https://github.com/AxaGuilDEv/react-oidc/commit/50042890bc070bd87a99c0c730acfc47678e0d8a) by Vincent Ricard 
+- Add readme [`be2bb57`](https://github.com/AxaGuilDEv/react-oidc/commit/be2bb5783ae702d65dbc90b38cf41bcf55002415) by Viet VO 
+- Add config option to OidcSecure [`7881742`](https://github.com/AxaGuilDEv/react-oidc/commit/7881742d81fda72571d88642da13a5fd6d188139) by Viet VO 
+- PR: change to authenticating [`bf06f9e`](https://github.com/AxaGuilDEv/react-oidc/commit/bf06f9e5f25e8d6343849f176ed5e1ecfb54b158) by Viet VO 
+- fix(Vanilla): return type callback with signinSilent [`3d4f8af`](https://github.com/AxaGuilDEv/react-oidc/commit/3d4f8af68901a39d6a9e4c958cf6c6e24c5c5ab5) by Hamza HAMIDI 
+- style: remove overwritten property jsx-filename-extension [`5dee604`](https://github.com/AxaGuilDEv/react-oidc/commit/5dee604e9bb16edad8a0c87c3c29d2fa98fc870f) by Hamza Hamidi 
 - docs(changelog) update to new 3.1.1 [`dd8b685`](https://github.com/AxaGuilDEv/react-oidc/commit/dd8b685650d08c2d2a480e7406b5d2f09c0ddc50) by Build-CI 
+- remove useMemo [`4cbf8f2`](https://github.com/AxaGuilDEv/react-oidc/commit/4cbf8f2df93271544f09f28008b199bfea07b391) by Viet VO 
 
 #### [v3.1.1](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.1-alpha.0...v3.1.1)
 > 25 May 2020
