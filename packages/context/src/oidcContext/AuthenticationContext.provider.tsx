@@ -175,7 +175,7 @@ type AuthenticationProviderProps = Omit<AuthenticationProviderIntProps,
   | 'logoutUserInt'
 >
 
-const AuthenticationProvider: ComponentType<AuthenticationProviderProps> = withRouter(
+const AuthenticationProvider: ComponentType<Partial<AuthenticationProviderProps>> = withRouter(
   withServices(AuthenticationProviderInt, {
     CallbackInt: Callback,
     authenticationServiceInt: authenticationService,
