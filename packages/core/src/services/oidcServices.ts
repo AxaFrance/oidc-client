@@ -29,7 +29,7 @@ export const authenticateUser = (
   if (isRequireSignin(oidcUser, isForce)) {
     oidcLog.info('authenticate user...');
     userRequested = true;
-    await userManager.signinRedirect({ data: { url } });
+    await userManager.signinPopup({ data: { url } });
     userRequested = false;
   } else if (oidcUser && oidcUser.expired) {
     userRequested = true;
@@ -37,7 +37,7 @@ export const authenticateUser = (
       await userManager.signinSilent();
     } catch (error) {
       if (numberAuthentication <= 1) {
-        await userManager.signinRedirect({ data: { url } });
+        await userManager.signinPopup({ data: { url } });
       } else {
         userRequested = false;
         oidcLog.warn(`session lost ${error.toString()}`);
