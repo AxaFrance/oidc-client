@@ -10,7 +10,8 @@ const propTypes = {
   notAuthorized: PropTypes.elementType,
   callbackComponent: PropTypes.elementType.isRequired,
   configuration: PropTypes.shape({
-    redirect_uri: PropTypes.string.isRequired,
+    redirect_uri: PropTypes.string,
+    popup_redirect_uri: PropTypes.string,
     silent_redirect_uri: PropTypes.string.isRequired,
   }).isRequired,
   children: PropTypes.node,
@@ -50,7 +51,15 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   const NotAuthorizedComponent = notAuthorized || NotAuthorized;
   const SessionLostComponent = sessionLost || SessionLost;
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
-  const callbackPath = getPath(configuration.redirect_uri);
+  var callbackPath = null;
+  if(configuration.redirect_uri !== undefined && configuration.redirect_uri !== null){
+    callbackPath = getPath(configuration.redirect_uri);
+  }else if(configuration.popup_redirect_uri !== undefined && configuration.popup_redirect_uri !== null){
+    callbackPath = getPath(configuration.popup_redirect_uri);
+  }else{
+    throw TypeError("redirect_uri or popup_redirect_uri have to be set in the configuration!")
+  }
+   
 
   switch (path) {
     case callbackPath:

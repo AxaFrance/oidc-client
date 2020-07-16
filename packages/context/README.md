@@ -56,7 +56,8 @@ const propTypes = {
   sessionLostComponent: PropTypes.elementType, // react component displayed when user loose authentication session
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
-    redirect_uri: PropTypes.string.isRequired,
+    redirect_uri: PropTypes.string, // Set this to login via redirect
+    popup_redirect_uri: PropTypes.string, //Set this to login within a popup
     response_type: PropTypes.string.isRequired,
     scope: PropTypes.string.isRequired,
     authority: PropTypes.string.isRequired,
