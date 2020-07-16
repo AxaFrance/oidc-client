@@ -1,6 +1,12 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.4](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.3...v3.1.4)
+> 14 July 2020
+- fix(context): made type for AuthenticationProviderProps partial [`#473`](https://github.com/AxaGuilDEv/react-oidc/pull/473) by Olivier YOUF
+- chore(release): publish v3.1.4 ***NO_CI*** [`aea9407`](https://github.com/AxaGuilDEv/react-oidc/commit/aea940793fbb9ecf4cc87a0d870e4b9e7d2e5156) by Build-CI 
+- docs(changelog) update to new 3.1.3 [`c3043c4`](https://github.com/AxaGuilDEv/react-oidc/commit/c3043c4078b24906e35b4a15062a1995e79683af) by Build-CI 
+
 #### [v3.1.3](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.2...v3.1.3)
 > 16 June 2020
 - style: remove overwritten property jsx-filename-extension [`#468`](https://github.com/AxaGuilDEv/react-oidc/pull/468) by Olivier YOUF
