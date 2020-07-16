@@ -1,5 +1,5 @@
 {
-  "version": "3.1.4",
+  "version": "3.1.5",
   "command": {
     "publish": {
       "message": "chore(release): publish %s ***NO_CI***",
@@ -9,7 +9,7 @@
         "*.md",
         ".npmrc"
       ],
-      "registry":"http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
+      "registry": "http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
     },
     "bootstrap": {
       "ignore": "component-*",
