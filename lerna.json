@@ -8,8 +8,7 @@
         "ignored-file",
         "*.md",
         ".npmrc"
-      ],
-      "registry": "http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
+      ]
     },
     "bootstrap": {
       "ignore": "component-*",
