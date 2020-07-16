@@ -51,9 +51,18 @@ describe('Container integration tests', () => {
     error: jest.fn(),
     warn: jest.fn(),
   };
+  const popup_redirect_uri = "/test"
   const signinRedirectCallback = jest.fn();
+  const signinPopupCallback = jest.fn();
+  const settings = {
+    popup_redirect_uri : popup_redirect_uri
+  }
   const getUserManager = jest.fn(() => ({
     signinRedirectCallback,
+  }));
+  const getUserManagerPopup = jest.fn(() => ({
+    signinPopupCallback,
+    settings
   }));
   const historyMock = {
     push: jest.fn(),
@@ -61,6 +70,7 @@ describe('Container integration tests', () => {
 
   beforeEach(() => {
     signinRedirectCallback.mockImplementation(() => Promise.resolve(user));
+    signinPopupCallback.mockImplementation(() => Promise.resolve(user));
     jest.clearAllMocks();
   });
 
@@ -80,10 +90,7 @@ describe('Container integration tests', () => {
     expect(historyMock.push).toHaveBeenCalledWith(user.state.url);
   });
 
-  it('should call signinRedirect Callback and onError if signin fail', async () => {
-    const error = { message: 'error message' };
-    signinRedirectCallback.mockImplementation(() => Promise.reject(error));
-
+  it('should call signinRedirect Callback and OnsucessCallback after all', async () => {
     await wait(() =>
       render(
         <CallbackContainerCore
@@ -96,9 +103,22 @@ describe('Container integration tests', () => {
 
     expect(getUserManager).toHaveBeenCalled();
     expect(signinRedirectCallback).toHaveBeenCalled();
-    const routeCalled = `/authentication/not-authenticated?message=${encodeURIComponent(
-      error.message
-    )}`;
-    expect(historyMock.push).toHaveBeenCalledWith(routeCalled);
+    expect(historyMock.push).toHaveBeenCalledWith(user.state.url);
+  });
+
+  it('should call signinPopup Callback if popup_redirect_uri is set', async () => {
+    const error = { message: 'error message' };
+    signinRedirectCallback.mockImplementation(() => Promise.reject(error));
+
+    await wait(() =>
+      render(
+        <CallbackContainerCore
+          history={historyMock}
+          getUserManager={getUserManagerPopup}
+          oidcLog={logger}
+        />
+      )
+    );
+    expect(signinPopupCallback).toHaveBeenCalled();
   });
 });

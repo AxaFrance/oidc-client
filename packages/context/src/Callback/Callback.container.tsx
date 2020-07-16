@@ -35,7 +35,7 @@ export const CallbackContainerCore: FC<CallbackContainerCoreProps> = ({
   useEffect(() => {
     var handle = async ()=>{
       var userManager = await getUserManagerInternal();
-      if(userManager.settings.popup_redirect_uri !== undefined && userManager.settings.popup_redirect_uri !== null){
+      if(userManager.settings != null && userManager.settings.popup_redirect_uri != null){
         oidcLog.info('Using popup callback')
         userManager
         .signinPopupCallback(window.location.href.split('?')[1])

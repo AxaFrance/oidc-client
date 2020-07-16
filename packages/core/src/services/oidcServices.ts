@@ -17,7 +17,7 @@ export const authenticateUser = (
   user: User = null
 ) => async (isForce: boolean = false, callbackPath: string = null) => {
   var usePopup = false;
-  if(userManager.settings.popup_redirect_uri !== undefined && userManager.settings.popup_redirect_uri !== null){
+  if(userManager.settings != null && userManager.settings.popup_redirect_uri != null){
     usePopup = true;
   }
   oidcLog.info('Use Popup: '+usePopup);
