@@ -2,7 +2,8 @@ import * as PropTypes from 'prop-types';
 
 export const configurationPropTypes = PropTypes.shape({
   client_id: PropTypes.string.isRequired,
-  redirect_uri: PropTypes.string.isRequired,
+  redirect_uri: PropTypes.string,
+  popup_redirect_uri: PropTypes.string,
   response_type: PropTypes.string.isRequired,
   scope: PropTypes.string.isRequired,
   authority: PropTypes.string.isRequired,
@@ -27,5 +28,5 @@ export const configurationDefaultProps = {
   automaticSilentRenew: true,
   loadUserInfo: true,
   triggerAuthFlow: true,
-  storeJwtInMemory: false,
+  storeJwtInMemory: false
 };

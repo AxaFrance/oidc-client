@@ -33,9 +33,22 @@ export const CallbackContainerCore: FC<CallbackContainerCoreProps> = ({
   const onError = onRedirectError(history, oidcLogInternal);
 
   useEffect(() => {
-    getUserManagerInternal()
-      .signinRedirectCallback()
-      .then(onSuccess, onError);
+    var handle = async ()=>{
+      var userManager = await getUserManagerInternal();
+      if(userManager.settings.popup_redirect_uri !== undefined && userManager.settings.popup_redirect_uri !== null){
+        oidcLog.info('Using popup callback')
+        userManager
+        .signinPopupCallback(window.location.href.split('?')[1])
+        .then(onSuccess, onError);
+      }else{
+        oidcLog.info('Using redirect callback')
+        userManager
+        .signinRedirectCallback()
+        .then(onSuccess, onError);
+      }
+      
+    }
+    handle()
   }, [getUserManagerInternal, onError, onSuccess]);
   return CallbackComponentOverride ? <CallbackComponentOverride /> : <Callback />;
 };

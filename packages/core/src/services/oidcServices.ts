@@ -16,6 +16,58 @@ export const authenticateUser = (
   history?: ReactOidcHistory,
   user: User = null
 ) => async (isForce: boolean = false, callbackPath: string = null) => {
+  var usePopup = false;
+  if(userManager.settings.popup_redirect_uri !== undefined && userManager.settings.popup_redirect_uri !== null){
+    usePopup = true;
+  }
+  oidcLog.info('Use Popup: '+usePopup);
+  let oidcUser = user;
+  if (!oidcUser) {
+    oidcUser = await userManager.getUser();
+  }
+  if (userRequested) {
+    return;
+  }
+  numberAuthentication++;
+  const url = callbackPath || location.pathname + (location.search || '');
+
+  if (isRequireSignin(oidcUser, isForce)) {
+    oidcLog.info('authenticate user...');
+    userRequested = true;
+    if(usePopup){
+      await userManager.signinPopup({ data: { url } });
+    }else{
+      await userManager.signinRedirect({ data: { url } });
+    }    
+    userRequested = false;
+  } else if (oidcUser && oidcUser.expired) {
+    userRequested = true;
+    try {
+      await userManager.signinSilent();
+    } catch (error) {
+      if (numberAuthentication <= 1) {
+        if(usePopup){
+          await userManager.signinPopup({ data: { url } });
+        }else{
+          await userManager.signinRedirect({ data: { url } });
+        }
+        
+      } else {
+        userRequested = false;
+        oidcLog.warn(`session lost ${error.toString()}`);
+        history.push(`/authentication/session-lost?path=${encodeURI(url)}`);
+      }
+    }
+    userRequested = false;
+  }
+};
+
+export const authenticateUserPopup = (
+  userManager: UserManager,
+  location: Location,
+  history?: ReactOidcHistory,
+  user: User = null
+) => async (isForce: boolean = false, callbackPath: string = null) => {
   let oidcUser = user;
   if (!oidcUser) {
     oidcUser = await userManager.getUser();
