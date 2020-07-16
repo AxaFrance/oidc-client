@@ -1,13 +1,10 @@
 {
-  "name": "@external/react-oidc",
-  "version": "0.0.1",
+  "name": "@axa-fr/react-oidc-root",
+  "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
   },
-  "publishConfig": {
-    "registry": "http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
-},
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "publish": "lerna publish",
