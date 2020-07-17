@@ -1,18 +1,18 @@
 {
   "name": "@axa-fr/react-oidc-fetch-core",
-  "version": "3.1.10",
+  "version": "3.1.11",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+    "url": "https://github.com/Maxinger15/react-oidc.git"
   },
   "peerDependencies": {
     "recompose": "~0.30.0"
   },
   "dependencies": {
-    "@axa-fr/react-oidc-core": "^3.1.10"
+    "@axa-fr/react-oidc-core": "^3.1.11"
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"
@@ -20,6 +20,7 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  }
+    "registry": "http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
+  },
+  "gitHead": "8f3393ca98bada018cfb7fbb4da725f6d5b0acd2"
 }

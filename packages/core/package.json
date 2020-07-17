@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-core",
-  "version": "3.1.10",
+  "version": "3.1.11",
   "description": "A core package for Axa React Oidc packages",
   "homepage": "https://github.com/AxaGuilDEv/react-oidc#readme",
   "main": "dist/index.js",
@@ -24,5 +24,6 @@
   "publishConfig": {
     "access": "public",
     "registry": "http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
-  }
+  },
+  "gitHead": "8f3393ca98bada018cfb7fbb4da725f6d5b0acd2"
 }
