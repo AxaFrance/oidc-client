@@ -7,7 +7,7 @@
   "description": "OpenID Connect & OAuth authentication using react and redux as state management",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+    "url": "https://github.com/Maxinger15/react-oidc.git"
   },
   "keywords": [
     "oidc",

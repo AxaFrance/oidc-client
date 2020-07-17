@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+    "url": "https://github.com/Maxinger15/react-oidc.git"
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
