@@ -12,6 +12,7 @@ const propTypes = {
   configuration: PropTypes.shape({
     redirect_uri: PropTypes.string,
     popup_redirect_uri: PropTypes.string,
+    popupWindowFeatures: PropTypes.string,
     silent_redirect_uri: PropTypes.string.isRequired,
   }).isRequired,
   children: PropTypes.node,

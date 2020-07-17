@@ -4,6 +4,7 @@ export const configurationPropTypes = PropTypes.shape({
   client_id: PropTypes.string.isRequired,
   redirect_uri: PropTypes.string,
   popup_redirect_uri: PropTypes.string,
+  popupWindowFeatures: PropTypes.string,
   response_type: PropTypes.string.isRequired,
   scope: PropTypes.string.isRequired,
   authority: PropTypes.string.isRequired,

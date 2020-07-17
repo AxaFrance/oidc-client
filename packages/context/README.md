@@ -58,6 +58,7 @@ const propTypes = {
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
     redirect_uri: PropTypes.string, // Set this to login via redirect
     popup_redirect_uri: PropTypes.string, //Set this to login within a popup
+    popupWindowFeatures: PropTypes.string, //(string, default: 'location=no,toolbar=no,width=500,height=500,left=100,top=100'): The features parameter to window.open for the popup signin window.
     response_type: PropTypes.string.isRequired,
     scope: PropTypes.string.isRequired,
     authority: PropTypes.string.isRequired,
