@@ -20,6 +20,6 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "registry": "http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
   }
 }
