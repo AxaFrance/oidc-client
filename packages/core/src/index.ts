@@ -6,6 +6,8 @@ export {
   getUserManager,
   authenticationService,
   authenticateUser,
+  authenticateUserSilent,
+  authenticateUserPopup,
   signinSilent,
   logoutUser,
   isRequireAuthentication,

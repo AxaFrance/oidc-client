@@ -16,11 +16,46 @@ export const authenticateUser = (
   history?: ReactOidcHistory,
   user: User = null
 ) => async (isForce: boolean = false, callbackPath: string = null) => {
-  var usePopup = false;
-  if (userManager.settings != null && userManager.settings.popup_redirect_uri != null) {
-    usePopup = true;
+  let oidcUser = user;
+  if (!oidcUser) {
+    oidcUser = await userManager.getUser();
   }
-  oidcLog.info('Use Popup: ' + usePopup);
+  if (userRequested) {
+    oidcLog.info('User is already requested. No new request will be sent.');
+    return;
+  }
+  
+  numberAuthentication++;
+  const url = callbackPath || location.pathname + (location.search || '');
+
+  if (isRequireSignin(oidcUser, isForce)) {
+    oidcLog.info('authenticate user...');
+    userRequested = true;
+    await userManager.signinRedirect({ data: { url } });
+    userRequested = false;
+  } else if (oidcUser && oidcUser.expired) {
+    userRequested = true;
+    try {
+      await userManager.signinSilent();
+    } catch (error) {
+      if (numberAuthentication <= 1) {
+        await userManager.signinRedirect({ data: { url } });
+      } else {
+        userRequested = false;
+        oidcLog.warn(`session lost ${error.toString()}`);
+        history.push(`/authentication/session-lost?path=${encodeURI(url)}`);
+      }
+    }
+    userRequested = false;
+  }
+};
+
+export const authenticateUserPopup = (
+  userManager: UserManager,
+  location: Location,
+  history?: ReactOidcHistory,
+  user: User = null
+) => async (isForce: boolean = false, callbackPath: string = null) => {
   let oidcUser = user;
   if (!oidcUser) {
     oidcUser = await userManager.getUser();
@@ -36,15 +71,10 @@ export const authenticateUser = (
     oidcLog.info('authenticate user...');
     userRequested = true;
 
-    if (usePopup) {
-      try {
-        await userManager.signinPopup({ data: { url } });
-      } catch (e) {
-        userRequested = false;
-      }
-
-    } else {
-      await userManager.signinRedirect({ data: { url } });
+    try {
+      await userManager.signinPopup({ data: { url } });
+    } catch (e) {
+      userRequested = false;
     }
     userRequested = false;
   } else if (oidcUser && oidcUser.expired) {
@@ -53,23 +83,46 @@ export const authenticateUser = (
       await userManager.signinSilent();
     } catch (error) {
       if (numberAuthentication <= 1) {
-
-        if (usePopup) {
-          try {
-            await userManager.signinPopup({ data: { url } });
-          } catch (e) {
-            userRequested = false;
-          }
-
-        } else {
-          await userManager.signinRedirect({ data: { url } });
+        try {
+          await userManager.signinPopup({ data: { url } });
+        } catch (e) {
+          userRequested = false;
         }
-
       } else {
         userRequested = false;
         oidcLog.warn(`session lost ${error.toString()}`);
         history.push(`/authentication/session-lost?path=${encodeURI(url)}`);
       }
+    }
+    userRequested = false;
+  }
+};
+
+export const authenticateUserSilent = (
+  userManager: UserManager,
+  location: Location,
+  history?: ReactOidcHistory,
+  user: User = null
+) => async (isForce: boolean = false, callbackPath: string = null) => {
+  oidcLog.info('Login Silent');
+  let oidcUser = user;
+  if (!oidcUser) {
+    oidcUser = await userManager.getUser();
+  }
+  if (userRequested) {
+    oidcLog.info('User is already requested. No new request will be sent.');
+    return;
+  }
+  numberAuthentication++;
+  const url = callbackPath || location.pathname + (location.search || '');
+
+  if (isRequireSignin(oidcUser, isForce)) {
+    oidcLog.info('authenticate user...');
+    userRequested = true;
+    try {
+      await userManager.signinSilent()
+    } catch (e) {
+      userRequested = false;
     }
     userRequested = false;
   }

@@ -12,7 +12,10 @@ import {
   UserStoreType,
   oidcLog,
   authenticateUser,
+  authenticateUserSilent,
+  authenticateUserPopup,
   logoutUser,
+  getUserManager
 } from '@axa-fr/react-oidc-core';
 
 import { Callback } from '../Callback';
@@ -40,6 +43,7 @@ type AuthenticationProviderIntProps = PropsWithChildren<{
   OidcRoutesInt: typeof OidcRoutes;
   oidcLogInt: typeof oidcLog;
   authenticateUserInt: typeof authenticateUser;
+  authenticateUserSilentInt: typeof authenticateUserSilent;
   logoutUserInt: typeof logoutUser;
 }>;
 
@@ -132,6 +136,18 @@ export const AuthenticationProviderInt = ({
     await authenticateUserInt(userManager, location, history)();
   }, [authenticateUserInt, history, location, oidcLogInt, onLoading, userManager]);
 
+  const loginPopupCallback = useCallback(async () => {
+    onLoading();
+    oidcLogInt.info('Login requested');
+    await authenticateUserPopup(userManager, location, history)();
+  }, [authenticateUserPopup, history, location, oidcLogInt, onLoading, userManager]);
+
+  const loginSilentCallback = useCallback(async () => {
+    onLoading();
+    oidcLogInt.info('Silent Login requested');
+    await authenticateUserSilent(userManager, location, history)();
+  }, [authenticateUserSilent, history, location, oidcLogInt, onLoading, userManager]);
+
   const logoutCallback = useCallback(async () => {
     try {
       onLogout();
@@ -148,6 +164,8 @@ export const AuthenticationProviderInt = ({
         authenticating,
         isEnabled,
         login: loginCallback,
+        loginSilent: loginSilentCallback,
+        loginPopup: loginPopupCallback,
         logout: logoutCallback,
         events: oidcState.userManager.events,
       }}

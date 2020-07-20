@@ -105,6 +105,7 @@
   },
   "private": false,
   "dependencies": {
+    "@axa-fr/react-oidc-context": "^3.1.12",
     "enzyme-adapter-react-16": "^1.14.0",
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",

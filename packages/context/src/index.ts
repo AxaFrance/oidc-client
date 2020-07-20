@@ -3,6 +3,7 @@ export { withOidcUser, OidcSecure, withOidcSecure } from './reactServices';
 export {
   isRequireAuthentication,
   authenticateUser,
+  authenticateUserSilent,
   signinSilent,
   oidcLog,
   getUserManager,

@@ -122,7 +122,7 @@ export default Routes;
 
 ## withOidcUser
 
-A Hoc that inject the oidc User
+A Hoc that inject the oidc User and the login methods
 
 Usage :
 

@@ -3,7 +3,7 @@ import { User } from 'oidc-client';
 
 import { AuthenticationContext } from '../oidcContext';
 
-export type WithOidcUserProps = { oidcUser: User | null };
+export type WithOidcUserProps = { oidcUser: User | null, login : Function, loginPopup: Function, loginSilent: Function };
 
 export function withOidcUser<T extends WithOidcUserProps = WithOidcUserProps>(
   WrappedComponent: React.ComponentType<T>
@@ -12,8 +12,8 @@ export function withOidcUser<T extends WithOidcUserProps = WithOidcUserProps>(
     WrappedComponent.displayName || WrappedComponent.name || "Component";
 
   const ComponentWithOidcUser = (props: Omit<T, keyof WithOidcUserProps>) => {
-    const { oidcUser } = useContext(AuthenticationContext);
-    return <WrappedComponent oidcUser={oidcUser} {...(props as T)} />;
+    const { oidcUser,login,loginPopup,loginSilent } = useContext(AuthenticationContext);
+    return <WrappedComponent oidcUser={oidcUser} login={login} loginPopup={loginPopup} loginSilent={loginSilent} {...(props as T)} />;
   };
 
   ComponentWithOidcUser.displayName = `withOidcUser(${displayName})`;
