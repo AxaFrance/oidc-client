@@ -221,6 +221,8 @@ export default () => (
               </ul>
             ) : (
               <button onClick={props.login}>login</button>
+              <button onClick={props.loginPopup}>loginPopup</button>
+              <button onClick={props.loginSilent}>loginSilent</button>
             )}
           </div>
         );
@@ -232,14 +234,14 @@ export default () => (
 
 ### How to consume : HOC method (Layout/Header.js)
 
-"withOidcUser" function act like "AuthenticationConsumer" below.
+"withOidcUser" function act like "AuthenticationContext.Consumer" above.
 "OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
 
 ```javascript
 import React from 'react';
 import { withOidcUser, OidcSecure } from '@axa-fr/react-oidc-context';
 
-const Admin = ({ oidcUser }) => (
+const Admin = ({ oidcUser,login, loginPopup, loginSilent }) => (
   <OidcSecure>
     <h1>Admin</h1>
     <p>Protected Admin</p>
