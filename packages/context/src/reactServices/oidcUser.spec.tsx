@@ -19,7 +19,7 @@ describe('oidcUser tests suite', () => {
   it('withOidcUser should inject oidcUser if user connected', () => {
     const testingComponent = ({ oidcUser }) => (
       <div>
-        <span data-testid="username">{oidcUser}</span>
+        <span data-testid='username'>{oidcUser}</span>
       </div>
     );
     const Component = withOidcUser(testingComponent);

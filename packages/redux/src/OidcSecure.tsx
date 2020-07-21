@@ -20,7 +20,13 @@ type AuthenticationLiveCycleProps = PropsWithChildren<{
   authenticating: ComponentType;
 }>;
 
-const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, oidc, children, history, authenticating }) => {
+const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({
+  location,
+  oidc,
+  children,
+  history,
+  authenticating,
+}) => {
   const { isLoadingUser, user } = oidc;
   const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
   const isLoading = isLoadingUser || isShouldAuthenticate;

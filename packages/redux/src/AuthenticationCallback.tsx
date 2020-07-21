@@ -27,11 +27,11 @@ export const success = (oidcLogInjected: { error: (msg: string) => void }) => (
   }
 };
 
-type AuthenticationCallbackProps = {
+interface AuthenticationCallbackProps {
   history: ReactOidcHistory;
   userManager: UserManager;
   callbackComponentOverride?: ComponentType;
-};
+}
 
 const AuthenticationCallback: FC<AuthenticationCallbackProps> = ({
   history,

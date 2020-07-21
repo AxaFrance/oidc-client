@@ -1,9 +1,17 @@
 import React, { ComponentType, FC, useEffect } from 'react';
-import { withRouter, getUserManager, oidcLog, Callback, ReactOidcHistory } from '@axa-fr/react-oidc-core';
+import {
+  withRouter,
+  getUserManager,
+  oidcLog,
+  Callback,
+  ReactOidcHistory,
+} from '@axa-fr/react-oidc-core';
 import { User, UserManager } from 'oidc-client';
 import withServices from '../withServices';
 
-export const onRedirectSuccess = (history: ReactOidcHistory, oidcLogInternal: typeof oidcLog) => (user: User) => {
+export const onRedirectSuccess = (history: ReactOidcHistory, oidcLogInternal: typeof oidcLog) => (
+  user: User
+) => {
   oidcLogInternal.info('Successfull login Callback', user);
   if (user.state.url) {
     history.push(user.state.url);
@@ -12,17 +20,21 @@ export const onRedirectSuccess = (history: ReactOidcHistory, oidcLogInternal: ty
   }
 };
 
-export const onRedirectError = (history: ReactOidcHistory, oidcLogInternal: typeof oidcLog) => ({ message }: { message: string }) => {
+export const onRedirectError = (history: ReactOidcHistory, oidcLogInternal: typeof oidcLog) => ({
+  message,
+}: {
+  message: string;
+}) => {
   oidcLogInternal.error(`There was an error handling the token callback: ${message}`);
   history.push(`/authentication/not-authenticated?message=${encodeURIComponent(message)}`);
 };
 
-type CallbackContainerCoreProps = {
+interface CallbackContainerCoreProps {
   history: ReactOidcHistory;
   getUserManager: () => UserManager | undefined;
   oidcLog: typeof oidcLog;
   callbackComponentOverride: ComponentType;
-};
+}
 export const CallbackContainerCore: FC<CallbackContainerCoreProps> = ({
   history,
   getUserManager: getUserManagerInternal,
@@ -33,22 +45,19 @@ export const CallbackContainerCore: FC<CallbackContainerCoreProps> = ({
   const onError = onRedirectError(history, oidcLogInternal);
 
   useEffect(() => {
-    var handle = async ()=>{
-      var userManager = await getUserManagerInternal();
-      if(userManager.settings != null && userManager.settings.popup_redirect_uri != null){
-        oidcLog.info('Using popup callback')
+    const handle = async () => {
+      const userManager = await getUserManagerInternal();
+      if (userManager.settings != null && userManager.settings.popup_redirect_uri != null) {
+        oidcLog.info('Using popup callback');
         userManager
-        .signinPopupCallback(window.location.href.split('?')[1])
-        .then(onSuccess, onError);
-      }else{
-        oidcLog.info('Using redirect callback')
-        userManager
-        .signinRedirectCallback()
-        .then(onSuccess, onError);
+          .signinPopupCallback(window.location.href.split('?')[1])
+          .then(onSuccess, onError);
+      } else {
+        oidcLog.info('Using redirect callback');
+        userManager.signinRedirectCallback().then(onSuccess, onError);
       }
-      
-    }
-    handle()
+    };
+    handle();
   }, [getUserManagerInternal, onError, onSuccess]);
   return CallbackComponentOverride ? <CallbackComponentOverride /> : <Callback />;
 };

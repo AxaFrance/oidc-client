@@ -24,7 +24,6 @@ export const authenticateUser = (
     oidcLog.info('User is already requested. No new request will be sent.');
     return;
   }
-  
   numberAuthentication++;
   const url = callbackPath || location.pathname + (location.search || '');
 
@@ -120,15 +119,13 @@ export const authenticateUserSilent = (
     oidcLog.info('authenticate user...');
     userRequested = true;
     try {
-      await userManager.signinSilent()
+      await userManager.signinSilent();
     } catch (e) {
       userRequested = false;
     }
     userRequested = false;
   }
 };
-
-
 
 export const logoutUser = async (userManager: UserManager) => {
   if (!userManager || !userManager.getUser) {

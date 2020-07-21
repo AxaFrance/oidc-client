@@ -11,15 +11,15 @@ export type WindowInternal = Window & {
   Event: typeof Event;
 };
 
-type IPrototype = {
+interface IPrototype {
   prototype: any;
-};
+}
 
-type InitCustomEventParams<T = any> = {
+interface InitCustomEventParams<T = any> {
   bubbles: boolean;
   cancelable: boolean;
   detail: T;
-};
+}
 
 // IE Polyfill for CustomEvent
 export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Document) => (

@@ -5,10 +5,10 @@ import '@testing-library/jest-dom/extend-expect';
 
 import { useOidcSecure, OidcSecureWithInjectedFunctions } from './OidcSecure';
 import { AuthenticationContext } from '../oidcContext';
-import { oidcContext } from '../oidcContext/AuthenticationContext';
+import { OidcContext } from '../oidcContext/AuthenticationContext';
 
 describe('OidcSecure tests suite', () => {
-  const values: oidcContext = {
+  const values: OidcContext = {
     isEnabled: true,
     oidcUser: { user: { name: 'tom', isExpired: false } },
     authenticating: () => (
@@ -54,7 +54,7 @@ describe('OidcSecure tests suite', () => {
     AuthenticatingInternal,
   };
   const history = { push: () => {} };
-  const TestingComponent = ({ props1 }) => <div data-testid="componentMount">{props1}</div>;
+  const TestingComponent = ({ props1 }) => <div data-testid='componentMount'>{props1}</div>;
 
   it('should call authentication when enabled, and display page if user connected', () => {
     const { result } = renderHook(

@@ -42,12 +42,19 @@ export const useOidcSecure = (
     return () => {
       oidcLogInternal.info('Protected component unmounted');
     };
-  }, [isEnabled, authenticateUserInternal, userManager, oidcLogInternal, location, history, isLoggingOut]);
-  const requiredAuth = useMemo(() => isRequireAuthenticationInternal(oidcUser, false) && isEnabled, [
+  }, [
     isEnabled,
-    isRequireAuthenticationInternal,
-    oidcUser,
+    authenticateUserInternal,
+    userManager,
+    oidcLogInternal,
+    location,
+    history,
+    isLoggingOut,
   ]);
+  const requiredAuth = useMemo(
+    () => isRequireAuthenticationInternal(oidcUser, false) && isEnabled,
+    [isEnabled, isRequireAuthenticationInternal, oidcUser]
+  );
 
   const AuthenticatingComponent: ComponentType = authenticating || AuthenticatingInternal;
   return requiredAuth ? AuthenticatingComponent : WrappedComponent;
@@ -87,7 +94,9 @@ const OidcSecure = withRouter(
   })
 );
 
-export const withOidcSecure = (WrappedComponent: ComponentType) => (props: PropsWithChildren<any>) => (
+export const withOidcSecure = (WrappedComponent: ComponentType) => (
+  props: PropsWithChildren<any>
+) => (
   <OidcSecure>
     <WrappedComponent {...props} />
   </OidcSecure>

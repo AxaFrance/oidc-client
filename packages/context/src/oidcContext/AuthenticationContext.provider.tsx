@@ -15,7 +15,7 @@ import {
   authenticateUserSilent,
   authenticateUserPopup,
   logoutUser,
-  getUserManager
+  getUserManager,
 } from '@axa-fr/react-oidc-core';
 
 import { Callback } from '../Callback';
@@ -77,7 +77,10 @@ const defaultProps: Partial<AuthenticationProviderIntProps> = {
   configuration: configurationDefaultProps,
 };
 
-export const withComponentOverrideProps = (Component: ComponentType, customCallback: ComponentType) => (props: PropsWithChildren<any>) => (
+export const withComponentOverrideProps = (
+  Component: ComponentType,
+  customCallback: ComponentType
+) => (props: PropsWithChildren<any>) => (
   <Component callbackComponentOverride={customCallback} {...props} />
 );
 
@@ -105,7 +108,14 @@ export const AuthenticationProviderInt = ({
   logoutUserInt,
 }: AuthenticationProviderIntProps) => {
   const userManager = authenticationServiceInt(configuration, UserStore);
-  const { oidcState, loadUser, onError, onLoading, unloadUser, onLogout } = useAuthenticationContextState(userManager);
+  const {
+    oidcState,
+    loadUser,
+    onError,
+    onLoading,
+    unloadUser,
+    onLogout,
+  } = useAuthenticationContextState(userManager);
   const oidcFunctions = { loadUser, onError, onLoading, unloadUser, onLogout };
   const { addOidcEvents, removeOidcEvents } = useOidcEvents(oidcLogInt, userManager, oidcFunctions);
 
@@ -123,10 +133,22 @@ export const AuthenticationProviderInt = ({
       removeOidcEvents();
       mount = false;
     };
-  }, [addOidcEvents, loadUser, logger, loggerLevel, onLoading, removeOidcEvents, setLoggerInt, userManager]);
+  }, [
+    addOidcEvents,
+    loadUser,
+    logger,
+    loggerLevel,
+    onLoading,
+    removeOidcEvents,
+    setLoggerInt,
+    userManager,
+  ]);
 
   const CallbackComponent = React.useMemo(
-    () => (callbackComponentOverride ? withComponentOverrideProps(CallbackInt, callbackComponentOverride) : CallbackInt),
+    () =>
+      callbackComponentOverride
+        ? withComponentOverrideProps(CallbackInt, callbackComponentOverride)
+        : CallbackInt,
     [CallbackInt, callbackComponentOverride]
   );
 
@@ -183,7 +205,8 @@ export const AuthenticationProviderInt = ({
   );
 };
 
-type AuthenticationProviderProps = Omit<AuthenticationProviderIntProps,
+type AuthenticationProviderProps = Omit<
+  AuthenticationProviderIntProps,
   | 'authenticationServiceInt'
   | 'CallbackInt'
   | 'setLoggerInt'
@@ -191,7 +214,7 @@ type AuthenticationProviderProps = Omit<AuthenticationProviderIntProps,
   | 'oidcLogInt'
   | 'authenticateUserInt'
   | 'logoutUserInt'
->
+>;
 
 const AuthenticationProvider: ComponentType<Partial<AuthenticationProviderProps>> = withRouter(
   withServices(AuthenticationProviderInt, {

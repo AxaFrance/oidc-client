@@ -23,13 +23,13 @@ const defaultProps: Partial<OidcRoutesProps> = {
   notAuthorized: null,
 };
 
-type OidcRoutesProps = {
+interface OidcRoutesProps {
   notAuthenticated?: ComponentType;
   notAuthorized?: ComponentType;
   callbackComponent: ComponentType;
   sessionLost?: ComponentType;
   configuration: UserManagerSettings;
-};
+}
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   notAuthenticated,
@@ -52,16 +52,17 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   const NotAuthorizedComponent = notAuthorized || NotAuthorized;
   const SessionLostComponent = sessionLost || SessionLost;
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
-  var callbackPath = null;
-  if(configuration.redirect_uri !== undefined && configuration.redirect_uri !== null){
+  let callbackPath = null;
+  if (configuration.redirect_uri !== undefined && configuration.redirect_uri !== null) {
     callbackPath = getPath(configuration.redirect_uri);
-  }else if(configuration.popup_redirect_uri !== undefined && configuration.popup_redirect_uri !== null){
+  } else if (
+    configuration.popup_redirect_uri !== undefined &&
+    configuration.popup_redirect_uri !== null
+  ) {
     callbackPath = getPath(configuration.popup_redirect_uri);
-  }else{
-    throw TypeError("redirect_uri or popup_redirect_uri have to be set in the configuration!")
+  } else {
+    throw TypeError('redirect_uri or popup_redirect_uri have to be set in the configuration!');
   }
-   
-
   switch (path) {
     case callbackPath:
       return <CallbackComponent />;

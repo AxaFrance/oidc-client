@@ -29,5 +29,5 @@ export const configurationDefaultProps = {
   automaticSilentRenew: true,
   loadUserInfo: true,
   triggerAuthFlow: true,
-  storeJwtInMemory: false
+  storeJwtInMemory: false,
 };

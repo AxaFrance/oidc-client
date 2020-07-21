@@ -60,13 +60,17 @@ const oidcReducer = (oidcState: OidcState, action: OidcAction): OidcState => {
   }
 };
 
-const onError = (dispatch: Dispatch<OidcAction>) => (message: string) => dispatch({ type: 'ON_ERROR', message });
-const loadUser = (dispatch: Dispatch<OidcAction>) => (user: User | null) => dispatch({ type: 'ON_LOAD_USER', user });
+const onError = (dispatch: Dispatch<OidcAction>) => (message: string) =>
+  dispatch({ type: 'ON_ERROR', message });
+const loadUser = (dispatch: Dispatch<OidcAction>) => (user: User | null) =>
+  dispatch({ type: 'ON_LOAD_USER', user });
 const onLoading = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: 'ON_LOADING' });
 const unloadUser = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: 'ON_UNLOAD_USER' });
 const onLogout = (dispatch: Dispatch<OidcAction>) => () => dispatch({ type: 'ON_LOGOUT' });
 
-export const useAuthenticationContextState = (userManagerInt: UserManager): UseAuthenticationContextStateType => {
+export const useAuthenticationContextState = (
+  userManagerInt: UserManager
+): UseAuthenticationContextStateType => {
   const defaultState = getDefaultState(userManagerInt);
   const [oidcState, dispatch] = useReducer(oidcReducer, defaultState);
 
@@ -89,7 +93,9 @@ export const onErrorEvent = (oidcLog: Logger, onErrorInt: Function) => (error: E
   onErrorInt(error.message);
 };
 
-export const onUserLoadedEvent = (oidcLog: Logger, loadUserInt: Function) => (user: User | null) => {
+export const onUserLoadedEvent = (oidcLog: Logger, loadUserInt: Function) => (
+  user: User | null
+) => {
   oidcLog.info('User Loaded');
   loadUserInt(user);
 };
@@ -99,28 +105,52 @@ export const onUserUnloadedEvent = (oidcLog: Logger, unloadUserInternal: Functio
   unloadUserInternal();
 };
 
-export const onAccessTokenExpiredEvent = (oidcLog: Logger, unloadUserInternal: Function, userManager: UserManager) => async () => {
+export const onAccessTokenExpiredEvent = (
+  oidcLog: Logger,
+  unloadUserInternal: Function,
+  userManager: UserManager
+) => async () => {
   oidcLog.info('AccessToken Expired');
   unloadUserInternal();
   await userManager.signinSilent();
 };
 
-export const useOidcEvents = (oidcLog: Logger, userManager: UserManager, oidcFunctions: OidcFunctions) => {
+export const useOidcEvents = (
+  oidcLog: Logger,
+  userManager: UserManager,
+  oidcFunctions: OidcFunctions
+) => {
   const addOidcEvents = useCallback(() => {
     userManager.events.addUserLoaded(onUserLoadedEvent(oidcLog, oidcFunctions.loadUser));
     userManager.events.addSilentRenewError(onErrorEvent(oidcLog, oidcFunctions.onError));
     userManager.events.addUserUnloaded(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
     userManager.events.addUserSignedOut(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
-    userManager.events.addAccessTokenExpired(onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager));
-  }, [oidcFunctions.loadUser, oidcFunctions.onError, oidcFunctions.unloadUser, oidcLog, userManager]);
+    userManager.events.addAccessTokenExpired(
+      onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager)
+    );
+  }, [
+    oidcFunctions.loadUser,
+    oidcFunctions.onError,
+    oidcFunctions.unloadUser,
+    oidcLog,
+    userManager,
+  ]);
 
   const removeOidcEvents = useCallback(() => {
     userManager.events.removeUserLoaded(onUserLoadedEvent(oidcLog, oidcFunctions.loadUser));
     userManager.events.removeSilentRenewError(onErrorEvent(oidcLog, oidcFunctions.onError));
     userManager.events.removeUserUnloaded(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
     userManager.events.removeUserSignedOut(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
-    userManager.events.removeAccessTokenExpired(onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager));
-  }, [oidcFunctions.loadUser, oidcFunctions.onError, oidcFunctions.unloadUser, oidcLog, userManager]);
+    userManager.events.removeAccessTokenExpired(
+      onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager)
+    );
+  }, [
+    oidcFunctions.loadUser,
+    oidcFunctions.onError,
+    oidcFunctions.unloadUser,
+    oidcLog,
+    userManager,
+  ]);
 
   return { addOidcEvents, removeOidcEvents };
 };

@@ -51,18 +51,18 @@ describe('Container integration tests', () => {
     error: jest.fn(),
     warn: jest.fn(),
   };
-  const popup_redirect_uri = "/test"
+  const popup_redirect_uri = '/test';
   const signinRedirectCallback = jest.fn();
   const signinPopupCallback = jest.fn();
   const settings = {
-    popup_redirect_uri : popup_redirect_uri
-  }
+    popup_redirect_uri: popup_redirect_uri,
+  };
   const getUserManager = jest.fn(() => ({
     signinRedirectCallback,
   }));
   const getUserManagerPopup = jest.fn(() => ({
     signinPopupCallback,
-    settings
+    settings,
   }));
   const historyMock = {
     push: jest.fn(),

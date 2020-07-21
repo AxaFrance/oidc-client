@@ -65,9 +65,7 @@ describe('authenticate testing', () => {
     expect(userManagerMockLocal.signinSilent).toHaveBeenCalled();
   });
 
-  it(
-    'authenticateUser should call signinsilent that fail and should call first signinRedirect and then should call history.push',
-    async () => {
+  it('authenticateUser call signinsilent that fail and call first signinRedirect and then call history.push', async () => {
     const sleep = (ms: number) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     };

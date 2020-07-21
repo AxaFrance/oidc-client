@@ -3,23 +3,28 @@ import * as React from 'react';
 import { render, waitForDomChange, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
-import { AuthenticationProviderInt, withComponentOverrideProps } from './AuthenticationContext.provider';
+import {
+  AuthenticationProviderInt,
+  withComponentOverrideProps,
+} from './AuthenticationContext.provider';
 import { AuthenticationContext } from './AuthenticationContext';
 
 const AppTest = () => {
-  const { oidcUser, isLoading, error, isEnabled, login, logout } = React.useContext(AuthenticationContext);
+  const { oidcUser, isLoading, error, isEnabled, login, logout } = React.useContext(
+    AuthenticationContext
+  );
 
   return (
     <>
-      <span data-testid="oidcUser">{JSON.stringify(oidcUser)}</span>
-      <span data-testid="isLoading">{JSON.stringify(isLoading)}</span>
-      <span data-testid="error">{JSON.stringify(error)}</span>
-      <span data-testid="isEnabled">{JSON.stringify(isEnabled)}</span>
+      <span data-testid='oidcUser'>{JSON.stringify(oidcUser)}</span>
+      <span data-testid='isLoading'>{JSON.stringify(isLoading)}</span>
+      <span data-testid='error'>{JSON.stringify(error)}</span>
+      <span data-testid='isEnabled'>{JSON.stringify(isEnabled)}</span>
 
-      <button type="button" onClick={() => login()}>
+      <button type='button' onClick={() => login()}>
         login
       </button>
-      <button type="button" onClick={() => logout()}>
+      <button type='button' onClick={() => logout()}>
         logout
       </button>
     </>
@@ -87,7 +92,9 @@ const propsMocks = {
   logoutUserInt: jest.fn(),
 };
 
-const getWrapper = props => ({ children }) => <AuthenticationProviderInt {...props}>{children}</AuthenticationProviderInt>;
+const getWrapper = props => ({ children }) => (
+  <AuthenticationProviderInt {...props}>{children}</AuthenticationProviderInt>
+);
 
 describe('AuthContext tests suite', () => {
   beforeEach(() => {
@@ -161,7 +168,11 @@ describe('AuthContext tests suite', () => {
     expect(loading).toHaveTextContent('false');
 
     fireEvent.click(loginButton);
-    expect(propsMocks.authenticateUserInt).toBeCalledWith(userManagerMock, propsMocks.location, propsMocks.history);
+    expect(propsMocks.authenticateUserInt).toBeCalledWith(
+      userManagerMock,
+      propsMocks.location,
+      propsMocks.history
+    );
     expect(loading).toHaveTextContent('true');
   });
 
@@ -175,7 +186,9 @@ describe('AuthContext tests suite', () => {
   });
 
   it('should change state and call when click on logout', async () => {
-    propsMocks.logoutUserInt.mockImplementation(() => Promise.reject(new Error('error occured 1233123')));
+    propsMocks.logoutUserInt.mockImplementation(() =>
+      Promise.reject(new Error('error occured 1233123'))
+    );
     const { getByTestId, getByText } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
     await waitForDomChange();
     const logoutButton = getByText('logout');
@@ -198,7 +211,7 @@ describe('AuthContext tests suite', () => {
           <div>
             <OverrideComponent />
           </div>
-          <span data-testid="oidcUser">{JSON.stringify(otherProps)}</span>
+          <span data-testid='oidcUser'>{JSON.stringify(otherProps)}</span>
         </div>
       );
     };
