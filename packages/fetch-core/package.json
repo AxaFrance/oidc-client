@@ -12,7 +12,7 @@
     "recompose": "~0.30.0"
   },
   "dependencies": {
-    "@axa-fr/react-oidc-core": "^3.2.0"
+    "@axa-fr/react-oidc-core": "^3.1.4"
   },
   "scripts": {
     "prepare": "node ../../scripts/prepare.js"

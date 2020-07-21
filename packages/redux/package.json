@@ -18,7 +18,7 @@
     "react-component"
   ],
   "dependencies": {
-    "@axa-fr/react-oidc-core": "^3.2.0"
+    "@axa-fr/react-oidc-core": "^3.1.4"
   },
   "peerDependencies": {
     "oidc-client": ">=1.8.2",
