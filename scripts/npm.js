@@ -7,10 +7,10 @@ try {
 
     if(args.length >= 3){
         const NPM_TOKEN = args[2];
-        template = `registry=http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/
+        template = `registry=https://registry.npmjs.org/
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}`;
     } else {
-        template = 'registry=http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/';
+        template = 'registry=https://registry.npmjs.org/';
     }
    const filePath = path.join(__dirname, '../.npmrc');
    fs.writeFileSync(filePath  , template, 'utf8');

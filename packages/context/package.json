@@ -32,7 +32,7 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public",
-    "registry": "http://denexus.de-gmbh.com/nexus/content/repositories/NpmDeRelease/"
+    "registry": "https://registry.npmjs.org/"
   },
   "gitHead": "8f3393ca98bada018cfb7fbb4da725f6d5b0acd2"
 }
