@@ -1,5 +1,5 @@
 import { useReducer, Dispatch, useCallback } from 'react';
-import { User, UserManager, Logger } from 'oidc-client';
+import { User, UserManager, Logger, UserManagerEvents } from 'oidc-client';
 
 // useAuthenticationContextState hook part
 
@@ -18,6 +18,16 @@ export interface UseAuthenticationContextStateType {
   unloadUser: Function;
   onLogout: Function;
   oidcState: OidcState;
+}
+
+export interface CustomEvents {
+  onUserLoaded: UserManagerEvents.UserLoadedCallback;
+  onUserUnloaded: UserManagerEvents.UserUnloadedCallback;
+  onSilentRenewError: UserManagerEvents.SilentRenewErrorCallback;
+  onUserSignedOut: UserManagerEvents.UserSignedOutCallback;
+  onUserSessionChanged: UserManagerEvents.UserSessionChangedCallback;
+  onAccessTokenExpiring(callback: (...ev: unknown[]) => void): void;
+  onAccessTokenExpired(callback: (...ev: unknown[]) => void): void;
 }
 
 const ON_LOADING = 'ON_LOADING';
@@ -105,22 +115,101 @@ export const onAccessTokenExpiredEvent = (oidcLog: Logger, unloadUserInternal: F
   await userManager.signinSilent();
 };
 
-export const useOidcEvents = (oidcLog: Logger, userManager: UserManager, oidcFunctions: OidcFunctions) => {
+export const useOidcEvents = (
+  oidcLog: Logger,
+  userManager: UserManager,
+  oidcFunctions: OidcFunctions,
+  customEvents: CustomEvents
+) => {
   const addOidcEvents = useCallback(() => {
     userManager.events.addUserLoaded(onUserLoadedEvent(oidcLog, oidcFunctions.loadUser));
     userManager.events.addSilentRenewError(onErrorEvent(oidcLog, oidcFunctions.onError));
     userManager.events.addUserUnloaded(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
     userManager.events.addUserSignedOut(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
-    userManager.events.addAccessTokenExpired(onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager));
-  }, [oidcFunctions.loadUser, oidcFunctions.onError, oidcFunctions.unloadUser, oidcLog, userManager]);
+    userManager.events.addAccessTokenExpired(
+      onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager)
+    );
+
+    if (customEvents && customEvents.onUserSessionChanged) {
+      userManager.events.addUserSessionChanged(customEvents.onUserSessionChanged);
+    }
+
+    if (customEvents && customEvents.onUserLoaded) {
+      userManager.events.addUserLoaded(customEvents.onUserLoaded);
+    }
+
+    if (customEvents && customEvents.onSilentRenewError) {
+      userManager.events.addSilentRenewError(customEvents.onSilentRenewError);
+    }
+
+    if (customEvents && customEvents.onUserUnloaded) {
+      userManager.events.addUserUnloaded(customEvents.onUserUnloaded);
+    }
+
+    if (customEvents && customEvents.onUserSignedOut) {
+      userManager.events.addUserSignedOut(customEvents.onUserSignedOut);
+    }
+
+    if (customEvents && customEvents.onAccessTokenExpired) {
+      userManager.events.addAccessTokenExpired(customEvents.onAccessTokenExpired);
+    }
+
+    if (customEvents && customEvents.onAccessTokenExpiring) {
+      userManager.events.addAccessTokenExpiring(customEvents.onAccessTokenExpiring);
+    }
+  }, [
+    oidcFunctions.loadUser,
+    oidcFunctions.onError,
+    oidcFunctions.unloadUser,
+    oidcLog,
+    userManager,
+    customEvents,
+  ]);
 
   const removeOidcEvents = useCallback(() => {
     userManager.events.removeUserLoaded(onUserLoadedEvent(oidcLog, oidcFunctions.loadUser));
     userManager.events.removeSilentRenewError(onErrorEvent(oidcLog, oidcFunctions.onError));
     userManager.events.removeUserUnloaded(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
     userManager.events.removeUserSignedOut(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
-    userManager.events.removeAccessTokenExpired(onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager));
-  }, [oidcFunctions.loadUser, oidcFunctions.onError, oidcFunctions.unloadUser, oidcLog, userManager]);
+    userManager.events.removeAccessTokenExpired(
+      onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager)
+    );
+
+    if (customEvents && customEvents.onUserSessionChanged) {
+      userManager.events.removeUserSessionChanged(customEvents.onUserSessionChanged);
+    }
+
+    if (customEvents && customEvents.onUserLoaded) {
+      userManager.events.removeUserLoaded(customEvents.onUserLoaded);
+    }
+
+    if (customEvents && customEvents.onSilentRenewError) {
+      userManager.events.removeSilentRenewError(customEvents.onSilentRenewError);
+    }
+
+    if (customEvents && customEvents.onUserUnloaded) {
+      userManager.events.removeUserUnloaded(customEvents.onUserUnloaded);
+    }
+
+    if (customEvents && customEvents.onUserSignedOut) {
+      userManager.events.removeUserSignedOut(customEvents.onUserSignedOut);
+    }
+
+    if (customEvents && customEvents.onAccessTokenExpired) {
+      userManager.events.removeAccessTokenExpired(customEvents.onAccessTokenExpired);
+    }
+
+    if (customEvents && customEvents.onAccessTokenExpiring) {
+      userManager.events.removeAccessTokenExpiring(customEvents.onAccessTokenExpiring);
+    }
+  }, [
+    oidcFunctions.loadUser,
+    oidcFunctions.onError,
+    oidcFunctions.unloadUser,
+    oidcLog,
+    userManager,
+    customEvents,
+  ]);
 
   return { addOidcEvents, removeOidcEvents };
 };

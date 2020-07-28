@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, ComponentType, PropsWithChildren } from 'react';
 import PropTypes from 'prop-types';
-import { User, Logger, UserManagerSettings } from 'oidc-client';
+import { User, Logger, UserManagerSettings, UserManagerEvents } from 'oidc-client';
 import {
   withRouter,
   authenticationService,
@@ -19,7 +19,7 @@ import { Callback } from '../Callback';
 
 import withServices from '../withServices';
 import { AuthenticationContext } from './AuthenticationContext';
-import { useAuthenticationContextState, useOidcEvents } from './AuthenticationContext.hooks';
+import { useAuthenticationContextState, useOidcEvents, CustomEvents } from './AuthenticationContext.hooks';
 
 type AuthenticationProviderIntProps = PropsWithChildren<{
   location: Location;
@@ -41,6 +41,7 @@ type AuthenticationProviderIntProps = PropsWithChildren<{
   oidcLogInt: typeof oidcLog;
   authenticateUserInt: typeof authenticateUser;
   logoutUserInt: typeof logoutUser;
+  customEvents: CustomEvents;
 }>;
 
 const propTypes = {
@@ -59,6 +60,15 @@ const propTypes = {
     debug: PropTypes.func.isRequired,
   }),
   UserStore: PropTypes.func,
+  customEvents: PropTypes.shape({
+    onUserLoaded: PropTypes.func,
+    onUserUnloaded: PropTypes.func,
+    onSilentRenewError: PropTypes.func,
+    onUserSignedOut: PropTypes.func,
+    onUserSessionChanged: PropTypes.func,
+    onAccessTokenExpiring: PropTypes.func,
+    onAccessTokenExpired: PropTypes.func,
+  }),
 };
 
 const defaultProps: Partial<AuthenticationProviderIntProps> = {
@@ -71,6 +81,7 @@ const defaultProps: Partial<AuthenticationProviderIntProps> = {
   loggerLevel: 0,
   logger: console,
   configuration: configurationDefaultProps,
+  customEvents: null,
 };
 
 export const withComponentOverrideProps = (Component: ComponentType, customCallback: ComponentType) => (props: PropsWithChildren<any>) => (
@@ -91,6 +102,7 @@ export const AuthenticationProviderInt = ({
   notAuthorized,
   callbackComponentOverride,
   children,
+  customEvents,
   // Injected
   authenticationServiceInt,
   CallbackInt,
@@ -103,7 +115,7 @@ export const AuthenticationProviderInt = ({
   const userManager = authenticationServiceInt(configuration, UserStore);
   const { oidcState, loadUser, onError, onLoading, unloadUser, onLogout } = useAuthenticationContextState(userManager);
   const oidcFunctions = { loadUser, onError, onLoading, unloadUser, onLogout };
-  const { addOidcEvents, removeOidcEvents } = useOidcEvents(oidcLogInt, userManager, oidcFunctions);
+  const { addOidcEvents, removeOidcEvents } = useOidcEvents(oidcLogInt, userManager, oidcFunctions, customEvents);
 
   useEffect(() => {
     onLoading();
@@ -119,7 +131,7 @@ export const AuthenticationProviderInt = ({
       removeOidcEvents();
       mount = false;
     };
-  }, [addOidcEvents, loadUser, logger, loggerLevel, onLoading, removeOidcEvents, setLoggerInt, userManager]);
+  }, [addOidcEvents, loadUser, logger, loggerLevel, onLoading, removeOidcEvents, setLoggerInt, userManager, customEvents]);
 
   const CallbackComponent = React.useMemo(
     () => (callbackComponentOverride ? withComponentOverrideProps(CallbackInt, callbackComponentOverride) : CallbackInt),
