@@ -28,7 +28,6 @@ export const authenticationServiceInternal = (
   if (UserStore) {
     overriddenConfiguration.userStore = new WebStorageStateStoreInt({ store: new UserStore() });
   }
-  oidcLog.debug('overriddenConfiguration', overriddenConfiguration);
   userManager = new UserManager(overriddenConfiguration);
   return userManager;
 };
