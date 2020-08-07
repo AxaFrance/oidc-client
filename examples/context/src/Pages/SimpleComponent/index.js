@@ -4,7 +4,7 @@ const SimpleComponent = ({ type }) => {
   const [state, setState] = React.useState('init');
   const handleChange = React.useCallback(e => {
     setState(e.target.value);
-  });
+  }, [setState]);
   return (
     <>
       <h1>Simple Component</h1>
