@@ -1,5 +1,5 @@
-import { authenticateUser, logoutUser, signinSilent } from './oidcServices';
 import { User, UserManager } from 'oidc-client';
+import { authenticateUser, logoutUser, signinSilent } from './oidcServices';
 
 jest.mock('./loggerService');
 
@@ -48,6 +48,19 @@ describe('authenticate testing', () => {
     });
   });
 
+  it('authenticateUser should call signin redirect with force to true with url= path + search + hash', async () => {
+    const localLocationMock = ({
+      pathname: '/pathname',
+      search: '?toto=tutu',
+      hash: '#titi',
+    } as unknown) as Location;
+    await authenticateUser(userManagerMock, localLocationMock)(true);
+    expect(userManagerMock.getUser).toHaveBeenCalled();
+    expect(userManagerMock.signinRedirect).toHaveBeenCalledWith({
+      data: { url: '/pathname?toto=tutu#titi' },
+    });
+  });
+
   it('authenticateUser should call signin redirect with force to true with url = callbackUrl', async () => {
     await authenticateUser(userManagerMock, locationMock)(true, '/injectedpath');
     expect(userManagerMock.getUser).toHaveBeenCalled();
@@ -65,9 +78,7 @@ describe('authenticate testing', () => {
     expect(userManagerMockLocal.signinSilent).toHaveBeenCalled();
   });
 
-  it(
-    'authenticateUser should call signinsilent that fail and should call first signinRedirect and then should call history.push',
-    async () => {
+  it('authenticateUser should call signinsilent that fail and should call first signinRedirect and then should call history.push', async () => {
     const sleep = (ms: number) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     };
