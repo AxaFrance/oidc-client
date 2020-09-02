@@ -1,5 +1,5 @@
-import { User, UserManager } from 'oidc-client';
 import { authenticateUser, logoutUser, signinSilent } from './oidcServices';
+import { User, UserManager } from 'oidc-client';
 
 jest.mock('./loggerService');
 
@@ -78,7 +78,9 @@ describe('authenticate testing', () => {
     expect(userManagerMockLocal.signinSilent).toHaveBeenCalled();
   });
 
-  it('authenticateUser should call signinsilent that fail and should call first signinRedirect and then should call history.push', async () => {
+  it(
+    'authenticateUser should call signinsilent that fail and should call first signinRedirect and then should call history.push',
+    async () => {
     const sleep = (ms: number) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     };
