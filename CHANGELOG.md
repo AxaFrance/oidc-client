@@ -1,6 +1,14 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.5](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.4...v3.1.5)
+> 8 September 2020
+- Add prop-types as dependency [`#507`](https://github.com/AxaGuilDEv/react-oidc/pull/507) by Olivier YOUF
+- fix(core): keep location.hash in the url used to redirect after login [`#515`](https://github.com/AxaGuilDEv/react-oidc/pull/515) by jreimbold-t1
+- fix: move prop-types from peer to dependencies [`a53a189`](https://github.com/AxaGuilDEv/react-oidc/commit/a53a189b08b70ee705bb06fd0d8eee4184a2558b) by Arnaud Foraison 
+- chore(release): publish v3.1.5 ***NO_CI*** [`0a24a04`](https://github.com/AxaGuilDEv/react-oidc/commit/0a24a04741b5d6ac28d0cd4d6346beeda01e79a8) by Build-CI 
+- docs(changelog) update to new 3.1.4 [`b43b45d`](https://github.com/AxaGuilDEv/react-oidc/commit/b43b45dab5b2ae6f46cce62e3061e23ab388b61e) by Build-CI 
+
 #### [v3.1.4](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.3...v3.1.4)
 > 14 July 2020
 - fix(context): made type for AuthenticationProviderProps partial [`#473`](https://github.com/AxaGuilDEv/react-oidc/pull/473) by Olivier YOUF
