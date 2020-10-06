@@ -177,15 +177,10 @@ export const AuthenticationProviderInt = ({
   );
 };
 
-type AuthenticationProviderProps = Omit<AuthenticationProviderIntProps,
-  | 'authenticationServiceInt'
-  | 'CallbackInt'
-  | 'setLoggerInt'
-  | 'OidcRoutesInt'
-  | 'oidcLogInt'
-  | 'authenticateUserInt'
-  | 'logoutUserInt'
->
+type AuthenticationProviderProps = Omit<
+  AuthenticationProviderIntProps,
+  'authenticationServiceInt' | 'CallbackInt' | 'setLoggerInt' | 'OidcRoutesInt' | 'oidcLogInt' | 'authenticateUserInt' | 'logoutUserInt'
+>;
 
 const AuthenticationProvider: ComponentType<Partial<AuthenticationProviderProps>> = withRouter(
   withServices(AuthenticationProviderInt, {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, wait, cleanup } from '@testing-library/react';
+import { render, waitFor, cleanup } from '@testing-library/react';
 import { CallbackContainerCore, onRedirectError, onRedirectSuccess } from './Callback.container';
 
 describe('Callback container tests suite', () => {
@@ -34,9 +34,7 @@ describe('Callback container tests suite', () => {
 
   it('Should push on error message when onError is call', () => {
     onRedirectError(history, logger)({ message: 'errorMessage' });
-    expect(history.push).toHaveBeenCalledWith(
-      '/authentication/not-authenticated?message=errorMessage'
-    );
+    expect(history.push).toHaveBeenCalledWith('/authentication/not-authenticated?message=errorMessage');
   });
 });
 
@@ -65,17 +63,9 @@ describe('Container integration tests', () => {
   });
 
   it('should call signinRedirect Callback and OnsucessCallback after all', async () => {
-    await wait(() =>
-      render(
-        <CallbackContainerCore
-          history={historyMock}
-          getUserManager={getUserManager}
-          oidcLog={logger}
-        />
-      )
-    );
+    render(<CallbackContainerCore history={historyMock} getUserManager={getUserManager} oidcLog={logger} />);
 
-    expect(getUserManager).toHaveBeenCalled();
+    await waitFor(() => expect(getUserManager).toHaveBeenCalled());
     expect(signinRedirectCallback).toHaveBeenCalled();
     expect(historyMock.push).toHaveBeenCalledWith(user.state.url);
   });
@@ -84,21 +74,12 @@ describe('Container integration tests', () => {
     const error = { message: 'error message' };
     signinRedirectCallback.mockImplementation(() => Promise.reject(error));
 
-    await wait(() =>
-      render(
-        <CallbackContainerCore
-          history={historyMock}
-          getUserManager={getUserManager}
-          oidcLog={logger}
-        />
-      )
-    );
+    render(<CallbackContainerCore history={historyMock} getUserManager={getUserManager} oidcLog={logger} />);
 
-    expect(getUserManager).toHaveBeenCalled();
+    await waitFor(() => expect(getUserManager).toHaveBeenCalled());
+
     expect(signinRedirectCallback).toHaveBeenCalled();
-    const routeCalled = `/authentication/not-authenticated?message=${encodeURIComponent(
-      error.message
-    )}`;
+    const routeCalled = `/authentication/not-authenticated?message=${encodeURIComponent(error.message)}`;
     expect(historyMock.push).toHaveBeenCalledWith(routeCalled);
   });
 });
