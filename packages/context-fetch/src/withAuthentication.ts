@@ -1,8 +1,6 @@
-import { compose } from 'recompose';
-import {
-  withFetchRedirectionOn403,
-  withFetchSilentAuthenticateAndRetryOn401,
-} from '@axa-fr/react-oidc-fetch-core';
+import { compose } from '@axa-fr/react-oidc-core';
+import { withFetchRedirectionOn403, withFetchSilentAuthenticateAndRetryOn401 } from '@axa-fr/react-oidc-fetch-core';
+
 import withFetchToken from './withFetchToken';
 
 type WindowFetch = typeof fetch;

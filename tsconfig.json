@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "jsx": "react",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
@@ -8,6 +9,7 @@
     "target": "es5",
     "lib": ["es2016", "dom"],
     "baseUrl": ".",
+    "esModuleInterop": true,
     "paths": {
       "@axa-fr/react-oidc-context": ["packages/context/dist"],
       "@axa-fr/react-oidc-core": ["packages/core/dist"],

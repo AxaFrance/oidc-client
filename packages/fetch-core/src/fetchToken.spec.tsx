@@ -1,6 +1,15 @@
-import { fetchWithToken, fetchWrapper } from './fetchToken';
+import React from 'react';
+import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-describe('redux-fetch.fetchToken', () => {
+import fetchToken, { fetchWithToken, fetchWrapper } from './fetchToken';
+
+const HeadersBackUp = global.Headers;
+
+describe('fetch-core.fetchToken unit tests', () => {
+  afterEach(() => {
+    global.Headers = HeadersBackUp;
+  });
   it('should fetchWithToken', async () => {
     const getAccessToken = jest.fn(() => 'test-token');
     const response = { status: 200 };
@@ -57,9 +66,47 @@ describe('redux-fetch.fetchToken', () => {
     const fetchWithTokenMock = () => newFetch;
     const getAccessTokenMock = jest.fn();
 
-    const newProps = await fetchWrapper(fetchWithTokenMock)(getAccessTokenMock)(injectedFetch)(
-      props
-    );
+    const newProps = await fetchWrapper(fetchWithTokenMock)(getAccessTokenMock)(injectedFetch)(props);
     expect(newProps.fetch).toBe(newFetch);
+  });
+});
+
+describe('fetch-core.fetchToken integration tests', () => {
+  let headersMock;
+  beforeEach(() => {
+    jest.clearAllMocks();
+    headersMock = new Headers();
+    headersMock.set('custom', 'value');
+  });
+  const fetchMock = jest.fn();
+  const MyComponent = props => {
+    const { fetch } = fetchToken(fetchMock)(props);
+    return (
+      <button type="button" onClick={() => fetch('http://url', { headers : headersMock})}>
+        Click
+      </button>
+    );
+  };
+
+  it('should call fetch with correct header with user', () => {
+    const { getByRole } = render(<MyComponent user={{ access_token: '##ACCESSTOKEN##' }} />);
+
+    userEvent.click(getByRole('button', { name: 'Click' }));
+    expect(fetchMock).toBeCalled();
+    expect(fetchMock.mock.calls[0][0]).toEqual('http://url');
+    expect(Array.from(fetchMock.mock.calls[0][1].headers.entries())).toEqual([
+      ['accept', 'application/json'],
+      ['authorization', 'Bearer ##ACCESSTOKEN##'],
+      ['custom', 'value'],
+    ]);
+  });
+
+  it('should call fetch with correct header without user', () => {
+    const { getByRole } = render(<MyComponent />);
+
+    userEvent.click(getByRole('button', { name: 'Click' }));
+    expect(fetchMock).toBeCalled();
+    expect(fetchMock.mock.calls[0][0]).toEqual('http://url');
+    expect(Array.from(fetchMock.mock.calls[0][1].headers.entries())).toEqual([['accept', 'application/json'], ['custom', 'value']]);
   });
 });

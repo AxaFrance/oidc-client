@@ -9,7 +9,8 @@
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
   },
   "peerDependencies": {
-    "recompose": "~0.30.0"
+    "react": ">=16.8.6",
+    "react-dom": ">=16.8.6"
   },
   "dependencies": {
     "@axa-fr/react-oidc-core": "^3.1.6"
