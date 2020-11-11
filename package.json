@@ -6,8 +6,8 @@
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "publish": "lerna publish",
+    "postinstall": "lerna bootstrap",
     "start": "npm run example:context",
     "clean": "lerna clean",
     "example:redux": "npm -C ./examples/redux run start",

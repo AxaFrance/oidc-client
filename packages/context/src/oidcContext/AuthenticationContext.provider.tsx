@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, ComponentType, PropsWithChildren } from 'react';
 import PropTypes from 'prop-types';
-import { User, Logger, UserManagerSettings, UserManagerEvents } from 'oidc-client';
+import { User, Logger, UserManagerSettings } from 'oidc-client';
 import {
   withRouter,
   authenticationService,
@@ -13,6 +13,7 @@ import {
   oidcLog,
   authenticateUser,
   logoutUser,
+  setUserManager,
 } from '@axa-fr/react-oidc-core';
 
 import { Callback } from '../Callback';
@@ -42,6 +43,7 @@ type AuthenticationProviderIntProps = PropsWithChildren<{
   authenticateUserInt: typeof authenticateUser;
   logoutUserInt: typeof logoutUser;
   customEvents: CustomEvents;
+  setUserManagerInt: typeof setUserManager;
 }>;
 
 const propTypes = {
@@ -111,6 +113,7 @@ export const AuthenticationProviderInt = ({
   oidcLogInt,
   authenticateUserInt,
   logoutUserInt,
+  setUserManagerInt,
 }: AuthenticationProviderIntProps) => {
   const userManager = authenticationServiceInt(configuration, UserStore);
   const { oidcState, loadUser, onError, onLoading, unloadUser, onLogout } = useAuthenticationContextState(userManager);
@@ -130,8 +133,9 @@ export const AuthenticationProviderInt = ({
     return () => {
       removeOidcEvents();
       mount = false;
+      setUserManagerInt(null);
     };
-  }, [addOidcEvents, loadUser, logger, loggerLevel, onLoading, removeOidcEvents, setLoggerInt, userManager, customEvents]);
+  }, [addOidcEvents, loadUser, logger, loggerLevel, onLoading, removeOidcEvents, setLoggerInt, setUserManagerInt, userManager]);
 
   const CallbackComponent = React.useMemo(
     () => (callbackComponentOverride ? withComponentOverrideProps(CallbackInt, callbackComponentOverride) : CallbackInt),
@@ -191,6 +195,7 @@ const AuthenticationProvider: ComponentType<Partial<AuthenticationProviderProps>
     oidcLogInt: oidcLog,
     authenticateUserInt: authenticateUser,
     logoutUserInt: logoutUser,
+    setUserManagerInt: setUserManager,
   })
 );
 // @ts-ignore

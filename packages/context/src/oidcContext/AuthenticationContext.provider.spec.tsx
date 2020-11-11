@@ -86,6 +86,7 @@ const propsMocks = {
   },
   authenticateUserInt: jest.fn(() => () => {}),
   logoutUserInt: jest.fn(),
+  setUserManagerInt : jest.fn()
 };
 
 const getWrapper = props => ({ children }) => <AuthenticationProviderInt {...props}>{children}</AuthenticationProviderInt>;
@@ -143,6 +144,7 @@ describe('AuthContext tests suite', () => {
     expect(userManagerMock.events.removeUserUnloaded).not.toBeCalled();
     expect(userManagerMock.events.removeUserSignedOut).not.toBeCalled();
     expect(userManagerMock.events.removeAccessTokenExpired).not.toBeCalled();
+    expect(propsMocks.setUserManagerInt).not.toBeCalled();
 
     unmount();
 
@@ -151,6 +153,7 @@ describe('AuthContext tests suite', () => {
     expect(userManagerMock.events.removeUserUnloaded).toBeCalled();
     expect(userManagerMock.events.removeUserSignedOut).toBeCalled();
     expect(userManagerMock.events.removeAccessTokenExpired).toBeCalled();
+    expect(propsMocks.setUserManagerInt).toBeCalledWith(null);
   });
 
   it('should change state and call when click on login', async () => {
