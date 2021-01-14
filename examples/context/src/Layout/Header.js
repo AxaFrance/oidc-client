@@ -1,5 +1,5 @@
 import React from 'react';
-import { AuthenticationContext } from '@axa-fr/react-oidc-context';
+import { useReactOidc } from '@axa-fr/react-oidc-context';
 import { Link } from 'react-router-dom';
 
 const headerStyle = {
@@ -14,48 +14,50 @@ const linkStyle = {
   textDecoration: 'underline',
 };
 
-export default () => (
-  <header>
-    <AuthenticationContext.Consumer>
-      {props => {
-        return (
-          <div style={headerStyle}>
-            <h3>
-              <Link style={linkStyle} to="/">
-                HOME
-              </Link>
-            </h3>
+const Header = () => {
+  const { isEnabled, login, logout, signinSilent, oidcUser } = useReactOidc();
+  return (
+    <header>
+      <div style={headerStyle}>
+        <h3>
+          <Link style={linkStyle} to="/">
+            HOME
+          </Link>
+        </h3>
 
-            {props.oidcUser || !props.isEnabled ? (
-              <ul>
-                <li>
-                  <Link style={linkStyle} to="/dashboard">
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link style={linkStyle} to="/admin">
-                    Admin
-                  </Link>
-                </li>
-                <li>
-                  <Link style={linkStyle} to="/protected1">
-                    Direct Protected
-                  </Link>
-                </li>
-                <li>
-                  <Link style={linkStyle} to="/protected2">
-                    HOC Protected
-                  </Link>
-                </li>
-                <button onClick={props.logout}>logout</button>
-              </ul>
-            ) : (
-              <button onClick={props.login}>login</button>
-            )}
-          </div>
-        );
-      }}
-    </AuthenticationContext.Consumer>
-  </header>
-);
+        {oidcUser || !isEnabled ? (
+          <ul>
+            <li>
+              <Link style={linkStyle} to="/dashboard">
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link style={linkStyle} to="/admin">
+                Admin
+              </Link>
+            </li>
+            <li>
+              <Link style={linkStyle} to="/protected1">
+                Direct Protected
+              </Link>
+            </li>
+            <li>
+              <Link style={linkStyle} to="/protected2">
+                HOC Protected
+              </Link>
+            </li>
+            <button onClick={logout}>logout</button>
+          </ul>
+        ) : (
+          <>
+            <button onClick={login}>login</button>
+            <button onClick={signinSilent}>login - Silent - </button>
+          </>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default Header;
