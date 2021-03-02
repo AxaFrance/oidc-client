@@ -32,3 +32,11 @@ export const getPath = (href: string) => {
 
   return path;
 };
+
+export const getAuthenticationRoutePath = (hrefPathName: string) => {
+  const segments = hrefPathName.split('/');
+  const authenticationRoute = segments.pop() || segments.pop();
+  const basePath = segments.pop();
+
+  return basePath && authenticationRoute ? `${basePath}/${authenticationRoute}` : undefined;
+}

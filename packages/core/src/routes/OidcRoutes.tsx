@@ -2,13 +2,14 @@ import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from
 import PropTypes from 'prop-types';
 import { UserManagerSettings } from 'oidc-client';
 import { NotAuthenticated, NotAuthorized, SessionLost } from '../default-component';
-import { getPath } from './route-utils';
+import { getPath, getAuthenticationRoutePath } from './route-utils';
 import { SilentCallback } from '../callbacks';
 
 const propTypes = {
   notAuthenticated: PropTypes.elementType,
   notAuthorized: PropTypes.elementType,
   callbackComponent: PropTypes.elementType.isRequired,
+  sessionLost: PropTypes.elementType,
   configuration: PropTypes.shape({
     redirect_uri: PropTypes.string.isRequired,
     silent_redirect_uri: PropTypes.string.isRequired,
@@ -19,6 +20,7 @@ const propTypes = {
 const defaultProps: Partial<OidcRoutesProps> = {
   notAuthenticated: null,
   notAuthorized: null,
+  sessionLost: null,
 };
 
 type OidcRoutesProps = {
@@ -52,20 +54,17 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
   const callbackPath = getPath(configuration.redirect_uri);
 
-  switch (path) {
-    case callbackPath:
-      return <CallbackComponent />;
-    case silentCallbackPath:
-      return <SilentCallback />;
-    case '/authentication/not-authenticated':
-      return <NotAuthenticatedComponent />;
-    case '/authentication/not-authorized':
-      return <NotAuthorizedComponent />;
-    case '/authentication/session-lost':
-      return <SessionLostComponent />;
-    default:
-      return <>{children}</>;
+  if (path === callbackPath) return <CallbackComponent />;
+  if (path === silentCallbackPath) return <SilentCallback />;
+
+  const authenticationRoute = getAuthenticationRoutePath(path);
+  if (authenticationRoute) {
+    if (authenticationRoute === 'authentication/not-authenticated') return <NotAuthenticatedComponent />;
+    if (authenticationRoute === 'authentication/not-authorized') return <NotAuthorizedComponent />;
+    if (authenticationRoute === 'authentication/session-lost') return <SessionLostComponent />;
   }
+
+  return <>{children}</>;
 };
 
 // @ts-ignore
