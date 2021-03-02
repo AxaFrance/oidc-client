@@ -39,4 +39,4 @@ export const getAuthenticationRoutePath = (hrefPathName: string) => {
   const basePath = segments.pop();
 
   return basePath && authenticationRoute ? `${basePath}/${authenticationRoute}` : undefined;
-}
+};
