@@ -157,12 +157,25 @@ export const AuthenticationProviderInt = ({
       onError(error.message);
     }
   }, [logoutUserInt, oidcLogInt, onError, onLogout, userManager]);
+
+  const signinCallBack = useCallback(
+    (...args) => {
+      try {
+        oidcLogInt.info('SILENT SIGNIN Requested');
+        oidcState.userManager.signinSilent(...args);
+      } catch (error) {
+        onError(error.message);
+      }
+    },
+    [oidcLogInt, oidcState.userManager, onError]
+  );
   return (
     <AuthenticationContext.Provider
       value={{
         ...oidcState,
         authenticating,
         isEnabled,
+        signinSilent: signinCallBack,
         login: loginCallback,
         logout: logoutCallback,
         events: oidcState.userManager.events,

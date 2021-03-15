@@ -6,6 +6,7 @@ export type oidcContext = {
   isEnabled: boolean;
   login: Function;
   logout: Function;
+  signinSilent: Function;
   events: UserManagerEvents;
   authenticating: ComponentType;
   isLoading: boolean;
@@ -17,6 +18,6 @@ export type oidcContext = {
 export const AuthenticationContext = React.createContext<oidcContext>(null);
 
 export const useReactOidc = () => {
-  const { isEnabled, login, logout, oidcUser, events } = React.useContext(AuthenticationContext);
-  return { isEnabled, login, logout, oidcUser, events };
+  const { isEnabled, login, logout, oidcUser, events, signinSilent } = React.useContext(AuthenticationContext);
+  return { isEnabled, login, logout, oidcUser, events, signinSilent };
 };
