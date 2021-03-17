@@ -115,21 +115,21 @@ export const onAccessTokenExpiredEvent = (oidcLog: Logger, unloadUserInternal: F
   await userManager.signinSilent();
 };
 
-export const useOidcEvents = (
-  oidcLog: Logger,
-  userManager: UserManager,
-  oidcFunctions: OidcFunctions,
-  customEvents: CustomEvents
-) => {
+export const onSilentRenewError = (oidcLog: Logger, onErrorInt: Function, userManager: UserManager) => async (error: Error) => {
+  oidcLog.info('SilentRenew Error => redirect signin');
+  onErrorInt(error.message);
+  const { pathname, search, hash } = window.location;
+  const url = pathname + search + hash;
+  userManager && userManager.signinRedirect({ data: { url } });
+};
+
+export const useOidcEvents = (oidcLog: Logger, userManager: UserManager, oidcFunctions: OidcFunctions, customEvents: CustomEvents) => {
   const addOidcEvents = useCallback(() => {
     userManager.events.addUserLoaded(onUserLoadedEvent(oidcLog, oidcFunctions.loadUser));
-    userManager.events.addSilentRenewError(onErrorEvent(oidcLog, oidcFunctions.onError));
     userManager.events.addUserUnloaded(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
     userManager.events.addUserSignedOut(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
-    userManager.events.addAccessTokenExpired(
-      onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager)
-    );
-
+    userManager.events.addAccessTokenExpired(onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager));
+    userManager.events.addSilentRenewError(onSilentRenewError(oidcLog, oidcFunctions.onError, userManager));
     if (customEvents && customEvents.onUserSessionChanged) {
       userManager.events.addUserSessionChanged(customEvents.onUserSessionChanged);
     }
@@ -157,23 +157,14 @@ export const useOidcEvents = (
     if (customEvents && customEvents.onAccessTokenExpiring) {
       userManager.events.addAccessTokenExpiring(customEvents.onAccessTokenExpiring);
     }
-  }, [
-    oidcFunctions.loadUser,
-    oidcFunctions.onError,
-    oidcFunctions.unloadUser,
-    oidcLog,
-    userManager,
-    customEvents,
-  ]);
+  }, [oidcFunctions.loadUser, oidcFunctions.onError, oidcFunctions.unloadUser, oidcLog, userManager, customEvents]);
 
   const removeOidcEvents = useCallback(() => {
     userManager.events.removeUserLoaded(onUserLoadedEvent(oidcLog, oidcFunctions.loadUser));
     userManager.events.removeSilentRenewError(onErrorEvent(oidcLog, oidcFunctions.onError));
     userManager.events.removeUserUnloaded(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
     userManager.events.removeUserSignedOut(onUserUnloadedEvent(oidcLog, oidcFunctions.unloadUser));
-    userManager.events.removeAccessTokenExpired(
-      onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager)
-    );
+    userManager.events.removeAccessTokenExpired(onAccessTokenExpiredEvent(oidcLog, oidcFunctions.unloadUser, userManager));
 
     if (customEvents && customEvents.onUserSessionChanged) {
       userManager.events.removeUserSessionChanged(customEvents.onUserSessionChanged);
@@ -202,14 +193,7 @@ export const useOidcEvents = (
     if (customEvents && customEvents.onAccessTokenExpiring) {
       userManager.events.removeAccessTokenExpiring(customEvents.onAccessTokenExpiring);
     }
-  }, [
-    oidcFunctions.loadUser,
-    oidcFunctions.onError,
-    oidcFunctions.unloadUser,
-    oidcLog,
-    userManager,
-    customEvents,
-  ]);
+  }, [oidcFunctions.loadUser, oidcFunctions.onError, oidcFunctions.unloadUser, oidcLog, userManager, customEvents]);
 
   return { addOidcEvents, removeOidcEvents };
 };
