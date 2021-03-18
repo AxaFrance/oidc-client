@@ -9,7 +9,7 @@ module.exports = {
   collectCoverageFrom: ['packages/**/*.{js,jsx,ts,tsx}', '!**/dist/**', '!**/index.{ts,js}', '!**/*.spec.{js,jsx,ts,tsx}'],
   coverageDirectory: 'coverage',
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['./scripts/jest.init.js'],
+  setupFilesAfterEnv: [],
   setupFiles: ['raf/polyfill'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
