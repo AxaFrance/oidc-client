@@ -6,8 +6,7 @@ import withServices from '../withServices';
 export const onRedirectSuccess = (history: ReactOidcHistory, oidcLogInternal: typeof oidcLog) => (user: User) => {
   oidcLogInternal.info('Successfull login Callback', user);
   if (user.state.url) {
-    window.history.replaceState({}, window.document.title, user.state.url);
-    window.dispatchEvent(new window.CustomEvent('popstate'));
+    history.replaceCurrent(user.state.url);
   } else {
     oidcLogInternal.warn('no location in state');
   }

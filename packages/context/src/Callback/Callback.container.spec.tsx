@@ -5,6 +5,7 @@ import { CallbackContainerCore, onRedirectError, onRedirectSuccess } from './Cal
 describe('Callback container tests suite', () => {
   const history = {
     push: jest.fn(),
+    replaceCurrent: jest.fn()
   };
   const userMock = {
     state: {
@@ -22,9 +23,9 @@ describe('Callback container tests suite', () => {
 
   afterEach(cleanup);
 
-  it('should push location if exist when call onRedirectSuccess', () => {
+  it('should replace location if exist when call onRedirectSuccess', () => {
     onRedirectSuccess(history, logger)(userMock);
-    expect(history.push).toHaveBeenCalledWith('/url');
+    expect(history.replaceCurrent).toHaveBeenCalledWith('/url');
   });
 
   it('should not push if exist location doesnt exists when call onRedirectSuccess', () => {
@@ -57,6 +58,7 @@ describe('Container integration tests', () => {
   }));
   const historyMock = {
     push: jest.fn(),
+    replaceCurrent: jest.fn()
   };
 
   beforeEach(() => {
@@ -77,7 +79,7 @@ describe('Container integration tests', () => {
 
     expect(getUserManager).toHaveBeenCalled();
     expect(signinRedirectCallback).toHaveBeenCalled();
-    expect(historyMock.push).toHaveBeenCalledWith(user.state.url);
+    expect(historyMock.replaceCurrent).toHaveBeenCalledWith(user.state.url);
   });
 
   it('should call signinRedirect Callback and onError if signin fail', async () => {

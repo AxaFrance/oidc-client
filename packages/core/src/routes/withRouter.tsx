@@ -45,6 +45,7 @@ type WindowHistoryState = typeof window.history.state;
 
 export interface ReactOidcHistory {
   push: (url?: string | null, stateHistory?: WindowHistoryState) => void;
+  replaceCurrent: (url?: string | null) => void;
 }
 
 export const withRouter = (
@@ -59,6 +60,11 @@ export const withRouter = (
       windowInternal.history.pushState({ key, state }, null, url);
       windowInternal.dispatchEvent(CreateEventInternal('popstate'));
     },
+    replaceCurrent: (url?: string | null): void => {
+      const state = windowInternal.history.state;
+      windowInternal.history.replaceState(state, null, url);
+      windowInternal.dispatchEvent(CreateEventInternal('popstate'));
+    }
   };
 
   const enhanceProps = {
