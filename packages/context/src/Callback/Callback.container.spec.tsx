@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, waitFor, cleanup } from '@testing-library/react';
 import { CallbackContainerCore, onRedirectError, onRedirectSuccess } from './Callback.container';
-import { UserManager } from 'oidc-client';
+import * as oidc from 'oidc-client';
 
 describe('Callback container tests suite', () => {
   const history = {
@@ -35,7 +35,7 @@ describe('Callback container tests suite', () => {
   });
 
   it('Should send signinRedirect when onError is called', () => {
-    const userManagerMock = new UserManager({});
+    const userManagerMock = new oidc.UserManager({});
     userManagerMock.signinRedirect = jest.fn();
     onRedirectError(logger, userManagerMock)({ message: 'errorMessage' });
     expect(userManagerMock.signinRedirect).toHaveBeenCalledWith({ data: { url: "/" } });
@@ -54,8 +54,10 @@ describe('Container integration tests', () => {
     warn: jest.fn(),
   };
   const signinRedirectCallback = jest.fn();
+  const signinRedirect = jest.fn();
   const getUserManager = jest.fn(() => ({
     signinRedirectCallback,
+    signinRedirect
   }));
   const historyMock = {
     push: jest.fn(),
@@ -84,7 +86,6 @@ describe('Container integration tests', () => {
     await waitFor(() => expect(getUserManager).toHaveBeenCalled());
 
     expect(signinRedirectCallback).toHaveBeenCalled();
-    const routeCalled = `/authentication/not-authenticated?message=${encodeURIComponent(error.message)}`;
-    expect(historyMock.push).toHaveBeenCalledWith(routeCalled);
+    expect(signinRedirect).toHaveBeenCalledWith({ data: { url: "/" } })
   });
 });
