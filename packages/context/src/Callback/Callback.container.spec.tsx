@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, wait, cleanup } from '@testing-library/react';
 import { CallbackContainerCore, onRedirectError, onRedirectSuccess } from './Callback.container';
+import { UserManager } from 'oidc-client';
 
 describe('Callback container tests suite', () => {
   const history = {
@@ -33,11 +34,11 @@ describe('Callback container tests suite', () => {
     expect(history.push).not.toHaveBeenCalled();
   });
 
-  it('Should push on error message when onError is call', () => {
-    onRedirectError(history, logger)({ message: 'errorMessage' });
-    expect(history.push).toHaveBeenCalledWith(
-      '/authentication/not-authenticated?message=errorMessage'
-    );
+  it('Should send signinRedirect when onError is called', () => {
+    const userManagerMock = new UserManager({});
+    userManagerMock.signinRedirect = jest.fn();
+    onRedirectError(logger, userManagerMock)({ message: 'errorMessage' });
+    expect(userManagerMock.signinRedirect).toHaveBeenCalledWith({ data: { url: "/" } });
   });
 });
 

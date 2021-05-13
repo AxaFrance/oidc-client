@@ -12,14 +12,9 @@ export const onRedirectSuccess = (history: ReactOidcHistory, oidcLogInternal: ty
   }
 };
 
-export const onRedirectError = (history: ReactOidcHistory, oidcLogInternal: typeof oidcLog, userManager: UserManager) => ({ message }: { message: string }) => {
+export const onRedirectError = (oidcLogInternal: typeof oidcLog, userManager: UserManager) => ({ message }: { message: string }) => {
   oidcLogInternal.error(`There was an error handling the token callback: ${message}`);
-  if (message === "No matching state found in storage") {
-    userManager.signinRedirect({ data: { url: "/" } })
-  }
-  else {
-    history.push(`/authentication/not-authenticated?message=${encodeURIComponent(message)}`);
-  }
+  userManager.signinRedirect({ data: { url: "/" } })
 };
 
 type CallbackContainerCoreProps = {
@@ -35,7 +30,7 @@ export const CallbackContainerCore: FC<CallbackContainerCoreProps> = ({
   callbackComponentOverride: CallbackComponentOverride,
 }) => {
   const onSuccess = onRedirectSuccess(history, oidcLogInternal);
-  const onError = onRedirectError(history, oidcLogInternal, getUserManagerInternal());
+  const onError = onRedirectError(oidcLogInternal, getUserManagerInternal());
 
   useEffect(() => {
     getUserManagerInternal()
