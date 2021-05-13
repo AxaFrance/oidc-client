@@ -1,7 +1,8 @@
 import * as React from 'react';
 
-import { render, waitForDomChange, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import userEvent from '@testing-library/user-event';
 
 import { AuthenticationProviderInt, withComponentOverrideProps } from './AuthenticationContext.provider';
 import { AuthenticationContext } from './AuthenticationContext';
@@ -85,6 +86,7 @@ const propsMocks = {
   },
   authenticateUserInt: jest.fn(() => () => {}),
   logoutUserInt: jest.fn(),
+  setUserManagerInt : jest.fn()
 };
 
 const getWrapper = props => ({ children }) => <AuthenticationProviderInt {...props}>{children}</AuthenticationProviderInt>;
@@ -99,7 +101,7 @@ describe('AuthContext tests suite', () => {
     const { asFragment } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
     // Should show loading in snap
     expect(asFragment()).toMatchSnapshot();
-    await waitForDomChange();
+    await waitFor(() => screen.getByTestId('isLoading'));
     // Should show user and cancel loading in snap
     expect(asFragment()).toMatchSnapshot();
   });
@@ -109,16 +111,15 @@ describe('AuthContext tests suite', () => {
       wrapper: getWrapper({ ...propsMocks, callbackComponentOverride: undefined }),
     });
 
-    await waitForDomChange();
+    await waitFor(() => screen.getByTestId('isLoading'));
     // Should show user and cancel loading in snap
     expect(asFragment()).toMatchSnapshot();
   });
 
   it('should call corrects initializer on mount', async () => {
     render(<AppTest />, { wrapper: getWrapper(propsMocks) });
-    await waitForDomChange();
 
-    expect(propsMocks.setLoggerInt).toBeCalledWith('loggerLevel', 'loggerMock');
+    await waitFor(() => expect(propsMocks.setLoggerInt).toBeCalledWith('loggerLevel', 'loggerMock'));
     expect(userManagerMock.events.addUserLoaded).toBeCalled();
     expect(userManagerMock.events.addSilentRenewError).toBeCalled();
     expect(userManagerMock.events.addUserUnloaded).toBeCalled();
@@ -128,21 +129,22 @@ describe('AuthContext tests suite', () => {
   });
 
   it('should not cll loead user if component unomount', async () => {
-    const { getByTestId, unmount } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
-    const userValue = getByTestId('oidcUser');
+    const { unmount } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
+    const userValue = screen.getByTestId('oidcUser');
     unmount();
     expect(userValue).toHaveTextContent('null');
   });
 
   it('should remove events  on unmount', async () => {
     const { unmount } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
-    await waitForDomChange();
+    await waitFor(() => screen.getByTestId('isLoading'));
 
     expect(userManagerMock.events.removeUserLoaded).not.toBeCalled();
     expect(userManagerMock.events.removeSilentRenewError).not.toBeCalled();
     expect(userManagerMock.events.removeUserUnloaded).not.toBeCalled();
     expect(userManagerMock.events.removeUserSignedOut).not.toBeCalled();
     expect(userManagerMock.events.removeAccessTokenExpired).not.toBeCalled();
+    expect(propsMocks.setUserManagerInt).not.toBeCalled();
 
     unmount();
 
@@ -151,40 +153,42 @@ describe('AuthContext tests suite', () => {
     expect(userManagerMock.events.removeUserUnloaded).toBeCalled();
     expect(userManagerMock.events.removeUserSignedOut).toBeCalled();
     expect(userManagerMock.events.removeAccessTokenExpired).toBeCalled();
+    expect(propsMocks.setUserManagerInt).toBeCalledWith(null);
   });
 
   it('should change state and call when click on login', async () => {
     const { getByTestId, getByText } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
-    await waitForDomChange();
+    await waitFor(() => screen.getByTestId('isLoading'));
     const loginButton = getByText('login');
     const loading = getByTestId('isLoading');
     expect(loading).toHaveTextContent('false');
 
-    fireEvent.click(loginButton);
+    userEvent.click(loginButton);
     expect(propsMocks.authenticateUserInt).toBeCalledWith(userManagerMock, propsMocks.location, propsMocks.history);
     expect(loading).toHaveTextContent('true');
   });
 
   it('should change state and call when click on logout', async () => {
-    const { getByText } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
-    await waitForDomChange();
-    const logoutButton = getByText('logout');
+    render(<AppTest />, { wrapper: getWrapper(propsMocks) });
+    await waitFor(() => screen.getByTestId('isLoading'));
+    const logoutButton = screen.getByText('logout');
 
-    fireEvent.click(logoutButton);
-    expect(propsMocks.logoutUserInt).toBeCalledWith(userManagerMock);
-  });
+    userEvent.click(logoutButton);
 
-  it('should change state and call when click on logout', async () => {
+    await waitFor(() => expect(propsMocks.logoutUserInt).toBeCalledWith(userManagerMock));  });
+
+  it('should change state and call when click on logout with errors', async () => {
     propsMocks.logoutUserInt.mockImplementation(() => Promise.reject(new Error('error occured 1233123')));
-    const { getByTestId, getByText } = render(<AppTest />, { wrapper: getWrapper(propsMocks) });
-    await waitForDomChange();
-    const logoutButton = getByText('logout');
-    const error = getByTestId('error');
+    render(<AppTest />, { wrapper: getWrapper(propsMocks) });
+    await waitFor(() => screen.getByTestId('isLoading'));
+    const logoutButton = screen.getByText('logout');
+    const error = screen.getByTestId('error');
     expect(error).toHaveTextContent('""');
 
-    fireEvent.click(logoutButton);
+    userEvent.click(logoutButton);
 
-    await waitForDomChange();
+    await waitFor(() => expect(propsMocks.logoutUserInt).toBeCalledWith(userManagerMock));
+
 
     expect(propsMocks.logoutUserInt).toBeCalledWith(userManagerMock);
     expect(error).toHaveTextContent('error occured 1233123');

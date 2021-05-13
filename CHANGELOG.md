@@ -1,6 +1,14 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.6](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.5...v3.1.6)
+> 13 October 2020
+- feat(context): Allowing hooking into the oidc-client events in the AuthenticationProvider [`#415`](https://github.com/AxaGuilDEv/react-oidc/issues/415) by Michael Wolfenden
+- chore(release): publish v3.1.6 ***NO_CI*** [`9c1a618`](https://github.com/AxaGuilDEv/react-oidc/commit/9c1a6186d4f804d6ddcf50819602653d50f05df3) by Build-CI 
+- docs(changelog) update to new 3.1.5 [`02ad255`](https://github.com/AxaGuilDEv/react-oidc/commit/02ad25574978464cb67123d4b695a62a15704960) by Build-CI 
+- feat(logger): remove debug overriddenConfiguration [`f23bebd`](https://github.com/AxaGuilDEv/react-oidc/commit/f23bebdd64de6082d183bead17553174919d515a) by Arnaud Foraison 
+- fix(example): add hook dependency [`b491c02`](https://github.com/AxaGuilDEv/react-oidc/commit/b491c02757775052d1605b2922fa13e25acf7128) by Arnaud Foraison 
+
 #### [v3.1.5](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.4...v3.1.5)
 > 8 September 2020
 - Add prop-types as dependency [`#507`](https://github.com/AxaGuilDEv/react-oidc/pull/507) by Olivier YOUF

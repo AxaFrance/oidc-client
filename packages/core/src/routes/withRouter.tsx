@@ -31,12 +31,7 @@ export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Do
   }
   const paramsToFunction = params || { bubbles: false, cancelable: false, detail: undefined };
   const evt: CustomEvent = documentInternal.createEvent('CustomEvent');
-  evt.initCustomEvent(
-    event,
-    paramsToFunction.bubbles,
-    paramsToFunction.cancelable,
-    paramsToFunction.detail
-  );
+  evt.initCustomEvent(event, paramsToFunction.bubbles, paramsToFunction.cancelable, paramsToFunction.detail);
   (evt as CustomEvent & IPrototype).prototype = windowInternal.Event.prototype;
   return evt;
 };
@@ -48,12 +43,12 @@ export interface ReactOidcHistory {
   replaceCurrent: (url?: string | null) => void;
 }
 
-export const withRouter = (
+const getHistory = (
   windowInternal: WindowInternal,
   CreateEventInternal: (event: string, params?: InitCustomEventParams) => CustomEvent,
   generateKeyInternal: typeof generateKey
-) => (Component: React.ComponentType) => (props: any) => {
-  const oidcHistory: ReactOidcHistory = {
+) => {
+  return {
     push: (url?: string | null, stateHistory?: WindowHistoryState): void => {
       const key = generateKeyInternal();
       const state = stateHistory || windowInternal.history.state;
@@ -66,6 +61,16 @@ export const withRouter = (
       windowInternal.dispatchEvent(CreateEventInternal('popstate'));
     }
   };
+};
+
+export const useHistory = () => getHistory(window, CreateEvent(window, document), generateKey);
+
+export const withRouter = (
+  windowInternal: WindowInternal,
+  CreateEventInternal: (event: string, params?: InitCustomEventParams) => CustomEvent,
+  generateKeyInternal: typeof generateKey
+) => (Component: React.ComponentType) => (props: any) => {
+  const oidcHistory: ReactOidcHistory = getHistory(windowInternal, CreateEventInternal, generateKeyInternal);
 
   const enhanceProps = {
     history: oidcHistory,

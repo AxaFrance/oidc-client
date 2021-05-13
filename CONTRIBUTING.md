@@ -8,7 +8,6 @@ To get started with the repository:
 git clone https://github.com/AxaGuilDEv/react-oidc.git
 cd react-oidc
 npm install
-npm run bootstrap
 ```
 
 ## Commands

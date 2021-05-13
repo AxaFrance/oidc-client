@@ -1,17 +1,26 @@
-# @axa-fr/react-oidc-context
+<H1> @axa-fr/react-oidc-context</H1>
 
-## About
+- [About](#about)
+- [Getting Started](#getting-started)
+  - [Application startup (index.js)](#application-startup-indexjs)
+  - [Polyfill](#polyfill)
+  - [How to consume : Hooks method (Pages/Dashboard/Dashboard.js)](#how-to-consume--hooks-method-pagesdashboarddashboardjs)
+  - [How to consume : react api context method (Layout/Header.js)](#how-to-consume--react-api-context-method-layoutheaderjs)
+  - [How to consume : HOC method (Layout/Header.js)](#how-to-consume--hoc-method-layoutheaderjs)
+  - [How to secure a component (Router/Routes.js)](#how-to-secure-a-component-routerroutesjs)
+- [Example](#example)
+# About
 
 Easy set up of OIDC for react and use the new react context api as state management.
 
-## Getting Started
+# Getting Started
 
 ```sh
 npm install @axa-fr/react-oidc-context --save
 
 ```
 
-### Application startup (index.js)
+## Application startup (index.js)
 
 The library is router agnostic and use native History API.
 
@@ -116,7 +125,7 @@ const configuration = {
 export default configuration;
 ```
 
-### Polyfill
+## Polyfill
 
 oidc-client needs some polyfills to works on Internet Explorer. You can use [core-js](https://github.com/zloirock/core-js) to help you. See [Context Sample](../../examples/context). In the sample we use some polyfills
 
@@ -140,7 +149,7 @@ import 'core-js/es/string/starts-with';
 import 'whatwg-fetch';
 ```
 
-### How to consume : Hooks method (Pages/Dashboard/Dashboard.js)
+## How to consume : Hooks method (Pages/Dashboard/Dashboard.js)
 
 "useReactOidc" returns all props from the Hook :
 
@@ -164,15 +173,25 @@ const Dashboard = () => {
 
 export default Dashboard;
 ```
+The Hook method exposes : 
+- isEnabled : used in provider to enable/disabled. You can get the value here.
+- oidcUser : user information (null if not authenticated)
+- logout: logout function
+- login: login function
+- signinSilent : silent login function 
+- events: returns events from oidc-client (see [oidc client section about events](https://github.com/IdentityModel/oidc-client-js/wiki#events))
 
-### How to consume : react api context method (Layout/Header.js)
+## How to consume : react api context method (Layout/Header.js)
 
 "AuthenticationContext" context contains all props you need
 
 - oidcUser : user information (null if not authenticated)
 - logout: logout function
 - login: login function
+- signinSilent : silent login function 
 - events: returns events from oidc-client (see [oidc client section about events](https://github.com/IdentityModel/oidc-client-js/wiki#events))
+- isEnabled : used in provider to enable/disabled. You can get the value here.
+
 
 ```javascript
 import React from 'react';
@@ -228,7 +247,7 @@ export default () => (
 );
 ```
 
-### How to consume : HOC method (Layout/Header.js)
+## How to consume : HOC method (Layout/Header.js)
 
 "withOidcUser" function act like "AuthenticationConsumer" below.
 "OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
@@ -249,7 +268,7 @@ const Admin = ({ oidcUser }) => (
 export default withOidcUser(Admin);
 ```
 
-### How to secure a component (Router/Routes.js)
+## How to secure a component (Router/Routes.js)
 
 "withOidcSecure" act the same as "OidcSecure" it also trigger authentication in case user is not authenticated.
 
@@ -273,6 +292,6 @@ const Routes = () => (
 export default Routes;
 ```
 
-## Example
+# Example
 
 - [`create react app & context`](../../examples/context)
