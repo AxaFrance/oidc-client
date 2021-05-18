@@ -1,7 +1,7 @@
 const configuration = {
-  client_id: "implicit",
+  client_id: "interactive.public",
   redirect_uri: "http://localhost:3000/authentication/callback",
-  response_type: "id_token token",
+  response_type: "code",
   post_logout_redirect_uri: "http://localhost:3000/",
   scope: "openid profile email",
   authority: "https://demo.identityserver.io",
