@@ -4,7 +4,7 @@ const configuration = {
     {
       origin: 'http://localhost:3000',
       config: {
-        client_id: 'spa',
+        client_id: 'interactive.public',
         redirect_uri: 'http://localhost:3000/authentication/callback',
         response_type: 'code',
         post_logout_redirect_uri: 'http://localhost:3000/',
@@ -19,7 +19,7 @@ const configuration = {
     {
       origin: 'http://127.0.0.1:3000',
       config: {
-        client_id: 'spa',
+        client_id: 'interactive.public',
         redirect_uri: 'http://127.0.0.1:3000/authentication/callback',
         response_type: 'code',
         post_logout_redirect_uri: 'https://127.0.0.1:3000/',
