@@ -46,6 +46,7 @@ const configuration = {
     silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
     automaticSilentRenew: true,
     loadUserInfo: true,
+    monitorSession: false, // set to true by default. this causes a signout after few seconds in chrome browser
   },
 };
 
@@ -53,11 +54,11 @@ const isEnabled = configuration.origin === document.location.origin;
 
 const Start = (
   <Provider store={store}>
-    <BrowserRouter>
-      <Oidc store={store} configuration={configuration.config} isEnabled={isEnabled}>
+    <Oidc store={store} configuration={configuration.config} isEnabled={isEnabled}>
+      <BrowserRouter>
         <App />
-      </Oidc>
-    </BrowserRouter>
+      </BrowserRouter>
+    </Oidc>
   </Provider>
 );
 

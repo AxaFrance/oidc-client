@@ -14,7 +14,8 @@ const configuration = {
         automaticSilentRenew: true,
         loadUserInfo: true,
         checkSessionInterval: 60,
-      }
+        monitorSession: false,
+      },
     },
     {
       origin: 'http://127.0.0.1:3000',
@@ -28,9 +29,10 @@ const configuration = {
         silent_redirect_uri: 'http://127.0.0.1:3000/authentication/silent_callback',
         automaticSilentRenew: true,
         loadUserInfo: true,
-      }
-    }
-  ]
+        monitorSession: false,
+      },
+    },
+  ],
 };
 
 export default configuration;

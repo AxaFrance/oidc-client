@@ -119,9 +119,9 @@ class App extends Component {
   render() {
     return (
       <Switch>
+        <Route exact path="/" component={Home} />
         <Route path="/protected1" component={oidcSecure(NotProtectedChild)} />
         <Route path="/protected2" component={ProtectedChild} />
-        <Route path="/" component={Home} />
       </Switch>
     );
   }

@@ -21,32 +21,25 @@ type AuthenticationLiveCycleProps = PropsWithChildren<{
 }>;
 
 const AuthenticationLiveCycle: FC<AuthenticationLiveCycleProps> = ({ location, oidc, children, history, authenticating }) => {
-  const { isLoadingUser, user } = oidc;
-  const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
-  const isLoading = isLoadingUser || isShouldAuthenticate;
+  const { user } = oidc;
+  const userRequireAuthentication = isRequireAuthentication(user);
   useEffect(() => {
-    if (isShouldAuthenticate) {
+    if (userRequireAuthentication) {
       const userManager = getUserManager();
       authenticateUser(userManager, location, history, user)();
     }
-  }, [isShouldAuthenticate, location, user]);
+  }, [userRequireAuthentication, location, user]);
 
   const AuthenticatingComponent: ComponentType = authenticating || DefaultAuthenticatingComponent;
 
-  return isLoading ? <AuthenticatingComponent /> : <>{children}</>;
+  return userRequireAuthentication ? <AuthenticatingComponent /> : <>{children}</>;
 };
 
 const mapStateToProps = (state: any) => ({
   oidc: state.oidc,
 });
 
-const oidcCompose = compose(
-  connect(
-    mapStateToProps,
-    null
-  ),
-  withRouter
-);
+const oidcCompose = compose(connect(mapStateToProps, null), withRouter);
 
 const Secure = oidcCompose(AuthenticationLiveCycle);
 
@@ -59,8 +52,8 @@ export const oidcSecure = (Component: ComponentType) => (props: any) => {
 };
 
 const propTypesOidcSecure = {
+  children: PropTypes.node.isRequired,
   isEnabled: PropTypes.bool,
-  children: PropTypes.node,
 };
 
 const defaultPropsOidcSecure = {
@@ -80,6 +73,7 @@ type OidcSecureProps = PropsWithChildren<{
 
 const OidcSecure: FC<OidcSecureProps> = props => {
   const { isEnabled, children, ...configProps } = props;
+
   if (isEnabled) {
     return <Secure {...configProps}>{children}</Secure>;
   }
