@@ -18,26 +18,24 @@ const isEnabled = configuration.isEnabled;
 if (configuration.configurations.length <= 0) {
   throw new Error(`No configuration found`);
 }
-const authenticationConfig = origin
-  ? configuration.configurations.find(m => m.origin === origin)
-  : configuration.configurations[0];
+const authenticationConfig = origin ? configuration.configurations.find(m => m.origin === origin) : configuration.configurations[0];
 if (!authenticationConfig) {
   throw new Error(`Configuration not found for origin ${origin}`);
 }
 
 const Start = (
   <Provider store={store}>
-    <Router>
-      <Oidc
-        store={store}
-        configuration={authenticationConfig.config}
-        isEnabled={isEnabled}
-        callbackComponentOverride={ComponentOverride}
-        UserStore={InMemoryWebStorage}
-      >
+    <Oidc
+      store={store}
+      configuration={authenticationConfig.config}
+      isEnabled={isEnabled}
+      callbackComponentOverride={ComponentOverride}
+      UserStore={InMemoryWebStorage}
+    >
+      <Router>
         <App />
-      </Oidc>
-    </Router>
+      </Router>
+    </Oidc>
   </Provider>
 );
 

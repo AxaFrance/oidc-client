@@ -1,13 +1,7 @@
-import React, { ComponentType, FC, PropsWithChildren } from 'react';
-import { OidcProvider, loadUser } from 'redux-oidc';
+import { authenticationService, configurationPropTypes, OidcRoutes, UserStoreType } from '@axa-fr/react-oidc-core';
 import PropTypes from 'prop-types';
-import {
-  OidcRoutes,
-  authenticationService,
-  getUserManager,
-  configurationPropTypes,
-  UserStoreType,
-} from '@axa-fr/react-oidc-core';
+import React, { ComponentType, FC, PropsWithChildren } from 'react';
+import { OidcProvider } from 'redux-oidc';
 import AuthenticationCallback from './AuthenticationCallback';
 
 const propTypes = {
@@ -18,7 +12,6 @@ const propTypes = {
   // eslint-disable-next-line react/require-default-props
   configuration: configurationPropTypes,
   store: PropTypes.object.isRequired,
-  isEnabled: PropTypes.bool,
   children: PropTypes.node,
   UserStore: PropTypes.func,
 };
@@ -28,7 +21,6 @@ const defaultPropsObject: Partial<OidcBaseProps> = {
   notAuthorized: null,
   callbackComponentOverride: null,
   sessionLostComponent: null,
-  isEnabled: true,
   children: null,
   UserStore: null,
 };
@@ -39,7 +31,6 @@ const withComponentOverrideProps = (Component: ComponentType, customProps: any) 
 
 export const OidcBaseInternal = (props: any) => {
   const {
-    isEnabled,
     children,
     store,
     callbackComponentOverride,
@@ -48,43 +39,27 @@ export const OidcBaseInternal = (props: any) => {
     notAuthorized,
     sessionLostComponent,
     UserStore,
-    loadUserInternal,
     authenticationServiceInternal,
   } = props;
 
-  const [ready, setReady] = React.useState(false);
-
-  React.useEffect(() => {
-    if (isEnabled) {
-      const userManager = authenticationServiceInternal(configuration, UserStore);
-      loadUserInternal(store, userManager);
-      setReady(true);
-    }
-  }, [UserStore, configuration, isEnabled, store, loadUserInternal, authenticationServiceInternal]);
-
-  return ready ? (
+  const getUserManager = () => authenticationServiceInternal(configuration, UserStore);
+  return (
     <OidcProvider store={store} userManager={getUserManager()}>
       <OidcRoutes
         configuration={configuration}
         notAuthenticated={notAuthenticated}
         notAuthorized={notAuthorized}
         sessionLost={sessionLostComponent}
-        callbackComponent={withComponentOverrideProps(
-          AuthenticationCallback,
-          callbackComponentOverride
-        )}
+        callbackComponent={withComponentOverrideProps(AuthenticationCallback, callbackComponentOverride)}
       >
         {children}
       </OidcRoutes>
     </OidcProvider>
-  ) : (
-    <>{children}</>
   );
 };
 
 OidcBaseInternal.propTypes = {
   ...propTypes,
-  loadUserInternal: PropTypes.func.isRequired,
   authenticationServiceInternal: PropTypes.func.isRequired,
 };
 
@@ -95,17 +70,10 @@ type OidcBaseProps = PropsWithChildren<{
   sessionLostComponent?: ComponentType | null;
   configuration: any;
   store: any;
-  isEnabled: boolean;
   UserStore: UserStoreType;
 }>;
 
-const OidcBase: FC<OidcBaseProps> = props => (
-  <OidcBaseInternal
-    loadUserInternal={loadUser}
-    authenticationServiceInternal={authenticationService}
-    {...props}
-  />
-);
+const OidcBase: FC<OidcBaseProps> = props => <OidcBaseInternal authenticationServiceInternal={authenticationService} {...props} />;
 
 // @ts-ignore
 OidcBase.propTypes = propTypes;
