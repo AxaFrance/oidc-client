@@ -1,6 +1,21 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.1.7](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.6...v3.1.7)
+> 17 June 2021
+- feat: add signinSilent to useReactOidc and AuthenticationContext [`#578`](https://github.com/AxaGuilDEv/react-oidc/pull/578) by Olivier YOUF
+- ci: add dependabot config file and change prefix to `build(npm)` [`#561`](https://github.com/AxaGuilDEv/react-oidc/pull/561) by Olivier YOUF
+- feat:unload userManager when unnmount oidc provider [`#547`](https://github.com/AxaGuilDEv/react-oidc/pull/547) by Olivier YOUF
+- feat(context-fetch/fetch-core): removing recompose [`#530`](https://github.com/AxaGuilDEv/react-oidc/pull/530) by Olivier YOUF
+- chore(deps): bump example dependencies [`80ccc10`](https://github.com/AxaGuilDEv/react-oidc/commit/80ccc10c5cb33df891365c896b81b8eb1d5e46c5) by Julien Foratier 
+- fix: create usermanager before rendering + some refacto [`16cb26d`](https://github.com/AxaGuilDEv/react-oidc/commit/16cb26d057e50037b7ee04f32319f02a92ae72cd) by Amine JELTI 
+- chore(release): publish v3.1.7 ***NO_CI*** [`8b5cb40`](https://github.com/AxaGuilDEv/react-oidc/commit/8b5cb405d5735bacd24318c9fe0de1736b98712e) by Build-CI 
+- chore(deps): [security] bump handlebars from 4.4.2 to 4.7.6 [`c785f2d`](https://github.com/AxaGuilDEv/react-oidc/commit/c785f2d6cd92d9380c0c3ec99e01bb61f7ec2fcd) by dependabot-preview[bot] 
+- chore(deps): [security] bump ini from 1.3.5 to 1.3.8 [`c978517`](https://github.com/AxaGuilDEv/react-oidc/commit/c9785176ccd4c1cd3777f8e6e12e3535a37e7aa6) by dependabot-preview[bot] 
+- fix(examples): replace https://demo.identityserver.io deprecated configuration [`ebe9e79`](https://github.com/AxaGuilDEv/react-oidc/commit/ebe9e79465f52323626b2ac94b333e8d51987999) by Julien Foratier 
+- docs(changelog) update to new 3.1.6 [`8cfbc7c`](https://github.com/AxaGuilDEv/react-oidc/commit/8cfbc7c6111444a156c5bddcad253c0366e6f38c) by Build-CI 
+- chore(deps): [security] bump lodash from 4.17.15 to 4.17.20 [`124a9ca`](https://github.com/AxaGuilDEv/react-oidc/commit/124a9ca777135382695f2873253f076bf4f7434a) by dependabot-preview[bot] 
+
 #### [v3.1.6](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.5...v3.1.6)
 > 13 October 2020
 - feat(context): Allowing hooking into the oidc-client events in the AuthenticationProvider [`#415`](https://github.com/AxaGuilDEv/react-oidc/issues/415) by Michael Wolfenden
