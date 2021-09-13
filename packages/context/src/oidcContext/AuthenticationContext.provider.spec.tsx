@@ -86,7 +86,8 @@ const propsMocks = {
   },
   authenticateUserInt: jest.fn(() => () => {}),
   logoutUserInt: jest.fn(),
-  setUserManagerInt : jest.fn()
+  setUserManagerInt : jest.fn(),
+  setBaseRouteInt: jest.fn(),
 };
 
 const getWrapper = props => ({ children }) => <AuthenticationProviderInt {...props}>{children}</AuthenticationProviderInt>;

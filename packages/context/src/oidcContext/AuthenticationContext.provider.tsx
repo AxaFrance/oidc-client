@@ -14,6 +14,7 @@ import {
   authenticateUser,
   logoutUser,
   setUserManager,
+  setBaseRoute,
 } from '@axa-fr/react-oidc-core';
 
 import { Callback } from '../Callback';
@@ -35,6 +36,7 @@ type AuthenticationProviderIntProps = PropsWithChildren<{
   UserStore: UserStoreType;
   isEnabled?: boolean;
   configuration: UserManagerSettings;
+  baseRoute?: string;
   authenticationServiceInt: typeof authenticationService;
   CallbackInt: typeof Callback;
   setLoggerInt: typeof setLogger;
@@ -44,6 +46,7 @@ type AuthenticationProviderIntProps = PropsWithChildren<{
   logoutUserInt: typeof logoutUser;
   customEvents: CustomEvents;
   setUserManagerInt: typeof setUserManager;
+  setBaseRouteInt: typeof setBaseRoute;
 }>;
 
 const propTypes = {
@@ -105,6 +108,7 @@ export const AuthenticationProviderInt = ({
   callbackComponentOverride,
   children,
   customEvents,
+  baseRoute,
   // Injected
   authenticationServiceInt,
   CallbackInt,
@@ -114,6 +118,7 @@ export const AuthenticationProviderInt = ({
   authenticateUserInt,
   logoutUserInt,
   setUserManagerInt,
+  setBaseRouteInt,
 }: AuthenticationProviderIntProps) => {
   const userManager = authenticationServiceInt(configuration, UserStore);
   const { oidcState, loadUser, onError, onLoading, unloadUser, onLogout } = useAuthenticationContextState(userManager);
@@ -122,6 +127,7 @@ export const AuthenticationProviderInt = ({
 
   useEffect(() => {
     onLoading();
+    setBaseRouteInt(baseRoute);
     setLoggerInt(loggerLevel, logger);
     addOidcEvents();
     let mount = true;
@@ -209,6 +215,7 @@ const AuthenticationProvider: ComponentType<Partial<AuthenticationProviderProps>
     authenticateUserInt: authenticateUser,
     logoutUserInt: logoutUser,
     setUserManagerInt: setUserManager,
+    setBaseRouteInt: setBaseRoute,
   })
 );
 // @ts-ignore

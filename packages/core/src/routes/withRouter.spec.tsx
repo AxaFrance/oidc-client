@@ -5,6 +5,8 @@ import { withRouter, CreateEvent, WindowInternal } from './withRouter';
 
 describe('WithRouter test Suite', () => {
   const generateKeyMock = () => '123ABC';
+  const getBaseRouteMock = () => '/base';
+
   const paramsMock = { bubbles: false, cancelable: false, detail: 'detail' };
   beforeEach(() => {});
   it('should CreateEvent return correct Event if not on IE', () => {
@@ -65,13 +67,14 @@ describe('WithRouter test Suite', () => {
     const NewComp = withRouter(
       (windowMock as unknown) as WindowInternal,
       createEvent,
-      generateKeyMock
+      generateKeyMock,
+      getBaseRouteMock
     )(Component);
     const { asFragment } = render(<NewComp />);
     expect(windowMock.history.pushState).toHaveBeenCalledWith(
       { key: '123ABC', state: 'state' },
       null,
-      '/url/page'
+      '/base/url/page'
     );
     expect(asFragment()).toMatchSnapshot();
   });

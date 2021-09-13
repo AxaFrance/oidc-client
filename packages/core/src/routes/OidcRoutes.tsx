@@ -4,6 +4,7 @@ import { UserManagerSettings } from 'oidc-client';
 import { NotAuthenticated, NotAuthorized, SessionLost } from '../default-component';
 import { getPath } from './route-utils';
 import { SilentCallback } from '../callbacks';
+import { getBaseRoute } from '../services';
 
 const propTypes = {
   notAuthenticated: PropTypes.elementType,
@@ -51,17 +52,18 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   const SessionLostComponent = sessionLost || SessionLost;
   const silentCallbackPath = getPath(configuration.silent_redirect_uri);
   const callbackPath = getPath(configuration.redirect_uri);
+  const baseRoute = getBaseRoute();
 
   switch (path) {
     case callbackPath:
       return <CallbackComponent />;
     case silentCallbackPath:
       return <SilentCallback />;
-    case '/authentication/not-authenticated':
+    case `${baseRoute}/authentication/not-authenticated`:
       return <NotAuthenticatedComponent />;
-    case '/authentication/not-authorized':
+    case `${baseRoute}/authentication/not-authorized`:
       return <NotAuthorizedComponent />;
-    case '/authentication/session-lost':
+    case `${baseRoute}/authentication/session-lost`:
       return <SessionLostComponent />;
     default:
       return <>{children}</>;

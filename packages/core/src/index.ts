@@ -14,4 +14,5 @@ export {
   InMemoryWebStorage,
   UserStoreType,
   setUserManager,
+  setBaseRoute,
 } from './services';
