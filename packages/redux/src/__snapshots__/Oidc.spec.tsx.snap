@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`redux.Oidc Render <OidcBaseInternal/> correctly 1`] = `
-<DocumentFragment>
-  <p>
-    Render Something
-  </p>
-</DocumentFragment>
-`;
