@@ -9,6 +9,10 @@
     "type": "git",
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "keywords": [
     "oidc",
     "context-api",

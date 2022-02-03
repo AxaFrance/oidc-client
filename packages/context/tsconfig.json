@@ -24,7 +24,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src"],
+  "include": ["src/oidc"],
   "exclude": [
     "node_modules",
     "**/*.spec.ts",
