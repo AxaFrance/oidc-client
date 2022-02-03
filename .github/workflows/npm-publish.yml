@@ -20,9 +20,9 @@ jobs:
           
       - name: npm ci
         run: npm ci
-        working-directory: ./package/context
+        working-directory: /package/context
 
       - name: npm prepare
         run: npm run prepare
-        working-directory: ./package/context
+        working-directory: /package/context
 
