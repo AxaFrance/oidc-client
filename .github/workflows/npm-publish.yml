@@ -32,5 +32,5 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/context/package.json
-          #dry-run: true
+          dry-run: true
 

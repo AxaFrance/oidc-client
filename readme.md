@@ -18,42 +18,34 @@
 - [How It Works](#how-it-works)
 - Packages
   - [`@axa-fr/react-oidc-context`](./packages/context#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context)
-  - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch)
-  - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux)
-  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch)
-  - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable)
   - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc)
+  - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch) **Deprecated in v4**
+  - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4**
+  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4**
+  - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
 - [Concepts](#concepts)
 - [Contribute](#contribute)
 
 ## About
 
 These components is used to manage client authentication.
-It uses the libraries ["oidc client"](https://github.com/IdentityModel/oidc-client-js).
+It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS).
 
-Two version of the component with different "State management" are available :
-
-- with redux
-- with react context api
+In the v4 we have chosen to remove a lot the surface API in order to simplify usage.
+It prepare the comming V5 version which will hide tokens in a ServiceWorker (for more security secure).
 
 ## Getting Started
 
 - [`@axa-fr/react-oidc-context`](./packages/context#readme)
-- [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme)
-- [`@axa-fr/react-oidc-redux`](./packages/redux#readme)
-- [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme)
-- [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme)
 - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme)
 
-## Examples
+## Example
 
-- [`create react app & context api`](./examples/context)
-- [`create react app & redux`](./examples/redux)
-- [`create react app & vanilla`](./examples/vanilla)
+- [`create react app & context api`](./packages/context)
 
 ## How It Works
 
-These components encapsulate the use of "oidc client" in order to hide workfow complexity.
+These components encapsulate the use of "AppAuth-JS" in order to hide workfow complexity.
 Internally, native History API is used to be router library agnostic.
 
 ## Concept

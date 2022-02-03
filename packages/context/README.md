@@ -27,9 +27,6 @@ The library is router agnostic and use native History API.
 The default routes used internally :
 
 - www.your-app.fr/authentication/callback
-- www.your-app.fr/authentication/silent_callback
-- www.your-app.fr/authentication/not-authenticated
-- www.your-app.fr/authentication/not-authorized
 
 ```javascript
 import React from 'react';
@@ -42,12 +39,12 @@ import oidcConfiguration from './configuration';
 
 const App = () => (
   <div>
-    <Router>
-      <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
+    <AuthenticationProvider configuration={oidcConfiguration} >
+      <Router>
         <Header />
         <Routes />
-      </AuthenticationProvider>
-    </Router>
+      </Router>
+    </AuthenticationProvider>
   </div>
 );
 
@@ -66,87 +63,24 @@ const propTypes = {
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
     redirect_uri: PropTypes.string.isRequired,
-    response_type: PropTypes.string.isRequired,
     scope: PropTypes.string.isRequired,
     authority: PropTypes.string.isRequired,
-    silent_redirect_uri: PropTypes.string.isRequired,
-    automaticSilentRenew: PropTypes.bool, //optional, by default to true
-    loadUserInfo: PropTypes.bool, //optional, by default to true
-    post_logout_redirect_uri: PropTypes.string, // optional
-    metadata: PropTypes.shape({
-      issuer: PropTypes.string,
-      jwks_uri: PropTypes.string,
-      authorization_endpoint: PropTypes.string,
-      token_endpoint: PropTypes.string,
-      userinfo_endpoint: PropTypes.string,
-      end_session_endpoint: PropTypes.string,
-      revocation_endpoint: PropTypes.string,
-      introspection_endpoint: PropTypes.string,
-    }),
-  }).isRequired,
-  isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
-  loggerLevel: PropTypes.number,
-  logger: PropTypes.shape({
-    info: PropTypes.func.isRequired,
-    warn: PropTypes.func.isRequired,
-    error: PropTypes.func.isRequired,
-    debug: PropTypes.func.isRequired,
-  }),
-  UserStore: PropTypes.func,
+  }).isRequired
 };
 ```
 
-Through the UserStore you can specify a class that can be used to store the user object. This class must define :
-
-```javascript
-  getItem(key: string): any;
-  setItem(key: string, value: any): any;
-  removeItem(key: string): any;
-  key(index: number): any;
-  length?: number;
-```
-It could also be window.localStorage or window.sessionStorage. By default, without any userStore, the sessionStorage will be used.
-
-See below a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
+See below a sample of configuration :
 
 ```javascript
 const configuration = {
   client_id: 'implicit',
   redirect_uri: 'http://localhost:3000/authentication/callback',
-  response_type: 'id_token token',
   post_logout_redirect_uri: 'http://localhost:3000/',
   scope: 'openid profile email',
   authority: 'https://demo.identityserver.io',
-  silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
-  automaticSilentRenew: true,
-  loadUserInfo: true,
 };
 
 export default configuration;
-```
-
-## Polyfill
-
-oidc-client needs some polyfills to works on Internet Explorer. You can use [core-js](https://github.com/zloirock/core-js) to help you. See [Context Sample](../../examples/context). In the sample we use some polyfills
-
-```javascript
-import 'core-js/es/array/from';
-import 'core-js/es/array/find';
-import 'core-js/es/array/includes';
-import 'core-js/es/array/find-index';
-import 'core-js/es/array/map';
-
-import 'core-js/es/object/assign';
-
-import 'core-js/es/promise';
-import 'core-js/es/map';
-
-import 'core-js/es/string/repeat';
-import 'core-js/es/string/pad-start';
-import 'core-js/es/string/pad-end';
-import 'core-js/es/string/starts-with';
-
-import 'whatwg-fetch';
 ```
 
 ## How to consume : Hooks method (Pages/Dashboard/Dashboard.js)
