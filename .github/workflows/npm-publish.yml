@@ -11,6 +11,7 @@ on:
 
 jobs:
   build:
+    environment: react-oidc
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,9 +21,16 @@ jobs:
           
       - name: npm ci
         run: npm ci
-        working-directory: /package/context
+        working-directory: ./packages/context
 
       - name: npm prepare
         run: npm run prepare
-        working-directory: /package/context
+        working-directory: ./packages/context
+        
+      - id: publish
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/context/package.json
+          dry-run: true
 
