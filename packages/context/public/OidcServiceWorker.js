@@ -38,15 +38,17 @@ const handleFetch = async (event) => {
     
     if(originalRequest.url.startsWith(refreshTokenUrl)) {
         if (tokens != null) {
-            const actualBody = await event.request.json()
-            console.log("actualBody")
-            console.log(actualBody)
-            const newRequest = new Request(originalRequest, {
-                body: {...actualBody, refreshToken: tokens.refreshToken},
-                headers: {
-                    ...originalRequest.headers,
-                    authorization: "Bearer " + tokens.access_token
-                }
+            const newRequest = event.request.text().then(actualBody => {
+                console.log("actualBody")
+                console.log(actualBody)
+                const newBody = actualBody.replace('%24(refresh_token)', tokens.refreshToken)
+                return new Request(originalRequest, {
+                    body: newBody,
+                    headers: {
+                        ...originalRequest.headers,
+                        authorization: "Bearer " + tokens.access_token
+                    }
+                });
             });
             event.waitUntil(event.respondWith(fetch(newRequest)));
         } else {
