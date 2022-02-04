@@ -38,7 +38,11 @@ const handleFetch = async (event) => {
     
     if(originalRequest.url.startsWith(refreshTokenUrl)) {
         if (tokens != null) {
+            const actualBody = await event.request.json()
+            console.log("actualBody")
+            console.log(actualBody)
             const newRequest = new Request(originalRequest, {
+                body: {...actualBody, refreshToken: tokens.refreshToken},
                 headers: {
                     ...originalRequest.headers,
                     authorization: "Bearer " + tokens.access_token
@@ -67,3 +71,11 @@ const handleFetch = async (event) => {
 self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
+
+
+addEventListener('message', event => {
+    // event is an ExtendableMessageEvent object
+    console.log(`The client sent me a message: ${event.data}`);
+
+    event.source.postMessage("Hi client");
+});

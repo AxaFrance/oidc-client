@@ -5,7 +5,7 @@ import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
+/*
 (async () => {
     const registration = await navigator.serviceWorker.register('/OidcServiceWorker.js');
 
@@ -21,4 +21,4 @@ ReactDOM.render(<App />, document.getElementById('root'));
     window.addEventListener('beforeunload', async () => {
         await registration.unregister();
     });
-})();
+})();*/

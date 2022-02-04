@@ -26,7 +26,7 @@ type SessionLostContainerProps = {
 };
 
 export const SessionLostContainer: FC<SessionLostContainerProps> = () => {
-  const {getOidc} = useContext(OidcContext);
+  const { getOidc } = useContext(OidcContext);
 
   const login = (callbackPath=undefined) => {
     return getOidc().redirectAsync(callbackPath);
