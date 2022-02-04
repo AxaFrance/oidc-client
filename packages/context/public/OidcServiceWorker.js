@@ -41,7 +41,7 @@ const handleFetch = async (event) => {
             const newRequest = event.request.text().then(actualBody => {
                 console.log("actualBody")
                 console.log(actualBody)
-                const newBody = actualBody.replace('%24(refresh_token)', tokens.refreshToken)
+                const newBody = actualBody.replace('%24(refresh_token)', tokens.refresh_token)
                 return new Request(originalRequest, {
                     body: newBody,
                     headers: {
