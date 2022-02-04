@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { Home } from "./Home";
 import {Profile, SecureProfile} from "./Profile";
 import configuration from './configuration';
-import {withOidcSecure,OidcProvider} from "./oidc";
+import {withOidcSecure,AuthenticationProvider} from "./oidc";
 
 function App() {
 
   return (
-    <OidcProvider configuration={configuration}>
+    <AuthenticationProvider configuration={configuration}>
       <Router>
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
           <a className="navbar-brand" href="/">@axa-fr/react-oidc-context</a>
@@ -37,7 +37,7 @@ function App() {
           <Route exact path="/profile-secure-hoc" component={withOidcSecure(Profile)} />
         </div>
       </Router>
-    </OidcProvider>
+    </AuthenticationProvider>
   );
 }
 

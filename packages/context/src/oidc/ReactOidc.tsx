@@ -1,6 +1,6 @@
-﻿﻿﻿import React, {useContext, useEffect, useState} from 'react';
+﻿import React, {useContext, useEffect, useState} from 'react';
 import {OidcContext} from "./OidcProvider";
-import Oidc from "./oidc";
+import Oidc from "./vanilla/oidc";
 
 export const useReactOidc =() =>{
     const {getOidc} = useContext(OidcContext);
@@ -19,12 +19,12 @@ export const useReactOidcAccessToken =() =>{
     
     useEffect(() => {
         const oidc = getOidc();
-        if(getOidc().tokens != null)
+        if(getOidc().tokens != null) {
             setAccessToken(getOidc().tokens.accessToken);
+        }
         oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired){
-            
             if(getOidc().tokens != null)
                 setAccessToken(getOidc().tokens.accessToken);
             } 

@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import Oidc from './oidc';
+import Oidc from './vanilla/oidc';
 import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost} from './core/default-component/index';
 

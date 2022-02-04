@@ -169,7 +169,7 @@ class Oidc {
     }
 
     async loginAsync(callbackPath=undefined) {
-        try{
+        try {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
             const state = url 
@@ -185,10 +185,10 @@ class Oidc {
                         state,
                     });
                     authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
-            }catch(exception){
+        } catch(exception){
                 this.publishEvent(eventNames.loginAsync_error, exception);
                 throw exception;
-            }
+        }
     }
 
     async loginCallbackAsync() {
@@ -266,11 +266,10 @@ class Oidc {
             console.log(token_response)
             this.publishEvent(eventNames.refreshTokensAsync_end, {});
             return token_response;
-        } catch(exception){
+        } catch(exception) {
             this.publishEvent(eventNames.refreshTokensAsync_error, {});
             throw exception;
         }
-
      }
      
      loginCallbackWithAutoTokensRenewAsync():Promise<string>{

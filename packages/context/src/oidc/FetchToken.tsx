@@ -1,14 +1,10 @@
-import {OidcSecure} from "./OidcSecure";
 import React from 'react';
-import Oidc from "./oidc";
-import {useReactOidcUser} from "./User";
 import {useReactOidcAccessToken} from "./ReactOidc";
 
 type Fetch = typeof window.fetch;
 interface ComponentWithFetchProps {
   fetch: Fetch;
 }
-
 
 export const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => string | null) => async (
     url: RequestInfo,
@@ -36,9 +32,6 @@ export const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => strin
   const newOptions = { ...optionTmp, headers };
   return await fetch(url, newOptions);
 };
-
-
-
 
 export const withFetchToken = (fetch) => (props: ComponentWithFetchProps) => (
     WrappedComponent
