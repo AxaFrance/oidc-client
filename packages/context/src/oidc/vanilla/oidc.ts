@@ -9,9 +9,9 @@ import {
     FetchRequestor, LocalStorageBackend, DefaultCrypto
 } from '@openid/appauth';
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
-import {initAsync} from './initWorker'
+//import {initAsync} from './initWorker'
 
-initAsync("/OidcServiceWorker.js")
+//initAsync("/OidcServiceWorker.js")
 /*
 
  class MemoryStorageBackend {
