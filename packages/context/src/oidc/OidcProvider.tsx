@@ -30,8 +30,12 @@ sessionLostComponent }) => {
     const [event, setEvent] = useState(defaultEventState);
 
     useEffect(() => {
+        let isMounted = true;
         const oidc = getOidc();
         oidc.subscriveEvents((name, data) => {
+            if(!isMounted){
+                return;
+            }
             setEvent({name, data});
            if(name == Oidc.eventNames.loginAsync_begin 
                || name == Oidc.eventNames.loginCallbackAsync_end
@@ -45,7 +49,10 @@ sessionLostComponent }) => {
         });
         
         setLoading(false);
-        return () => getOidc().destroy();
+        return () => {
+            getOidc().destroy();
+            isMounted = false;
+        }
     }, []);
 
     switch(event.name){

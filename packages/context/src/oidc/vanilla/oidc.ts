@@ -138,7 +138,7 @@ class Oidc {
       this.initAsync.bind(this);
       this.loginCallbackAsync.bind(this);
       this.subscriveEvents.bind(this);
-      this.removeEvent.bind(this);
+      this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroy.bind(this);
     }
@@ -149,7 +149,7 @@ class Oidc {
         return id;
     }
 
-    removeEvent(id){
+    removeEventSubscription(id){
         const event = this.events.find(e => e.id === id);
         const index =this.events.indexOf(event);
         if(index >=0){
@@ -287,6 +287,7 @@ class Oidc {
      destroy(){
          this.tokens = null;
          this.userInfo = null;
+         this.events = [];
          window.clearTimeout(this.timeoutId);
      }
      

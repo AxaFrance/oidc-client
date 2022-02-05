@@ -13,6 +13,7 @@ export const initAsync = async(serviceWorkerRelativeUrl, isKeepServiceWorkerAliv
     }
     catch(err) {
         console.error('[OidcServiceWorker] error registering:', err)
+        return null;
     }
 
     window.addEventListener('beforeunload', async () => {

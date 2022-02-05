@@ -18,18 +18,24 @@ export const useReactOidcAccessToken =() =>{
     const [accessToken, setAccessToken] = useState<string>(null);
     
     useEffect(() => {
+        let isMounted = true;
         const oidc = getOidc();
         if(getOidc().tokens != null) {
             setAccessToken(getOidc().tokens.accessToken);
         }
-        oidc.subscriveEvents((name, data) => {
+        const subscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired){
-            if(getOidc().tokens != null)
-                setAccessToken(getOidc().tokens.accessToken);
+                if(getOidc().tokens != null && isMounted) {
+                    setAccessToken(getOidc().tokens.accessToken);
+                }
             } 
             
         });
+        return  () => { 
+            isMounted = false;
+            oidc.removeEventSubscription(subscriptionId);
+        };
     }, []);
     return {accessToken};
 }
