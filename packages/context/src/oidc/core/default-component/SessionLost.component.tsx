@@ -13,9 +13,6 @@ export const SessionLost: FC<SessionLostProps> = ({ login }) => (
       <p className="oidc-session-lost__content">
         Votre session est expirée. Veuillez vous ré-authentifier.
       </p>
-      <button className="oidc-session-lost__button" type="button" onClick={login}>
-        Ré-authentifier
-      </button>
     </div>
   </div>
 );
@@ -26,12 +23,7 @@ type SessionLostContainerProps = {
 };
 
 export const SessionLostContainer: FC<SessionLostContainerProps> = () => {
-  const { getOidc } = useContext(OidcContext);
-
-  const login = (callbackPath=undefined) => {
-    return getOidc().redirectAsync(callbackPath);
-  };
-  return <SessionLost login={login} />;
+  return <SessionLost />;
 };
 
 export default withCustomRouter(SessionLostContainer);
