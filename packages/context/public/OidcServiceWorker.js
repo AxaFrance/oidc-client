@@ -17,6 +17,23 @@ const domainsToSendTokens = [
 
 const refreshTokenUrl = "https://demo.identityserver.io/connect/token";
 
+function hideTokens() {
+    return async (response) => {
+        console.log('response: ', response);
+        tokens = await response.json()
+        console.log('response.body: ', tokens);
+
+        const secureTokens = {
+            ...tokens,
+            access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
+            refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER"
+        };
+        const body = JSON.stringify(secureTokens)
+        const newResponse = new Response(body, response)
+        return newResponse;
+    };
+}
+
 const handleFetch = async (event) => {
     const originalRequest = event.request;
     console.log('request: ', originalRequest);
@@ -38,19 +55,7 @@ const handleFetch = async (event) => {
     
     if(originalRequest.url.startsWith(refreshTokenUrl)) {
         if (tokens != null) {
-            /*const newRequest = originalRequest.text().then(actualBody => {
-                console.log("actualBody")
-                console.log(actualBody)
-                const newBody = actualBody.replace('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER', tokens.refresh_token)
-                return new Request(originalRequest, {
-                    body: newBody,
-                    headers: {
-                        ...originalRequest.headers,
-                    }
-                });
-            });
-            event.waitUntil(event.respondWith(fetch(originalRequest)));*/
-            const newfecth =originalRequest.text().then(actualBody => {
+            const response =originalRequest.text().then(actualBody => {
                 console.log("actualBody")
                 console.log(actualBody)
                 const newBody = actualBody.replace('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER', encodeURIComponent(tokens.refresh_token))
@@ -67,20 +72,11 @@ const handleFetch = async (event) => {
                     referrer: originalRequest.referrer,
                     credentials: originalRequest.credentials,
                     integrity: originalRequest.integrity
-                });
+                }).then(hideTokens());
             });
-            event.waitUntil(event.respondWith(newfecth));
+            event.waitUntil(event.respondWith(response));
         } else {
-            const response = fetch(event.request).then(async (response) => {
-                console.log('response: ', response);
-                tokens = await response.json()
-                console.log('response.body: ', tokens);
-
-                const secureTokens = {...tokens, access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER", refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER"};
-                const body = JSON.stringify(secureTokens)
-                const newResponse = new Response(body, response)
-                return newResponse;
-            });
+            const response = fetch(event.request).then(hideTokens());
             event.waitUntil(event.respondWith(response));
 
 
