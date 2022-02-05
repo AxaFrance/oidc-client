@@ -48,6 +48,8 @@ export type Configuration = {
     redirect_uri: string,
     scope: string,
     authority: string,
+    refresh_time_before_tokens_expiration_in_second?: number,
+    service_worker_relative_url?:string,
 };
 
 const oidcDatabase = {};
@@ -69,12 +71,13 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     return response.state;
 }
 const autoRenewTokensAsync = async (oidc,refreshToken, intervalSeconds) =>{
+    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 20;
     return setTimeout(async () => {
         const tokens = await oidc.refreshTokensAsync(refreshToken);
         oidc.tokens = tokens;
         oidc.publishEvent(Oidc.eventNames.token_renewed, {});
         oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
-      }, (intervalSeconds- 20) *1000);
+      }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
 }
 
 const userInfoAsync = async (oidc)=> {

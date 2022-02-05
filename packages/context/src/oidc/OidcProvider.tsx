@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, {ComponentType, createContext, useEffect, useState} from 'react';
 import Oidc from './vanilla/oidc';
 import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost} from './core/default-component/index';
@@ -19,7 +19,8 @@ export const withOidc = Component => props => (
 
 const defaultEventState = {name:"", data:null};
 
-export const OidcProvider = ({ children, configuration, configurationName = "default" }) => {
+export const OidcProvider = ({ children, configuration, configurationName = "default", callbackSuccessComponent, callbackErrorComponent,
+sessionLostComponent }) => {
     
     const getOidc =() => {
         return Oidc.getOrCreate(configuration, configurationName);
@@ -60,13 +61,14 @@ export const OidcProvider = ({ children, configuration, configurationName = "def
                     {loading ? (
                         <span>Loading</span>
                     ) : (
-                      
                             <OidcContext.Provider value={oidcState}>
-                                  <OidcRoutes redirect_uri={configuration.redirect_uri}>
+                                  <OidcRoutes redirect_uri={configuration.redirect_uri} 
+                                              callbackSuccessComponent={callbackSuccessComponent} 
+                                              callbackErrorComponent={callbackErrorComponent}
+                                                sessionLostComponent={sessionLostComponent} >
                                       {children}
                                 </OidcRoutes>
                             </OidcContext.Provider>
-                       
                     )}
                 </>
             );

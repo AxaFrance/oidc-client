@@ -1,6 +1,11 @@
 ﻿
-export const initAsync = async(workerRelativeUrl) => {
-    const registration = await navigator.serviceWorker.register(workerRelativeUrl);
+export const initAsync = async(serviceWorkerRelativeUrl, isKeepServiceWorkerAlive= () => false) => {
+    
+    if(!navigator.serviceWorker){
+        return null;
+    }
+    
+    const registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
 
     try {
         await navigator.serviceWorker.ready
@@ -12,7 +17,9 @@ export const initAsync = async(workerRelativeUrl) => {
 
     window.addEventListener('beforeunload', async () => {
        // @ts-ignore
-        await registration.unregister();
+        if(!isKeepServiceWorkerAlive()){
+            await registration.unregister();
+        }
     });
 
     navigator.serviceWorker.addEventListener('message', event => {
