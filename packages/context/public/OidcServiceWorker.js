@@ -10,6 +10,7 @@ const handleActivate = () => {
 };
 
 let tokens = null;
+let items = [];
 
 const domainsToSendTokens = [
     "https://demo.identityserver.io/connect/userinfo",
@@ -19,9 +20,9 @@ const refreshTokenUrl = "https://demo.identityserver.io/connect/token";
 
 function hideTokens() {
     return async (response) => {
-        console.log('response: ', response);
+        //console.log('response: ', response);
         tokens = await response.json()
-        console.log('response.body: ', tokens);
+        //console.log('response.body: ', tokens);
 
         const secureTokens = {
             ...tokens,
@@ -36,7 +37,6 @@ function hideTokens() {
 
 const handleFetch = async (event) => {
     const originalRequest = event.request;
-    console.log('request: ', originalRequest);
     domainsToSendTokens.forEach(domain => {
         if(originalRequest.url.startsWith(domain)) {
             const newRequest =new Request(originalRequest, {
@@ -56,8 +56,6 @@ const handleFetch = async (event) => {
     if(originalRequest.url.startsWith(refreshTokenUrl)) {
         if (tokens != null) {
             const response =originalRequest.text().then(actualBody => {
-                console.log("actualBody")
-                console.log(actualBody)
                 const newBody = actualBody.replace('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER', encodeURIComponent(tokens.refresh_token))
                 return fetch(originalRequest, {
                     body: newBody,
@@ -92,7 +90,20 @@ self.addEventListener('fetch', handleFetch);
 
 addEventListener('message', event => {
     // event is an ExtendableMessageEvent object
-    console.log(`The client sent me a message: ${event.data}`);
+    const parsedData=JSON.parse(event.data);
+    console.log(`The client sent me a message: ${parsedData}`);
+    switch (parsedData.name){
+        case "loadItems":
+            event.source.postMessage(JSON.stringify(items));
+            return;
+        default:
+          items = parsedData.items;
+          return;
+    }
+});
 
-    event.source.postMessage("Hi client");
+
+addEventListener('setItems', event => {
+    console.log(`The client sent me a message: ${event.data}`);
+   
 });

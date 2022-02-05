@@ -9,14 +9,19 @@ import {
     FetchRequestor, LocalStorageBackend, DefaultCrypto
 } from '@openid/appauth';
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
-//import {initAsync} from './initWorker'
+import {initWorkerAsync} from './initWorker'
 
-//initAsync("/OidcServiceWorker.js")
-/*
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
  class MemoryStorageBackend {
-    constructor() {
-        this.items={};
+     public items: any;
+     private saveItems: Function;
+    constructor(saveItems, items ={}) {
+        this.items=items;
+        this.saveItems = saveItems;
+        this.saveItems.bind(this);
         this.getItem.bind(this);
         this.removeItem.bind(this);
         this.clear.bind(this);
@@ -29,19 +34,22 @@ import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
   
     removeItem(name){
         delete this.items[name];
+        this.saveItems(this.items);
         return Promise.resolve();
     }
   
     clear(){
          this.items= {};
+        this.saveItems(this.items);
         return Promise.resolve();
     }
   
     setItem(name, value) {
         this.items[name]=value;
-        return Promise.resolve();
+        this.saveItems(this.items);
+        return Promise.resolve().then(async () => await sleep(2220));
     }
-  }*/
+  }
 
 export type Configuration = {
     client_id: string,
@@ -141,6 +149,8 @@ class Oidc {
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroy.bind(this);
+
+        
     }
 
     subscriveEvents(func){
@@ -177,9 +187,15 @@ class Oidc {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
             const state = url 
-            this.publishEvent(eventNames.loginAsync_begin, {})
+            this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
-            const authorizationHandler = new RedirectRequestHandler(new LocalStorageBackend(), new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
+            const worker = await initWorkerAsync(configuration.service_worker_relative_url);
+            await sleep(2000);
+            const items =worker.loadItems();
+            const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItems, items);
+            
+            // @ts-ignore
+            const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
             const oidcServerConfiguration = await this.initAsync(configuration.authority)
                     const authRequest = new AuthorizationRequest({
                         client_id: configuration.client_id,
@@ -200,21 +216,24 @@ class Oidc {
         const clientId = this.configuration.client_id;
         const redirectURL = this.configuration.redirect_uri;
         const authority =  this.configuration.authority;
+        const worker = await initWorkerAsync(this.configuration.service_worker_relative_url);
+        const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItems);
+
         const promise = new Promise((resolve, reject) => {
+            
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-            const authorizationHandler = new RedirectRequestHandler(new LocalStorageBackend(), new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
+            // @ts-ignore
+            const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
             const notifier = new AuthorizationNotifier();
             authorizationHandler.setAuthorizationNotifier(notifier);
         
             notifier.setAuthorizationListener(async (request, response, error) => {
-                console.log('Authorization request complete ', request, response, error);
                 if(error){
                     reject(error);
                 }
                 if (!response) {
                     return;
                 }
-                console.log(`Authorization Code  ${response.code}`);
 
                 let extras = null;
                 if (request && request.internal) {
@@ -233,7 +252,6 @@ class Oidc {
                 try {
                     const oidcServerConfiguration = await this.initAsync(authority);
                     const tokenResponse =  await tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest);
-                    console.log(tokenResponse)
                     resolve({tokens:tokenResponse, state: request.state});
                     this.publishEvent(eventNames.loginCallbackAsync_end, {})
                 } catch(exception){
@@ -267,7 +285,7 @@ class Oidc {
             
             const oidcServerConfiguration = await this.initAsync(authority);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
-            console.log(token_response)
+           // console.log(token_response)
             this.publishEvent(eventNames.refreshTokensAsync_end, {});
             return token_response;
         } catch(exception) {

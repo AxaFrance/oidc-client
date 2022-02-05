@@ -1,7 +1,7 @@
 ﻿
-export const initAsync = async(serviceWorkerRelativeUrl, isKeepServiceWorkerAlive= () => false) => {
+export const initWorkerAsync = async(serviceWorkerRelativeUrl, isKeepServiceWorkerAlive= () => false) => {
     
-    if(!navigator.serviceWorker){
+    if(!navigator.serviceWorker||!serviceWorkerRelativeUrl){
         return null;
     }
     
@@ -22,13 +22,23 @@ export const initAsync = async(serviceWorkerRelativeUrl, isKeepServiceWorkerAliv
             await registration.unregister();
         }
     });
-
+    
+    let items={};
     navigator.serviceWorker.addEventListener('message', event => {
+        items= JSON.parse(event.data);
         // event is a MessageEvent object
-        console.log(`The service worker sent me a message: ${event.data}`);
+        //console.log(`The service worker sent me a message: ${event.data}`);
     });
 
-    registration.active.postMessage("Hi service worker");
+    //registration.active.postMessage("Hi service worker");
+    registration.active.postMessage(JSON.stringify({name: "loadItems"}));
+    const saveItems =(items) =>{
+        registration.active.postMessage(JSON.stringify({name: "saveItems", items}));
+    }
     
-    return registration;
+    const loadItems=() =>{
+        return items;
+    }
+    
+    return { saveItems, loadItems };
 }
