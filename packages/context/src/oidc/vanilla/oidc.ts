@@ -9,9 +9,9 @@ import {
     FetchRequestor, LocalStorageBackend, DefaultCrypto
 } from '@openid/appauth';
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
-//import {initAsync} from './initWorker'
+import {initAsync} from './initWorker'
 
-//initAsync("/OidcServiceWorker.js")
+initAsync("/OidcServiceWorker.js")
 /*
 
  class MemoryStorageBackend {
@@ -74,7 +74,7 @@ const autoRenewTokensAsync = async (oidc,refreshToken, intervalSeconds) =>{
         oidc.tokens = tokens;
         oidc.publishEvent(Oidc.eventNames.token_renewed, {});
         oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
-      }, (intervalSeconds- 20) *1000);
+      }, (intervalSeconds- 70) *1000);
 }
 
 const userInfoAsync = async (oidc)=> {
