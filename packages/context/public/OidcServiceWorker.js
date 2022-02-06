@@ -1,4 +1,4 @@
-﻿//this.importScripts('TrustedUrls.js');
+﻿this.importScripts('OidcTrustedDomains.js');
 
 const handleInstall = () => {
     console.log('[SWOPR] service worker installed');
@@ -12,12 +12,7 @@ const handleActivate = () => {
 
 let tokens = null;
 let items = [];
-
-const domainsToSendTokens = [
-    "https://demo.identityserver.io/connect/userinfo",
-]
-
-const refreshTokenUrl = "https://demo.identityserver.io/connect/token";
+let oidcServerConfiguration = null;
 
 function hideTokens() {
     return async (response) => {
@@ -35,6 +30,11 @@ function hideTokens() {
 }
 
 const handleFetch = async (event) => {
+
+    const domainsToSendTokens = this.oidcServerConfiguration != null ? [
+        this.oidcServerConfiguration.userInfoEndpoint, ...trustedDomains
+    ] : [...trustedDomains];
+    
     const originalRequest = event.request;
     domainsToSendTokens.forEach(domain => {
         if(originalRequest.url.startsWith(domain)) {
@@ -52,7 +52,11 @@ const handleFetch = async (event) => {
         return;
     }
     
-    if(originalRequest.url.startsWith(refreshTokenUrl)) {
+    if(this.oidcServerConfiguration === null){
+        return;
+    }
+    
+    if(originalRequest.url.startsWith(this.oidcServerConfiguration.tokenEndpoint)) {
         if (tokens != null) {
             const response =originalRequest.text().then(actualBody => {
                 const newBody = actualBody.replace('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER', encodeURIComponent(tokens.refresh_token))
@@ -75,10 +79,7 @@ const handleFetch = async (event) => {
         } else {
             const response = fetch(event.request).then(hideTokens());
             event.waitUntil(event.respondWith(response));
-
-
         }
-
     }
 };
 
@@ -86,7 +87,7 @@ self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
-
+const ServiceWorkerVersion = "1.0.0";
 addEventListener('message', event => {
     const data =event.data;
     switch (data.type){
@@ -99,7 +100,12 @@ addEventListener('message', event => {
             event.ports[0].postMessage("ok");
             return;
         case "init":
-            //this.importScripts(data.data);
+            const  ScriptVersion  = data.data.ScriptVersion;
+            if(ServiceWorkerVersion !== ScriptVersion) {
+                console.warn(`Service worker version is ${ServiceWorkerVersion} and script version is ${ScriptVersion}, please update your service worker it may not work properly.`)
+            }
+            this.oidcServerConfiguration = data.data.oidcServerConfiguration;
+            
             event.ports[0].postMessage("ok");
             return;
         default:

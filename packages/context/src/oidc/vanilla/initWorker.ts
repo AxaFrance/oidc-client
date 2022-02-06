@@ -1,5 +1,21 @@
 ﻿
-export const initWorkerAsync = async(serviceWorkerRelativeUrl, service_worker_trusted_urls_relative_url, isKeepServiceWorkerAlive= () => false) => {
+
+const sendMessageAsync = (data) =>{
+    return new Promise(function(resolve, reject) {
+        const messageChannel = new MessageChannel();
+        messageChannel.port1.onmessage = function (event) {
+            if (event.data.error) {
+                reject(event.data.error);
+            } else {
+                resolve(event.data);
+            }
+        };
+        navigator.serviceWorker.controller.postMessage(data, [messageChannel.port2]);
+    });
+} 
+
+
+export const initWorkerAsync = async(serviceWorkerRelativeUrl, oidcServerConfiguration) => {
     
     if(!navigator.serviceWorker||!serviceWorkerRelativeUrl){
         return null;
@@ -17,62 +33,23 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, service_worker_tr
     }
     
     const saveItemsAsync =(items) =>{
-            return new Promise(function(resolve, reject) {
-                const messageChannel = new MessageChannel();
-                messageChannel.port1.onmessage = function(event) {
-                    if (event.data.error) {
-                        reject(event.data.error);
-                    } else {
-                        resolve(event.data);
-                    }
-                };
-                navigator.serviceWorker.controller.postMessage({type: "saveItems", data: items}, [messageChannel.port2]);
-            });
+            return sendMessageAsync({type: "saveItems", data: items});
     }
     
     const loadItemsAsync=() =>{
-        return new Promise(function(resolve, reject) {
-            const messageChannel = new MessageChannel();
-            messageChannel.port1.onmessage = function (event) {
-                if (event.data.error) {
-                    reject(event.data.error);
-                } else {
-                    resolve(event.data);
-                }
-            };
-            navigator.serviceWorker.controller.postMessage({type: "loadItems", data: null}, [messageChannel.port2]);
-        });
+        return sendMessageAsync({type: "loadItems", data: null});
     }
 
     const clearAsync=() =>{
-        return new Promise(function(resolve, reject) {
-            const messageChannel = new MessageChannel();
-            messageChannel.port1.onmessage = function (event) {
-                if (event.data.error) {
-                    reject(event.data.error);
-                } else {
-                    resolve(event.data);
-                }
-            };
-            navigator.serviceWorker.controller.postMessage({type: "loadItems", data: null}, [messageChannel.port2]);
-        });
+        return sendMessageAsync({type: "loadItems", data: null});
     }
 
-    const initAsync=(service_worker_trusted_urls_relative_url) =>{
-        return new Promise(function(resolve, reject) {
-            const messageChannel = new MessageChannel();
-            messageChannel.port1.onmessage = function (event) {
-                if (event.data.error) {
-                    reject(event.data.error);
-                } else {
-                    resolve(event.data);
-                }
-            };
-            navigator.serviceWorker.controller.postMessage({type: "init", data: service_worker_trusted_urls_relative_url}, [messageChannel.port2]);
-        });
+    const initAsync=(oidcServerConfiguration) =>{
+        const ScriptVersion = "1.0.0";
+        return sendMessageAsync({type: "init", data: { oidcServerConfiguration, ScriptVersion }});
     }
     
-    await initAsync(service_worker_trusted_urls_relative_url);
+    await initAsync(oidcServerConfiguration);
     
     return { saveItemsAsync, loadItemsAsync, clearAsync };
 }

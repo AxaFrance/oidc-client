@@ -189,14 +189,13 @@ class Oidc {
             const state = url 
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
-            const worker = await initWorkerAsync(configuration.service_worker_relative_url, configuration.service_worker_trusted_urls_relative_url);
-            //await sleep(2000);
-           // const items =await worker.loadItemsAsync();
+            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            const worker = await initWorkerAsync(configuration.service_worker_relative_url, oidcServerConfiguration);
             const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItemsAsync, {});
             
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
-            const oidcServerConfiguration = await this.initAsync(configuration.authority)
+            
                     const authRequest = new AuthorizationRequest({
                         client_id: configuration.client_id,
                         redirect_uri: configuration.redirect_uri,
@@ -216,13 +215,13 @@ class Oidc {
         const clientId = this.configuration.client_id;
         const redirectURL = this.configuration.redirect_uri;
         const authority =  this.configuration.authority;
-        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configuration.service_worker_trusted_urls_relative_url);
+        const oidcServerConfiguration = await this.initAsync(authority);
+        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, oidcServerConfiguration);
         this.serviceWorker = serviceWorker;
         const items = await serviceWorker.loadItemsAsync();
-        const storage = serviceWorker == null ? new LocalStorageBackend():new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
+        const storage = serviceWorker === null ? new LocalStorageBackend():new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
 
         const promise = new Promise((resolve, reject) => {
-            
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
@@ -252,7 +251,7 @@ class Oidc {
                     extras,
                 });
                 try {
-                    const oidcServerConfiguration = await this.initAsync(authority);
+                    
                     const tokenResponse =  await tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest);
                     resolve({tokens:tokenResponse, state: request.state});
                     this.publishEvent(eventNames.loginCallbackAsync_end, {})
