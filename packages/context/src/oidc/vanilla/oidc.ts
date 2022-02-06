@@ -17,11 +17,11 @@ function sleep(ms) {
 
  class MemoryStorageBackend {
      public items: any;
-     private saveItems: Function;
-    constructor(saveItems, items ={}) {
+     private saveItemsAsync: Function;
+    constructor(saveItemsAsync, items ={}) {
         this.items=items;
-        this.saveItems = saveItems;
-        this.saveItems.bind(this);
+        this.saveItemsAsync = saveItemsAsync;
+        this.saveItemsAsync.bind(this);
         this.getItem.bind(this);
         this.removeItem.bind(this);
         this.clear.bind(this);
@@ -34,20 +34,17 @@ function sleep(ms) {
   
     removeItem(name){
         delete this.items[name];
-        this.saveItems(this.items);
-        return Promise.resolve();
+        return this.saveItemsAsync(this.items);
     }
   
     clear(){
          this.items= {};
-        this.saveItems(this.items);
-        return Promise.resolve();
+        return this.saveItemsAsync(this.items);
     }
   
     setItem(name, value) {
         this.items[name]=value;
-        this.saveItems(this.items);
-        return Promise.resolve().then(async () => await sleep(2220));
+        return this.saveItemsAsync(this.items);
     }
   }
 
@@ -134,13 +131,15 @@ class Oidc {
     public userInfo: null;
     public tokens: null;
     public events: Array<any>;
-    private timeoutId: NodeJS.Timeout; 
+    private timeoutId: NodeJS.Timeout;
+    private serviceWorker?: any; 
     constructor(configuration:Configuration) {
       this.configuration = configuration
       this.tokens = null
       this.userInfo = null;
       this.events = []
         this.timeoutId = null;
+      this.serviceWorker = null;
       this.refreshTokensAsync.bind(this);
       this.loginCallbackWithAutoTokensRenewAsync.bind(this);
       this.initAsync.bind(this);
@@ -148,7 +147,7 @@ class Oidc {
       this.subscriveEvents.bind(this);
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
-      this.destroy.bind(this);
+      this.destroyAsync.bind(this);
 
         
     }
@@ -190,9 +189,9 @@ class Oidc {
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
             const worker = await initWorkerAsync(configuration.service_worker_relative_url);
-            await sleep(2000);
-            const items =worker.loadItems();
-            const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItems, items);
+            //await sleep(2000);
+           // const items =await worker.loadItemsAsync();
+            const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItemsAsync, {});
             
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
@@ -216,8 +215,10 @@ class Oidc {
         const clientId = this.configuration.client_id;
         const redirectURL = this.configuration.redirect_uri;
         const authority =  this.configuration.authority;
-        const worker = await initWorkerAsync(this.configuration.service_worker_relative_url);
-        const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItems);
+        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url);
+        this.serviceWorker = serviceWorker;
+        const items = await serviceWorker.loadItemsAsync();
+        const storage = serviceWorker == null ? new LocalStorageBackend():new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
 
         const promise = new Promise((resolve, reject) => {
             
@@ -302,7 +303,8 @@ class Oidc {
          return userInfoAsync(this);
      }
      
-     destroy(){
+     async destroyAsync() {
+         await this.serviceWorker.clearAsync()
          this.tokens = null;
          this.userInfo = null;
          this.events = [];
@@ -311,7 +313,7 @@ class Oidc {
      
     async logoutAsync() {
         const oidcServerConfiguration = await this.initAsync(this.configuration.authority);
-        this.destroy();
+        await this.destroyAsync();
         window.location.href = oidcServerConfiguration.endSessionEndpoint;
     }
   }

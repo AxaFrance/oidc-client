@@ -89,21 +89,19 @@ self.addEventListener('fetch', handleFetch);
 
 
 addEventListener('message', event => {
-    // event is an ExtendableMessageEvent object
-    const parsedData=JSON.parse(event.data);
-    console.log(`The client sent me a message: ${parsedData}`);
-    switch (parsedData.name){
+    const data =event.data;
+    switch (data.type){
         case "loadItems":
-            event.source.postMessage(JSON.stringify(items));
+            event.ports[0].postMessage(items);
+            return;
+        case "clear":
+            tokens = null;
+            items = null;
+            event.ports[0].postMessage("ok");
             return;
         default:
-          items = parsedData.items;
+          items = data.data;
+          event.ports[0].postMessage("ok");
           return;
     }
-});
-
-
-addEventListener('setItems', event => {
-    console.log(`The client sent me a message: ${event.data}`);
-   
 });

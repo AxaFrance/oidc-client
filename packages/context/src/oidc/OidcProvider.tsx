@@ -50,7 +50,7 @@ sessionLostComponent }) => {
         
         setLoading(false);
         return () => {
-            getOidc().destroy();
+            getOidc().destroyAsync();
             isMounted = false;
         }
     }, []);
