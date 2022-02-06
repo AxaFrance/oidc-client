@@ -55,6 +55,7 @@ export type Configuration = {
     authority: string,
     refresh_time_before_tokens_expiration_in_second?: number,
     service_worker_relative_url?:string,
+    service_worker_trusted_urls_relative_url?:string,
 };
 
 const oidcDatabase = {};
@@ -188,7 +189,7 @@ class Oidc {
             const state = url 
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
-            const worker = await initWorkerAsync(configuration.service_worker_relative_url);
+            const worker = await initWorkerAsync(configuration.service_worker_relative_url, configuration.service_worker_trusted_urls_relative_url);
             //await sleep(2000);
            // const items =await worker.loadItemsAsync();
             const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItemsAsync, {});
@@ -215,7 +216,7 @@ class Oidc {
         const clientId = this.configuration.client_id;
         const redirectURL = this.configuration.redirect_uri;
         const authority =  this.configuration.authority;
-        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url);
+        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configuration.service_worker_trusted_urls_relative_url);
         this.serviceWorker = serviceWorker;
         const items = await serviceWorker.loadItemsAsync();
         const storage = serviceWorker == null ? new LocalStorageBackend():new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
@@ -286,8 +287,8 @@ class Oidc {
             
             const oidcServerConfiguration = await this.initAsync(authority);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
-           // console.log(token_response)
             this.publishEvent(eventNames.refreshTokensAsync_end, {});
+            console.log("tokens renewed");
             return token_response;
         } catch(exception) {
             this.publishEvent(eventNames.refreshTokensAsync_error, {});

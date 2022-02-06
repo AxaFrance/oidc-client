@@ -4,7 +4,8 @@ let configuration = {
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.identityserver.io',
     refresh_time_before_tokens_expiration_in_second: 70,
-    service_worker_relative_url:'/OidcServiceWorker.js'
+    service_worker_relative_url:'/OidcServiceWorker.js',
+    service_worker_trusted_urls_relative_url:'TrustedUrls.js'
   };
 
 export default configuration;

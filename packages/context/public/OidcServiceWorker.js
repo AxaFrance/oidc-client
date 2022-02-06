@@ -1,4 +1,5 @@
-﻿
+﻿//this.importScripts('TrustedUrls.js');
+
 const handleInstall = () => {
     console.log('[SWOPR] service worker installed');
     self.skipWaiting();
@@ -20,9 +21,7 @@ const refreshTokenUrl = "https://demo.identityserver.io/connect/token";
 
 function hideTokens() {
     return async (response) => {
-        //console.log('response: ', response);
         tokens = await response.json()
-        //console.log('response.body: ', tokens);
 
         const secureTokens = {
             ...tokens,
@@ -99,9 +98,14 @@ addEventListener('message', event => {
             items = null;
             event.ports[0].postMessage("ok");
             return;
+        case "init":
+            //this.importScripts(data.data);
+            event.ports[0].postMessage("ok");
+            return;
         default:
           items = data.data;
           event.ports[0].postMessage("ok");
           return;
     }
 });
+
