@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/vanilla-oidc",
-  "version": "4.0.0-alpha.12",
+  "version": "4.0.0-alpha.13",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -24,9 +24,9 @@
     "oauth2"
   ],
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "rimraf dist && rimraf src",
     "copy": "copyfiles -f ../context/src/oidc/vanilla/*.ts ./src && copyfiles -f ../context/src/oidc/vanilla/*.js ./src",
-    "prepare": "npm run clean&& tsc --build \"./tsconfig.json\" && npm run copy && copyfiles -f ./src/OidcServiceWorker.js ./dist && copyfiles -f ./src/OidcTrustedDomains.js ./dist"
+    "prepare": "npm run clean && npm run copy && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/OidcServiceWorker.js ./dist && copyfiles -f ./src/OidcTrustedDomains.js ./dist"
   },
   "license": "MIT",
   "publishConfig": {
