@@ -133,7 +133,7 @@ const eventNames = {
     refreshTokensAsync_error: "refreshTokensAsync_error",
 }
 
-class Oidc {
+export class Oidc {
     public configuration: Configuration;
     public userInfo: null;
     public tokens: null;
@@ -155,8 +155,6 @@ class Oidc {
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
-
-        
     }
 
     subscriveEvents(func){

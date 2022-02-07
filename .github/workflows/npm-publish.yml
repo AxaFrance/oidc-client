@@ -34,3 +34,17 @@ jobs:
           package: ./packages/context/package.json
           #dry-run: true
 
+      - name: npm ci
+        run: npm ci
+        working-directory: ./packages/vanilla
+
+      - name: npm prepare
+        run: npm run prepare
+        working-directory: ./packages/vanilla
+
+      - id: publish
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/vanilla/package.json
+          #dry-run: true
