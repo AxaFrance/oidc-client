@@ -39,7 +39,7 @@ export const useOidcAccessToken =() =>{
     return {accessToken};
 }
 
-export const useOidcIDToken =() =>{
+export const useOidcIdToken =() =>{
     const {getOidc} = useContext(OidcContext);
     const [idToken, setIDToken] = useState<string>(null);
 

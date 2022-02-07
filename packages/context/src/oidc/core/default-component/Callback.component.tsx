@@ -1,10 +1,6 @@
-import React, {FC, useEffect, useContext, useState, PropsWithChildren} from 'react';
+import React, { useEffect, useContext, useState, PropsWithChildren} from 'react';
 import  {OidcContext} from "../../OidcProvider";
-import withRouter, {ReactOidcHistory} from "../routes/withRouter";
-import {Callback} from "./index";
-
-
-
+import withRouter from "../routes/withRouter";
 
 const CallBackSuccess = () =>  (<div className="oidc-callback">
 <div className="oidc-callback__container">

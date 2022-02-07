@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {OidcSecure, useOidcAccessToken, useOidcIDToken, useOidcUser} from "./oidc";
+import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser} from "./oidc";
 
 const DisplayUserInfo = () => {
 
@@ -55,7 +55,7 @@ const DisplayAccessToken = () => {
 
 
 const DisplayIdToken =() => {
-    const{ idToken } = useOidcIDToken();
+    const{ idToken } = useOidcIdToken();
 
     if(!idToken){
         return <p>you are not authentified</p>

@@ -1,5 +1,5 @@
-import React, {ComponentType, createContext, useEffect, useState} from 'react';
-import Oidc from './vanilla/oidc';
+import React, {ComponentType, createContext, FC, PropsWithChildren, useEffect, useState} from 'react';
+import Oidc, {Configuration} from './vanilla/oidc';
 import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost} from './core/default-component/index';
 
@@ -19,7 +19,16 @@ export const withOidc = Component => props => (
 
 const defaultEventState = {name:"", data:null};
 
-export const OidcProvider = ({ children, configuration, configurationName = "default", callbackSuccessComponent, callbackErrorComponent,
+type OidcProviderProps = {
+    callbackSuccessComponent?: ComponentType;
+    callbackErrorComponent?: ComponentType;
+    sessionLostComponent?: ComponentType;
+    configurationName?: string;
+    configuration?: Configuration;
+};
+
+
+export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ children, configuration, configurationName = "default", callbackSuccessComponent, callbackErrorComponent,
 sessionLostComponent }) => {
     
     const getOidc =() => {
