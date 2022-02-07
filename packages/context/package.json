@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-context",
-  "version": "4.0.0-alpha.9",
+  "version": "4.0.0-alpha.10",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -22,12 +22,13 @@
     "react-component"
   ],
   "scripts": {
-    "start": "set PORT=5002 && react-scripts start",
-    "build": "react-scripts build",
+    "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public",
+    "start": "npm run copy && set PORT=5002 && react-scripts start",
+    "build": "npm run copy && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "clean": "rimraf dist",
-    "prepare": "npm run clean && tsc --build \"./tsconfig.json\""
+    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist"
   },
   "peerDependencies": {
     "react": ">=16.8.6",
@@ -37,6 +38,7 @@
     "@openid/appauth": "^1.2.6"
   },
   "devDependencies": {
+    "copyfiles": "^2.4.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^7.2.1",

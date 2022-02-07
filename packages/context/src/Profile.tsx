@@ -1,10 +1,10 @@
 import React from 'react';
 
-import {OidcSecure, useReactOidcAccessToken, useReactOidcIDToken, useReactOidcUser} from "./oidc";
+import {OidcSecure, useOidcAccessToken, useOidcIDToken, useOidcUser} from "./oidc";
 
 const DisplayUserInfo = () => {
 
-    const{ oidcUser, isOidcUserLoading, isLogged } = useReactOidcUser();
+    const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
 
     if(isOidcUserLoading) {
         return <p>User Information are loading</p>
@@ -37,7 +37,7 @@ export const Profile = () => {
 }
 
 const DisplayAccessToken = () => {
-    const{ accessToken } = useReactOidcAccessToken();
+    const{ accessToken } = useOidcAccessToken();
 
     if(!accessToken){
         return <p>you are not authentified</p>
@@ -55,7 +55,7 @@ const DisplayAccessToken = () => {
 
 
 const DisplayIdToken =() => {
-    const{ idToken } = useReactOidcIDToken();
+    const{ idToken } = useOidcIDToken();
 
     if(!idToken){
         return <p>you are not authentified</p>

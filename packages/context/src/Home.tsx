@@ -1,9 +1,9 @@
 import React from 'react';
-import {useReactOidc} from "./oidc";
+import {useOidc} from "./oidc";
 
 export const Home = () => {
 
-    const { login, logout, isLogged} = useReactOidc();
+    const { login, logout, isLogged} = useOidc();
     
     return (
         <div className="container-fluid mt-3">

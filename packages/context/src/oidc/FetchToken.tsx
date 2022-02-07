@@ -1,5 +1,5 @@
 import React from 'react';
-import {useReactOidcAccessToken} from "./ReactOidc";
+import {useOidcAccessToken} from "./ReactOidc";
 
 type Fetch = typeof window.fetch;
 interface ComponentWithFetchProps {
@@ -37,7 +37,7 @@ export const withFetchToken = (fetch) => (props: ComponentWithFetchProps) => (
     WrappedComponent
   ) => (props) => {
     const previousFetch = fetch || props.fetch;
-    const {accessToken} = useReactOidcAccessToken();
+    const {accessToken} = useOidcAccessToken();
 
     const getAccessTokenInjected = () => { return accessToken };
     

@@ -1,15 +1,19 @@
 import {
-    TokenRequest,
-    BaseTokenRequestHandler,
-    GRANT_TYPE_AUTHORIZATION_CODE, GRANT_TYPE_REFRESH_TOKEN,
-    AuthorizationServiceConfiguration,
-    RedirectRequestHandler,
     AuthorizationNotifier,
     AuthorizationRequest,
-    FetchRequestor, LocalStorageBackend, DefaultCrypto
+    AuthorizationServiceConfiguration,
+    BaseTokenRequestHandler,
+    DefaultCrypto,
+    FetchRequestor,
+    GRANT_TYPE_AUTHORIZATION_CODE,
+    GRANT_TYPE_REFRESH_TOKEN,
+    LocalStorageBackend,
+    RedirectRequestHandler,
+    TokenRequest
 } from '@openid/appauth';
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
 import {initWorkerAsync} from './initWorker'
+import {MemoryStorageBackend} from "./memoryStorageBackend";
 
 function parseJwt (token) {
     const base64Url = token.split('.')[1];
@@ -21,40 +25,7 @@ function parseJwt (token) {
     return JSON.parse(jsonPayload);
 }
 
- class MemoryStorageBackend {
-     public items: any;
-     private saveItemsAsync: Function;
-    constructor(saveItemsAsync, items ={}) {
-        this.items=items;
-        this.saveItemsAsync = saveItemsAsync;
-        this.saveItemsAsync.bind(this);
-        this.getItem.bind(this);
-        this.removeItem.bind(this);
-        this.clear.bind(this);
-        this.setItem.bind(this);
-    }
-    
-    getItem(name){
-        return Promise.resolve(this.items[name]);
-    }
-  
-    removeItem(name){
-        delete this.items[name];
-        return this.saveItemsAsync(this.items);
-    }
-  
-    clear(){
-         this.items= {};
-        return this.saveItemsAsync(this.items);
-    }
-  
-    setItem(name, value) {
-        this.items[name]=value;
-        return this.saveItemsAsync(this.items);
-    }
-  }
-
-export type Configuration = {
+ export type Configuration = {
     client_id: string,
     redirect_uri: string,
     scope: string,
@@ -74,7 +45,6 @@ const oidcFactory = (configuration: Configuration, name="default") => {
 }
 
 const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
-    
     const response = await oidc.loginCallbackAsync();
     const tokens = response.tokens
     oidc.tokens = { ...tokens, idToken: parseJwt(tokens.idToken) };
@@ -86,7 +56,8 @@ const autoRenewTokensAsync = async (oidc,refreshToken, intervalSeconds) =>{
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 20;
     return setTimeout(async () => {
         const tokens = await oidc.refreshTokensAsync(refreshToken);
-        oidc.tokens = { ...tokens, idToken: parseJwt(tokens.idToken) };
+        oidc.tokens = { ...tokens, idToken: parseJwt(tokens.idToken)};
+        console.log(oidc.tokens);
         oidc.publishEvent(Oidc.eventNames.token_renewed, {});
         oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
       }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
@@ -144,8 +115,8 @@ export class Oidc {
       this.configuration = configuration
       this.tokens = null
       this.userInfo = null;
-      this.events = []
-        this.timeoutId = null;
+      this.events = [];
+      this.timeoutId = null;
       this.serviceWorker = null;
       this.refreshTokensAsync.bind(this);
       this.loginCallbackWithAutoTokensRenewAsync.bind(this);
@@ -314,7 +285,9 @@ export class Oidc {
      }
      
      async destroyAsync() {
-         await this.serviceWorker.clearAsync()
+        if(this.serviceWorker){
+            await this.serviceWorker.clearAsync();
+        }
          this.tokens = null;
          this.userInfo = null;
          this.events = [];

@@ -2,7 +2,7 @@
 import {OidcContext} from "./OidcProvider";
 import Oidc from "./vanilla/oidc";
 
-export const useReactOidc =() =>{
+export const useOidc =() =>{
     const {getOidc} = useContext(OidcContext);
     const login = (callbackPath=undefined) => {
         return getOidc().loginAsync(callbackPath);
@@ -10,10 +10,10 @@ export const useReactOidc =() =>{
     const logout = () => {
         return getOidc().logoutAsync();
     };
-    return {login, logout, isLogged: getOidc().tokens != null}
+    return {login, logout, isLogged: getOidc().tokens != null};
 }
 
-export const useReactOidcAccessToken =() =>{
+export const useOidcAccessToken =() =>{
     const {getOidc} = useContext(OidcContext);
     const [accessToken, setAccessToken] = useState<string>(null);
     
@@ -29,8 +29,7 @@ export const useReactOidcAccessToken =() =>{
                 if(isMounted) {
                     setAccessToken(getOidc().tokens != null  ? getOidc().tokens.accessToken : null);
                 }
-            } 
-            
+            }
         });
         return  () => { 
             isMounted = false;
@@ -40,7 +39,7 @@ export const useReactOidcAccessToken =() =>{
     return {accessToken};
 }
 
-export const useReactOidcIDToken =() =>{
+export const useOidcIDToken =() =>{
     const {getOidc} = useContext(OidcContext);
     const [idToken, setIDToken] = useState<string>(null);
 

@@ -1,7 +1,7 @@
 ﻿import {useContext, useEffect, useState} from "react";
 import {OidcContext} from "./OidcProvider";
 
-export const useReactOidcUser =() => {
+export const useOidcUser =() => {
     const [oidcUser, setOidcUser] = useState(null);
     const [isOidcUserLoading, setIsOidcUserLoading] = useState(false);
     const {getOidc} = useContext(OidcContext);
