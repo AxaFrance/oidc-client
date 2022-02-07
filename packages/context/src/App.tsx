@@ -4,6 +4,7 @@ import { Home } from "./Home";
 import {Profile, SecureProfile} from "./Profile";
 import configuration from './configuration';
 import {withOidcSecure,OidcProvider} from "./oidc";
+import {FetchUser} from "./FetchUser";
 
 function App() {
 
@@ -26,6 +27,9 @@ function App() {
               <li className="nav-item">
                 <Link className="nav-link" to="/profile-secure-hoc">Secure Profile Hoc</Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/user-fetch-secure">Secure User Fetch</Link>
+              </li>
             </ul>
           </div>
         </nav>
@@ -35,6 +39,7 @@ function App() {
           <Route exact path="/profile" component={Profile} />
           <Route exact path="/profile-secure-component" component={SecureProfile} />
           <Route exact path="/profile-secure-hoc" component={withOidcSecure(Profile)} />
+          <Route exact path="/user-fetch-secure" component={FetchUser} />
         </div>
       </Router>
     </OidcProvider>
