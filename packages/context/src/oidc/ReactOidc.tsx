@@ -26,8 +26,8 @@ export const useReactOidcAccessToken =() =>{
         const subscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired){
-                if(getOidc().tokens != null && isMounted) {
-                    setAccessToken(getOidc().tokens.accessToken);
+                if(isMounted) {
+                    setAccessToken(getOidc().tokens != null  ? getOidc().tokens.accessToken : null);
                 }
             } 
             
@@ -38,4 +38,31 @@ export const useReactOidcAccessToken =() =>{
         };
     }, []);
     return {accessToken};
+}
+
+export const useReactOidcIDToken =() =>{
+    const {getOidc} = useContext(OidcContext);
+    const [idToken, setIDToken] = useState<string>(null);
+
+    useEffect(() => {
+        let isMounted = true;
+        const oidc = getOidc();
+        if(getOidc().tokens != null) {
+            setIDToken(getOidc().tokens.idToken);
+        }
+        const subscriptionId = oidc.subscriveEvents((name, data) => {
+            if(name == Oidc.eventNames.token_renewed
+                || name == Oidc.eventNames.token_aquired){
+                if(isMounted) {
+                    setIDToken(getOidc().tokens != null  ? getOidc().tokens.idToken : null);
+                }
+            }
+
+        });
+        return  () => {
+            isMounted = false;
+            oidc.removeEventSubscription(subscriptionId);
+        };
+    }, []);
+    return {idToken};
 }

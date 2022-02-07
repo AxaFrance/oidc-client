@@ -1,15 +1,25 @@
 import React from 'react';
 
-import {OidcSecure, useReactOidcAccessToken, useReactOidcUser} from "./oidc";
+import {OidcSecure, useReactOidcAccessToken, useReactOidcIDToken, useReactOidcUser} from "./oidc";
 
-const DisplayUserInfo = ({userInfo, accessToken}) => {
+const DisplayUserInfo = () => {
+
+    const{ oidcUser, isOidcUserLoading, isLogged } = useReactOidcUser();
+
+    if(isOidcUserLoading) {
+        return <p>User Information are loading</p>
+    }
+
+    if(!isLogged){
+        return <p>you are not authentified</p>
+    }
+
     return (
         <div className="card text-white bg-success mb-3">
             <div className="card-body">
-                <h5 className="card-title">Userinfo</h5>
-                <p>{userInfo == null && "You are not logged" }</p>
-                {userInfo != null && <p className="card-text">{JSON.stringify(userInfo)}</p>}
-                {accessToken != null && <p className="card-text">{JSON.stringify(accessToken)}</p>}
+                <h5 className="card-title">User information</h5>
+                <p>{oidcUser == null && "You are not logged" }</p>
+                {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
             </div>
         </div>
     )
@@ -17,20 +27,46 @@ const DisplayUserInfo = ({userInfo, accessToken}) => {
 
 export const Profile = () => {
 
-    const{ oidcUser, isOidcUserLoading, isLogged } = useReactOidcUser();
-    const{ accessToken } = useReactOidcAccessToken();
-    
-    if(isOidcUserLoading) {
-        return <p>User Info are loading</p>
-    }
-    
-   if(!isLogged){
-       return <p>you are not authentified</p>
-   }
-
     return (
        <div className="container mt-3">
-            <DisplayUserInfo userInfo={oidcUser} accessToken={accessToken}></DisplayUserInfo>
+           <DisplayAccessToken/>
+           <DisplayIdToken/>
+           <DisplayUserInfo/>
+        </div>
+    );
+}
+
+const DisplayAccessToken = () => {
+    const{ accessToken } = useReactOidcAccessToken();
+
+    if(!accessToken){
+        return <p>you are not authentified</p>
+    }
+    return (
+        <div className="card text-white bg-info mb-3">
+            <div className="card-body">
+                <h5 className="card-title">Access Token</h5>
+                <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. ""access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
+                {accessToken != null && <p className="card-text">{JSON.stringify(accessToken)}</p>}
+            </div>
+        </div>
+    )
+};
+
+
+const DisplayIdToken =() => {
+    const{ idToken } = useReactOidcIDToken();
+
+    if(!idToken){
+        return <p>you are not authentified</p>
+    }
+    
+    return (
+        <div className="card text-white bg-info mb-3">
+            <div className="card-body">
+                <h5 className="card-title">ID Token</h5>
+                {idToken != null && <p className="card-text">{JSON.stringify(idToken)}</p>}
+            </div>
         </div>
     );
 }

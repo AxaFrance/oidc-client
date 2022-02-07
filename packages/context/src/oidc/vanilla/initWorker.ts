@@ -1,6 +1,6 @@
 ﻿
 
-const sendMessageAsync = (data) =>{
+const sendMessageAsync = (registration) => (data) =>{
     return new Promise(function(resolve, reject) {
         const messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function (event) {
@@ -10,7 +10,7 @@ const sendMessageAsync = (data) =>{
                 resolve(event.data);
             }
         };
-        navigator.serviceWorker.controller.postMessage(data, [messageChannel.port2]);
+        registration.active.postMessage(data, [messageChannel.port2]);
     });
 } 
 
@@ -33,20 +33,20 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, oidcServerConfigu
     }
     
     const saveItemsAsync =(items) =>{
-            return sendMessageAsync({type: "saveItems", data: items});
+            return sendMessageAsync(registration)({type: "saveItems", data: items});
     }
     
     const loadItemsAsync=() =>{
-        return sendMessageAsync({type: "loadItems", data: null});
+        return sendMessageAsync(registration)({type: "loadItems", data: null});
     }
 
     const clearAsync=() =>{
-        return sendMessageAsync({type: "loadItems", data: null});
+        return sendMessageAsync(registration)({type: "loadItems", data: null});
     }
 
     const initAsync=(oidcServerConfiguration) =>{
         const ScriptVersion = "1.0.0";
-        return sendMessageAsync({type: "init", data: { oidcServerConfiguration, ScriptVersion }});
+        return sendMessageAsync(registration)({type: "init", data: { oidcServerConfiguration, ScriptVersion }});
     }
     
     await initAsync(oidcServerConfiguration);

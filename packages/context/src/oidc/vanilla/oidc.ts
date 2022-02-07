@@ -11,8 +11,14 @@ import {
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
 import {initWorkerAsync} from './initWorker'
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function parseJwt (token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
 }
 
  class MemoryStorageBackend {
@@ -71,8 +77,8 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     
     const response = await oidc.loginCallbackAsync();
     const tokens = response.tokens
+    oidc.tokens = { ...tokens, idToken: parseJwt(tokens.idToken) };
     oidc.publishEvent(Oidc.eventNames.token_aquired, {});
-    oidc.tokens = tokens;
     oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
     return response.state;
 }
@@ -80,7 +86,7 @@ const autoRenewTokensAsync = async (oidc,refreshToken, intervalSeconds) =>{
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 20;
     return setTimeout(async () => {
         const tokens = await oidc.refreshTokensAsync(refreshToken);
-        oidc.tokens = tokens;
+        oidc.tokens = { ...tokens, idToken: parseJwt(tokens.idToken) };
         oidc.publishEvent(Oidc.eventNames.token_renewed, {});
         oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
       }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
@@ -190,8 +196,8 @@ class Oidc {
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
-            const worker = await initWorkerAsync(configuration.service_worker_relative_url, oidcServerConfiguration);
-            const storage = worker == null ? new LocalStorageBackend():new MemoryStorageBackend(worker.saveItemsAsync, {});
+            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, oidcServerConfiguration);
+            const storage = serviceWorker == null ? new LocalStorageBackend():new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
             
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
@@ -218,8 +224,14 @@ class Oidc {
         const oidcServerConfiguration = await this.initAsync(authority);
         const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, oidcServerConfiguration);
         this.serviceWorker = serviceWorker;
-        const items = await serviceWorker.loadItemsAsync();
-        const storage = serviceWorker === null ? new LocalStorageBackend():new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
+        let storage = null;
+        if(serviceWorker){
+            const items = await serviceWorker.loadItemsAsync();
+            storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
+        }else{
+            storage = new LocalStorageBackend();
+        }
+       
 
         const promise = new Promise((resolve, reject) => {
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
