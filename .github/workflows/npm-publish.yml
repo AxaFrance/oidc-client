@@ -27,7 +27,7 @@ jobs:
         run: npm run prepare
         working-directory: ./packages/context
         
-      - id: publish
+      - id: publish-context
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
@@ -42,7 +42,7 @@ jobs:
         run: npm run prepare
         working-directory: ./packages/vanilla
 
-      - id: publish
+      - id: publish-vanilla
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
