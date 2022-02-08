@@ -18,14 +18,26 @@ let database = {
     }
 };
 
+const accessTokenPayload = t => {
+    if (!t) {
+        return null;
+    }
+    const payload = JSON.parse(atob(t.split('.')[1]));
+    return payload;
+};
+
 function hideTokens(currentDatabaseElement) {
     return async (response) => {
-        currentDatabaseElement.tokens = await response.json()
+        
+        const tokens = await response.json();
+        const accessTokenPayLoad = accessTokenPayload(tokens.access_token);
+        currentDatabaseElement.tokens = {...tokens, access_token_payload: accessTokenPayLoad};
 
         const secureTokens = {
-            ...database.default.tokens,
+            ...tokens,
             access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
-            refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER"
+            refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
+            access_token_payload: accessTokenPayLoad
         };
         const body = JSON.stringify(secureTokens)
         const newResponse = new Response(body, response)
