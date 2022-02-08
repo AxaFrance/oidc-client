@@ -3,7 +3,6 @@ import React from 'react';
 import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser} from "./oidc";
 
 const DisplayUserInfo = () => {
-
     const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
 
     if(isOidcUserLoading) {
