@@ -17,7 +17,6 @@ const defaultProps: Partial<OidcRoutesProps> = {
 type OidcRoutesProps = {
   callbackSuccessComponent?: ComponentType;
   callbackErrorComponent?: ComponentType;
-  sessionLostComponent?: ComponentType;
   redirect_uri: string;
 };
 

@@ -1,7 +1,7 @@
 import React, {ComponentType, createContext, FC, PropsWithChildren, useEffect, useState} from 'react';
 import Oidc, {Configuration} from './vanilla/oidc';
 import OidcRoutes from './core/routes/OidcRoutes';
-import {Authenticating, AuthenticateError, SessionLost} from './core/default-component/index';
+import {Authenticating, AuthenticateError, SessionLost, Loading, Callback} from './core/default-component/index';
 
 export const OidcContext = createContext<oidcContext>(null);
 
@@ -23,11 +23,13 @@ type OidcProviderProps = {
     callbackSuccessComponent?: ComponentType;
     callbackErrorComponent?: ComponentType;
     sessionLostComponent?: ComponentType;
+    authenticatingComponent?: ComponentType;
+    loadingComponent?: ComponentType;
     configurationName?: string;
     configuration?: Configuration;
 };
 
-const OidcSession = ({oidcState, children}) =>{
+const OidcSession = ({oidcState, loadingComponent, children}) =>{
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         let isMounted = true;
@@ -43,11 +45,11 @@ const OidcSession = ({oidcState, children}) =>{
             isMounted = false;
         }
     }, []);
-
+    const LoadingComponent = loadingComponent;
     return (
         <>
             {loading ? (
-                <span>Loading</span>
+               <LoadingComponent/>
             ) : (
                 <>{children}</>
             )}
@@ -56,8 +58,14 @@ const OidcSession = ({oidcState, children}) =>{
 }
 
 
-export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ children, configuration, configurationName = "default", callbackSuccessComponent, callbackErrorComponent,
-sessionLostComponent }) => {
+export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ children, 
+                                                                             configuration, 
+                                                                             configurationName = "default", 
+                                                                             callbackSuccessComponent = Callback, 
+                                                                             callbackErrorComponent = AuthenticateError,
+                                                                             authenticatingComponent = Authenticating,
+                                                                             loadingComponent = Loading,
+sessionLostComponent=SessionLost }) => {
     
     const getOidc =() => {
         return Oidc.getOrCreate(configuration, configurationName);
@@ -93,26 +101,31 @@ sessionLostComponent }) => {
             isMounted = false;
         }
     }, []);
+    
+    
+    const SessionLostComponent = sessionLostComponent;
+    const AuthenticatingComponent = authenticatingComponent;
+    const LoadingComponent = loadingComponent;
 
     switch(event.name){
         case Oidc.eventNames.loginAsync_begin:
-            return <Authenticating />;
-        case Oidc.eventNames.loginAsync_error:
-            return <AuthenticateError />;
+            return <AuthenticatingComponent />;
+        /*case Oidc.eventNames.loginAsync_error:
+            return <AuthenticateError />;*/
         case Oidc.eventNames.refreshTokensAsync_error:
-            return <SessionLost />;
+            return <SessionLostComponent />;
         default:
             return (
                 <>
                     {loading ? (
-                        <span>Loading</span>
+                        <LoadingComponent/>
                     ) : (
                             <OidcContext.Provider value={oidcState}>
                                   <OidcRoutes redirect_uri={configuration.redirect_uri} 
                                               callbackSuccessComponent={callbackSuccessComponent} 
                                               callbackErrorComponent={callbackErrorComponent}
-                                                sessionLostComponent={sessionLostComponent} >
-                                      <OidcSession oidcState={oidcState}>
+                                                >
+                                      <OidcSession oidcState={oidcState} loadingComponent={LoadingComponent}>
                                         {children}
                                       </OidcSession>
                                 </OidcRoutes>

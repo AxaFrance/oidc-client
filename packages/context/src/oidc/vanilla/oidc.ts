@@ -57,7 +57,6 @@ const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
     return setTimeout(async () => {
         const tokens = await oidc.refreshTokensAsync(refreshToken);
         oidc.tokens = { ...tokens, idToken: parseJwt(tokens.idToken)};
-        console.log(oidc.tokens);
         oidc.publishEvent(Oidc.eventNames.token_renewed, {});
         oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
       }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
@@ -165,6 +164,9 @@ export class Oidc {
     
     async tryKeepExistingSessionAsync() {
         let serviceWorker
+        if(this.tokens != null){
+            return false;
+        }
         this.publishEvent(eventNames.tryKeepExistingSessionAsync_begin, {});
         try {
             const configuration = this.configuration;
