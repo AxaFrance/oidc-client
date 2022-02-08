@@ -15,7 +15,7 @@ const sendMessageAsync = (registration) => (data) =>{
 } 
 
 
-export const initWorkerAsync = async(serviceWorkerRelativeUrl) => {
+export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
     
     if(!navigator.serviceWorker||!serviceWorkerRelativeUrl){
         return null;
@@ -33,20 +33,26 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl) => {
     }
     
     const saveItemsAsync =(items) =>{
-            return sendMessageAsync(registration)({type: "saveItems", data: items});
+            return sendMessageAsync(registration)({type: "saveItems", data: items, configurationName});
     }
     
     const loadItemsAsync=() =>{
-        return sendMessageAsync(registration)({type: "loadItems", data: null});
+        return sendMessageAsync(registration)({type: "loadItems", data: null, configurationName});
     }
 
     const clearAsync=() =>{
-        return sendMessageAsync(registration)({type: "clear", data: null});
+        return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
     }
 
-    const initAsync=(oidcServerConfiguration) =>{
+    const initAsync=async (oidcServerConfiguration) => {
         const ScriptVersion = "1.0.0";
-        return sendMessageAsync(registration)({type: "init", data: { oidcServerConfiguration, ScriptVersion }});
+        const result = await sendMessageAsync(registration)({
+            type: "init",
+            data: {oidcServerConfiguration, ScriptVersion},
+            configurationName
+        });
+        // @ts-ignore
+        return result.tokens;
     }    
     
     return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync };

@@ -66,8 +66,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              authenticatingComponent = Authenticating,
                                                                              loadingComponent = Loading,
 sessionLostComponent=SessionLost }) => {
-    
-    const getOidc =() => {
+    const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
     }
     const [oidcState, setOidc] = useState({getOidc});
@@ -76,7 +75,7 @@ sessionLostComponent=SessionLost }) => {
 
     useEffect(() => {
         let isMounted = true;
-        const oidc = getOidc();
+        const oidc = getOidc(configurationName);
         oidc.subscriveEvents((name, data) => {
             if(!isMounted){
                 return;
@@ -110,8 +109,6 @@ sessionLostComponent=SessionLost }) => {
     switch(event.name){
         case Oidc.eventNames.loginAsync_begin:
             return <AuthenticatingComponent />;
-        /*case Oidc.eventNames.loginAsync_error:
-            return <AuthenticateError />;*/
         case Oidc.eventNames.refreshTokensAsync_error:
             return <SessionLostComponent />;
         default:

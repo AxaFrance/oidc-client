@@ -33,11 +33,11 @@ export const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => strin
   return await fetch(url, newOptions);
 };
 
-export const withOidcFetch = (fetch) => (
+export const withOidcFetch = (fetch, configurationName="default") => (
     WrappedComponent
   ) => (props: ComponentWithFetchProps) => {
     const previousFetch = fetch || props.fetch;
-    const {accessToken} = useOidcAccessToken();
+    const {accessToken} = useOidcAccessToken(configurationName);
 
     const getAccessTokenInjected = () => { return accessToken };
     

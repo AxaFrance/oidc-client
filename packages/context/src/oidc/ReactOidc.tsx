@@ -2,24 +2,24 @@
 import {OidcContext} from "./OidcProvider";
 import Oidc from "./vanilla/oidc";
 
-export const useOidc =() =>{
+export const useOidc =(configurationName="default") =>{
     const {getOidc} = useContext(OidcContext);
     const login = (callbackPath=undefined) => {
-        return getOidc().loginAsync(callbackPath);
+        return getOidc(configurationName).loginAsync(callbackPath);
     };
     const logout = () => {
-        return getOidc().logoutAsync();
+        return getOidc(configurationName).logoutAsync();
     };
-    return {login, logout, isLogged: getOidc().tokens != null};
+    return {login, logout, isLogged: getOidc(configurationName).tokens != null};
 }
 
-export const useOidcAccessToken =() =>{
+export const useOidcAccessToken =(configurationName="default") =>{
     const {getOidc} = useContext(OidcContext);
     const [accessToken, setAccessToken] = useState<string>(null);
     
     useEffect(() => {
         let isMounted = true;
-        const oidc = getOidc();
+        const oidc = getOidc(configurationName);
         if(getOidc().tokens != null) {
             setAccessToken(getOidc().tokens.accessToken);
         }
@@ -39,21 +39,22 @@ export const useOidcAccessToken =() =>{
     return {accessToken};
 }
 
-export const useOidcIdToken =() =>{
+export const useOidcIdToken =(configurationName="default") =>{
     const {getOidc} = useContext(OidcContext);
     const [idToken, setIDToken] = useState<string>(null);
 
     useEffect(() => {
         let isMounted = true;
-        const oidc = getOidc();
-        if(getOidc().tokens != null) {
-            setIDToken(getOidc().tokens.idToken);
+        const oidc = getOidc(configurationName);
+        if(oidc.tokens != null) {
+            setIDToken(oidc.tokens.idToken);
         }
         const subscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired){
                 if(isMounted) {
-                    setIDToken(getOidc().tokens != null  ? getOidc().tokens.idToken : null);
+                    const tokens = oidc.tokens;
+                    setIDToken(tokens != null  ? tokens.idToken : null);
                 }
             }
 

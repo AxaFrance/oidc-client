@@ -23,7 +23,7 @@
   ],
   "scripts": {
     "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcTrustedDomains.js ./public",
-    "start": "npm run copy && set PORT=5002 && react-scripts start",
+    "start": "npm run copy && set PORT=4200 && react-scripts start",
     "build": "npm run copy && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

@@ -2,9 +2,9 @@ import React, {useEffect, useContext} from 'react';
 
 import {OidcContext} from "./OidcProvider"
 
-export const OidcSecure = ({children, callbackPath=null}) => {
+export const OidcSecure = ({children, callbackPath=null, configurationName="default"}) => {
     const {getOidc} = useContext(OidcContext);
-    const oidc = getOidc();
+    const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
            

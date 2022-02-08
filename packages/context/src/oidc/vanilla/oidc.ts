@@ -115,9 +115,11 @@ export class Oidc {
     public tokens: null;
     public events: Array<any>;
     private timeoutId: NodeJS.Timeout;
-    private serviceWorker?: any; 
-    constructor(configuration:Configuration) {
+    private serviceWorker?: any;
+    private configurationName: string; 
+    constructor(configuration:Configuration, configurationName="default") {
       this.configuration = configuration
+        this.configurationName= configurationName;
       this.tokens = null
       this.userInfo = null;
       this.events = [];
@@ -171,7 +173,7 @@ export class Oidc {
         try {
             const configuration = this.configuration;
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
-            serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url);
+            serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             if(serviceWorker) {
                 const tokens = await serviceWorker.initAsync(oidcServerConfiguration);
                 if (tokens) {
@@ -180,8 +182,7 @@ export class Oidc {
                     this.tokens = {...updatedTokens, idToken: parseJwt(updatedTokens.idToken)};
                     this.serviceWorker = serviceWorker;
                     await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
-                    console.log("tokens inside ServiceWorker are valid");
-                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are invalid"});
+                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
                 }
                 this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no exiting session found"});
@@ -205,7 +206,7 @@ export class Oidc {
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
-            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url);
+            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage;
             if(serviceWorker){
                 await serviceWorker.initAsync(oidcServerConfiguration);
@@ -237,7 +238,7 @@ export class Oidc {
         const redirectURL = this.configuration.redirect_uri;
         const authority =  this.configuration.authority;
         const oidcServerConfiguration = await this.initAsync(authority);
-        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url);
+        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
         this.serviceWorker = serviceWorker;
         let storage = null;
         if(serviceWorker){

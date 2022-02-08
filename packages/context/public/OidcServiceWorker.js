@@ -1,12 +1,12 @@
 ﻿﻿this.importScripts('OidcTrustedDomains.js');
 
 const handleInstall = () => {
-    console.log('[SWOPR] service worker installed');
+    console.log('[OidcServiceWorker] service worker installed');
     self.skipWaiting();
 };
 
 const handleActivate = () => {
-    console.log('[SWOPR] service worker activated');
+    console.log('[OidcServiceWorker] service worker activated');
     return self.clients.claim();
 };
 
@@ -15,12 +15,12 @@ let database = {
         tokens: null,
         items:[],
         oidcServerConfiguration: null
-    }    
+    }
 };
 
-function hideTokens() {
+function hideTokens(currentDatabaseElement) {
     return async (response) => {
-        database.default.tokens = await response.json()
+        currentDatabaseElement.tokens = await response.json()
 
         const secureTokens = {
             ...database.default.tokens,
@@ -33,39 +33,65 @@ function hideTokens() {
     };
 }
 
-const handleFetch = async (event) => {
-    const currentDatabase = database.default;
-    const oidcServerConfiguration = database.default.oidcServerConfiguration;
-    
-    const domainsToSendTokens = oidcServerConfiguration != null ? [
-        oidcServerConfiguration.userInfoEndpoint, ...trustedDomains.default
-    ] : [...trustedDomains.default];
-    
-    const originalRequest = event.request;
-    domainsToSendTokens.forEach(domain => {
-        if(originalRequest.url.startsWith(domain)) {
-            const newRequest = new Request(originalRequest, {
-                headers: {
-                    ...originalRequest.headers,
-                    authorization: "Bearer " + currentDatabase.tokens.access_token
-                }
-            });
-            event.waitUntil(event.respondWith(fetch(newRequest)));
+const getCurrentDatabaseTokenEndpoint = (database, url) => {
+    for (const [key, value] of Object.entries(database)) {
+        if(value && value.oidcServerConfiguration !=null && url.startsWith(value.oidcServerConfiguration.tokenEndpoint)){
+            return value;
         }
-    });
-    
+    }
+    return null;
+}
+
+const getCurrentDatabaseDomain = (database, url) => {
+    for (const [key, currentDatabase] of Object.entries(database)) {
+
+        const oidcServerConfiguration = currentDatabase.oidcServerConfiguration;
+        const domainsToSendTokens = oidcServerConfiguration != null ? [
+            oidcServerConfiguration.userInfoEndpoint, ...trustedDomains[key]
+        ] : [...trustedDomains[key]];
+
+        let hasToSendToken = false;
+        for(let i=0;i<domainsToSendTokens.length;i++) {
+            const domain = domainsToSendTokens[i];
+            if (url.startsWith(domain)) {
+                hasToSendToken = true;
+                break;
+            }
+        }
+
+        if(hasToSendToken){
+            if(!currentDatabase.tokens) {
+                return null;
+            }
+            return currentDatabase;
+        }
+    }
+
+    return null;
+}
+
+const handleFetch = async (event) => {
+    const originalRequest = event.request;
+    const currentDatabase = getCurrentDatabaseDomain(database, originalRequest.url);
+    if(currentDatabase && currentDatabase.tokens) {
+        const newRequest = new Request(originalRequest, {
+            headers: {
+                ...originalRequest.headers,
+                authorization: "Bearer " + currentDatabase.tokens.access_token
+            }
+        });
+        event.waitUntil(event.respondWith(fetch(newRequest)));
+    }
+
     if(event.request.method !== "POST"){
         return;
     }
-    
-    if(oidcServerConfiguration === null){
-        return;
-    }
-    
-    if(originalRequest.url.startsWith(oidcServerConfiguration.tokenEndpoint)) {
-        if (currentDatabase.tokens != null) {
+
+    const currentDatabaseForTokenEndpoint = getCurrentDatabaseTokenEndpoint(database, originalRequest.url);
+    if(currentDatabaseForTokenEndpoint) {
+        if (currentDatabaseForTokenEndpoint.tokens != null) {
             const response =originalRequest.text().then(actualBody => {
-                const newBody = actualBody.replace('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER', encodeURIComponent(currentDatabase.tokens.refresh_token))
+                const newBody = actualBody.replace('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER', encodeURIComponent(currentDatabaseForTokenEndpoint.tokens.refresh_token))
                 return fetch(originalRequest, {
                     body: newBody,
                     method: originalRequest.method,
@@ -79,11 +105,11 @@ const handleFetch = async (event) => {
                     referrer: originalRequest.referrer,
                     credentials: originalRequest.credentials,
                     integrity: originalRequest.integrity
-                }).then(hideTokens());
+                }).then(hideTokens(currentDatabaseForTokenEndpoint));
             });
             event.waitUntil(event.respondWith(response));
         } else {
-            const response = fetch(event.request).then(hideTokens());
+            const response = fetch(event.request).then(hideTokens(currentDatabaseForTokenEndpoint));
             event.waitUntil(event.respondWith(response));
         }
     }
@@ -95,17 +121,19 @@ self.addEventListener('fetch', handleFetch);
 
 const ServiceWorkerVersion = "1.0.0";
 addEventListener('message', event => {
-    const currentDatabase = database.default;
+
     const port = event.ports[0];
     const data = event.data;
+    const configurationName = data.configurationName;
+    const currentDatabase = database[data.configurationName];
     switch (data.type){
         case "loadItems":
-            port.postMessage(currentDatabase.items);
+            port.postMessage(database[configurationName].items);
             return;
         case "clear":
             currentDatabase.tokens = null;
             currentDatabase.items = null;
-            port.postMessage("ok");
+            port.postMessage({configurationName});
             return;
         case "init":
             const ScriptVersion = data.data.ScriptVersion;
@@ -113,11 +141,11 @@ addEventListener('message', event => {
                 console.warn(`Service worker version is ${ServiceWorkerVersion} and script version is ${ScriptVersion}, please update your service worker it may not work properly.`)
             }
             currentDatabase.oidcServerConfiguration = data.data.oidcServerConfiguration;
-            port.postMessage(currentDatabase.tokens);
+            port.postMessage({tokens:currentDatabase.tokens,configurationName} );
             return;
         default:
             currentDatabase.items = data.data;
-            port.postMessage("ok");
+            port.postMessage({configurationName});
             return;
     }
 });
