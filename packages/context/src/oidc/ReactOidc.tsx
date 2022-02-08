@@ -58,7 +58,7 @@ export const useOidcIdToken =() =>{
             }
 
         });
-        return  () => {
+        return () => {
             isMounted = false;
             oidc.removeEventSubscription(subscriptionId);
         };

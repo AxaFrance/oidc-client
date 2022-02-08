@@ -27,6 +27,34 @@ type OidcProviderProps = {
     configuration?: Configuration;
 };
 
+const OidcSession = ({oidcState, children}) =>{
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        let isMounted = true;
+        const oidc = oidcState.getOidc();
+        oidc.tryKeepExistingSessionAsync().then( () =>  {
+            if(isMounted){
+                setLoading(false);
+            }
+        })
+
+        return () => {
+            oidc.destroyAsync();
+            isMounted = false;
+        }
+    }, []);
+
+    return (
+        <>
+            {loading ? (
+                <span>Loading</span>
+            ) : (
+                <>{children}</>
+            )}
+        </>
+    );
+}
+
 
 export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ children, configuration, configurationName = "default", callbackSuccessComponent, callbackErrorComponent,
 sessionLostComponent }) => {
@@ -56,10 +84,12 @@ sessionLostComponent }) => {
                     setEvent(defaultEventState);
                 }
         });
-        
-        setLoading(false);
+
+            if(isMounted) {
+                setLoading(false);
+            }
         return () => {
-            getOidc().destroyAsync();
+            oidc.destroyAsync();
             isMounted = false;
         }
     }, []);
@@ -82,7 +112,9 @@ sessionLostComponent }) => {
                                               callbackSuccessComponent={callbackSuccessComponent} 
                                               callbackErrorComponent={callbackErrorComponent}
                                                 sessionLostComponent={sessionLostComponent} >
-                                      {children}
+                                      <OidcSession oidcState={oidcState}>
+                                        {children}
+                                      </OidcSession>
                                 </OidcRoutes>
                             </OidcContext.Provider>
                     )}

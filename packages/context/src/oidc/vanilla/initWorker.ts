@@ -4,7 +4,7 @@ const sendMessageAsync = (registration) => (data) =>{
     return new Promise(function(resolve, reject) {
         const messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function (event) {
-            if (event.data.error) {
+            if (event.data && event.data.error) {
                 reject(event.data.error);
             } else {
                 resolve(event.data);
@@ -15,7 +15,7 @@ const sendMessageAsync = (registration) => (data) =>{
 } 
 
 
-export const initWorkerAsync = async(serviceWorkerRelativeUrl, oidcServerConfiguration) => {
+export const initWorkerAsync = async(serviceWorkerRelativeUrl) => {
     
     if(!navigator.serviceWorker||!serviceWorkerRelativeUrl){
         return null;
@@ -28,7 +28,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, oidcServerConfigu
         console.log('[OidcServiceWorker] proxy server ready');
     }
     catch(err) {
-        console.error('[OidcServiceWorker] error registering:', err)
+        console.error('[OidcServiceWorker] error registering:', err);
         return null;
     }
     
@@ -41,15 +41,13 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, oidcServerConfigu
     }
 
     const clearAsync=() =>{
-        return sendMessageAsync(registration)({type: "loadItems", data: null});
+        return sendMessageAsync(registration)({type: "clear", data: null});
     }
 
     const initAsync=(oidcServerConfiguration) =>{
         const ScriptVersion = "1.0.0";
         return sendMessageAsync(registration)({type: "init", data: { oidcServerConfiguration, ScriptVersion }});
-    }
+    }    
     
-    await initAsync(oidcServerConfiguration);
-    
-    return { saveItemsAsync, loadItemsAsync, clearAsync };
+    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync };
 }

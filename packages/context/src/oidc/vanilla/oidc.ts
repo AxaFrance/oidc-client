@@ -52,8 +52,8 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
     return response.state;
 }
-const autoRenewTokensAsync = async (oidc,refreshToken, intervalSeconds) =>{
-    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 20;
+const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
+    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 30;
     return setTimeout(async () => {
         const tokens = await oidc.refreshTokensAsync(refreshToken);
         oidc.tokens = { ...tokens, idToken: parseJwt(tokens.idToken)};
@@ -102,6 +102,12 @@ const eventNames = {
     refreshTokensAsync_begin: "refreshTokensAsync_begin",
     refreshTokensAsync_end: "refreshTokensAsync_end",
     refreshTokensAsync_error: "refreshTokensAsync_error",
+    refreshTokensAsync_silent_begin: "refreshTokensAsync_silent_begin",
+    refreshTokensAsync_silent_end: "refreshTokensAsync_silent_end",
+    refreshTokensAsync_silent_error: "refreshTokensAsync_silent_error",
+    tryKeepExistingSessionAsync_begin: "tryKeepExistingSessionAsync_begin",
+    tryKeepExistingSessionAsync_end: "tryKeepExistingSessionAsync_end",
+    tryKeepExistingSessionAsync_error: "tryKeepExistingSessionAsync_error",
 }
 
 export class Oidc {
@@ -156,6 +162,38 @@ export class Oidc {
         const oidcServerConfiguration = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
         return oidcServerConfiguration;
     }
+    
+    async tryKeepExistingSessionAsync() {
+        let serviceWorker
+        this.publishEvent(eventNames.tryKeepExistingSessionAsync_begin, {});
+        try {
+            const configuration = this.configuration;
+            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url);
+            if(serviceWorker) {
+                const tokens = await serviceWorker.initAsync(oidcServerConfiguration);
+                if (tokens) {
+                    const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
+                    // @ts-ignore
+                    this.tokens = {...updatedTokens, idToken: parseJwt(updatedTokens.idToken)};
+                    this.serviceWorker = serviceWorker;
+                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
+                    console.log("tokens inside ServiceWorker are valid");
+                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are invalid"});
+                    return true;
+                }
+                this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no exiting session found"});
+            }
+            this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no service worker"});
+            return false;
+        } catch (exception) {
+            if(serviceWorker){
+                await serviceWorker.clearAsync();
+            }
+            this.publishEvent(eventNames.tryKeepExistingSessionAsync_error, "tokens inside ServiceWorker are invalid");
+            return false;
+        }
+    }
 
     async loginAsync(callbackPath=undefined) {
         try {
@@ -165,9 +203,15 @@ export class Oidc {
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
-            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, oidcServerConfiguration);
-            const storage = serviceWorker == null ? new LocalStorageBackend():new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
-            
+            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url);
+            let storage;
+            if(serviceWorker){
+                await serviceWorker.initAsync(oidcServerConfiguration);
+                storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
+            } else{
+                storage = new LocalStorageBackend();
+            }
+                
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
             
@@ -186,15 +230,16 @@ export class Oidc {
     }
 
     async loginCallbackAsync() {
-        this.publishEvent(eventNames.loginCallbackAsync_begin, {})
+        this.publishEvent(eventNames.loginCallbackAsync_begin, {});
         const clientId = this.configuration.client_id;
         const redirectURL = this.configuration.redirect_uri;
         const authority =  this.configuration.authority;
         const oidcServerConfiguration = await this.initAsync(authority);
-        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, oidcServerConfiguration);
+        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url);
         this.serviceWorker = serviceWorker;
         let storage = null;
         if(serviceWorker){
+            await serviceWorker.initAsync(oidcServerConfiguration);
             const items = await serviceWorker.loadItemsAsync();
             storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
         }else{
@@ -246,9 +291,9 @@ export class Oidc {
         return promise;
     }
 
-    async refreshTokensAsync(refreshToken) {
+    async refreshTokensAsync(refreshToken, silentEvent = false) {
         try{
-            this.publishEvent(eventNames.refreshTokensAsync_begin, {})
+            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_begin : eventNames.refreshTokensAsync_begin, {})
             const configuration = this.configuration;
             const clientId = configuration.client_id;
             const redirectUri = configuration.redirect_uri;
@@ -267,11 +312,10 @@ export class Oidc {
             
             const oidcServerConfiguration = await this.initAsync(authority);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
-            this.publishEvent(eventNames.refreshTokensAsync_end, {});
-            console.log("tokens renewed");
+            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end, token_response);
             return token_response;
         } catch(exception) {
-            this.publishEvent(eventNames.refreshTokensAsync_error, {});
+            this.publishEvent( silentEvent ? eventNames.refreshTokensAsync_silent_error :eventNames.refreshTokensAsync_error, exception);
             throw exception;
         }
      }
