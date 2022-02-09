@@ -18,12 +18,16 @@ let database = {
     }
 };
 
-const accessTokenPayload = t => {
-    if (!t) {
-        return null;
-    }
-    const payload = JSON.parse(atob(t.split('.')[1]));
-    return payload;
+const accessTokenPayload = accessToken => {
+    try{
+        if (!accessToken) {
+            return null;
+        }
+            return JSON.parse(atob(accessToken.split('.')[1]));
+        } catch (e) {
+            console.error(e);
+        }
+    return null;
 };
 
 function hideTokens(currentDatabaseElement) {

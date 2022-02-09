@@ -1,4 +1,4 @@
-﻿﻿this.importScripts('OidcTrustedDomains.js');
+﻿this.importScripts('OidcTrustedDomains.js');
 
 const handleInstall = () => {
     console.log('[OidcServiceWorker] service worker installed');
@@ -18,12 +18,16 @@ let database = {
     }
 };
 
-const accessTokenPayload = t => {
-    if (!t) {
-        return null;
-    }
-    const payload = JSON.parse(atob(t.split('.')[1]));
-    return payload;
+const accessTokenPayload = accessToken => {
+    try{
+        if (!accessToken) {
+            return null;
+        }
+            return JSON.parse(atob(accessToken.split('.')[1]));
+        } catch (e) {
+            console.error(e);
+        }
+    return null;
 };
 
 function hideTokens(currentDatabaseElement) {
@@ -39,7 +43,6 @@ function hideTokens(currentDatabaseElement) {
             refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
             access_token_payload: accessTokenPayLoad
         };
-        console.log(secureTokens);
         const body = JSON.stringify(secureTokens)
         const newResponse = new Response(body, response)
         return newResponse;
