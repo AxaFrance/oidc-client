@@ -25,7 +25,7 @@ const idTokenPayload = (token) => {
     return JSON.parse(jsonPayload);
 }
 
-const accessTokenPayload = tokens => {
+const extractAccessTokenPayload = tokens => {
     if(tokens.accessTokenPayload)
     {
         return tokens.accessTokenPayload;
@@ -64,18 +64,18 @@ const oidcFactory = (configuration: Configuration, name="default") => {
 const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     const response = await oidc.loginCallbackAsync();
     const tokens = response.tokens
-    oidc.tokens = setTokens(tokens);
-    oidc.publishEvent(Oidc.eventNames.token_aquired, {});
-    oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
+    oidc.tokens = await setTokensAsync(oidc.serviceWorker, tokens);
+    oidc.publishEvent(Oidc.eventNames.token_aquired, oidc.tokens);
+    oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
     return response.state;
 }
 const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 30;
     return setTimeout(async () => {
         const tokens = await oidc.refreshTokensAsync(refreshToken);
-        oidc.tokens=setTokens(tokens);
-        oidc.publishEvent(Oidc.eventNames.token_renewed, {});
-        oidc.timeoutId = autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
+        oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
+        oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
+        oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
       }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
 }
 
@@ -108,8 +108,15 @@ const userInfoAsync = async (oidc)=> {
    return userInfo;
 }
 
-const setTokens = (tokens) =>{
-    return {...tokens, idTokenPayload: idTokenPayload(tokens.idToken), accessTokenPayload : accessTokenPayload(tokens)};
+const setTokensAsync = async (serviceWorker, tokens) =>{
+    let accessTokenPayload;
+    if(serviceWorker){
+        accessTokenPayload = await serviceWorker.getAccessTokenPayloadAsync();
+    }
+    else {
+        accessTokenPayload = extractAccessTokenPayload(tokens);
+    }
+    return {...tokens, idTokenPayload: idTokenPayload(tokens.idToken), accessTokenPayload};
 }
 
 const eventNames = {
@@ -200,7 +207,7 @@ export class Oidc {
                 if (tokens) {
                     const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                     // @ts-ignore
-                    this.tokens = setTokens(updatedTokens);
+                    this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
                     this.serviceWorker = serviceWorker;
                     await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});

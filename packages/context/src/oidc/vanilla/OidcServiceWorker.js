@@ -1,4 +1,4 @@
-﻿this.importScripts('OidcTrustedDomains.js');
+﻿﻿﻿this.importScripts('OidcTrustedDomains.js');
 
 const handleInstall = () => {
     console.log('[OidcServiceWorker] service worker installed');
@@ -18,7 +18,7 @@ let database = {
     }
 };
 
-const accessTokenPayload = accessToken => {
+function extractAccessTokenPayload(accessToken) {
     try{
         if (!accessToken) {
             return null;
@@ -32,20 +32,15 @@ const accessTokenPayload = accessToken => {
 
 function hideTokens(currentDatabaseElement) {
     return async (response) => {
-        
         const tokens = await response.json();
-        const accessTokenPayLoad = accessTokenPayload(tokens.access_token);
-        currentDatabaseElement.tokens = {...tokens, access_token_payload: accessTokenPayLoad};
-
+        currentDatabaseElement.tokens = tokens;
         const secureTokens = {
             ...tokens,
             access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
             refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
-            access_token_payload: accessTokenPayLoad
         };
         const body = JSON.stringify(secureTokens)
-        const newResponse = new Response(body, response)
-        return newResponse;
+        return new Response(body, response);
     };
 }
 
@@ -158,6 +153,11 @@ addEventListener('message', event => {
             }
             currentDatabase.oidcServerConfiguration = data.data.oidcServerConfiguration;
             port.postMessage({tokens:currentDatabase.tokens,configurationName} );
+            return;
+            
+        case "getAccessTokenPayload":
+            const accessTokenPayload = extractAccessTokenPayload(currentDatabase.tokens.access_token);
+            port.postMessage({configurationName, accessTokenPayload});
             return;
         default:
             currentDatabase.items = data.data;

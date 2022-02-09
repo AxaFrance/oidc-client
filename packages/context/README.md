@@ -170,7 +170,7 @@ export default Routes;
 
 ```javascript
 const DisplayAccessToken = () => {
-    const{ accessToken } = useOidcAccessToken();
+    const{ accessToken, accessTokenPayload } = useOidcAccessToken();
 
     if(!accessToken){
         return <p>you are not authentified</p>
@@ -191,7 +191,7 @@ const DisplayAccessToken = () => {
 
 ```javascript
 const DisplayIdToken =() => {
-    const{ idToken } = useOidcIdToken();
+    const{ idToken, idTokenPayload } = useOidcIdToken();
 
     if(!idToken){
         return <p>you are not authentified</p>

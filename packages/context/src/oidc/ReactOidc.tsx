@@ -22,15 +22,16 @@ export const useOidcAccessToken =(configurationName="default") =>{
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
-        if(getOidc().tokens != null) {
-            setAccessToken(getOidc().tokens.accessToken);
+        if(oidc.tokens) {
+            const tokens = oidc.tokens;
+            setAccessToken({accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload });
         }
         const subscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired){
                 if(isMounted) {
-                    const tokens = getOidc().tokens;
-                    setAccessToken(tokens != null  ? {accessToken :tokens.accessToken, accessTokenPayload: tokens.accessToken } : accessTokenInitialState);
+                    const tokens = oidc.tokens;
+                    setAccessToken(tokens != null  ? {accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload } : accessTokenInitialState);
                 }
             }
         });
@@ -39,6 +40,7 @@ export const useOidcAccessToken =(configurationName="default") =>{
             oidc.removeEventSubscription(subscriptionId);
         };
     }, []);
+    console.log(state)
     return state;
 }
 
@@ -51,8 +53,9 @@ export const useOidcIdToken =(configurationName="default") =>{
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
-        if(oidc.tokens != null) {
-            setIDToken(oidc.tokens.idToken);
+        if(oidc.tokens) {
+            const tokens = oidc.tokens;
+            setIDToken({idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload});
         }
         const subscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed

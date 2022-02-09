@@ -40,6 +40,16 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return sendMessageAsync(registration)({type: "loadItems", data: null, configurationName});
     }
 
+    const getAccessTokenPayloadAsync=async () => {
+        const result = await sendMessageAsync(registration)({
+            type: "getAccessTokenPayload",
+            data: null,
+            configurationName
+        });
+        // @ts-ignore
+        return result.accessTokenPayload;
+    }
+
     const clearAsync=() =>{
         return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
     }
@@ -55,5 +65,5 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return result.tokens;
     }    
     
-    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync };
+    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync, getAccessTokenPayloadAsync };
 }
