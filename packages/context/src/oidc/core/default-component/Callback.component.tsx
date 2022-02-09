@@ -16,7 +16,7 @@ const CallBackError = () =>  (<div className="oidc-callback">
 </div>
 </div>);
 
-const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBackSuccess }) => { 
+const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBackSuccess, configurationName }) => { 
   const {getOidc} = useContext(OidcContext);
   const [error, setError] = useState(false);
 
@@ -24,18 +24,22 @@ const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBa
   const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
   
   useEffect(() => {
-    const playCallback = async () => {
-        try {
-          const state = await getOidc().loginCallbackWithAutoTokensRenewAsync();
-          if (state != null){
-            history.replaceState(decodeURIComponent(state))
-          }
-          
-        } catch (error) {
-          setError(true)
+    let isMounted = true;
+    const playCallbackAsync = async () => {
+     
+      try {
+        const state = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
+        if (state != null && isMounted) {
+          history.replaceState(decodeURIComponent(state))
         }
-      };
-      playCallback()
+      } catch (error) {
+        setError(true)
+      }
+    };
+    playCallbackAsync();
+    return  () => {
+      isMounted = false;
+    };
   },[]);
 
   if(error){

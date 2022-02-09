@@ -2,9 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { Home } from "./Home";
 import {Profile, SecureProfile} from "./Profile";
-import {configurationAuth0, configurationIdentityServer} from './configurations';
+import {configurationIdentityServer} from './configurations';
 import {withOidcSecure,OidcProvider} from "./oidc";
 import {FetchUser} from "./FetchUser";
+import {MultiAuthContainer} from "./MultiAuth";
 
 function App() {
 
@@ -30,6 +31,9 @@ function App() {
               <li className="nav-item">
                 <Link className="nav-link" to="/user-fetch-secure">Secure User Fetch</Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/multi-auth">Multi Auth</Link>
+              </li>
             </ul>
           </div>
         </nav>
@@ -40,7 +44,7 @@ function App() {
           <Route exact path="/profile-secure-component" component={SecureProfile} />
           <Route exact path="/profile-secure-hoc" component={withOidcSecure(Profile)} />
           <Route exact path="/user-fetch-secure" component={FetchUser} />
-          <Route exact path="/multi-auth" component={FetchUser} />
+          <Route path="/multi-auth" component={MultiAuthContainer} />
         </div>
       </Router>
     </OidcProvider>

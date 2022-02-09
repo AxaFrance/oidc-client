@@ -40,7 +40,6 @@ export const useOidcAccessToken =(configurationName="default") =>{
             oidc.removeEventSubscription(subscriptionId);
         };
     }, []);
-    console.log(state)
     return state;
 }
 

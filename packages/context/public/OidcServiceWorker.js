@@ -1,4 +1,4 @@
-﻿﻿﻿this.importScripts('OidcTrustedDomains.js');
+﻿﻿﻿﻿this.importScripts('OidcTrustedDomains.js');
 
 const handleInstall = () => {
     console.log('[OidcServiceWorker] service worker installed');
@@ -136,7 +136,16 @@ addEventListener('message', event => {
     const port = event.ports[0];
     const data = event.data;
     const configurationName = data.configurationName;
-    const currentDatabase = database[data.configurationName];
+    let currentDatabase = database[configurationName];
+    
+    if(!currentDatabase){
+        database[configurationName] = {
+            tokens: null,
+            items:[],
+            oidcServerConfiguration: null
+        };
+        currentDatabase = database[configurationName];
+    }
     switch (data.type){
         case "loadItems":
             port.postMessage(database[configurationName].items);

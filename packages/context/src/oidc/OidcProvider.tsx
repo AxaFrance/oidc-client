@@ -29,11 +29,11 @@ type OidcProviderProps = {
     configuration?: Configuration;
 };
 
-const OidcSession = ({oidcState, loadingComponent, children}) =>{
+const OidcSession = ({oidcState, loadingComponent, children, configurationName}) =>{
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         let isMounted = true;
-        const oidc = oidcState.getOidc();
+        const oidc = oidcState.getOidc(configurationName);
         oidc.tryKeepExistingSessionAsync().then( () =>  {
             if(isMounted){
                 setLoading(false);
@@ -121,8 +121,9 @@ sessionLostComponent=SessionLost }) => {
                                   <OidcRoutes redirect_uri={configuration.redirect_uri} 
                                               callbackSuccessComponent={callbackSuccessComponent} 
                                               callbackErrorComponent={callbackErrorComponent}
+                                              configurationName={configurationName}
                                                 >
-                                      <OidcSession oidcState={oidcState} loadingComponent={LoadingComponent}>
+                                      <OidcSession oidcState={oidcState} loadingComponent={LoadingComponent} configurationName={configurationName}>
                                         {children}
                                       </OidcSession>
                                 </OidcRoutes>

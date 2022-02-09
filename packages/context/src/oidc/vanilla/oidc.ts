@@ -57,7 +57,7 @@ const oidcFactory = (configuration: Configuration, name="default") => {
     if(oidcDatabase[name]){
         return oidcDatabase[name];
     }
-    oidcDatabase[name] = new Oidc(configuration)
+    oidcDatabase[name] = new Oidc(configuration, name)
     return oidcDatabase[name];
 }
 

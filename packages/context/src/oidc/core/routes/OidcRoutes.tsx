@@ -17,13 +17,14 @@ const defaultProps: Partial<OidcRoutesProps> = {
 type OidcRoutesProps = {
   callbackSuccessComponent?: ComponentType;
   callbackErrorComponent?: ComponentType;
+  configurationName:string;
   redirect_uri: string;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   callbackErrorComponent,
   callbackSuccessComponent, redirect_uri,
-  children,
+  children, configurationName
 }) => {
   const [path, setPath] = useState(window.location.pathname);
 
@@ -39,7 +40,7 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
 
   switch (path) {
     case callbackPath:
-      return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} />;
+      return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} />;
     default:
       return <>{children}</>;
   }
