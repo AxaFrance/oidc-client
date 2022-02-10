@@ -70,7 +70,7 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     return response.state;
 }
 const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
-    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 30;
+    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return setTimeout(async () => {
         const tokens = await oidc.refreshTokensAsync(refreshToken);
         oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
@@ -203,7 +203,7 @@ export class Oidc {
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
             serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             if(serviceWorker) {
-                const tokens = await serviceWorker.initAsync(oidcServerConfiguration);
+                const tokens = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
                 if (tokens) {
                     const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                     // @ts-ignore
@@ -237,7 +237,7 @@ export class Oidc {
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage;
             if(serviceWorker){
-                await serviceWorker.initAsync(oidcServerConfiguration);
+                await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
             } else{
                 storage = new LocalStorageBackend();
@@ -270,14 +270,13 @@ export class Oidc {
         this.serviceWorker = serviceWorker;
         let storage = null;
         if(serviceWorker){
-            await serviceWorker.initAsync(oidcServerConfiguration);
+            await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
             const items = await serviceWorker.loadItemsAsync();
             storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
         }else{
             storage = new LocalStorageBackend();
         }
-       
-
+        
         const promise = new Promise((resolve, reject) => {
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
             // @ts-ignore

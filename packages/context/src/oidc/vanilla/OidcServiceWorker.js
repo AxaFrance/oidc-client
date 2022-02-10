@@ -10,8 +10,10 @@ const handleActivate = () => {
     return self.clients.claim();
 };
 
+let currentLoginCallbackConfigurationName = null;
 let database = {
     default: {
+        configurationName: "default",
         tokens: null,
         items:[],
         oidcServerConfiguration: null
@@ -23,34 +25,36 @@ function extractAccessTokenPayload(accessToken) {
         if (!accessToken) {
             return null;
         }
-            return JSON.parse(atob(accessToken.split('.')[1]));
-        } catch (e) {
-            console.error(e);
-        }
+        return JSON.parse(atob(accessToken.split('.')[1]));
+    } catch (e) {
+        console.error(e);
+    }
     return null;
-};
+}
 
 function hideTokens(currentDatabaseElement) {
+    const configurationName = currentDatabaseElement.configurationName;
     return async (response) => {
         const tokens = await response.json();
         currentDatabaseElement.tokens = tokens;
         const secureTokens = {
             ...tokens,
-            access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
-            refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER",
+            access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_"+configurationName,
+            refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_"+configurationName,
         };
         const body = JSON.stringify(secureTokens)
         return new Response(body, response);
     };
 }
 
-const getCurrentDatabaseTokenEndpoint = (database, url) => {
+const getCurrentDatabasesTokenEndpoint = (database, url) => {
+    const databases = [];
     for (const [key, value] of Object.entries(database)) {
         if(value && value.oidcServerConfiguration !=null && url.startsWith(value.oidcServerConfiguration.tokenEndpoint)){
-            return value;
+            databases.push(value);
         }
     }
-    return null;
+    return databases;
 }
 
 const getCurrentDatabaseDomain = (database, url) => {
@@ -83,12 +87,12 @@ const getCurrentDatabaseDomain = (database, url) => {
 
 const handleFetch = async (event) => {
     const originalRequest = event.request;
-    const currentDatabase = getCurrentDatabaseDomain(database, originalRequest.url);
-    if(currentDatabase && currentDatabase.tokens) {
+    const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(database, originalRequest.url);
+    if(currentDatabaseForRequestAccessToken && currentDatabaseForRequestAccessToken.tokens) {
         const newRequest = new Request(originalRequest, {
             headers: {
                 ...originalRequest.headers,
-                authorization: "Bearer " + currentDatabase.tokens.access_token
+                authorization: "Bearer " + currentDatabaseForRequestAccessToken.tokens.access_token
             }
         });
         event.waitUntil(event.respondWith(fetch(newRequest)));
@@ -97,12 +101,22 @@ const handleFetch = async (event) => {
     if(event.request.method !== "POST"){
         return;
     }
-
-    const currentDatabaseForTokenEndpoint = getCurrentDatabaseTokenEndpoint(database, originalRequest.url);
-    if(currentDatabaseForTokenEndpoint) {
-        if (currentDatabaseForTokenEndpoint.tokens != null) {
-            const response =originalRequest.text().then(actualBody => {
-                const newBody = actualBody.replace('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER', encodeURIComponent(currentDatabaseForTokenEndpoint.tokens.refresh_token))
+    let currentDatabase = null;
+    const currentDatabases = getCurrentDatabasesTokenEndpoint(database, originalRequest.url);
+    const numberDatabase = currentDatabases.length;
+    if(numberDatabase > 0) {
+        const response =originalRequest.text().then(actualBody => {
+            if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
+                let newBody = actualBody;
+                for(let i= 0;i<numberDatabase;i++){
+                    const currentDb = currentDatabases[i];
+                    const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
+                    if(actualBody.includes(key)) {
+                        newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
+                        currentDatabase = currentDb;
+                        break;
+                    }
+                }
                 return fetch(originalRequest, {
                     body: newBody,
                     method: originalRequest.method,
@@ -116,13 +130,28 @@ const handleFetch = async (event) => {
                     referrer: originalRequest.referrer,
                     credentials: originalRequest.credentials,
                     integrity: originalRequest.integrity
-                }).then(hideTokens(currentDatabaseForTokenEndpoint));
-            });
-            event.waitUntil(event.respondWith(response));
-        } else {
-            const response = fetch(event.request).then(hideTokens(currentDatabaseForTokenEndpoint));
-            event.waitUntil(event.respondWith(response));
-        }
+                }).then(hideTokens(currentDatabase));
+            } else if(currentLoginCallbackConfigurationName){
+                currentDatabase = database[currentLoginCallbackConfigurationName];
+                currentLoginCallbackConfigurationName=null;
+                return fetch(originalRequest,{
+                    body: actualBody,
+                    method: originalRequest.method,
+                    headers: {
+                        ...originalRequest.headers,
+                        'Content-Type':'application/x-www-form-urlencoded'
+                    },
+                    mode: originalRequest.mode,
+                    cache: originalRequest.cache,
+                    redirect: originalRequest.redirect,
+                    referrer: originalRequest.referrer,
+                    credentials: originalRequest.credentials,
+                    integrity: originalRequest.integrity
+                }).then(hideTokens(currentDatabase));
+            }
+        });
+
+        event.waitUntil(event.respondWith(response));
     }
 };
 
@@ -137,12 +166,13 @@ addEventListener('message', event => {
     const data = event.data;
     const configurationName = data.configurationName;
     let currentDatabase = database[configurationName];
-    
+
     if(!currentDatabase){
         database[configurationName] = {
             tokens: null,
             items:[],
-            oidcServerConfiguration: null
+            oidcServerConfiguration: null,
+            configurationName: configurationName,
         };
         currentDatabase = database[configurationName];
         if(!trustedDomains[configurationName]) {
@@ -164,9 +194,15 @@ addEventListener('message', event => {
                 console.warn(`Service worker version is ${ServiceWorkerVersion} and script version is ${ScriptVersion}, please update your service worker it may not work properly.`)
             }
             currentDatabase.oidcServerConfiguration = data.data.oidcServerConfiguration;
-            port.postMessage({tokens:currentDatabase.tokens,configurationName} );
+            const where = data.data.where;
+            if(where === "loginCallbackAsync" || where === "tryKeepExistingSessionAsync") {
+                currentLoginCallbackConfigurationName = configurationName;
+            } else{
+                currentLoginCallbackConfigurationName = null;
+            }
+            port.postMessage({tokens:currentDatabase.tokens, configurationName} );
             return;
-            
+
         case "getAccessTokenPayload":
             const accessTokenPayload = extractAccessTokenPayload(currentDatabase.tokens.access_token);
             port.postMessage({configurationName, accessTokenPayload});

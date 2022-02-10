@@ -8,10 +8,18 @@
 Easy set up of OIDC for react and use the new react context api as state management.
 It use AppAuthJS behind the scene. 
 
-- Simple : refresh and access token are auto refreshed in background
-- OIDC with pcke mode only
-- No cookies problem : No silent complexe signin mode
-- Secure : with the use of Service Worker, you tokens are not accessible to the client (protect against XSRF attacks)
+- Simple : 
+  - refresh_token and access_token are auto refreshed in background
+  - with the use of the Service Worker, you do not need to inject the access_token everywhere
+- No cookies problem : No silent signin mode inside in iframe
+- Secure : 
+  - with the use of Service Worker, your tokens are not accessible to the client (protect against XSRF attacks)
+  - OIDC using client side Code Credential Grant with pkce only
+- Multiple Authentification :
+  - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
+  - You can authenticate to multiple different providers inside the same SPA (single page application) website
+- Flexible :
+  - Work with Service Worker (more secure) and whithout for older browser (less secure)
 
 
 # Getting Started
@@ -20,10 +28,10 @@ It use AppAuthJS behind the scene.
 npm install @axa-fr/react-oidc-context copyfiles --save
 ```
 
-If you need a very secure mode where refresh_token and access_token will be hide by a service worker.
+If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
 
 Add a copy task in order to install and stay up to date an Oidc Service Worker.
-The only file you should edit is "OidcTrustedDomains.js" which will never be erased.
+The only file you should edit is "OidcTrustedDomains.js" which will never be erased with following configuration bellow.
 
 ```sh
 #package.json
@@ -169,6 +177,8 @@ export default Routes;
 ## How to get "Access Token" : Hook method
 
 ```javascript
+import { useOidcAccessToken } from '@axa-fr/react-oidc-context';
+
 const DisplayAccessToken = () => {
     const{ accessToken, accessTokenPayload } = useOidcAccessToken();
 
@@ -190,6 +200,8 @@ const DisplayAccessToken = () => {
 ## How to get IDToken : Hook method
 
 ```javascript
+import { useOidcIdToken } from '@axa-fr/react-oidc-context';
+
 const DisplayIdToken =() => {
     const{ idToken, idTokenPayload } = useOidcIdToken();
 
@@ -213,6 +225,8 @@ const DisplayIdToken =() => {
 ## How to get User Information : Hook method
 
 ```javascript
+import { useOidcUser } from '@axa-fr/react-oidc-context';
+
 const DisplayUserInfo = () => {
     const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
 
