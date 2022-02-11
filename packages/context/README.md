@@ -61,9 +61,9 @@ import { OidcProvider } from '@axa-fr/react-oidc-context';
 import Header from './Layout/Header';
 import Routes from './Router';
 
-// This configuration use hybrid mode
-// ServiceWorker are use if available (more secure) else it tokens are given to the client
-// You need to give inside your code the "access_token" when using fetch
+// This configuration use ServiceWorker only (more secure mode)
+// If service token are not available an information page display, and the user cannot continue
+// You do not need to send access_token whithin your code
 const configuration = {
     client_id: 'interactive.public.short',
     redirect_uri: 'http://localhost:4200/authentication/callback',
@@ -72,17 +72,17 @@ const configuration = {
     service_worker_relative_url:'/OidcServiceWorker.js',
 };
 
-// This configuration use ServiceWorker only (more secure mode)
-// If service token are not available an information page display, and the user cannot continue
-// You do not need to send access_token whithin your code
 /*
+// This configuration use hybrid mode
+// ServiceWorker are used if available (more secure) else tokens are given to the client
+// You need to give inside your code the "access_token" when using fetch
 const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
-  service_worker_only:true,
+  service_worker_only:false,
 }
 ;*/
 

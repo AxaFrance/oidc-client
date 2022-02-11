@@ -2,7 +2,7 @@
 
 const handleInstall = () => {
     console.log('[OidcServiceWorker] service worker installed');
-    self.skipWaiting();
+    //self.skipWaiting();
 };
 
 const handleActivate = () => {
@@ -189,10 +189,6 @@ addEventListener('message', event => {
             port.postMessage({configurationName});
             return;
         case "init":
-            const ScriptVersion = data.data.ScriptVersion;
-            if(ServiceWorkerVersion !== ScriptVersion) {
-                console.warn(`Service worker version is ${ServiceWorkerVersion} and script version is ${ScriptVersion}, please update your service worker it may not work properly.`)
-            }
             currentDatabase.oidcServerConfiguration = data.data.oidcServerConfiguration;
             const where = data.data.where;
             if(where === "loginCallbackAsync" || where === "tryKeepExistingSessionAsync") {
@@ -200,7 +196,7 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
-            port.postMessage({tokens:currentDatabase.tokens, configurationName} );
+            port.postMessage({tokens:currentDatabase.tokens, configurationName, serviceWorkerVersion :ServiceWorkerVersion} );
             return;
 
         case "getAccessTokenPayload":

@@ -55,10 +55,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     }
 
     const initAsync=async (oidcServerConfiguration, where) => {
-        const ScriptVersion = "1.0.0";
         const result = await sendMessageAsync(registration)({
             type: "init",
-            data: {oidcServerConfiguration, ScriptVersion, where},
+            data: {oidcServerConfiguration, where},
             configurationName
         });
         // @ts-ignore

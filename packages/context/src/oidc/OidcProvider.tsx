@@ -86,13 +86,14 @@ sessionLostComponent=SessionLost }) => {
             if(!isMounted){
                 return;
             }
+            
             setEvent({name, data});
            if(name == Oidc.eventNames.loginAsync_begin 
                 || name == Oidc.eventNames.loginCallbackAsync_end
                 || name == Oidc.eventNames.loginAsync_error 
                 || name == Oidc.eventNames.loginCallbackAsync_error
                 || name == Oidc.eventNames.refreshTokensAsync_error
-                || name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only){
+                || name == Oidc.eventNames.service_worker_not_supported_by_browser && !(configuration.service_worker_only === true)){
                     setEvent({name, data});
                 } else{
                if(defaultEventState.name === event.name)
@@ -123,7 +124,7 @@ sessionLostComponent=SessionLost }) => {
             return <AuthenticatingComponent />;
         case Oidc.eventNames.loginAsync_error:
         case Oidc.eventNames.loginCallbackAsync_error:
-            return <AuthenticatingComponent />;
+            return <AuthenticatingErrorComponent />;
         case Oidc.eventNames.refreshTokensAsync_error:
             return <SessionLostComponent />;
         default:

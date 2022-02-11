@@ -18,3 +18,20 @@ export const Home = () => {
         </div>
     )
 };
+
+/*
+const sendFile = (e) => {
+    e.preventDefault();
+    let photo = document.getElementById("imgFile").files[0];
+    let formData = new FormData();
+
+    formData.append("photo", photo);
+    fetch('/upload/image', {method: "POST", body: formData});
+}
+
+const FileUpload = () =>{
+    return (<form method="post" action="#" onSubmit={sendFile} >
+        <input type="file" name="imgFile" id="imgFile"/>
+            <input type="submit" id="submit" value="upload"  />
+    </form>)
+}*/

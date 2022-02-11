@@ -146,7 +146,8 @@ export class Oidc {
     public events: Array<any>;
     private timeoutId: NodeJS.Timeout;
     private serviceWorker?: any;
-    private configurationName: string; 
+    private configurationName: string;
+    private version: string; 
     constructor(configuration:Configuration, configurationName="default") {
       this.configuration = configuration
         this.configurationName= configurationName;
@@ -163,6 +164,7 @@ export class Oidc {
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
+      this.version = "1.0.0";
     }
 
     subscriveEvents(func){
