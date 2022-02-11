@@ -25,10 +25,10 @@ function extractAccessTokenPayload(accessToken) {
         if (!accessToken) {
             return null;
         }
-            return JSON.parse(atob(accessToken.split('.')[1]));
-        } catch (e) {
-            console.error(e);
-        }
+        return JSON.parse(atob(accessToken.split('.')[1]));
+    } catch (e) {
+        console.error(e);
+    }
     return null;
 }
 
@@ -105,53 +105,53 @@ const handleFetch = async (event) => {
     const currentDatabases = getCurrentDatabasesTokenEndpoint(database, originalRequest.url);
     const numberDatabase = currentDatabases.length;
     if(numberDatabase > 0) {
-            const response =originalRequest.text().then(actualBody => {
-                if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
-                    let newBody = actualBody;
-                    for(let i= 0;i<numberDatabase;i++){
-                        const currentDb = currentDatabases[i];
-                        const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
-                        if(actualBody.includes(key)) {
-                            newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
-                            currentDatabase = currentDb;
-                            break;
-                        }
+        const response =originalRequest.text().then(actualBody => {
+            if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
+                let newBody = actualBody;
+                for(let i= 0;i<numberDatabase;i++){
+                    const currentDb = currentDatabases[i];
+                    const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
+                    if(actualBody.includes(key)) {
+                        newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
+                        currentDatabase = currentDb;
+                        break;
                     }
-                    return fetch(originalRequest, {
-                        body: newBody,
-                        method: originalRequest.method,
-                        headers: {
-                            ...originalRequest.headers,
-                            'Content-Type':'application/x-www-form-urlencoded'
-                        },
-                        mode: originalRequest.mode,
-                        cache: originalRequest.cache,
-                        redirect: originalRequest.redirect,
-                        referrer: originalRequest.referrer,
-                        credentials: originalRequest.credentials,
-                        integrity: originalRequest.integrity
-                    }).then(hideTokens(currentDatabase));
-                } else if(currentLoginCallbackConfigurationName){
-                    currentDatabase = database[currentLoginCallbackConfigurationName];
-                    currentLoginCallbackConfigurationName=null;
-                    return fetch(originalRequest,{
-                        body: actualBody,
-                        method: originalRequest.method,
-                        headers: {
-                            ...originalRequest.headers,
-                            'Content-Type':'application/x-www-form-urlencoded'
-                        },
-                        mode: originalRequest.mode,
-                        cache: originalRequest.cache,
-                        redirect: originalRequest.redirect,
-                        referrer: originalRequest.referrer,
-                        credentials: originalRequest.credentials,
-                        integrity: originalRequest.integrity
-                    }).then(hideTokens(currentDatabase));
                 }
-                });
-            
-            event.waitUntil(event.respondWith(response));
+                return fetch(originalRequest, {
+                    body: newBody,
+                    method: originalRequest.method,
+                    headers: {
+                        ...originalRequest.headers,
+                        'Content-Type':'application/x-www-form-urlencoded'
+                    },
+                    mode: originalRequest.mode,
+                    cache: originalRequest.cache,
+                    redirect: originalRequest.redirect,
+                    referrer: originalRequest.referrer,
+                    credentials: originalRequest.credentials,
+                    integrity: originalRequest.integrity
+                }).then(hideTokens(currentDatabase));
+            } else if(currentLoginCallbackConfigurationName){
+                currentDatabase = database[currentLoginCallbackConfigurationName];
+                currentLoginCallbackConfigurationName=null;
+                return fetch(originalRequest,{
+                    body: actualBody,
+                    method: originalRequest.method,
+                    headers: {
+                        ...originalRequest.headers,
+                        'Content-Type':'application/x-www-form-urlencoded'
+                    },
+                    mode: originalRequest.mode,
+                    cache: originalRequest.cache,
+                    redirect: originalRequest.redirect,
+                    referrer: originalRequest.referrer,
+                    credentials: originalRequest.credentials,
+                    integrity: originalRequest.integrity
+                }).then(hideTokens(currentDatabase));
+            }
+        });
+
+        event.waitUntil(event.respondWith(response));
     }
 };
 
@@ -166,7 +166,7 @@ addEventListener('message', event => {
     const data = event.data;
     const configurationName = data.configurationName;
     let currentDatabase = database[configurationName];
-    
+
     if(!currentDatabase){
         database[configurationName] = {
             tokens: null,
@@ -200,9 +200,9 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
-            port.postMessage({tokens:currentDatabase.tokens,configurationName} );
+            port.postMessage({tokens:currentDatabase.tokens, configurationName} );
             return;
-            
+
         case "getAccessTokenPayload":
             const accessTokenPayload = extractAccessTokenPayload(currentDatabase.tokens.access_token);
             port.postMessage({configurationName, accessTokenPayload});

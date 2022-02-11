@@ -49,7 +49,7 @@ const extractAccessTokenPayload = tokens => {
     authority: string,
     refresh_time_before_tokens_expiration_in_second?: number,
     service_worker_relative_url?:string,
-    service_worker_trusted_urls_relative_url?:string,
+     service_worker_only?:boolean,
 };
 
 const oidcDatabase = {};
@@ -120,12 +120,14 @@ const setTokensAsync = async (serviceWorker, tokens) =>{
 }
 
 const eventNames = {
+    service_worker_not_supported_by_browser: "service_worker_not_supported_by_browser",
     token_aquired: "token_aquired",
     token_renewed: "token_renewed",
     loginAsync_begin:"loginAsync_begin",
     loginAsync_error:"loginAsync_error",
     loginCallbackAsync_begin:"loginCallbackAsync_begin",
     loginCallbackAsync_end:"loginCallbackAsync_end",
+    loginCallbackAsync_error:"loginCallbackAsync_error",
     refreshTokensAsync_begin: "refreshTokensAsync_begin",
     refreshTokensAsync_end: "refreshTokensAsync_end",
     refreshTokensAsync_error: "refreshTokensAsync_error",
@@ -214,6 +216,10 @@ export class Oidc {
                     return true;
                 }
                 this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no exiting session found"});
+            } else if(configuration.service_worker_relative_url) {
+                this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
+                    message: "service worker is not supported by this browser"
+                });
             }
             this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no service worker"});
             return false;
@@ -261,64 +267,70 @@ export class Oidc {
     }
 
     async loginCallbackAsync() {
-        this.publishEvent(eventNames.loginCallbackAsync_begin, {});
-        const clientId = this.configuration.client_id;
-        const redirectURL = this.configuration.redirect_uri;
-        const authority =  this.configuration.authority;
-        const oidcServerConfiguration = await this.initAsync(authority);
-        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
-        this.serviceWorker = serviceWorker;
-        let storage = null;
-        if(serviceWorker){
-            await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
-            const items = await serviceWorker.loadItemsAsync();
-            storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
-        }else{
-            storage = new LocalStorageBackend();
-        }
-        
-        const promise = new Promise((resolve, reject) => {
-            const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-            // @ts-ignore
-            const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
-            const notifier = new AuthorizationNotifier();
-            authorizationHandler.setAuthorizationNotifier(notifier);
-        
-            notifier.setAuthorizationListener(async (request, response, error) => {
-                if(error){
-                    reject(error);
-                }
-                if (!response) {
-                    return;
-                }
-
-                let extras = null;
-                if (request && request.internal) {
-                    extras = {};
-                    extras.code_verifier = request.internal.code_verifier;
-                }
-
-                const tokenRequest = new TokenRequest({
-                    client_id: clientId,
-                    redirect_uri: redirectURL,
-                    grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
-                    code: response.code,
-                    refresh_token: undefined,
-                    extras,
+        try {
+            this.publishEvent(eventNames.loginCallbackAsync_begin, {});
+            const clientId = this.configuration.client_id;
+            const redirectURL = this.configuration.redirect_uri;
+            const authority =  this.configuration.authority;
+            const oidcServerConfiguration = await this.initAsync(authority);
+            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+            this.serviceWorker = serviceWorker;
+            let storage = null;
+            if(serviceWorker){
+                await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
+                const items = await serviceWorker.loadItemsAsync();
+                storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
+            }else{
+                storage = new LocalStorageBackend();
+            }
+            
+            const promise = new Promise((resolve, reject) => {
+                const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
+                // @ts-ignore
+                const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
+                const notifier = new AuthorizationNotifier();
+                authorizationHandler.setAuthorizationNotifier(notifier);
+            
+                notifier.setAuthorizationListener(async (request, response, error) => {
+                    if(error){
+                        reject(error);
+                    }
+                    if (!response) {
+                        return;
+                    }
+    
+                    let extras = null;
+                    if (request && request.internal) {
+                        extras = {};
+                        extras.code_verifier = request.internal.code_verifier;
+                    }
+    
+                    const tokenRequest = new TokenRequest({
+                        client_id: clientId,
+                        redirect_uri: redirectURL,
+                        grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
+                        code: response.code,
+                        refresh_token: undefined,
+                        extras,
+                    });
+                    try {
+                        
+                        const tokenResponse =  await tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest);
+                        resolve({tokens:tokenResponse, state: request.state});
+                        this.publishEvent(eventNames.loginCallbackAsync_end, {})
+                    } catch(exception){
+                        this.publishEvent(eventNames.loginCallbackAsync_error, exception);
+                        reject(exception);
+                    }
                 });
-                try {
-                    
-                    const tokenResponse =  await tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest);
-                    resolve({tokens:tokenResponse, state: request.state});
-                    this.publishEvent(eventNames.loginCallbackAsync_end, {})
-                } catch(exception){
-                    reject(exception);
-                }
+                authorizationHandler.completeAuthorizationRequestIfPossible();
             });
-            authorizationHandler.completeAuthorizationRequestIfPossible();
-        });
-        
-        return promise;
+            return promise;
+        } catch(exception){
+            this.publishEvent(eventNames.loginCallbackAsync_error, exception);
+            throw exception;
+        }
+
     }
 
     async refreshTokensAsync(refreshToken, silentEvent = false) {

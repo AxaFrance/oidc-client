@@ -2,6 +2,8 @@ import React, {ComponentType, createContext, FC, PropsWithChildren, useEffect, u
 import Oidc, {Configuration} from './vanilla/oidc';
 import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, Callback} from './core/default-component/index';
+import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
+import AuthenticatingError from "./core/default-component/AuthenticateError.component";
 
 export const OidcContext = createContext<oidcContext>(null);
 
@@ -25,6 +27,8 @@ type OidcProviderProps = {
     sessionLostComponent?: ComponentType;
     authenticatingComponent?: ComponentType;
     loadingComponent?: ComponentType;
+    authenticatingErrorComponent?: ComponentType;
+    serviceWorkerNotSupportedComponent?: ComponentType;
     configurationName?: string;
     configuration?: Configuration;
 };
@@ -65,6 +69,8 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              callbackErrorComponent = AuthenticateError,
                                                                              authenticatingComponent = Authenticating,
                                                                              loadingComponent = Loading,
+                                                                             serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
+                                                                             authenticatingErrorComponent = AuthenticatingError,
 sessionLostComponent=SessionLost }) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
@@ -82,9 +88,11 @@ sessionLostComponent=SessionLost }) => {
             }
             setEvent({name, data});
            if(name == Oidc.eventNames.loginAsync_begin 
-               || name == Oidc.eventNames.loginCallbackAsync_end
-               || name == Oidc.eventNames.loginAsync_error 
-                ||name == Oidc.eventNames.refreshTokensAsync_error){
+                || name == Oidc.eventNames.loginCallbackAsync_end
+                || name == Oidc.eventNames.loginAsync_error 
+                || name == Oidc.eventNames.loginCallbackAsync_error
+                || name == Oidc.eventNames.refreshTokensAsync_error
+                || name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only){
                     setEvent({name, data});
                 } else{
                if(defaultEventState.name === event.name)
@@ -105,9 +113,16 @@ sessionLostComponent=SessionLost }) => {
     const SessionLostComponent = sessionLostComponent;
     const AuthenticatingComponent = authenticatingComponent;
     const LoadingComponent = loadingComponent;
+    const ServiceWorkerNotSupportedComponent = serviceWorkerNotSupportedComponent;
+    const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
     switch(event.name){
+        case Oidc.eventNames.service_worker_not_supported_by_browser:
+            return <ServiceWorkerNotSupportedComponent />;
         case Oidc.eventNames.loginAsync_begin:
+            return <AuthenticatingComponent />;
+        case Oidc.eventNames.loginAsync_error:
+        case Oidc.eventNames.loginCallbackAsync_error:
             return <AuthenticatingComponent />;
         case Oidc.eventNames.refreshTokensAsync_error:
             return <SessionLostComponent />;

@@ -7,7 +7,6 @@ export const OidcSecure = ({children, callbackPath=null, configurationName="defa
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
-           
             oidc.loginAsync(callbackPath);
         }
         return () => {

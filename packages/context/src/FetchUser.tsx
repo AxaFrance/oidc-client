@@ -25,7 +25,7 @@ const DisplayUserInfo = ({fetch}) => {
         return  () => {
             isMounted = false;
         };
-    });
+    },[]);
     
     if(isLoading){
         return "Loading";

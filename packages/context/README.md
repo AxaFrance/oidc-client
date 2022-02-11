@@ -61,14 +61,41 @@ import { OidcProvider } from '@axa-fr/react-oidc-context';
 import Header from './Layout/Header';
 import Routes from './Router';
 
+// This configuration use hybrid mode
+// ServiceWorker are use if available (more secure) else it tokens are given to the client
+// You need to give inside your code the "access_token" when using fetch
 const configuration = {
     client_id: 'interactive.public.short',
     redirect_uri: 'http://localhost:4200/authentication/callback',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.identityserver.io',
-    refresh_time_before_tokens_expiration_in_second: 70,
     service_worker_relative_url:'/OidcServiceWorker.js',
 };
+
+// This configuration use ServiceWorker only (more secure mode)
+// If service token are not available an information page display, and the user cannot continue
+// You do not need to send access_token whithin your code
+/*
+const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:4200/authentication/callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.identityserver.io',
+  service_worker_relative_url:'/OidcServiceWorker.js',
+  service_worker_only:true,
+}
+;*/
+
+// This configuration do not use service worker (less secure mode)
+// Does not support multi auth
+/*
+const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:4200/authentication/callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.identityserver.io',
+};
+*/
 
 const App = () => (
     <OidcProvider configuration={configuration} >
@@ -90,6 +117,7 @@ const propTypes = {
   authenticating: PropTypes.elementType, // you can inject your own authenticationg component
   callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
   callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
+  serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url

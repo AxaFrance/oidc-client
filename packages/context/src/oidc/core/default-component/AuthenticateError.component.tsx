@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const Authenticating = () => (
+const AuthenticatingError = () => (
   <div className="oidc-authenticating">
     <div className="oidc-authenticating__container">
       <h1 className="oidc-authenticating__title">Authentification erreur</h1>
@@ -9,4 +9,4 @@ const Authenticating = () => (
   </div>
 );
 
-export default Authenticating;
+export default AuthenticatingError;
