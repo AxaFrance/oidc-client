@@ -1,6 +1,5 @@
 import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Callback } from '../default-component/index';
 import { getPath } from './route-utils';
 import CallbackComponent from '../default-component/Callback.component';
 

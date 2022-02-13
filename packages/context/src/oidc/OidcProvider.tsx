@@ -11,14 +11,6 @@ export type oidcContext = {
     getOidc: Function;
 };
 
-export const OidcConsumer = OidcContext.Consumer;
-
-export const withOidc = Component => props => (
-    <OidcConsumer>
-        {store => <Component {...props} {...store} />}
-    </OidcConsumer>
-);
-
 const defaultEventState = {name:"", data:null};
 
 type OidcProviderProps = {
@@ -43,9 +35,8 @@ const OidcSession = ({oidcState, loadingComponent, children, configurationName})
                 setLoading(false);
             }
         })
-
+ 
         return () => {
-            oidc.destroyAsync();
             isMounted = false;
         }
     }, []);
@@ -105,7 +96,6 @@ sessionLostComponent=SessionLost }) => {
                 setLoading(false);
             }
         return () => {
-            oidc.destroyAsync();
             isMounted = false;
         }
     }, []);
@@ -143,7 +133,7 @@ sessionLostComponent=SessionLost }) => {
                                         {children}
                                       </OidcSession>
                                 </OidcRoutes>
-                            </OidcContext.Provider>
+                            </OidcContext.Provider> 
                     )}
                 </>
             );

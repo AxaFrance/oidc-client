@@ -189,6 +189,9 @@ export class Oidc {
     static getOrCreate(configuration, name="default") {
         return oidcFactory(configuration, name);
     }
+    static get(name="default") {
+        return oidcDatabase[name];
+    }
     static eventNames = eventNames;
 
     async initAsync(authority) {
@@ -207,7 +210,7 @@ export class Oidc {
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
             serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             if(serviceWorker) {
-                const tokens = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
+                const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
                 if (tokens) {
                     const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                     // @ts-ignore
@@ -238,14 +241,21 @@ export class Oidc {
         try {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
-            const state = url 
+            const state = url
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
-            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+            let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage;
             if(serviceWorker){
-                await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                const {isUpdateDetected} = await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                if(isUpdateDetected){
+                    // Install and activate new worker
+                    await serviceWorker.updateAsync();
+                    // Init new worker
+                    await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                }
+                
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
             } else{
                 storage = new LocalStorageBackend();
@@ -322,6 +332,7 @@ export class Oidc {
                         this.publishEvent(eventNames.loginCallbackAsync_end, {})
                     } catch(exception){
                         this.publishEvent(eventNames.loginCallbackAsync_error, exception);
+                        console.error(exception);
                         reject(exception);
                     }
                 });
@@ -329,6 +340,7 @@ export class Oidc {
             });
             return promise;
         } catch(exception){
+            console.error(exception);
             this.publishEvent(eventNames.loginCallbackAsync_error, exception);
             throw exception;
         }
@@ -359,6 +371,7 @@ export class Oidc {
             this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end, token_response);
             return token_response;
         } catch(exception) {
+            console.error(exception);
             this.publishEvent( silentEvent ? eventNames.refreshTokensAsync_silent_error :eventNames.refreshTokensAsync_error, exception);
             throw exception;
         }
@@ -384,7 +397,8 @@ export class Oidc {
      
     async logoutAsync() {
         const oidcServerConfiguration = await this.initAsync(this.configuration.authority);
-        await this.destroyAsync();
+        // TODO implement real logout
+        await this.destroyAsync();  
         window.location.href = oidcServerConfiguration.endSessionEndpoint;
     }
   }

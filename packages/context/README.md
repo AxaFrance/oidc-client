@@ -10,7 +10,7 @@ It use AppAuthJS behind the scene.
 
 - Simple : 
   - refresh_token and access_token are auto refreshed in background
-  - with the use of the Service Worker, you do not need to inject the access_token everywhere
+  - with the use of the Service Worker, you do not need to inject the access_token in every fetch, juste configure OidcTrustedDomains.js
 - No cookies problem : No silent signin mode inside in iframe
 - Secure : 
   - with the use of Service Worker, your tokens are not accessible to the client (protect against XSRF attacks)
@@ -61,18 +61,6 @@ import { OidcProvider } from '@axa-fr/react-oidc-context';
 import Header from './Layout/Header';
 import Routes from './Router';
 
-// This configuration use ServiceWorker only (more secure mode)
-// If service token are not available an information page display, and the user cannot continue
-// You do not need to send access_token whithin your code
-const configuration = {
-    client_id: 'interactive.public.short',
-    redirect_uri: 'http://localhost:4200/authentication/callback',
-    scope: 'openid profile email api offline_access',
-    authority: 'https://demo.identityserver.io',
-    service_worker_relative_url:'/OidcServiceWorker.js',
-};
-
-/*
 // This configuration use hybrid mode
 // ServiceWorker are used if available (more secure) else tokens are given to the client
 // You need to give inside your code the "access_token" when using fetch
@@ -83,19 +71,7 @@ const configuration = {
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
   service_worker_only:false,
-}
-;*/
-
-// This configuration do not use service worker (less secure mode)
-// Does not support multi auth
-/*
-const configuration = {
-  client_id: 'interactive.public.short',
-  redirect_uri: 'http://localhost:4200/authentication/callback',
-  scope: 'openid profile email api offline_access',
-  authority: 'https://demo.identityserver.io',
 };
-*/
 
 const App = () => (
     <OidcProvider configuration={configuration} >
@@ -219,6 +195,7 @@ const DisplayAccessToken = () => {
                 <h5 className="card-title">Access Token</h5>
                 <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. ""access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
                 {accessToken != null && <p className="card-text">{JSON.stringify(accessToken)}</p>}
+                {accessTokenPayload != null && <p className="card-text">{JSON.stringify(accessTokenPayload)}</p>}
             </div>
         </div>
     )
@@ -242,6 +219,7 @@ const DisplayIdToken =() => {
             <div className="card-body">
                 <h5 className="card-title">ID Token</h5>
                 {idToken != null && <p className="card-text">{JSON.stringify(idToken)}</p>}
+                {idTokenPayload != null && <p className="card-text">{JSON.stringify(idTokenPayload)}</p>}
             </div>
         </div>
     );

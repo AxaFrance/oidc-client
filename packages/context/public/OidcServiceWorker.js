@@ -1,18 +1,18 @@
 ﻿this.importScripts('OidcTrustedDomains.js');
 
-const handleInstall = () => {
-    console.log('[OidcServiceWorker] service worker installed');
-   // self.skipWaiting();     
-};
+const id = Math.round(new Date().getTime() / 1000).toString();
 
+const handleInstall = () => {
+    console.log('[OidcServiceWorker] service worker installed ' + id);
+}; 
+ 
 const handleActivate = () => {
-    console.log('[OidcServiceWorker] service worker activated');
-    return self.clients.claim();
+    console.log('[OidcServiceWorker] service worker activated ' + id);
 };
 
 let currentLoginCallbackConfigurationName = null;
-let database = {
-    default: {
+let database = { 
+    default: {  
         configurationName: "default",
         tokens: null,
         items:[],
@@ -20,12 +20,16 @@ let database = {
     }
 };
 
-function extractAccessTokenPayload(accessToken) {
+function extractAccessTokenPayload(accessToken) { 
     try{
-        if (!accessToken) {
+        if (!accessToken) { 
             return null;
         }
-        return JSON.parse(atob(accessToken.split('.')[1]));
+        if(accessToken.includes('.')) {
+            return JSON.parse(atob(accessToken.split('.')[1]));
+        } else {
+            return null;
+        }
     } catch (e) {
         console.error(e);
     }
@@ -45,7 +49,7 @@ function hideTokens(currentDatabaseElement) {
         const body = JSON.stringify(secureTokens)
         return new Response(body, response);
     };
-}
+} 
 
 const getCurrentDatabasesTokenEndpoint = (database, url) => {
     const databases = [];
@@ -84,6 +88,8 @@ const getCurrentDatabaseDomain = (database, url) => {
 
     return null;
 }
+
+
 
 const handleFetch = async (event) => {
     const originalRequest = event.request;
@@ -159,9 +165,8 @@ self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
-const ServiceWorkerVersion = "1.0.0";
-addEventListener('message', event => {
 
+addEventListener('message', event => {
     const port = event.ports[0];
     const data = event.data;
     const configurationName = data.configurationName;
@@ -173,13 +178,19 @@ addEventListener('message', event => {
             items:[],
             oidcServerConfiguration: null,
             configurationName: configurationName,
-        };
+        }; 
         currentDatabase = database[configurationName];
         if(!trustedDomains[configurationName]) {
             trustedDomains[configurationName] = [];
         }
     }
-    switch (data.type){
+    switch (data.type){   
+        case "skipWaiting":
+            self.skipWaiting().then(async () => {
+                await self.clients.claim();
+                port.postMessage({configurationName});
+            });
+            return;
         case "loadItems":
             port.postMessage(database[configurationName].items);
             return;
@@ -196,7 +207,7 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
-            port.postMessage({tokens:currentDatabase.tokens, configurationName, serviceWorkerVersion :ServiceWorkerVersion} );
+            port.postMessage({tokens:currentDatabase.tokens, configurationName} );
             return;
 
         case "getAccessTokenPayload":
@@ -208,5 +219,5 @@ addEventListener('message', event => {
             port.postMessage({configurationName});
             return;
     }
-}); 
+});
 

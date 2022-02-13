@@ -12,8 +12,9 @@ const sendMessageAsync = (registration) => (data) =>{
         };
         registration.active.postMessage(data, [messageChannel.port2]);
     });
-} 
+}
 
+let isUpdateDetected = false;
 
 export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
     
@@ -31,6 +32,32 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         console.error('[OidcServiceWorker] error registering:', err);
         return null;
     }
+
+    const updateAsync = () =>{
+        return sendMessageAsync(registration)({type: "skipWaiting", data: null, configurationName});
+    }
+
+    if (registration.waiting) {
+        //await updateAsync();
+    }
+    
+        registration.addEventListener('updatefound', () => {
+            console.log('Service Worker update detected!');
+            if (registration.installing) {
+                // wait until the new Service worker is actually installed (ready to take over)
+                registration.installing.addEventListener('statechange', () => {
+                    if (registration.waiting) {
+                        // if there's an existing controller (previous Service Worker), show the prompt
+                        if (navigator.serviceWorker.controller) {
+                            isUpdateDetected = true;
+                        } else {
+                            // otherwise it's the first install, nothing to do
+                            console.log('Service Worker initialized for the first time')
+                        }
+                    }
+                })
+            }
+        });
     
     const saveItemsAsync =(items) =>{
             return sendMessageAsync(registration)({type: "saveItems", data: items, configurationName});
@@ -61,8 +88,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return result.tokens;
+        return { tokens : result.tokens, isUpdateDetected };
     }    
     
-    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync, getAccessTokenPayloadAsync };
+
+    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync, getAccessTokenPayloadAsync, updateAsync };
 }
