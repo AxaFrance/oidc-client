@@ -18,12 +18,6 @@ exports[`Session Lost test suite SessionLost renders correctly 1`] = `
       >
         Votre session est expirée. Veuillez vous ré-authentifier.
       </p>
-      <button
-        class="oidc-session-lost__button"
-        type="button"
-      >
-        Ré-authentifier
-      </button>
     </div>
   </div>
 </DocumentFragment>
@@ -47,12 +41,6 @@ exports[`Session Lost test suite SessionLostContainer renders correctly 1`] = `
       >
         Votre session est expirée. Veuillez vous ré-authentifier.
       </p>
-      <button
-        class="oidc-session-lost__button"
-        type="button"
-      >
-        Ré-authentifier
-      </button>
     </div>
   </div>
 </DocumentFragment>

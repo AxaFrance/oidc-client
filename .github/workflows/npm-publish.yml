@@ -48,3 +48,15 @@ jobs:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/vanilla/package.json
           #dry-run: true
+          
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=axaguildev
+            -Dsonar.projectKey=AxaGuilDEv_react-oidc
+            -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
+            -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info

@@ -118,6 +118,7 @@ sessionLostComponent=SessionLost }) => {
         case Oidc.eventNames.refreshTokensAsync_error:
             return <SessionLostComponent />;
         default:
+            // @ts-ignore
             return (
                 <>
                     {loading ? (
