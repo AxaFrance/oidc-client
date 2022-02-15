@@ -21,18 +21,32 @@
   - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc)
   - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4**
-  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4**
+  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4 : react-oidc-context also works with redux**
   - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
 - [Concepts](#concepts)
 - [Contribute](#contribute)
 
 ## About
 
-These components is used to manage client authentication.
+These libraries is used to manage client authentication.
 It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS).
 
 In the v4 we have chosen to remove a lot the surface API in order to simplify usage.
-It prepare the comming V5 version which will hide tokens in a ServiceWorker (for more security secure).
+In this version you can use a ServiceWorker that will hide the refresh_token and access_token (for more security).
+
+- Simple :
+  - refresh_token and access_token are auto refreshed in background
+  - with the use of the Service Worker, you do not need to inject the access_token in every fetch, juste configure OidcTrustedDomains.js
+- No cookies problem : No silent signin mode inside in iframe
+- Secure :
+  - with the use of Service Worker, your tokens are not accessible to the client (protect against XSRF attacks)
+  - OIDC using client side Code Credential Grant with pkce only
+- Multiple Authentification :
+  - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
+  - You can authenticate to multiple different providers inside the same SPA (single page application) website
+- Flexible :
+  - Work with Service Worker (more secure) and whithout for older browser (less secure)
+
 
 ## Getting Started
 
@@ -41,25 +55,17 @@ It prepare the comming V5 version which will hide tokens in a ServiceWorker (for
 
 ## Example
 
-- [`create react app & context api`](./packages/context)
+```sh
+git clone https://github.com/AxaGuilDEv/react-oidc.git
+cd react-oidc/packages/context
+npm install
+npm start
+```
 
 ## How It Works
 
 These components encapsulate the use of "AppAuth-JS" in order to hide workfow complexity.
 Internally, native History API is used to be router library agnostic.
-
-## Concept
-
-A set of react components and HOC to make Oidc client easy!
-
-The purpose of the component is :
-
-- Simple set up
-- React component protection (by composing)
-- Standardize the "Routes" used by the oauth flow
-- Manage the recovery of tokens and different exchanges with "openid connect" server
-- Flexible : You can customize routes and redirect components if you need it
-- HOC => override "fetch" in order to retrieve a new "fetch" that will be able to manage http 401 and http 403 response.
 
 ## Contribute
 

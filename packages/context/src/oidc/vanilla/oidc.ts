@@ -237,7 +237,7 @@ export class Oidc {
         }
     }
 
-    async loginAsync(callbackPath=undefined) {
+    async loginAsync(callbackPath:string=undefined) {
         try {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');

@@ -23,9 +23,17 @@ type OidcProviderProps = {
     serviceWorkerNotSupportedComponent?: ComponentType;
     configurationName?: string;
     configuration?: Configuration;
+    children: any;
 };
 
-const OidcSession = ({oidcState, loadingComponent, children, configurationName}) =>{
+type OidcSessionProps = {
+    oidcState:string;
+    configurationName: string;
+    loadingComponent: ComponentType
+};
+
+
+const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({oidcState, loadingComponent, children, configurationName}) =>{
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         let isMounted = true;
