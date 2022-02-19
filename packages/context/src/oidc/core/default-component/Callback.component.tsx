@@ -19,6 +19,7 @@ const CallBackError = () =>  (<div className="oidc-callback">
 const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBackSuccess, configurationName }) => { 
   const {getOidc} = useContext(OidcContext);
   const [error, setError] = useState(false);
+  const [isLoading, setLoading] = useState(true);
 
   const CallbackErrorComponent = callBackError || CallBackError;
   const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
@@ -33,6 +34,7 @@ const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBa
           history.replaceState(decodeURIComponent(state))
         }
       } catch (error) {
+        setLoading(false);
         setError(true)
       }
     };
@@ -41,6 +43,10 @@ const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBa
       isMounted = false;
     };
   },[]);
+  
+  if(isLoading){
+    return null;
+  }
 
   if(error){
     return <CallbackErrorComponent />

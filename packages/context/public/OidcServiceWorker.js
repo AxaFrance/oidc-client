@@ -38,16 +38,17 @@ function extractAccessTokenPayload(accessToken) {
 
 function hideTokens(currentDatabaseElement) {
     const configurationName = currentDatabaseElement.configurationName;
-    return async (response) => {
-        const tokens = await response.json();
-        currentDatabaseElement.tokens = tokens;
-        const secureTokens = {
-            ...tokens,
-            access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_"+configurationName,
-            refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_"+configurationName,
-        };
-        const body = JSON.stringify(secureTokens)
-        return new Response(body, response);
+    return (response) => {
+        return response.json().then(tokens => {
+            currentDatabaseElement.tokens = tokens;
+            const secureTokens = {
+                ...tokens,
+                access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_" + configurationName,
+                refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_" + configurationName,
+            };
+            const body = JSON.stringify(secureTokens)
+            return new Response(body, response);
+        });
     };
 } 
 
@@ -111,53 +112,63 @@ const handleFetch = async (event) => {
     const currentDatabases = getCurrentDatabasesTokenEndpoint(database, originalRequest.url);
     const numberDatabase = currentDatabases.length;
     if(numberDatabase > 0) {
-        const response =originalRequest.text().then(actualBody => {
-            if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
-                let newBody = actualBody;
-                for(let i= 0;i<numberDatabase;i++){
-                    const currentDb = currentDatabases[i];
-                    const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
-                    if(actualBody.includes(key)) {
-                        newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
-                        currentDatabase = currentDb;
-                        break;
+        const maPromesse = new Promise((resolve, reject) => {
+                const response =originalRequest.text().then(actualBody => {
+                    if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
+                        let newBody = actualBody;
+                        for(let i= 0;i<numberDatabase;i++){
+                            const currentDb = currentDatabases[i];
+                            const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
+                            if(actualBody.includes(key)) {
+                                newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
+                                currentDatabase = currentDb;
+                                break;
+                            }
+                        }
+                        return fetch(originalRequest, {
+                            body: newBody,
+                            method: originalRequest.method,
+                            headers: {
+                                ...originalRequest.headers,
+                                'Content-Type':'application/x-www-form-urlencoded'
+                            },
+                            mode: originalRequest.mode,
+                            cache: originalRequest.cache,
+                            redirect: originalRequest.redirect,
+                            referrer: originalRequest.referrer,
+                            credentials: originalRequest.credentials,
+                            integrity: originalRequest.integrity
+                        }).then(hideTokens(currentDatabase));
+                    } else if(currentLoginCallbackConfigurationName){
+                        currentDatabase = database[currentLoginCallbackConfigurationName];
+                        currentLoginCallbackConfigurationName=null;
+                        return fetch(originalRequest,{
+                            body: actualBody,
+                            method: originalRequest.method,
+                            headers: {
+                                ...originalRequest.headers,
+                                'Content-Type':'application/x-www-form-urlencoded'
+                            },
+                            mode: originalRequest.mode,
+                            cache: originalRequest.cache,
+                            redirect: originalRequest.redirect,
+                            referrer: originalRequest.referrer,
+                            credentials: originalRequest.credentials,
+                            integrity: originalRequest.integrity
+                        }).then(hideTokens(currentDatabase));
                     }
+                });
+            response.then(r => {
+                if(r !== undefined){
+                    resolve(r);
                 }
-                return fetch(originalRequest, {
-                    body: newBody,
-                    method: originalRequest.method,
-                    headers: {
-                        ...originalRequest.headers,
-                        'Content-Type':'application/x-www-form-urlencoded'
-                    },
-                    mode: originalRequest.mode,
-                    cache: originalRequest.cache,
-                    redirect: originalRequest.redirect,
-                    referrer: originalRequest.referrer,
-                    credentials: originalRequest.credentials,
-                    integrity: originalRequest.integrity
-                }).then(hideTokens(currentDatabase));
-            } else if(currentLoginCallbackConfigurationName){
-                currentDatabase = database[currentLoginCallbackConfigurationName];
-                currentLoginCallbackConfigurationName=null;
-                return fetch(originalRequest,{
-                    body: actualBody,
-                    method: originalRequest.method,
-                    headers: {
-                        ...originalRequest.headers,
-                        'Content-Type':'application/x-www-form-urlencoded'
-                    },
-                    mode: originalRequest.mode,
-                    cache: originalRequest.cache,
-                    redirect: originalRequest.redirect,
-                    referrer: originalRequest.referrer,
-                    credentials: originalRequest.credentials,
-                    integrity: originalRequest.integrity
-                }).then(hideTokens(currentDatabase));
-            }
+            }).catch(err => {
+                if(r !== err) {
+                    reject(err);
+                }
+            });
         });
-
-        event.waitUntil(event.respondWith(response));
+        event.waitUntil(event.respondWith(maPromesse));
     }
 };
 

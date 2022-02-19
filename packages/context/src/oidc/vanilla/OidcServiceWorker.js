@@ -4,15 +4,15 @@ const id = Math.round(new Date().getTime() / 1000).toString();
 
 const handleInstall = () => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
-}; 
- 
+};
+
 const handleActivate = () => {
     console.log('[OidcServiceWorker] service worker activated ' + id);
 };
 
 let currentLoginCallbackConfigurationName = null;
-let database = { 
-    default: {  
+let database = {
+    default: {
         configurationName: "default",
         tokens: null,
         items:[],
@@ -20,9 +20,9 @@ let database = {
     }
 };
 
-function extractAccessTokenPayload(accessToken) { 
+function extractAccessTokenPayload(accessToken) {
     try{
-        if (!accessToken) { 
+        if (!accessToken) {
             return null;
         }
         if(accessToken.includes('.')) {
@@ -38,18 +38,19 @@ function extractAccessTokenPayload(accessToken) {
 
 function hideTokens(currentDatabaseElement) {
     const configurationName = currentDatabaseElement.configurationName;
-    return async (response) => {
-        const tokens = await response.json();
-        currentDatabaseElement.tokens = tokens;
-        const secureTokens = {
-            ...tokens,
-            access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_"+configurationName,
-            refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_"+configurationName,
-        };
-        const body = JSON.stringify(secureTokens)
-        return new Response(body, response);
+    return (response) => {
+        return response.json().then(tokens => {
+            currentDatabaseElement.tokens = tokens;
+            const secureTokens = {
+                ...tokens,
+                access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_" + configurationName,
+                refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_" + configurationName,
+            };
+            const body = JSON.stringify(secureTokens)
+            return new Response(body, response);
+        });
     };
-} 
+}
 
 const getCurrentDatabasesTokenEndpoint = (database, url) => {
     const databases = [];
@@ -111,53 +112,63 @@ const handleFetch = async (event) => {
     const currentDatabases = getCurrentDatabasesTokenEndpoint(database, originalRequest.url);
     const numberDatabase = currentDatabases.length;
     if(numberDatabase > 0) {
-        const response =originalRequest.text().then(actualBody => {
-            if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
-                let newBody = actualBody;
-                for(let i= 0;i<numberDatabase;i++){
-                    const currentDb = currentDatabases[i];
-                    const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
-                    if(actualBody.includes(key)) {
-                        newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
-                        currentDatabase = currentDb;
-                        break;
+        const maPromesse = new Promise((resolve, reject) => {
+            const response =originalRequest.text().then(actualBody => {
+                if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
+                    let newBody = actualBody;
+                    for(let i= 0;i<numberDatabase;i++){
+                        const currentDb = currentDatabases[i];
+                        const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
+                        if(actualBody.includes(key)) {
+                            newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
+                            currentDatabase = currentDb;
+                            break;
+                        }
                     }
+                    return fetch(originalRequest, {
+                        body: newBody,
+                        method: originalRequest.method,
+                        headers: {
+                            ...originalRequest.headers,
+                            'Content-Type':'application/x-www-form-urlencoded'
+                        },
+                        mode: originalRequest.mode,
+                        cache: originalRequest.cache,
+                        redirect: originalRequest.redirect,
+                        referrer: originalRequest.referrer,
+                        credentials: originalRequest.credentials,
+                        integrity: originalRequest.integrity
+                    }).then(hideTokens(currentDatabase));
+                } else if(currentLoginCallbackConfigurationName){
+                    currentDatabase = database[currentLoginCallbackConfigurationName];
+                    currentLoginCallbackConfigurationName=null;
+                    return fetch(originalRequest,{
+                        body: actualBody,
+                        method: originalRequest.method,
+                        headers: {
+                            ...originalRequest.headers,
+                            'Content-Type':'application/x-www-form-urlencoded'
+                        },
+                        mode: originalRequest.mode,
+                        cache: originalRequest.cache,
+                        redirect: originalRequest.redirect,
+                        referrer: originalRequest.referrer,
+                        credentials: originalRequest.credentials,
+                        integrity: originalRequest.integrity
+                    }).then(hideTokens(currentDatabase));
                 }
-                return fetch(originalRequest, {
-                    body: newBody,
-                    method: originalRequest.method,
-                    headers: {
-                        ...originalRequest.headers,
-                        'Content-Type':'application/x-www-form-urlencoded'
-                    },
-                    mode: originalRequest.mode,
-                    cache: originalRequest.cache,
-                    redirect: originalRequest.redirect,
-                    referrer: originalRequest.referrer,
-                    credentials: originalRequest.credentials,
-                    integrity: originalRequest.integrity
-                }).then(hideTokens(currentDatabase));
-            } else if(currentLoginCallbackConfigurationName){
-                currentDatabase = database[currentLoginCallbackConfigurationName];
-                currentLoginCallbackConfigurationName=null;
-                return fetch(originalRequest,{
-                    body: actualBody,
-                    method: originalRequest.method,
-                    headers: {
-                        ...originalRequest.headers,
-                        'Content-Type':'application/x-www-form-urlencoded'
-                    },
-                    mode: originalRequest.mode,
-                    cache: originalRequest.cache,
-                    redirect: originalRequest.redirect,
-                    referrer: originalRequest.referrer,
-                    credentials: originalRequest.credentials,
-                    integrity: originalRequest.integrity
-                }).then(hideTokens(currentDatabase));
-            }
+            });
+            response.then(r => {
+                if(r !== undefined){
+                    resolve(r);
+                }
+            }).catch(err => {
+                if(r !== err) {
+                    reject(err);
+                }
+            });
         });
-
-        event.waitUntil(event.respondWith(response));
+        event.waitUntil(event.respondWith(maPromesse));
     }
 };
 
@@ -178,13 +189,13 @@ addEventListener('message', event => {
             items:[],
             oidcServerConfiguration: null,
             configurationName: configurationName,
-        }; 
+        };
         currentDatabase = database[configurationName];
         if(!trustedDomains[configurationName]) {
             trustedDomains[configurationName] = [];
         }
     }
-    switch (data.type){   
+    switch (data.type){
         case "skipWaiting":
             self.skipWaiting().then(async () => {
                 await self.clients.claim();
