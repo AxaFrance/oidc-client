@@ -163,7 +163,7 @@ const handleFetch = async (event) => {
                     resolve(r);
                 }
             }).catch(err => {
-                if(r !== err) {
+                if(err !== undefined) {
                     reject(err);
                 }
             });
