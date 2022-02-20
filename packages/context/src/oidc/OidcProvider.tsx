@@ -82,23 +82,22 @@ sessionLostComponent=SessionLost }) => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
         oidc.subscriveEvents((name, data) => {
-            if(!isMounted){
-                return;
-            }
-            
-            setEvent({name, data});
-           if(name == Oidc.eventNames.loginAsync_begin 
-                || name == Oidc.eventNames.loginCallbackAsync_end
-                || name == Oidc.eventNames.loginAsync_error 
-                || name == Oidc.eventNames.loginCallbackAsync_error
-                || name == Oidc.eventNames.refreshTokensAsync_error
-                || name == Oidc.eventNames.service_worker_not_supported_by_browser && !(configuration.service_worker_only === true)){
-                    setEvent({name, data});
-                } else{
-               if(defaultEventState.name === event.name)
-                    setEvent(defaultEventState);
+                if (!isMounted) {
+                    return;
                 }
-        });
+
+                if (name == Oidc.eventNames.loginAsync_begin
+                    || name == Oidc.eventNames.loginCallbackAsync_end
+                    || name == Oidc.eventNames.loginAsync_error
+                    || name == Oidc.eventNames.loginCallbackAsync_error
+                    || name == Oidc.eventNames.refreshTokensAsync_error
+                ) {
+                    setEvent({name, data});
+                } else if (name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
+                    setEvent({name, data});
+                }
+            }
+        );
 
             if(isMounted) {
                 setLoading(false);
