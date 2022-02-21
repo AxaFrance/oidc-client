@@ -151,7 +151,7 @@ const DisplayIdToken =() => {
 
 ```
 
-# How to get User Information
+How to get User Information
 
 ```javascript
 import { useOidcUser } from '@axa-fr/react-oidc-context';
