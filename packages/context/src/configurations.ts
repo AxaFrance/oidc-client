@@ -5,7 +5,7 @@ export const configurationIdentityServer = {
     authority: 'https://demo.identityserver.io',
     refresh_time_before_tokens_expiration_in_second: 70,
     service_worker_relative_url:'/OidcServiceWorker.js',
-    service_worker_only: true,
+    service_worker_only: false,
   };
 
 

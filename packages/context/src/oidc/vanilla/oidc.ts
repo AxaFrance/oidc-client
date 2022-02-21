@@ -164,7 +164,6 @@ export class Oidc {
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
-      this.version = "1.0.0";
     }
 
     subscriveEvents(func){
