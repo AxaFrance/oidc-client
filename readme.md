@@ -21,7 +21,7 @@
   - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc)
   - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4**
-  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4 : react-oidc-context also works with redux**
+  - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4 : use react-oidc-context which works with redux and in fact does not use any react context**
   - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
 - [Concepts](#concepts)
 - [Contribute](#contribute)
@@ -29,9 +29,9 @@
 ## About
 
 These libraries is used to manage client authentication.
-It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS).
+V4 uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
 
-In the v4 we have chosen to remove a lot the surface API in order to simplify usage.
+In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
 In this version you can use a ServiceWorker that will hide the refresh_token and access_token (for more security).
 
 - Simple :
@@ -50,7 +50,80 @@ In this version you can use a ServiceWorker that will hide the refresh_token and
 
 ## Getting Started
 
+### Getting Started React
+```sh
+npm install @axa-fr/react-oidc-context copyfiles --save
+```
+
+If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
+
+Add a copy task in order to install and stay up to date an Oidc Service Worker.
+The only file you should edit is "OidcTrustedDomains.js" which will never be erased with following configuration bellow.
+
+```sh
+#package.json
+{
+    "scripts": {
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
+        "start:server": "npm run copy && react-scripts start",
+        "build:server": "npm run copy && react-scripts build",
+    }
+}
+```
+
+```javascript
+import React from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { OidcProvider } from '@axa-fr/react-oidc-context';
+import Header from './Layout/Header';
+import Routes from './Router';
+
+// This configuration use hybrid mode
+// ServiceWorker are used if available (more secure) else tokens are given to the client
+// You need to give inside your code the "access_token" when using fetch
+const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:4200/authentication/callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.identityserver.io',
+  service_worker_relative_url:'/OidcServiceWorker.js',
+  service_worker_only:false,
+};
+
+const App = () => (
+    <OidcProvider configuration={configuration} >
+      <Router>
+        <Header />
+        <Routes />
+      </Router>
+    </OidcProvider>
+);
+
+render(<App />, document.getElementById('root'));
+```
+
+"OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
+
+```javascript
+import React from 'react';
+import { OidcSecure } from '@axa-fr/react-oidc-context';
+
+const AdminSecure = () => (
+  <OidcSecure>
+    <h1>My sub component</h1>}
+  </OidcSecure>
+);
+
+// adding the oidc user in the props
+export default AdminSecure;
+```
+More information :
 - [`@axa-fr/react-oidc-context`](./packages/context#readme)
+
+### Getting Started Vanilla
+
+More information :
 - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme)
 
 ## Example

@@ -1,12 +1,22 @@
 ﻿function get_browser() {
-    var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+    console.log(navigator.userAgent);
+    let ua = navigator.userAgent, tem,
+        M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
     if(/trident/i.test(M[1])){
         tem=/\brv[ :]+(\d+)/g.exec(ua) || [];
-        return {name:'IE',version:(tem[1]||'')};
+        return {name:'ie',version:(tem[1]||'')};
     }
     if(M[1]==='Chrome'){
-        tem=ua.match(/\bOPR|Edge\/(\d+)/)
-        if(tem!=null)   {return {name:'Opera', version:tem[1]};}
+        tem=ua.match(/\bOPR|Edge\/(\d+)/);
+        
+        let version = tem[1];
+        if(!version){
+            const splits = ua.split(tem[0]+"/");
+            if(splits.length>1){
+                version = splits[1];
+            }
+        }
+        if(tem!=null)   {return {name:'opera', version};}
     }
     M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
     if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
@@ -39,8 +49,22 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     if(!navigator.serviceWorker||!serviceWorkerRelativeUrl){
         return null;
     }
-    const browser = get_browser();
-    if(browser.name == "firefox"){
+    const {name, version} = get_browser();
+    if(name == "firefox"){
+        return null;
+    }
+    if(name == "chrome" && parseInt(version)<90){
+        return null;
+    }
+    if(name == "opera"){
+        if(!version) {
+            return null;
+        }
+        if(parseInt(version.split(".")[0])< 82) {
+            return null;
+        }
+    }
+    if(name == "ie"){
         return null;
     }
 
