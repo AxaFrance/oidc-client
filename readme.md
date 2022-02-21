@@ -32,7 +32,7 @@ These libraries is used to manage client authentication.
 V4 uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
 
 In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
-In this version you can use a ServiceWorker that will hide the refresh_token and access_token (for more security).
+In this version you can use a ServiceWorker that will hide the refresh_token and access_token (more secure).
 
 - Simple :
   - refresh_token and access_token are auto refreshed in background
@@ -58,7 +58,7 @@ npm install @axa-fr/react-oidc-context copyfiles --save
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
 
 Add a copy task in order to install and stay up to date an Oidc Service Worker.
-The only file you should edit is "OidcTrustedDomains.js" which will never be erased with following configuration bellow.
+The only file you should edit is "OidcTrustedDomains.js" which will never be erased with the configuration bellow.
 
 ```sh
 #package.json
@@ -79,16 +79,15 @@ import { OidcProvider } from '@axa-fr/react-oidc-context';
 import Header from './Layout/Header';
 import Routes from './Router';
 
-// This configuration use hybrid mode
-// ServiceWorker are used if available (more secure) else tokens are given to the client
-// You need to give inside your code the "access_token" when using fetch
+// This configuration use the ServiceWorker mode only
+// "access_token" will be provided automaticaly to the urls and domains configured inside "OidcTrustedDomains.js"
 const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
-  service_worker_only:false,
+  service_worker_only:true,
 };
 
 const App = () => (
