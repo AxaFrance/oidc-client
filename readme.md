@@ -50,7 +50,7 @@ In this version you can use a ServiceWorker that will hide the refresh_token and
 
 ## Getting Started
 
-### Getting Started React
+### Getting Started React using create-react-app
 ```sh
 npm install @axa-fr/react-oidc-context copyfiles --save
 ```
@@ -102,6 +102,15 @@ const App = () => (
 render(<App />, document.getElementById('root'));
 ```
 
+```javascript
+// OidcTrustedDomains.js
+// Add here trusted domains, access tokens will be send to
+const trustedDomains = {
+default:["http://localhost:4200"],
+auth0:[]
+};
+```
+
 "OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
 
 ```javascript
@@ -114,15 +123,14 @@ const AdminSecure = () => (
   </OidcSecure>
 );
 
-// adding the oidc user in the props
 export default AdminSecure;
 ```
-More information :
+More documentation :
 - [`@axa-fr/react-oidc-context`](./packages/context#readme)
 
 ### Getting Started Vanilla
 
-More information :
+More documentation :
 - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme)
 
 ## Example

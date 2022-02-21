@@ -101,12 +101,13 @@ const propTypes = {
     authority: PropTypes.string.isRequired,
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
+    service_worker_only: PropTypes.boolean, // default false
   }).isRequired
 };
 ```
 ## How to consume 
 
-"useReactOidc" returns all props from the Hook :
+"useOidc" returns all props from the Hook :
 
 ```javascript
 import React from 'react';
@@ -136,7 +137,7 @@ The Hook method exposes :
 - logout: logout function (return a promise)
 - login: login function 'return a promise'
 
-## How to secure a component : Hook method
+## How to secure a component
 
 "OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
 
