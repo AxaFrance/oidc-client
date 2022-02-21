@@ -1,10 +1,10 @@
 {
   "name": "@axa-fr/react-oidc-context",
-  "version": "4.0.0-beta.5",
+  "version": "4.0.0-beta.6",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
-  "description": "OpenID Connect & OAuth authentication using react context api as state management",
+  "description": "OpenID Connect & OAuth authentication using react",
   "repository": {
     "type": "git",
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"

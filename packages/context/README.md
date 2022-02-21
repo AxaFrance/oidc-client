@@ -1,7 +1,18 @@
 <H1> @axa-fr/react-oidc-context</H1>
 
+<p align="center">
+    <img src="../../docs/img/introduction.gif"
+     alt="Sample React Oicd"
+      />
+</p>
+
+<p align="center">
+  A set of react components to make Oidc (OpenID Connect) client easy. It aim to simplify OAuth authentication between multiples providers.
+</p>
+
 - [About](#about)
 - [Getting Started](#getting-started)
+- [Run The Demo](#run-the-demo)
 - [Examples](#examples)
 # About
 
