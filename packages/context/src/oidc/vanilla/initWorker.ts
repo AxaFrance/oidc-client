@@ -8,15 +8,18 @@
     }
     if(M[1]==='Chrome'){
         tem=ua.match(/\bOPR|Edge\/(\d+)/);
-        
-        let version = tem[1];
-        if(!version){
-            const splits = ua.split(tem[0]+"/");
-            if(splits.length>1){
-                version = splits[1];
+       
+        if(tem!=null)   {
+            let version = tem[1];
+            if(!version){
+                const splits = ua.split(tem[0]+"/");
+                if(splits.length>1){
+                    version = splits[1];
+                }
             }
+            
+            return {name:'opera', version};
         }
-        if(tem!=null)   {return {name:'opera', version};}
     }
     M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
     if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
