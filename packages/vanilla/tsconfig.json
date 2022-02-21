@@ -5,6 +5,9 @@
     "outDir": "dist",
     "jsx": "react",
     "module": "commonjs",
+    "types": [
+      "node"
+    ],
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -24,7 +27,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/oidc"],
+  "include": ["src"],
   "exclude": [
     "node_modules",
     "**/*.spec.ts",
@@ -34,5 +37,5 @@
     "**/*.stories.tsx",
     "./src/setupTests.ts"
   ],
-  "files": ["./src/oidc/index.ts"]
+  "files": ["./src/index.ts"]
 }

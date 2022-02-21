@@ -1,0 +1,62 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: React Oidc CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    environment: react-oidc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          
+      - name: npm ci
+        run: npm ci
+        working-directory: ./packages/context
+
+      - name: npm prepare
+        run: npm run prepare
+        working-directory: ./packages/context
+        
+      - id: publish-context
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/context/package.json
+          #dry-run: true
+
+      - name: npm ci
+        run: npm ci
+        working-directory: ./packages/vanilla
+
+      - name: npm prepare
+        run: npm run prepare
+        working-directory: ./packages/vanilla
+
+      - id: publish-vanilla
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/vanilla/package.json
+          #dry-run: true
+          
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=axaguildev
+            -Dsonar.projectKey=AxaGuilDEv_react-oidc
+            -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
+            -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info

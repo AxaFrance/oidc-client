@@ -1,274 +1,192 @@
 <H1> @axa-fr/react-oidc-context</H1>
 
+<p align="center">
+    <img src="../../docs/img/introduction.gif"
+     alt="Sample React Oicd"
+      />
+</p>
+
+<p align="center">
+  A set of react components to make Oidc (OpenID Connect) client easy. It aim to simplify OAuth authentication between multiples providers.
+</p>
+
 - [About](#about)
 - [Getting Started](#getting-started)
-  - [Application startup (index.js)](#application-startup-indexjs)
-  - [Polyfill](#polyfill)
-  - [How to consume : Hooks method (Pages/Dashboard/Dashboard.js)](#how-to-consume--hooks-method-pagesdashboarddashboardjs)
-  - [How to consume : react api context method (Layout/Header.js)](#how-to-consume--react-api-context-method-layoutheaderjs)
-  - [How to consume : HOC method (Layout/Header.js)](#how-to-consume--hoc-method-layoutheaderjs)
-  - [How to secure a component (Router/Routes.js)](#how-to-secure-a-component-routerroutesjs)
-- [Example](#example)
+- [Run The Demo](#run-the-demo)
+- [Examples](#examples)
 # About
 
 Easy set up of OIDC for react and use the new react context api as state management.
+It use AppAuthJS behind the scene. 
+
+- Simple : 
+  - refresh_token and access_token are auto refreshed in background
+  - with the use of the Service Worker, you do not need to inject the access_token in every fetch, juste configure OidcTrustedDomains.js
+- No cookies problem : No silent signin mode inside in iframe
+- Secure : 
+  - with the use of Service Worker, your tokens are not accessible to the client (protect against XSRF attacks)
+  - OIDC using client side Code Credential Grant with pkce only
+- Multiple Authentification :
+  - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
+  - You can authenticate to multiple different providers inside the same SPA (single page application) website
+- Flexible :
+  - Work with Service Worker (more secure) and whithout for older browser (less secure)
+
 
 # Getting Started
 
 ```sh
-npm install @axa-fr/react-oidc-context --save
-
+npm install @axa-fr/react-oidc-context copyfiles --save
 ```
 
-## Application startup (index.js)
+If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
+
+Add a copy task in order to install and stay up to date an Oidc Service Worker.
+The only file you should edit is "OidcTrustedDomains.js" which will never be erased with following configuration bellow.
+
+```sh
+#package.json
+{
+    "scripts": {
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
+        "start:server": "npm run copy && react-scripts start",
+        "build:server": "npm run copy && react-scripts build",
+    }
+}
+```
+
+```javascript
+// OidcTrustedDomains.js
+// Add here trusted domains, access tokens will be send to
+const trustedDomains = {
+default:["http://localhost:4200"],
+auth0:[]
+};
+```
+
+# Run The Demo
+
+```sh
+git clone https://github.com/AxaGuilDEv/react-oidc.git
+cd react-oidc/packages/context
+npm install
+npm start
+# then navigate to http://localhost:4200
+```
+
+# Examples
+
+## Application startup
 
 The library is router agnostic and use native History API.
 
 The default routes used internally :
 
 - www.your-app.fr/authentication/callback
-- www.your-app.fr/authentication/silent_callback
-- www.your-app.fr/authentication/not-authenticated
-- www.your-app.fr/authentication/not-authorized
 
 ```javascript
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AuthenticationProvider, oidcLog } from '@axa-fr/react-oidc-context';
+import { OidcProvider } from '@axa-fr/react-oidc-context';
 import Header from './Layout/Header';
 import Routes from './Router';
-import oidcConfiguration from './configuration';
+
+// This configuration use hybrid mode
+// ServiceWorker are used if available (more secure) else tokens are given to the client
+// You need to give inside your code the "access_token" when using fetch
+const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:4200/authentication/callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.identityserver.io',
+  service_worker_relative_url:'/OidcServiceWorker.js',
+  service_worker_only:false,
+};
 
 const App = () => (
-  <div>
-    <Router>
-      <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
+    <OidcProvider configuration={configuration} >
+      <Router>
         <Header />
         <Routes />
-      </AuthenticationProvider>
-    </Router>
-  </div>
+      </Router>
+    </OidcProvider>
 );
 
 render(<App />, document.getElementById('root'));
 ```
 
-`AuthenticationProvider` accept the following properties :
 
 ```javascript
 const propTypes = {
-  notAuthenticated: PropTypes.elementType, // react component displayed during authentication
-  notAuthorized: PropTypes.elementType, // react component displayed in case user is not Authorised
-  authenticating: PropTypes.elementType, // react component displayed when about to redirect user to be authenticated
-  callbackComponentOverride: PropTypes.elementType, // react component displayed when user is connected
-  sessionLostComponent: PropTypes.elementType, // react component displayed when user loose authentication session
+  loadingComponent: PropTypes.elementType, // you can inject your own loading component
+  sessionLostComponent: PropTypes.elementType, // you can inject your own session lost component
+  authenticating: PropTypes.elementType, // you can inject your own authenticationg component
+  callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
+  callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
+  serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
   configuration: PropTypes.shape({
-    client_id: PropTypes.string.isRequired, // oidc client configuration, the same as oidc client library used internally https://github.com/IdentityModel/oidc-client-js
-    redirect_uri: PropTypes.string.isRequired,
-    response_type: PropTypes.string.isRequired,
-    scope: PropTypes.string.isRequired,
+    client_id: PropTypes.string.isRequired, // oidc client id
+    redirect_uri: PropTypes.string.isRequired, // oidc redirect url
+    scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
-    silent_redirect_uri: PropTypes.string.isRequired,
-    automaticSilentRenew: PropTypes.bool, //optional, by default to true
-    loadUserInfo: PropTypes.bool, //optional, by default to true
-    post_logout_redirect_uri: PropTypes.string, // optional
-    metadata: PropTypes.shape({
-      issuer: PropTypes.string,
-      jwks_uri: PropTypes.string,
-      authorization_endpoint: PropTypes.string,
-      token_endpoint: PropTypes.string,
-      userinfo_endpoint: PropTypes.string,
-      end_session_endpoint: PropTypes.string,
-      revocation_endpoint: PropTypes.string,
-      introspection_endpoint: PropTypes.string,
-    }),
-  }).isRequired,
-  isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
-  loggerLevel: PropTypes.number,
-  logger: PropTypes.shape({
-    info: PropTypes.func.isRequired,
-    warn: PropTypes.func.isRequired,
-    error: PropTypes.func.isRequired,
-    debug: PropTypes.func.isRequired,
-  }),
-  UserStore: PropTypes.func,
+    refresh_time_before_tokens_expiration_in_second: PropTypes.number,
+    service_worker_relative_url: PropTypes.string,
+    service_worker_only: PropTypes.boolean, // default false
+  }).isRequired
 };
 ```
+## How to consume 
 
-Through the UserStore you can specify a class that can be used to store the user object. This class must define :
-
-```javascript
-  getItem(key: string): any;
-  setItem(key: string, value: any): any;
-  removeItem(key: string): any;
-  key(index: number): any;
-  length?: number;
-```
-It could also be window.localStorage or window.sessionStorage. By default, without any userStore, the sessionStorage will be used.
-
-See below a sample of configuration, you can have more information about on [oidc client github](https://github.com/IdentityModel/oidc-client-js)
-
-```javascript
-const configuration = {
-  client_id: 'implicit',
-  redirect_uri: 'http://localhost:3000/authentication/callback',
-  response_type: 'id_token token',
-  post_logout_redirect_uri: 'http://localhost:3000/',
-  scope: 'openid profile email',
-  authority: 'https://demo.identityserver.io',
-  silent_redirect_uri: 'http://localhost:3000/authentication/silent_callback',
-  automaticSilentRenew: true,
-  loadUserInfo: true,
-};
-
-export default configuration;
-```
-
-## Polyfill
-
-oidc-client needs some polyfills to works on Internet Explorer. You can use [core-js](https://github.com/zloirock/core-js) to help you. See [Context Sample](../../examples/context). In the sample we use some polyfills
-
-```javascript
-import 'core-js/es/array/from';
-import 'core-js/es/array/find';
-import 'core-js/es/array/includes';
-import 'core-js/es/array/find-index';
-import 'core-js/es/array/map';
-
-import 'core-js/es/object/assign';
-
-import 'core-js/es/promise';
-import 'core-js/es/map';
-
-import 'core-js/es/string/repeat';
-import 'core-js/es/string/pad-start';
-import 'core-js/es/string/pad-end';
-import 'core-js/es/string/starts-with';
-
-import 'whatwg-fetch';
-```
-
-## How to consume : Hooks method (Pages/Dashboard/Dashboard.js)
-
-"useReactOidc" returns all props from the Hook :
+"useOidc" returns all props from the Hook :
 
 ```javascript
 import React from 'react';
-import { useReactOidc } from '@axa-fr/react-oidc-context';
+import {useOidc} from "./oidc";
 
-const Dashboard = () => {
-  const { oidcUser } = useReactOidc();
-  const { profile } = oidcUser;
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Protected Dashboard</p>
-      <span>
-        Hello {profile.given_name} {profile.family_name}
-      </span>
-    </div>
-  );
+export const Home = () => {
+
+    const { login, logout, isLogged} = useOidc();
+    
+    return (
+        <div className="container-fluid mt-3">
+            <div className="card">
+                <div className="card-body">
+                    <h5 className="card-title">Welcome !!!</h5>
+                    <p className="card-text">React Demo Application protected by OpenId Connect</p>
+                    {!isLogged && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
+                    {isLogged && <button type="button" className="btn btn-primary" onClick={logout}>logout</button>}
+                </div>
+            </div>
+        </div>
+    )
 };
 
-export default Dashboard;
 ```
 The Hook method exposes : 
-- isEnabled : used in provider to enable/disabled. You can get the value here.
-- oidcUser : user information (null if not authenticated)
-- logout: logout function
-- login: login function
-- signinSilent : silent login function 
-- events: returns events from oidc-client (see [oidc client section about events](https://github.com/IdentityModel/oidc-client-js/wiki#events))
+- isLogged : is the user logged?
+- logout: logout function (return a promise)
+- login: login function 'return a promise'
 
-## How to consume : react api context method (Layout/Header.js)
+## How to secure a component
 
-"AuthenticationContext" context contains all props you need
-
-- oidcUser : user information (null if not authenticated)
-- logout: logout function
-- login: login function
-- signinSilent : silent login function 
-- events: returns events from oidc-client (see [oidc client section about events](https://github.com/IdentityModel/oidc-client-js/wiki#events))
-- isEnabled : used in provider to enable/disabled. You can get the value here.
-
-
-```javascript
-import React from 'react';
-import { AuthenticationContext } from '@axa-fr/react-oidc-context';
-import { Link } from 'react-router-dom';
-
-const headerStyle = {
-  display: 'flex',
-  backgroundColor: '#26c6da',
-  justifyContent: 'space-between',
-  padding: 10,
-};
-
-const linkStyle = {
-  color: 'white',
-  textDecoration: 'underline',
-};
-
-export default () => (
-  <header>
-    <AuthenticationContext.Consumer>
-      {props => {
-        return (
-          <div style={headerStyle}>
-            <h3>
-              <Link style={linkStyle} to="/">
-                HOME
-              </Link>
-            </h3>
-
-            {props.oidcUser ? (
-              <ul>
-                <li>
-                  <Link style={linkStyle} to="/dashboard">
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link style={linkStyle} to="/admin">
-                    Admin
-                  </Link>
-                </li>
-                <button onClick={props.logout}>logout</button>
-              </ul>
-            ) : (
-              <button onClick={props.login}>login</button>
-            )}
-          </div>
-        );
-      }}
-    </AuthenticationContext.Consumer>
-  </header>
-);
-```
-
-## How to consume : HOC method (Layout/Header.js)
-
-"withOidcUser" function act like "AuthenticationConsumer" below.
 "OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
 
 ```javascript
 import React from 'react';
-import { withOidcUser, OidcSecure } from '@axa-fr/react-oidc-context';
+import { OidcSecure } from '@axa-fr/react-oidc-context';
 
-const Admin = ({ oidcUser }) => (
+const AdminSecure = () => (
   <OidcSecure>
-    <h1>Admin</h1>
-    <p>Protected Admin</p>
-    {oidcUser && <p>Bonjour {oidcUser.profile.name}</p>}
+    <h1>My sub component</h1>}
   </OidcSecure>
 );
 
 // adding the oidc user in the props
-export default withOidcUser(Admin);
+export default AdminSecure;
 ```
 
-## How to secure a component (Router/Routes.js)
+## How to secure a component : HOC method
 
 "withOidcSecure" act the same as "OidcSecure" it also trigger authentication in case user is not authenticated.
 
@@ -292,6 +210,87 @@ const Routes = () => (
 export default Routes;
 ```
 
-# Example
+## How to get "Access Token" : Hook method
 
-- [`create react app & context`](../../examples/context)
+```javascript
+import { useOidcAccessToken } from '@axa-fr/react-oidc-context';
+
+const DisplayAccessToken = () => {
+    const{ accessToken, accessTokenPayload } = useOidcAccessToken();
+
+    if(!accessToken){
+        return <p>you are not authentified</p>
+    }
+    return (
+        <div className="card text-white bg-info mb-3">
+            <div className="card-body">
+                <h5 className="card-title">Access Token</h5>
+                <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. ""access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
+                {accessToken != null && <p className="card-text">{JSON.stringify(accessToken)}</p>}
+                {accessTokenPayload != null && <p className="card-text">{JSON.stringify(accessTokenPayload)}</p>}
+            </div>
+        </div>
+    )
+};
+```
+
+## How to get IDToken : Hook method
+
+```javascript
+import { useOidcIdToken } from '@axa-fr/react-oidc-context';
+
+const DisplayIdToken =() => {
+    const{ idToken, idTokenPayload } = useOidcIdToken();
+
+    if(!idToken){
+        return <p>you are not authentified</p>
+    }
+    
+    return (
+        <div className="card text-white bg-info mb-3">
+            <div className="card-body">
+                <h5 className="card-title">ID Token</h5>
+                {idToken != null && <p className="card-text">{JSON.stringify(idToken)}</p>}
+                {idTokenPayload != null && <p className="card-text">{JSON.stringify(idTokenPayload)}</p>}
+            </div>
+        </div>
+    );
+}
+
+```
+
+
+## How to get User Information : Hook method
+
+```javascript
+import { useOidcUser } from '@axa-fr/react-oidc-context';
+
+const DisplayUserInfo = () => {
+    const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
+
+    if(isOidcUserLoading) {
+        return <p>User Information are loading</p>
+    }
+
+    if(!isLogged){
+        return <p>you are not authentified</p>
+    }
+
+    return (
+        <div className="card text-white bg-success mb-3">
+            <div className="card-body">
+                <h5 className="card-title">User information</h5>
+                <p>{oidcUser == null && "You are not logged" }</p>
+                {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
+            </div>
+        </div>
+    )
+};
+```
+
+# Service Worker Support
+
+- Firefox : still a bug that has to be fixed by us
+- Chrome/Edge : version upper to 90
+- Opera : version upper to 80
+- Safari : still need to be tested
