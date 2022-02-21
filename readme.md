@@ -29,8 +29,8 @@
 ## About
 
 These libraries is used to manage client authentication.
-V4 uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
 
+V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
 In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
 In this version you can use a ServiceWorker that will hide the refresh_token and access_token (more secure).
 
@@ -125,6 +125,61 @@ const AdminSecure = () => (
 
 export default AdminSecure;
 ```
+
+How to get IDToken
+
+```javascript
+import { useOidcIdToken } from '@axa-fr/react-oidc-context';
+
+const DisplayIdToken =() => {
+    const{ idToken, idTokenPayload } = useOidcIdToken();
+
+    if(!idToken){
+        return <p>you are not authentified</p>
+    }
+    
+    return (
+        <div className="card text-white bg-info mb-3">
+            <div className="card-body">
+                <h5 className="card-title">ID Token</h5>
+                {idToken != null && <p className="card-text">{JSON.stringify(idToken)}</p>}
+                {idTokenPayload != null && <p className="card-text">{JSON.stringify(idTokenPayload)}</p>}
+            </div>
+        </div>
+    );
+}
+
+```
+
+# How to get User Information
+
+```javascript
+import { useOidcUser } from '@axa-fr/react-oidc-context';
+
+const DisplayUserInfo = () => {
+    const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
+
+    if(isOidcUserLoading) {
+        return <p>User Information are loading</p>
+    }
+
+    if(!isLogged){
+        return <p>you are not authentified</p>
+    }
+
+    return (
+        <div className="card text-white bg-success mb-3">
+            <div className="card-body">
+                <h5 className="card-title">User information</h5>
+                <p>{oidcUser == null && "You are not logged" }</p>
+                {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
+            </div>
+        </div>
+    )
+};
+```
+
+
 More documentation :
 - [`@axa-fr/react-oidc-context`](./packages/context#readme)
 
@@ -133,7 +188,7 @@ More documentation :
 More documentation :
 - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme)
 
-## Run the demo
+## Run The Demo
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git

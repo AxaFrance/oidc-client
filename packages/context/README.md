@@ -64,7 +64,7 @@ auth0:[]
 };
 ```
 
-# Run the demo
+# Run The Demo
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
@@ -290,7 +290,7 @@ const DisplayUserInfo = () => {
 
 # Service Worker Support
 
-- Firefox : No (a bug has to be fixed)
+- Firefox : still a bug that has to be fixed by us
 - Chrome/Edge : version upper to 90
 - Opera : version upper to 80
-- Safari : need to be tested
+- Safari : still need to be tested
