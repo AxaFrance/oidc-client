@@ -133,13 +133,14 @@ More documentation :
 More documentation :
 - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme)
 
-## Example
+## Run the demo
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
 cd react-oidc/packages/context
 npm install
 npm start
+# then navigate to http://localhost:4200
 ```
 
 ## How It Works

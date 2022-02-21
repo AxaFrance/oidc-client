@@ -60,7 +60,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         if(!version) {
             return null;
         }
-        if(parseInt(version.split(".")[0])< 82) {
+        if(parseInt(version.split(".")[0])< 80) {
             return null;
         }
     }

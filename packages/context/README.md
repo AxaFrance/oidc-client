@@ -43,6 +43,26 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
     }
 }
 ```
+
+```javascript
+// OidcTrustedDomains.js
+// Add here trusted domains, access tokens will be send to
+const trustedDomains = {
+default:["http://localhost:4200"],
+auth0:[]
+};
+```
+
+# Run the demo
+
+```sh
+git clone https://github.com/AxaGuilDEv/react-oidc.git
+cd react-oidc/packages/context
+npm install
+npm start
+# then navigate to http://localhost:4200
+```
+
 # Examples
 
 ## Application startup
@@ -256,3 +276,10 @@ const DisplayUserInfo = () => {
     )
 };
 ```
+
+# Service Worker Support
+
+- Firefox : No (a bug has to be fixed)
+- Chrome/Edge : version upper to 90
+- Opera : version upper to 80
+- Safari : need to be tested
