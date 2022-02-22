@@ -1,7 +1,7 @@
-import React, { useEffect, useContext, useState, PropsWithChildren} from 'react';
-import  {OidcContext} from "../../OidcProvider";
+import React, { useEffect, useState, PropsWithChildren} from 'react';
 import withRouter from "../routes/withRouter";
 import AuthenticatingError from "./AuthenticateError.component";
+import Oidc from "../../vanilla/oidc";
 
 const CallBackSuccess = () =>  (<div className="oidc-callback">
 <div className="oidc-callback__container">
@@ -10,8 +10,8 @@ const CallBackSuccess = () =>  (<div className="oidc-callback">
 </div>
 </div>);
 
-const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBackSuccess, configurationName }) => { 
-  const {getOidc} = useContext(OidcContext);
+const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBackSuccess, configurationName }) => {
+  const getOidc =  Oidc.get;
   const [error, setError] = useState(false);
   const [isLoading, setLoading] = useState(true);
 

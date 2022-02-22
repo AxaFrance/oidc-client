@@ -1,9 +1,9 @@
-﻿import React, {useContext, useEffect, useState} from 'react';
-import {OidcContext} from "./OidcProvider";
+﻿import React, {useEffect, useState} from 'react';
 import Oidc from "./vanilla/oidc";
 
 export const useOidc =(configurationName="default") =>{
-    const {getOidc} = useContext(OidcContext);
+    const getOidc =  Oidc.get;
+   
     const login = (callbackPath=undefined) => {
         return getOidc(configurationName).loginAsync(callbackPath);
     };
@@ -16,7 +16,7 @@ export const useOidc =(configurationName="default") =>{
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};
 
 export const useOidcAccessToken =(configurationName="default") =>{
-    const {getOidc} = useContext(OidcContext);
+    const getOidc =  Oidc.get;
     const [state, setAccessToken] = useState<any>(accessTokenInitialState);
     
     useEffect(() => {
@@ -46,7 +46,7 @@ export const useOidcAccessToken =(configurationName="default") =>{
 const idTokenInitialState = {idToken:null, idTokenPayload:null};
 
 export const useOidcIdToken =(configurationName="default") =>{
-    const {getOidc} = useContext(OidcContext);
+    const getOidc =  Oidc.get;
     const [state, setIDToken] = useState<any>(idTokenInitialState);
 
     useEffect(() => {

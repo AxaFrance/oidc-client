@@ -8,7 +8,6 @@ export const configurationIdentityServer = {
     service_worker_only: false,
   };
 
-
 export const configurationAuth0 = {
     client_id: 'xGZxEAJhzlkuQUlWl90y1ntIX-0UDWHx',
     redirect_uri: 'http://localhost:4200/callback',

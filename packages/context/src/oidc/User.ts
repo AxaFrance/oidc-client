@@ -1,10 +1,10 @@
-﻿import {useContext, useEffect, useState} from "react";
-import {OidcContext} from "./OidcProvider";
+﻿import { useEffect, useState} from "react";
+import Oidc from "./vanilla/oidc";
 
 export const useOidcUser =(configurationName="default") => {
     const [oidcUser, setOidcUser] = useState(null);
     const [isOidcUserLoading, setIsOidcUserLoading] = useState(false);
-    const {getOidc} = useContext(OidcContext);
+    const getOidc =  Oidc.get;
     useEffect(() => {
         let isMounted = true;
         if(getOidc(configurationName).tokens) {

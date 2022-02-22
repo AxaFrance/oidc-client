@@ -1,6 +1,5 @@
-import React, {useContext} from 'react';
-import {useOidcAccessToken} from "./ReactOidc";
-import {OidcContext} from "./OidcProvider";
+import React from 'react';
+import Oidc from "./vanilla/oidc";
 
 type Fetch = typeof window.fetch;
 interface ComponentWithFetchProps {
@@ -38,7 +37,7 @@ export const withOidcFetch = (fetch, configurationName="default") => (
     WrappedComponent
   ) => (props: ComponentWithFetchProps) => {
     const previousFetch = fetch || props.fetch;
-    const {getOidc} = useContext(OidcContext);
+    const getOidc =  Oidc.get;
 
     const getAccessTokenInjected = () => { return getOidc(configurationName).tokens.accessToken; };
     

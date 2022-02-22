@@ -59,8 +59,8 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 // OidcTrustedDomains.js
 // Add here trusted domains, access tokens will be send to
 const trustedDomains = {
-default:["http://localhost:4200"],
-auth0:[]
+    default:["http://localhost:4200"],
+    auth0:[]
 };
 ```
 
@@ -280,7 +280,6 @@ const DisplayUserInfo = () => {
         <div className="card text-white bg-success mb-3">
             <div className="card-body">
                 <h5 className="card-title">User information</h5>
-                <p>{oidcUser == null && "You are not logged" }</p>
                 {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
             </div>
         </div>

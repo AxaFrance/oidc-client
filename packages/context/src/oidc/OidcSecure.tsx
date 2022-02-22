@@ -1,14 +1,14 @@
-import React, {useEffect, useContext, PropsWithChildren, FC} from 'react';
+import React, {useEffect, PropsWithChildren, FC} from 'react';
 
-import {OidcContext} from "./OidcProvider"
+import Oidc from "./vanilla/oidc";
 
 type OidcSecureProps = {
-    callbackPath:string;
-    configurationName: string;
+    callbackPath?:string;
+    configurationName?: string;
 };
 
 export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, configurationName="default"}) => {
-    const {getOidc} = useContext(OidcContext);
+    const getOidc =  Oidc.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
