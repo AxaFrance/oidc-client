@@ -1,4 +1,4 @@
 ﻿module.exports = {
     collectCoverage: true,
-    collectCoverageFrom: ['src/**/*'],
+    collectCoverageFrom: ['src/**/*.{ts,tsx}'],
 };
