@@ -59,8 +59,8 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 // OidcTrustedDomains.js
 // Add here trusted domains, access tokens will be send to
 const trustedDomains = {
-default:["http://localhost:4200"],
-auth0:[]
+    default:["http://localhost:4200"],
+    auth0:[]
 };
 ```
 
