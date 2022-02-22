@@ -1,6 +1,5 @@
-import React, {FC, MouseEventHandler, useContext} from 'react';
+import React, {FC, MouseEventHandler} from 'react';
 import withCustomRouter, { ReactOidcHistory } from '../routes/withRouter';
-import {OidcContext} from "../../OidcProvider";
 
 type SessionLostProps = {
   login?: MouseEventHandler;

@@ -72,10 +72,10 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
 const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return setTimeout(async () => {
-        const tokens = await oidc.refreshTokensAsync(refreshToken);
-        oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
-        oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
-        oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
+            const tokens = await oidc.refreshTokensAsync(refreshToken);
+            oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
+            oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
+            oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
       }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
 }
 

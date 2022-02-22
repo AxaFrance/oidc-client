@@ -34,6 +34,8 @@ V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.co
 In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
 In this version you can use a ServiceWorker that will hide the refresh_token and access_token (more secure).
 
+For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATION_GUIDE_V3_TO_V4.md)
+
 - Simple :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, juste configure OidcTrustedDomains.js
@@ -106,8 +108,8 @@ render(<App />, document.getElementById('root'));
 // OidcTrustedDomains.js
 // Add here trusted domains, access tokens will be send to
 const trustedDomains = {
-default:["http://localhost:4200"],
-auth0:[]
+    default:["http://localhost:4200"],
+    auth0:[]
 };
 ```
 
@@ -171,7 +173,6 @@ const DisplayUserInfo = () => {
         <div className="card text-white bg-success mb-3">
             <div className="card-body">
                 <h5 className="card-title">User information</h5>
-                <p>{oidcUser == null && "You are not logged" }</p>
                 {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
             </div>
         </div>

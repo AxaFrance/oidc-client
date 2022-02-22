@@ -36,7 +36,6 @@ const DisplayUserInfo = ({fetch}) => {
             <div className="card text-white bg-success mb-3">
                 <div className="card-body">
                     <h5 className="card-title">User information</h5>
-                    <p>{oidcUser == null && "You are not logged" }</p>
                     {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
                 </div>
             </div>
