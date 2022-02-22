@@ -27,7 +27,7 @@ jobs:
         run: npm run prepare
         working-directory: ./packages/context
         
-      - name: npm ci
+      - name: npm test
         run: npm test -- --runInBand --coverage --watchAll=false
         working-directory: ./packages/context
         
