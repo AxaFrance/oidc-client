@@ -1,3 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Authenticating test suite renders correctly 1`] = `"http://url.com"`;
+exports[`Authenticating test suite renders correctly 1`] = `
+<DocumentFragment>
+  http://url.com
+</DocumentFragment>
+`;

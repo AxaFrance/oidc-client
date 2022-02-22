@@ -7,10 +7,10 @@ import {withOidcSecure,OidcProvider} from "./oidc";
 import {FetchUser} from "./FetchUser";
 import {MultiAuthContainer} from "./MultiAuth";
 
-function App() {
+function App({configuration=configurationIdentityServer}) {
 
   return (
-    <OidcProvider configuration={configurationIdentityServer}>
+    <OidcProvider configuration={configuration}>
       <Router>
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
           <a className="navbar-brand" href="/">@axa-fr/react-oidc-context</a>

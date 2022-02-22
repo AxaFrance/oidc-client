@@ -5,10 +5,11 @@ import {setupServer} from 'msw/node'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import App from "./App";
+import {act} from "react-dom/test-utils";
 
 const server = setupServer(
-    rest.get('https://demo.identityserver.io/.well-known/o', (req, res, ctx) => {
-        return res(ctx.json({
+   rest.get('http://api/.well-known/openid-configuration', (req, res, ctx) => {
+        return res( ctx.status(200),ctx.json({
             "issuer":"https://demo.identityserver.io",
             "jwks_uri":"https://demo.identityserver.io/.well-known/openid-configuration/jwks",
             "authorization_endpoint":"https://demo.identityserver.io/connect/authorize",
@@ -26,18 +27,19 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-test('loads and displays greeting', async () => {
-    const {debug, getByText, rerender} =render(<App />)
-   // debug()
-
-    //rerender(<App/>)
-    //rerender(<App/>)
-    //await waitFor(() => getByText('Home'));
+test('Load home page then login should log', async () => {
     
-    //fireEvent.click(screen.getByText('Login'));
-
-    //await waitFor(() => screen.getByRole('heading'))
-
-   // expect(screen.getByRole('heading')).toHaveTextContent('hello there')
-    //expect(screen.getByRole('button')).toBeDisabled()
+    const configuration = {
+        client_id: 'interactive.public.short',
+        redirect_uri: 'http://localhost:4200/authentication/callback',
+        scope: 'openid profile email api offline_access',
+        authority: 'http://api',
+        refresh_time_before_tokens_expiration_in_second: 70,
+    };
+    // @ts-ignore
+    const {debug, getByText, rerender} = render(<App configuration={configuration}/>);
+    await waitFor(() => getByText('React Demo Application protected by OpenId Connect'));
+    fireEvent.click(screen.getByText('Login'));
+    await waitFor(() => getByText('Authentification en cours'));
+    
 })
