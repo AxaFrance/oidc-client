@@ -10,7 +10,7 @@ import {MultiAuthContainer} from "./MultiAuth";
 function App() {
 
   return (
-    <OidcProvider configuration={configurationAuth0}>
+    <OidcProvider configuration={configurationIdentityServer}>
       <Router>
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
           <a className="navbar-brand" href="/">@axa-fr/react-oidc-context</a>
