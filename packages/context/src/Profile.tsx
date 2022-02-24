@@ -45,7 +45,7 @@ const DisplayAccessToken = () => {
         <div className="card text-white bg-info mb-3">
             <div className="card-body">
                 <h5 className="card-title">Access Token</h5>
-                <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. ""access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
+                <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. "access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
                 {accessToken != null && <p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
                 {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
             </div>

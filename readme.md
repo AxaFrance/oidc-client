@@ -3,6 +3,8 @@
 [![React Oidc CI](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Corevage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
+Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
+
 <p align="center">
     <img src="./docs/img/introduction.gif"
      alt="Sample React Oicd"
@@ -67,8 +69,9 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 {
     "scripts": {
         "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
-        "start:server": "npm run copy && react-scripts start",
+        "start:server": "react-scripts start",
         "build:server": "npm run copy && react-scripts build",
+        "prepare": "npm run copy"
     }
 }
 ```
@@ -106,7 +109,7 @@ render(<App />, document.getElementById('root'));
 
 ```javascript
 // OidcTrustedDomains.js
-// Add here trusted domains, access tokens will be send to
+// Add here trusted domains, access tokens will be send
 const trustedDomains = {
     default:["http://localhost:4200"],
     auth0:[]
