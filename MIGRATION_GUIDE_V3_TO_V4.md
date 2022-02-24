@@ -29,7 +29,7 @@ import { OidcProvider } from '@axa-fr/react-oidc-context';
 </OidcProvider>
 ```
 
-Provider properties have changed
+Provider properties have changed, you need to keep only required properties for v4.
 ```javascript
 // old v3 
 const propTypes = {
@@ -132,6 +132,34 @@ withOidcFetch(</MyComponent/>)
 
  
 ```
+
+If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
+
+Add a copy task in order to install and stay up to date an Oidc Service Worker.
+The only file you should edit is "OidcTrustedDomains.js" which will never be erased with the configuration bellow.
+
+```sh
+#package.json
+{
+    "scripts": {
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
+        "start:server": "react-scripts start",
+        "build:server": "npm run copy && react-scripts build",
+        "prepare": "npm run copy"
+    }
+}
+```
+
+Then edit OidcTrustedDomains.js in "public" folder for your need
+
+```javascript
+// OidcTrustedDomains.js
+// Add here trusted domains, access tokens will be send to
+const trustedDomains = {
+    default:["http://localhost:4200"],
+};
+```
+
 
 In case v4 does not implement all features that you are using or this migration guide enought complete.
 

@@ -69,8 +69,9 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 {
     "scripts": {
         "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
-        "start:server": "npm run copy && react-scripts start",
+        "start:server": "react-scripts start",
         "build:server": "npm run copy && react-scripts build",
+        "prepare": "npm run copy"
     }
 }
 ```
