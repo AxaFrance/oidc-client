@@ -90,7 +90,13 @@ const getCurrentDatabaseDomain = (database, url) => {
     return null;
 }
 
-
+const serializeHeaders = (headers) => {
+    let headersObj = {};
+    for (let key of headers.keys()) {
+        headersObj[key] = headers.get(key);
+    }
+    return headersObj;
+};
 
 const handleFetch = async (event) => {
     const originalRequest = event.request;
@@ -98,7 +104,7 @@ const handleFetch = async (event) => {
     if(currentDatabaseForRequestAccessToken && currentDatabaseForRequestAccessToken.tokens) {
         const newRequest = new Request(originalRequest, {
             headers: {
-                ...originalRequest.headers,
+                ...serializeHeaders(originalRequest.headers),
                 authorization: "Bearer " + currentDatabaseForRequestAccessToken.tokens.access_token
             }
         });
@@ -129,8 +135,8 @@ const handleFetch = async (event) => {
                         body: newBody,
                         method: originalRequest.method,
                         headers: {
-                            ...originalRequest.headers,
-                            'Content-Type':'application/x-www-form-urlencoded'
+                            ...serializeHeaders(originalRequest.headers),
+                            //'Content-Type':'application/x-www-form-urlencoded'
                         },
                         mode: originalRequest.mode,
                         cache: originalRequest.cache,
@@ -146,8 +152,8 @@ const handleFetch = async (event) => {
                         body: actualBody,
                         method: originalRequest.method,
                         headers: {
-                            ...originalRequest.headers,
-                            'Content-Type':'application/x-www-form-urlencoded'
+                            ...serializeHeaders(originalRequest.headers),
+                            //   'Content-Type':'application/x-www-form-urlencoded'
                         },
                         mode: originalRequest.mode,
                         cache: originalRequest.cache,

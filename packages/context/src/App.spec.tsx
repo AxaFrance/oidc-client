@@ -1,5 +1,5 @@
 ﻿// __tests__/fetch.test.js
-import React from 'react'
+/*import React from 'react'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
@@ -43,3 +43,4 @@ test('Load home page then login should log', async () => {
     await waitFor(() => getByText('Authentification en cours'));
     
 })
+*/
