@@ -136,7 +136,6 @@ const handleFetch = async (event) => {
                         method: originalRequest.method,
                         headers: {
                             ...serializeHeaders(originalRequest.headers),
-                            //'Content-Type':'application/x-www-form-urlencoded'
                         },
                         mode: originalRequest.mode,
                         cache: originalRequest.cache,
@@ -153,7 +152,6 @@ const handleFetch = async (event) => {
                         method: originalRequest.method,
                         headers: {
                             ...serializeHeaders(originalRequest.headers),
-                            //   'Content-Type':'application/x-www-form-urlencoded'
                         },
                         mode: originalRequest.mode,
                         cache: originalRequest.cache,
