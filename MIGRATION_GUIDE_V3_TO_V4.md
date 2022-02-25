@@ -11,6 +11,9 @@ In the v4 we have chosen to remove a lot the surface API in order to simplify us
   - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
 
+Migration PullRequest sample : https://github.com/samuel-gomez/react-starter-toolkit/pull/36
+
+
 Main provider component have been renamed
 ```javascript
 import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
@@ -29,7 +32,7 @@ import { OidcProvider } from '@axa-fr/react-oidc-context';
 </OidcProvider>
 ```
 
-Provider properties have changed, you need to keep only required properties for v4.
+Provider properties have changed, you need to keep only required properties for v4 else it won't work.
 ```javascript
 // old v3 
 const propTypes = {

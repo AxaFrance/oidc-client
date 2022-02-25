@@ -29,8 +29,6 @@
     };
 }
 
-
-
 const sendMessageAsync = (registration) => (data) =>{
     return new Promise(function(resolve, reject) {
         const messageChannel = new MessageChannel();

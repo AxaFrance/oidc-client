@@ -1,5 +1,7 @@
 ﻿# @axa-fr/vanilla-oidc
 
+Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
+
 ## About
 
 Wrap of ["App-AuthJS"](https://github.com/openid/AppAuth-JS) library in order to simplify its use. 
