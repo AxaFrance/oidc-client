@@ -1,5 +1,7 @@
 <H1> @axa-fr/react-oidc-context</H1>
 
+Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
+
 <p align="center">
     <img src="../../docs/img/introduction.gif"
      alt="Sample React Oicd"
@@ -290,6 +292,6 @@ const DisplayUserInfo = () => {
 # Service Worker Support
 
 - Firefox : still a bug that has to be fixed by us
-- Chrome/Edge : version upper to 90
-- Opera : version upper to 80
-- Safari : still need to be tested
+- Chrome/Edge : tested on version upper to 90
+- Opera : tested on version upper to 80
+- Safari : tested on Safari/605.1.15

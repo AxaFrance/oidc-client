@@ -43,8 +43,8 @@ function hideTokens(currentDatabaseElement) {
             currentDatabaseElement.tokens = tokens;
             const secureTokens = {
                 ...tokens,
-                access_token: "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_" + configurationName,
-                refresh_token: "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_" + configurationName,
+                access_token: ACCESS_TOKEN +"_" + configurationName,
+                refresh_token: REFRESH_TOKEN + "_" + configurationName,
             };
             const body = JSON.stringify(secureTokens)
             return new Response(body, response);
@@ -98,6 +98,9 @@ const serializeHeaders = (headers) => {
     return headersObj;
 };
 
+const REFRESH_TOKEN = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
+const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
+
 const handleFetch = async (event) => {
     const originalRequest = event.request;
     const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(database, originalRequest.url);
@@ -120,11 +123,11 @@ const handleFetch = async (event) => {
     if(numberDatabase > 0) {
         const maPromesse = new Promise((resolve, reject) => {
             const response =originalRequest.text().then(actualBody => {
-                if(actualBody.includes('REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER')) {
+                if(actualBody.includes(REFRESH_TOKEN)) {
                     let newBody = actualBody;
                     for(let i= 0;i<numberDatabase;i++){
                         const currentDb = currentDatabases[i];
-                        const key = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_'+ currentDb.configurationName;
+                        const key = REFRESH_TOKEN + '_'+ currentDb.configurationName;
                         if(actualBody.includes(key)) {
                             newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
                             currentDatabase = currentDb;
@@ -222,7 +225,7 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
-            port.postMessage({tokens:currentDatabase.tokens, configurationName} );
+            port.postMessage({tokens:{...currentDatabase.tokens, refresh_token : REFRESH_TOKEN + "_" + configurationName, access_token : ACCESS_TOKEN + "_" + configurationName  }, configurationName} );
             return;
 
         case "getAccessTokenPayload":
