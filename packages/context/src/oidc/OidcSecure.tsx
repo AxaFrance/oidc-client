@@ -16,7 +16,7 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, ca
         }
         return () => {
         }
-    }, [])
+    }, [configurationName])
 
     if(!oidc.tokens){
       return null;

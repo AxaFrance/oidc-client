@@ -147,7 +147,6 @@ export class Oidc {
     private timeoutId: NodeJS.Timeout;
     private serviceWorker?: any;
     private configurationName: string;
-    private version: string; 
     constructor(configuration:Configuration, configurationName="default") {
       this.configuration = configuration
         this.configurationName= configurationName;

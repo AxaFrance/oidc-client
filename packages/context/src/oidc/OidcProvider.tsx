@@ -73,38 +73,40 @@ sessionLostComponent=SessionLost }) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
     }
-    //const [oidcState, setOidc] = useState({getOidc});
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(defaultEventState);
+    const [subscriptionId, setSubscriptionId] = useState(null);
 
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
-        oidc.subscriveEvents((name, data) => {
-                if (!isMounted) {
-                    return;
-                }
-
-                if (name == Oidc.eventNames.loginAsync_begin
-                    || name == Oidc.eventNames.loginCallbackAsync_end
-                    || name == Oidc.eventNames.loginAsync_error
-                    || name == Oidc.eventNames.loginCallbackAsync_error
-                    || name == Oidc.eventNames.refreshTokensAsync_error
-                ) {
-                    setEvent({name, data});
-                } else if (name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
-                    setEvent({name, data});
-                }
+        if(subscriptionId){
+            oidc.removeEventSubscription(subscriptionId);
+        }
+        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+            if (!isMounted) {
+                return;
             }
-        );
-
+            if (name == Oidc.eventNames.loginAsync_begin
+                || name == Oidc.eventNames.loginCallbackAsync_end
+                || name == Oidc.eventNames.loginAsync_error
+                || name == Oidc.eventNames.loginCallbackAsync_error
+                || name == Oidc.eventNames.refreshTokensAsync_error
+            ) {
+                setEvent({name, data});
+            } else if (name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
+                setEvent({name, data});
+            }
+        });
+        
             if(isMounted) {
+                setSubscriptionId(newSubscriptionId);
                 setLoading(false);
             }
         return () => {
             isMounted = false;
         }
-    }, []);
+    }, [configuration, configurationName]);
     
     
     const SessionLostComponent = sessionLostComponent;

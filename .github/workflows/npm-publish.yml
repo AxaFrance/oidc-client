@@ -15,10 +15,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+          
+      - name: Bump version and push tag
+        id: tag_version
+        if: github.ref == 'refs/heads/master'
+        uses: mathieudutour/github-tag-action@v6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-          
+
+      - name: npm version ${{ steps.tag_version.outputs.new_tag }}
+        run: npm version ${{ steps.tag_version.outputs.new_tag }}
+        working-directory: ./packages/context
+      
       - name: npm ci
         run: npm ci
         working-directory: ./packages/context
@@ -36,7 +48,10 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/context/package.json
-          #dry-run: true
+
+      - name: npm version ${{ steps.tag_version.outputs.new_tag }}
+        run: npm version ${{ steps.tag_version.outputs.new_tag }}
+        working-directory: ./packages/context
 
       - name: npm ci
         run: npm ci
@@ -51,8 +66,7 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/vanilla/package.json
-          #dry-run: true
-          
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         env:
@@ -64,3 +78,11 @@ jobs:
             -Dsonar.projectKey=AxaGuilDEv_react-oidc
             -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
             -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
+
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
