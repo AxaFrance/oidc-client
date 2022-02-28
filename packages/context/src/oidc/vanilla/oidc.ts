@@ -14,6 +14,7 @@ import {
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
 import {initWorkerAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
+import {initSession} from "./initSession";
 
 const idTokenPayload = (token) => {
     const base64Url = token.split('.')[1];
@@ -65,6 +66,9 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     const response = await oidc.loginCallbackAsync();
     const tokens = response.tokens
     oidc.tokens = await setTokensAsync(oidc.serviceWorker, tokens);
+    if(!oidc.serviceWorker){
+        oidc.session.setTokens(oidc.tokens);
+    }
     oidc.publishEvent(Oidc.eventNames.token_aquired, oidc.tokens);
     oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
     return response.state;
@@ -74,6 +78,9 @@ const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
     return setTimeout(async () => {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
             oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
+            if(!oidc.serviceWorker){
+                oidc.session.setTokens(oidc.tokens);
+            }
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
             oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
       }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
@@ -147,6 +154,7 @@ export class Oidc {
     private timeoutId: NodeJS.Timeout;
     private serviceWorker?: any;
     private configurationName: string;
+    private session?: any;
     constructor(configuration:Configuration, configurationName="default") {
       this.configuration = configuration
         this.configurationName= configurationName;
@@ -155,6 +163,7 @@ export class Oidc {
       this.events = [];
       this.timeoutId = null;
       this.serviceWorker = null;
+      this.session = null;
       this.refreshTokensAsync.bind(this);
       this.loginCallbackWithAutoTokensRenewAsync.bind(this);
       this.initAsync.bind(this);
@@ -223,6 +232,18 @@ export class Oidc {
                 this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
                     message: "service worker is not supported by this browser"
                 });
+                const session = initSession(this.configurationName);
+                const {tokens} = await session.initAsync();
+                if (tokens) {
+                    const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
+                    // @ts-ignore
+                    this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
+                    session.setTokens(tokens);
+                    this.session = session;
+                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
+                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
+                    return true;
+                }
             }
             this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no service worker"});
             return false;
@@ -256,7 +277,8 @@ export class Oidc {
                 
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
             } else{
-                storage = new LocalStorageBackend();
+                const session = initSession(this.configurationName);
+                storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
                 
             // @ts-ignore
@@ -284,14 +306,17 @@ export class Oidc {
             const authority =  this.configuration.authority;
             const oidcServerConfiguration = await this.initAsync(authority);
             const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
-            this.serviceWorker = serviceWorker;
             let storage = null;
             if(serviceWorker){
+                this.serviceWorker = serviceWorker;
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
                 const items = await serviceWorker.loadItemsAsync();
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
             }else{
-                storage = new LocalStorageBackend();
+                const session = initSession(this.configurationName);
+                this.session = session;
+                const items = await session.loadItemsAsync();
+                storage = new MemoryStorageBackend(session.saveItemsAsync, items);
             }
             
             const promise = new Promise((resolve, reject) => {
@@ -387,6 +412,9 @@ export class Oidc {
         if(this.serviceWorker){
             await this.serviceWorker.clearAsync();
         }
+         if(this.session){
+             await this.session.clearAsync();
+         }
          this.tokens = null;
          this.userInfo = null;
          this.events = [];

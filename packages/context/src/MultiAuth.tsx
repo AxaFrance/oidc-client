@@ -1,5 +1,5 @@
 ﻿import React, {useState} from 'react';
-import {OidcProvider, useOidc} from "./oidc";
+import {OidcProvider, useOidc, useOidcAccessToken} from "./oidc";
 import { configurationIdentityServer} from "./configurations";
 
 const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
@@ -44,7 +44,26 @@ export const MultiAuthContainer = () => {
     return (
         <OidcProvider configuration={configurations[configurationName]} configurationName={configurationName}>
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
+            <DisplayAccessToken configurationName={configurationName} />
         </OidcProvider>
     );
 };
 
+
+const DisplayAccessToken = ({configurationName}) => {
+    const{ accessToken, accessTokenPayload } = useOidcAccessToken(configurationName);
+
+    if(!accessToken){
+        return <p>you are not authentified</p>
+    }
+    return (
+        <div className="card text-white bg-info mb-3">
+            <div className="card-body">
+                <h5 className="card-title">Access Token</h5>
+                <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. "access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
+                {accessToken != null && <p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
+                {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
+            </div>
+        </div>
+    )
+};

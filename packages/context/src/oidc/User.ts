@@ -7,7 +7,8 @@ export const useOidcUser =(configurationName="default") => {
     const getOidc =  Oidc.get;
     useEffect(() => {
         let isMounted = true;
-        if(getOidc(configurationName).tokens) {
+        const oidc = getOidc(configurationName);
+        if(oidc && oidc.tokens) {
             setIsOidcUserLoading(true);
             getOidc().userInfoAsync()
                 .then((info) => {

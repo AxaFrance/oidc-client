@@ -1,1 +1,5 @@
-{"chromeWebSecurity": false}
+{
+  "chromeWebSecurity": false,
+  "experimentalFetchPolyfill": true,
+  "experimentalNetworkStubbing": true
+}

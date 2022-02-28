@@ -31,9 +31,12 @@ export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
-        if(oidc.tokens) {
+        if(oidc && oidc.tokens) {
             const tokens = oidc.tokens;
             setAccessToken({accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload });
+        }
+        else{
+            setAccessToken(accessTokenInitialState);
         }
         if(subscriptionId){
             oidc.removeEventSubscription(subscriptionId);
@@ -68,9 +71,11 @@ export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
-        if(oidc.tokens) {
+        if(oidc && oidc.tokens) {
             const tokens = oidc.tokens;
             setIDToken({idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload});
+        } else{
+            setIDToken(idTokenInitialState);
         }
         if(subscriptionId){
             oidc.removeEventSubscription(subscriptionId);
