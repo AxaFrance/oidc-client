@@ -31,10 +31,10 @@ if(!sessionStorage.configurationName){
 
 export const MultiAuthContainer = () => {
     const [configurationName, setConfigurationName] = useState(sessionStorage.configurationName);
-    const callBack = "http://localhost:4200/multi-auth/authentification/callback2";
+    const callBack = window.location.origin+"/multi-auth/authentification/callback2";
     const configurations = {
         "config_1": {...configurationIdentityServer, redirect_uri:callBack},
-        "config_2": {...configurationIdentityServer, redirect_uri:callBack, scope: 'openid profile email api',}
+        "config_2": {...configurationIdentityServer, redirect_uri:callBack, scope: 'openid profile email api'}
     }
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
