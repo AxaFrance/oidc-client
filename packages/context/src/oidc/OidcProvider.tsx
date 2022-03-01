@@ -76,6 +76,7 @@ sessionLostComponent=SessionLost }) => {
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(defaultEventState);
     const [subscriptionId, setSubscriptionId] = useState(null);
+    const [currentConfigurationName, setConfigurationName] = useState("default");
 
     useEffect(() => {
         let isMounted = true;
@@ -100,6 +101,7 @@ sessionLostComponent=SessionLost }) => {
         });
         
             if(isMounted) {
+                setConfigurationName(configurationName);
                 setSubscriptionId(newSubscriptionId);
                 setLoading(false);
             }
@@ -129,7 +131,7 @@ sessionLostComponent=SessionLost }) => {
             // @ts-ignore
             return (
                 <>
-                    {loading ? (
+                    {(loading || (currentConfigurationName != configurationName )) ? (
                         <LoadingComponent/>
                     ) : (
                             <>

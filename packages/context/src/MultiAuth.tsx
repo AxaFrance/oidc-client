@@ -11,7 +11,8 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
             <div className="card">
                 <div className="card-body">
                     <h5 className="card-title">Work in progress</h5>
-                    <p className="card-text">React Demo Application protected by OpenId Connect</p>
+                    <p className="card-text">React Demo Application protected by OpenId Connect with MultipleAUthentication. 
+                        <br/>For example, config_1 can have other sensitive scope, config_2 does not ask for the "offline_access" so it does not retrieve the most sensitive token "refresh_token" for very sensitive operation, it retrive only access_token valid for a small amout of time.</p>
                     <select value={configurationName} onChange={handleConfigurationChange} >
                         <option value="config_1">config_1</option>
                         <option value="config_2">config_2</option>
