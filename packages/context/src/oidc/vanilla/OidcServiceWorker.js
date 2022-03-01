@@ -128,7 +128,7 @@ const handleFetch = async (event) => {
                     for(let i= 0;i<numberDatabase;i++){
                         const currentDb = currentDatabases[i];
                         const key = REFRESH_TOKEN + '_'+ currentDb.configurationName;
-                        if(actualBody.includes(key)) {
+                        if(currentDb && currentDb.tokens != null && actualBody.includes(key)) {
                             newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
                             currentDatabase = currentDb;
                             break;
