@@ -1,7 +1,8 @@
 ﻿import React, {useEffect, useState} from 'react';
 import Oidc from "./vanilla/oidc";
 
-export const useOidc =(configurationName="default") =>{
+const defaultConfigurationName = "default";
+export const useOidc =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
    
     const login = (callbackPath=undefined) => {
@@ -10,14 +11,22 @@ export const useOidc =(configurationName="default") =>{
     const logout = () => {
         return getOidc(configurationName).logoutAsync();
     };
-    return {login, logout, isLogged: getOidc(configurationName).tokens != null};
+    
+    let isLogged = false;
+    const oidc = getOidc(configurationName);
+    if(oidc){
+        isLogged = getOidc(configurationName).tokens != null;
+    }
+    
+    return {login, logout, isLogged };
 }
 
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};
 
-export const useOidcAccessToken =(configurationName="default") =>{
+export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
     const [state, setAccessToken] = useState<any>(accessTokenInitialState);
+    const [subscriptionId, setSubscriptionId] = useState(null);
     
     useEffect(() => {
         let isMounted = true;
@@ -26,7 +35,10 @@ export const useOidcAccessToken =(configurationName="default") =>{
             const tokens = oidc.tokens;
             setAccessToken({accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload });
         }
-        const subscriptionId = oidc.subscriveEvents((name, data) => {
+        if(subscriptionId){
+            oidc.removeEventSubscription(subscriptionId);
+        }
+        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired){
                 if(isMounted) {
@@ -35,28 +47,35 @@ export const useOidcAccessToken =(configurationName="default") =>{
                 }
             }
         });
+        if(isMounted){
+            setSubscriptionId(newSubscriptionId);
+        }
         return  () => { 
             isMounted = false;
             oidc.removeEventSubscription(subscriptionId);
         };
-    }, []);
+    }, [configurationName]);
     return state;
 }
 
 const idTokenInitialState = {idToken:null, idTokenPayload:null};
 
-export const useOidcIdToken =(configurationName="default") =>{
+export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
     const [state, setIDToken] = useState<any>(idTokenInitialState);
-
+    const [subscriptionId, setSubscriptionId] = useState(null);
+    
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
         if(oidc.tokens) {
             const tokens = oidc.tokens;
             setIDToken({idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload});
+        } 
+        if(subscriptionId){
+            oidc.removeEventSubscription(subscriptionId);
         }
-        const subscriptionId = oidc.subscriveEvents((name, data) => {
+        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired){
                 if(isMounted) {
@@ -64,12 +83,14 @@ export const useOidcIdToken =(configurationName="default") =>{
                     setIDToken(tokens != null  ? {idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload} : idTokenInitialState);
                 }
             }
-
         });
+        if(isMounted){
+            setSubscriptionId(newSubscriptionId);
+        }
         return () => {
             isMounted = false;
             oidc.removeEventSubscription(subscriptionId);
         };
-    }, []);
+    }, [configurationName]);
     return state;
 }
