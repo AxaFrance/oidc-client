@@ -28,9 +28,7 @@
     "test": "react-scripts test --coverage",
     "eject": "react-scripts eject",
     "clean": "rimraf dist",
-    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run --headed -b chrome"
+    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist"
   },
   "peerDependencies": {
     "react": ">=16.8.6",
