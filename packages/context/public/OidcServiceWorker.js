@@ -225,7 +225,18 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
-            port.postMessage({tokens:{...currentDatabase.tokens, refresh_token : REFRESH_TOKEN + "_" + configurationName, access_token : ACCESS_TOKEN + "_" + configurationName  }, configurationName} );
+            if(!currentDatabase.tokens){
+                port.postMessage({
+                    tokens:null, configurationName}); 
+            } else {
+                port.postMessage({
+                    tokens: {
+                        ...currentDatabase.tokens,
+                        refresh_token: REFRESH_TOKEN + "_" + configurationName,
+                        access_token: ACCESS_TOKEN + "_" + configurationName
+                    }, configurationName
+                });
+            }
             return;
 
         case "getAccessTokenPayload":

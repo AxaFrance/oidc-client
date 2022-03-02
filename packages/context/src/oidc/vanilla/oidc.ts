@@ -7,7 +7,6 @@ import {
     FetchRequestor,
     GRANT_TYPE_AUTHORIZATION_CODE,
     GRANT_TYPE_REFRESH_TOKEN,
-    LocalStorageBackend,
     RedirectRequestHandler,
     TokenRequest
 } from '@openid/appauth';
@@ -78,8 +77,11 @@ const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
     return setTimeout(async () => {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
             oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
-            if(!oidc.serviceWorker){
-                oidc.session.setTokens(oidc.tokens);
+        if(!oidc.serviceWorker){
+            oidc.session.setTokens(oidc.tokens);
+        }
+            if(!oidc.tokens){
+                return;                
             }
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
             oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
@@ -117,13 +119,20 @@ const userInfoAsync = async (oidc)=> {
 
 const setTokensAsync = async (serviceWorker, tokens) =>{
     let accessTokenPayload;
+    if(tokens == null){
+        if(serviceWorker){
+            await serviceWorker.clearAsync();
+        }
+        return null;
+    }
     if(serviceWorker){
         accessTokenPayload = await serviceWorker.getAccessTokenPayloadAsync();
     }
     else {
         accessTokenPayload = extractAccessTokenPayload(tokens);
     }
-    return {...tokens, idTokenPayload: idTokenPayload(tokens.idToken), accessTokenPayload};
+    const expiresAt =  new Date().getTime() + (tokens.expiresIn * 1000);
+    return {...tokens, idTokenPayload: idTokenPayload(tokens.idToken), accessTokenPayload, expiresAt};
 }
 
 const eventNames = {
@@ -396,7 +405,7 @@ export class Oidc {
         } catch(exception) {
             console.error(exception);
             this.publishEvent( silentEvent ? eventNames.refreshTokensAsync_silent_error :eventNames.refreshTokensAsync_error, exception);
-            throw exception;
+            return null;
         }
      }
      
