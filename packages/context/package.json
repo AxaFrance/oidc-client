@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-context",
-  "version": "4.0.3",
+  "version": "4.2.3-alpha.0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -28,7 +28,7 @@
     "test": "react-scripts test --coverage",
     "eject": "react-scripts eject",
     "clean": "rimraf dist",
-    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist"
+    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcKeepAliveServiceWorker.json ./dist"
   },
   "peerDependencies": {
     "react": ">=16.8.6",
