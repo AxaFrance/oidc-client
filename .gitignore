@@ -6,6 +6,7 @@ yarn-error.log*
 lib-cov
 coverage
 node_modules/
+build/
 jspm_packages/
 .npm
 .eslintcache
