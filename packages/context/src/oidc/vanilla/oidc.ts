@@ -72,7 +72,8 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
     return response.state;
 }
-const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
+
+const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return setTimeout(async () => {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
@@ -88,7 +89,7 @@ const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) =>{
       }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
 }
 
-const userInfoAsync = async (oidc)=> {
+const userInfoAsync = async (oidc) => {
     if(oidc.userInfo != null){
         return oidc.userInfo;
     }
@@ -226,7 +227,7 @@ export class Oidc {
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
             serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             if(serviceWorker) {
-                const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
+                const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
                 if (tokens) {
                     const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                     // @ts-ignore

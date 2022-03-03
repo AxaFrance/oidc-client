@@ -50,7 +50,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 #package.json
 {
     "scripts": {
-        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public && copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcKeepAliveServiceWorker.json ./public",
         "start:server": "react-scripts start",
         "build:server": "npm run copy && react-scripts build",
         "prepare": "npm run copy"
