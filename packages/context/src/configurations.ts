@@ -1,5 +1,5 @@
 export const configurationIdentityServer = {
-    client_id: 'interactive.public.short',
+    client_id: 'interactive.public', //  interactive.public
     redirect_uri: window.location.origin+'/authentication/callback', // http://localhost:4200/authentication/callback
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.identityserver.io',

@@ -2,8 +2,17 @@
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
-const handleInstall = () => {
+const assetCacheName = "asset";
+const keepAliveJsonFilename = "OidcKeepAliveServiceWorker.json";
+const handleInstall = (event) => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
+    event.waitUntil(
+        caches.open(assetCacheName).then(cache => {
+            return cache.addAll(
+                [
+                    keepAliveJsonFilename
+                ]);
+        }));
 };
 
 const handleActivate = () => {
@@ -103,6 +112,21 @@ const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 
 const handleFetch = async (event) => {
     const originalRequest = event.request;
+    
+    if(originalRequest.url.includes(keepAliveJsonFilename) ){
+        event.respondWith(
+            caches.open(assetCacheName).then(function(cache) {
+                return cache.match(event.request).then(function (response) {
+                    return response || fetch(event.request).then(function(response) {
+                        cache.put(event.request, response.clone());
+                        return response;
+                    });
+                });
+            })
+        );
+        return;
+    }
+    
     const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(database, originalRequest.url);
     if(currentDatabaseForRequestAccessToken && currentDatabaseForRequestAccessToken.tokens) {
         const newRequest = new Request(originalRequest, {
@@ -122,7 +146,7 @@ const handleFetch = async (event) => {
     const numberDatabase = currentDatabases.length;
     if(numberDatabase > 0) {
         const maPromesse = new Promise((resolve, reject) => {
-            const response =originalRequest.text().then(actualBody => {
+            const response = originalRequest.text().then(actualBody => {
                 if(actualBody.includes(REFRESH_TOKEN)) {
                     let newBody = actualBody;
                     for(let i= 0;i<numberDatabase;i++){

@@ -9,7 +9,7 @@
     if(M[1]==='Chrome'){
         tem=ua.match(/\bOPR|Edge\/(\d+)/);
        
-        if(tem!=null)   {
+        if(tem!=null) {
             let version = tem[1];
             if(!version){
                 const splits = ua.split(tem[0]+"/");
@@ -27,6 +27,16 @@
         name: M[0].toLowerCase(),
         version: M[1]
     };
+}
+
+let keepAliveServiceWorkerTimeoutId = null;
+const keepAliveServiceWorker = () => {
+    if(keepAliveServiceWorkerTimeoutId == null) {
+        keepAliveServiceWorkerTimeoutId = setInterval(() => {
+            console.log('/OidcKeepAliveServiceWorker.json');
+            fetch('OidcKeepAliveServiceWorker.json')
+        }, 20000);
+    }
 }
 
 const sendMessageAsync = (registration) => (data) =>{
@@ -127,8 +137,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const clearAsync=() =>{
         return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
     }
-
-    const initAsync=async (oidcServerConfiguration, where) => {
+    const initAsync= async (oidcServerConfiguration, where) => {
+        
         const result = await sendMessageAsync(registration)({
             type: "init",
             data: {oidcServerConfiguration, where},
@@ -136,8 +146,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         });
         // @ts-ignore
         return { tokens : result.tokens, isUpdateDetected };
-    }    
-    
+    }
+    keepAliveServiceWorker();
 
     return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync, getAccessTokenPayloadAsync, updateAsync };
 }

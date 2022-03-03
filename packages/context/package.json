@@ -22,7 +22,7 @@
     "react-component"
   ],
   "scripts": {
-    "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcTrustedDomains.js ./public",
+    "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcTrustedDomains.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcKeepAliveServiceWorker.json ./public",
     "start": "npm run copy && set PORT=4200 && react-scripts start",
     "build": "npm i react react-dom && npm run copy && react-scripts build",
     "test": "react-scripts test --coverage",
