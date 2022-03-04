@@ -1,5 +1,5 @@
 import React, { useEffect, useState, PropsWithChildren} from 'react';
-import withRouter from "../routes/withRouter";
+import {getCustomHistory} from "../routes/withRouter";
 import AuthenticatingError from "./AuthenticateError.component";
 import Oidc from "../../vanilla/oidc";
 
@@ -10,7 +10,7 @@ const CallBackSuccess = () =>  (<div className="oidc-callback">
 </div>
 </div>);
 
-const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBackSuccess, configurationName }) => {
+const CallbackManager: PropsWithChildren<any> = ({callBackError, callBackSuccess, configurationName }) => {
   const getOidc =  Oidc.get;
   const [error, setError] = useState(false);
   const [isLoading, setLoading] = useState(true);
@@ -25,6 +25,7 @@ const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBa
       try {
         const state = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
         if (state != null && isMounted) {
+          const history = getCustomHistory()
           history.replaceState(decodeURIComponent(state))
         }
       } catch (error) {
@@ -49,4 +50,4 @@ const CallbackManager: PropsWithChildren<any> = ({history, callBackError, callBa
   return <CallbackSuccessComponent />;
 };
 
-export default withRouter(CallbackManager);
+export default CallbackManager;

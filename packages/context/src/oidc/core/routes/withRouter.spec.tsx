@@ -1,7 +1,6 @@
 import React from 'react';
-import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { withRouter, CreateEvent, WindowInternal } from './withRouter';
+import { CreateEvent, WindowInternal } from './withRouter';
 
 describe('WithRouter test Suite', () => {
   const generateKeyMock = () => '123ABC';
@@ -45,34 +44,5 @@ describe('WithRouter test Suite', () => {
     expect(documentMock.createEvent).toHaveBeenCalledWith('CustomEvent');
     expect(evtMock.initCustomEvent).toHaveBeenCalledWith('event test', false, false, 'detail');
   });
-
-  it('should withRouter add location and history', () => {
-    const Component = (props: any) => {
-      const { history } = props;
-      const { push } = history;
-      push('/url/page');
-      return <div {...props}>Component Mock</div>;
-    };
-    const windowMock = {
-      history: {
-        pushState: jest.fn(),
-        state: 'state',
-      },
-      dispatchEvent: jest.fn(),
-      location: 'location',
-    };
-    const createEvent = jest.fn();
-    const NewComp = withRouter(
-      (windowMock as unknown) as WindowInternal,
-      createEvent,
-      generateKeyMock
-    )(Component);
-    const { asFragment } = render(<NewComp />);
-    expect(windowMock.history.pushState).toHaveBeenCalledWith(
-      { key: '123ABC', state: 'state' },
-      null,
-      '/url/page'
-    );
-    expect(asFragment()).toMatchSnapshot();
-  });
+  
 });

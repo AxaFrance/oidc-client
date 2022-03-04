@@ -1,11 +1,10 @@
 import React, {FC, MouseEventHandler} from 'react';
-import withCustomRouter, { ReactOidcHistory } from '../routes/withRouter';
 
 type SessionLostProps = {
   login?: MouseEventHandler;
 };
 
-export const SessionLost: FC<SessionLostProps> = ({ login }) => (
+export const SessionLost: FC<SessionLostProps> = () => (
   <div className="oidc-session-lost">
     <div className="oidc-session-lost__container">
       <h1 className="oidc-session-lost__title">Session expirée</h1>
@@ -16,13 +15,9 @@ export const SessionLost: FC<SessionLostProps> = ({ login }) => (
   </div>
 );
 
-type SessionLostContainerProps = {
-  location: Location;
-  history?: ReactOidcHistory;
-};
 
-export const SessionLostContainer: FC<SessionLostContainerProps> = () => {
+export const SessionLostContainer = () => {
   return <SessionLost />;
 };
 
-export default withCustomRouter(SessionLostContainer);
+export default SessionLostContainer;
