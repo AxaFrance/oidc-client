@@ -110,20 +110,25 @@ const serializeHeaders = (headers) => {
 const REFRESH_TOKEN = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const keepAliveAsync = async (event) => {
+    await sleep(5000);
+    return caches.open(assetCacheName).then(function(cache) {
+        return cache.match(event.request).then(function (response) {
+            return response || fetch(event.request).then(function(response) {
+                cache.put(event.request, response.clone());
+                return response;
+            });
+        });
+    });
+}
+
 const handleFetch = async (event) => {
     const originalRequest = event.request;
     
     if(originalRequest.url.includes(keepAliveJsonFilename) ){
-        event.respondWith(
-            caches.open(assetCacheName).then(function(cache) {
-                return cache.match(event.request).then(function (response) {
-                    return response || fetch(event.request).then(function(response) {
-                        cache.put(event.request, response.clone());
-                        return response;
-                    });
-                });
-            })
-        );
+        event.respondWith(keepAliveAsync(event));
         return;
     }
     

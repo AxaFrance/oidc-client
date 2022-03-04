@@ -30,12 +30,18 @@
 }
 
 let keepAliveServiceWorkerTimeoutId = null;
+
+const keepAlive = () => {
+    console.log('/OidcKeepAliveServiceWorker.json');
+    fetch('OidcKeepAliveServiceWorker.json').then(() => {
+        keepAlive();
+    })
+}
+
 const keepAliveServiceWorker = () => {
     if(keepAliveServiceWorkerTimeoutId == null) {
-        keepAliveServiceWorkerTimeoutId = setInterval(() => {
-            console.log('/OidcKeepAliveServiceWorker.json');
-            fetch('OidcKeepAliveServiceWorker.json')
-        }, 20000);
+        keepAliveServiceWorkerTimeoutId = "not_null";
+        keepAlive();
     }
 }
 

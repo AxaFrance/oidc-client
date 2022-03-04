@@ -25,16 +25,18 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   callbackSuccessComponent, redirect_uri,
   children, configurationName
 }) => {
-  const [path, setPath] = useState(window.location.pathname);
-
-  const setNewPath = () => setPath(window.location.pathname);
+  // This exist because in next.js window outside useEffect is null
+  const pathname = window ? window.location.pathname : '';
+  
+  const [path, setPath] = useState(pathname);
+  
   useEffect(() => {
+    const setNewPath = () => setPath(window.location.pathname);
     setNewPath();
     window.addEventListener('popstate', setNewPath, false);
     return () => window.removeEventListener('popstate', setNewPath, false);
   });
-
-
+  
   const callbackPath = getPath(redirect_uri);
 
   switch (path) {
