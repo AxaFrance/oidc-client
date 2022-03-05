@@ -18,7 +18,7 @@ jobs:
           
       - name: Bump version and push tag
         id: tag_version
-        if: github.ref == 'refs/heads/master'
+      #  if: github.ref == 'refs/heads/master'
         uses: mathieudutour/github-tag-action@v6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -45,7 +45,7 @@ jobs:
         
       - id: publish-context
         uses: JS-DevTools/npm-publish@v1
-        if: github.ref == 'refs/heads/master'
+      #  if: github.ref == 'refs/heads/master'
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/context/package.json
@@ -64,7 +64,7 @@ jobs:
 
       - id: publish-vanilla
         uses: JS-DevTools/npm-publish@v1
-        if: github.ref == 'refs/heads/master'
+       # if: github.ref == 'refs/heads/master'
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/vanilla/package.json
