@@ -39,7 +39,6 @@ export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Do
 type WindowHistoryState = typeof window.history.state;
 
 export interface ReactOidcHistory {
-  push: (url?: string | null, stateHistory?: WindowHistoryState) => void;
   replaceState: (url?: string | null, stateHistory?: WindowHistoryState) => void;
 }
 
@@ -49,12 +48,6 @@ const getHistory = (
   generateKeyInternal: typeof generateKey
 ) => {
   return {
-    push: (url?: string | null, stateHistory?: WindowHistoryState): void => {
-      const key = generateKeyInternal();
-      const state = stateHistory || windowInternal.history.state;
-      windowInternal.history.pushState({ key, state }, null, url);
-      windowInternal.dispatchEvent(CreateEventInternal('popstate'));
-    },
     replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {
       const key = generateKeyInternal();
       const state = stateHistory || windowInternal.history.state;
@@ -64,21 +57,4 @@ const getHistory = (
   };
 };
 
-export const useHistory = () => getHistory(window, CreateEvent(window, document), generateKey);
-
-export const withRouter = (
-  windowInternal: WindowInternal,
-  CreateEventInternal: (event: string, params?: InitCustomEventParams) => CustomEvent,
-  generateKeyInternal: typeof generateKey
-) => (Component: React.ComponentType) => (props: any) => {
-  const oidcHistory: ReactOidcHistory = getHistory(windowInternal, CreateEventInternal, generateKeyInternal);
-
-  const enhanceProps = {
-    history: oidcHistory,
-    location: windowInternal.location,
-    ...props,
-  };
-  return <Component {...enhanceProps} />;
-};
-
-export default withRouter(window, CreateEvent(window, document), generateKey);
+export const getCustomHistory = () => getHistory(window, CreateEvent(window, document), generateKey);
