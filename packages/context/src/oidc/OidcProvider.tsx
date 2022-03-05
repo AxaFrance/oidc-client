@@ -135,7 +135,8 @@ sessionLostComponent=SessionLost }) => {
                         <LoadingComponent/>
                     ) : (
                             <>
-                                  <OidcRoutes redirect_uri={configuration.redirect_uri} 
+                                  <OidcRoutes redirect_uri={configuration.redirect_uri}
+                                              silent_redirect_uri={configuration.silent_redirect_uri}            
                                               callbackSuccessComponent={callbackSuccessComponent} 
                                               callbackErrorComponent={callbackErrorComponent}
                                               configurationName={configurationName}

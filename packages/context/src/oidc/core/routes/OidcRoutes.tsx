@@ -2,6 +2,7 @@ import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from
 import PropTypes from 'prop-types';
 import { getPath } from './route-utils';
 import CallbackComponent from '../default-component/Callback.component';
+import SilentCallbackComponent from "../default-component/SilentCallback.component";
 
 const propTypes = {
   callbackComponent: PropTypes.elementType,
@@ -18,11 +19,12 @@ type OidcRoutesProps = {
   callbackErrorComponent?: ComponentType;
   configurationName:string;
   redirect_uri: string;
+  silent_redirect_uri?: string;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   callbackErrorComponent,
-  callbackSuccessComponent, redirect_uri,
+  callbackSuccessComponent, redirect_uri, silent_redirect_uri,
   children, configurationName
 }) => {
   // This exist because in next.js window outside useEffect is null
@@ -38,6 +40,12 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   });
   
   const callbackPath = getPath(redirect_uri);
+  
+  if(silent_redirect_uri){
+    if(path === getPath(silent_redirect_uri)){
+      return <SilentCallbackComponent configurationName={configurationName} />
+    }
+  }
 
   switch (path) {
     case callbackPath:
