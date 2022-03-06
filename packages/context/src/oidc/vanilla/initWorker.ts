@@ -33,7 +33,7 @@ let keepAliveServiceWorkerTimeoutId = null;
 
 const keepAlive = () => {
     console.log('/OidcKeepAliveServiceWorker.json');
-    fetch('OidcKeepAliveServiceWorker.json').then(() => {
+    fetch('/OidcKeepAliveServiceWorker.json').then(() => {
         keepAlive();
     })
 }
