@@ -6,7 +6,7 @@ interface ComponentWithFetchProps {
   fetch: Fetch;
 }
 
-export const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => string | null) => async (
+export const fetchWithToken = (fetch: Fetch, getAccessTokenInjectedAsync: () => Promise<string> | null) => async (
     url: RequestInfo,
     options: RequestInit = { method: 'GET' }
 ) => {
@@ -19,7 +19,7 @@ export const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => strin
         : optionTmp.headers;
   }
 
-  const accessToken = getAccessTokenInjected();
+  const accessToken = await getAccessTokenInjectedAsync();
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json');
   }
@@ -39,9 +39,13 @@ export const withOidcFetch = (fetch, configurationName="default") => (
     const previousFetch = fetch || props.fetch;
     const getOidc =  Oidc.get;
 
-    const getAccessTokenInjected = () => { return getOidc(configurationName).tokens.accessToken; };
+    const getAccessTokenInjectedAysnc = async () => {
+      const oidc = getOidc(configurationName);
+      await oidc.syncTokensAsync();
+      return oidc.tokens.accessToken;
+    };
     
-    const newFetch = fetchWithToken(previousFetch, getAccessTokenInjected);
+    const newFetch = fetchWithToken(previousFetch, getAccessTokenInjectedAysnc);
     return <WrappedComponent {...props} fetch={newFetch} />;
   };
 

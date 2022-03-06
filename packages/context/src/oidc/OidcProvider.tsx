@@ -99,6 +99,20 @@ sessionLostComponent=SessionLost }) => {
                 setEvent({name, data});
             }
         });
+
+        // Active
+        window.addEventListener('visibilitychange', onVisibilitychange);
+
+        function onVisibilitychange(event) {
+            if(window.self === window.top) {
+                if (document.hidden) {
+                    console.log('not visible');
+                } else {
+                    console.log('visible');
+                    oidc.syncTokensAsync();
+                }
+            }
+        }
         
             if(isMounted) {
                 setConfigurationName(configurationName);

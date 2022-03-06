@@ -79,6 +79,7 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
 const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return timer.setTimeout(async () => {
+            await oidc.syncTokensAsync();
             const tokens = await oidc.refreshTokensAsync(refreshToken);
             oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
         if(!oidc.serviceWorker){
@@ -186,7 +187,25 @@ export class Oidc {
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
     }
-
+    async syncTokensAsync() {
+        const configuration = this.configuration;
+        if(!this.tokens){
+            return;
+        }
+        const oidcServerConfiguration = await this.initAsync(configuration.authority);
+        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+        if (serviceWorker) {
+            const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
+            if(!tokens){
+                const newTokens = await this.silentSigninAsync();
+                console.log(newTokens);
+                this.tokens = await setTokensAsync(serviceWorker, newTokens);
+                return;
+            }
+        }
+        // TODO
+        return;
+    }
     subscriveEvents(func){
         const id = new Date().getTime().toString();
         this.events.push({id, func});
@@ -223,28 +242,36 @@ export class Oidc {
     }
     silentSigninAsync() {
         if(!this.configuration.silent_redirect_uri){
-            return;
+            return Promise.resolve(null);
         }
-
         const link = this.configuration.silent_redirect_uri;
         const iframe = document.createElement('iframe');
-        iframe.width = "300px";
-        iframe.height = "250px";
-        iframe.id = "randomid";
+        iframe.width = "0px";
+        iframe.height = "0px";
+        iframe.id = `${this.configurationName}_iframe`;
         iframe.setAttribute("src", link);
         document.body.appendChild(iframe);
-        //const promise = new Promise((resolve, reject) => {
-        window.onmessage = function (e) {
-            if (e.data.startsWith('tokens:')) {
-                alert(e.data);
-                //          resolve(e.data);
-            }
-        };
-
-        //conste element = document.getElementById()
-        //element.remove();  
-
-        //}    
+        const promise = new Promise((resolve, reject) => {
+            let isResolved = false;
+            window.onmessage = function (e) {
+                if (e.data && typeof (e.data) === "string" && e.data.startsWith('tokens:')) {
+                    if(!isResolved){
+                        resolve(JSON.parse(e.data.replace('tokens:','')));
+                        iframe.remove();
+                        isResolved = true;
+                    }
+                }
+            };
+    
+            setTimeout(() => {
+                if(!isResolved) {
+                    resolve(null);
+                    iframe.remove();
+                    isResolved = true;
+                }
+            }, 10000);
+        });
+        return promise;
     }
     
     async tryKeepExistingSessionAsync() {
@@ -267,8 +294,6 @@ export class Oidc {
                     await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
-                } else {
-                    this.silentSigninAsync();
                 }
                 this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no exiting session found"});
             } else if(configuration.service_worker_relative_url) {
@@ -317,7 +342,6 @@ export class Oidc {
                     // Init new worker
                     await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                 }
-                
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
             } else{
                 const session = initSession(this.configurationName);
@@ -326,7 +350,6 @@ export class Oidc {
                 
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
-            
                     const authRequest = new AuthorizationRequest({
                         client_id: configuration.client_id,
                         redirect_uri: configuration.redirect_uri,
