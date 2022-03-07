@@ -100,10 +100,7 @@ sessionLostComponent=SessionLost }) => {
             }
         });
 
-        // Active
-        window.addEventListener('visibilitychange', onVisibilitychange);
-
-        function onVisibilitychange(event) {
+        const onVisibilitychange = (event) => {
             if(window.self === window.top) {
                 if (document.hidden) {
                     console.log('not visible');
@@ -113,6 +110,9 @@ sessionLostComponent=SessionLost }) => {
                 }
             }
         }
+        window.addEventListener('visibilitychange', onVisibilitychange);
+
+        
         
             if(isMounted) {
                 setConfigurationName(configurationName);

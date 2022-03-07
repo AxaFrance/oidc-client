@@ -41,8 +41,8 @@ export const withOidcFetch = (fetch, configurationName="default") => (
 
     const getAccessTokenInjectedAysnc = async () => {
       const oidc = getOidc(configurationName);
-      await oidc.syncTokensAsync();
-      return oidc.tokens.accessToken;
+      const tokens = oidc.tokens;
+      return tokens ? tokens.accessToken: null;
     };
     
     const newFetch = fetchWithToken(previousFetch, getAccessTokenInjectedAysnc);
