@@ -107,7 +107,7 @@ const  { isEnabled, login, logout, oidcUser, events } = useReactOidc();
 import { useOidc, useOidcAccessToken, useOidcIdToken } from '@axa-fr/react-oidc-context';
 
 const { login, logout, isLogged} = useOidc(); // login and logout return a Promise
-const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser(); // Retrun user_info endpoint data
+const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser(); // Return user_info endpoint data
 const{ accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a jwk
 const{ idToken, idTokenPayload } = useOidcIdToken(); // contain IDToken metadata
  
