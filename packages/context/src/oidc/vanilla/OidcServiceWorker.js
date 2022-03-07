@@ -269,7 +269,7 @@ addEventListener('message', event => {
             return;
 
         case "getAccessTokenPayload":
-            const accessTokenPayload = extractAccessTokenPayload(currentDatabase.tokens.access_token);
+            const accessTokenPayload = currentDatabase.tokens ? extractAccessTokenPayload(currentDatabase.tokens.access_token): null;
             port.postMessage({configurationName, accessTokenPayload});
             return;
         default:
