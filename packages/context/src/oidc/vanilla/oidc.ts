@@ -80,8 +80,8 @@ const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return timer.setTimeout(async () => {
         const currentTimeUnixSecond = new Date().getTime() /1000;
-        //console.log("Temps restant: " + ((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond));
-        //console.log(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond));
+        console.log("Temps restant: " + ((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond));
+       // console.log(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond));
         if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
             await oidc.syncTokensAsync();
             const tokens = await oidc.refreshTokensAsync(refreshToken);
@@ -97,7 +97,7 @@ const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
         } else{
             oidc.timeoutId = await autoRenewTokensAsync(oidc, refreshToken, expiresAt)
         }
-      }, 5000);
+      }, 1000);
 }
 
 const userInfoAsync = async (oidc) => {
