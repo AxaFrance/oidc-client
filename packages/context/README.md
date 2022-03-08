@@ -3,7 +3,7 @@
 Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 
 <p align="center">
-    <img src="../../docs/img/introduction.gif"
+    <img src="https://github.com/AxaGuilDEv/react-oidc/blob/master/docs/img/introduction.gif?raw=true"
      alt="Sample React Oicd"
       />
 </p>
@@ -21,19 +21,26 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 Easy set up of OIDC for react and use the new react context api as state management.
 It use AppAuthJS behind the scene. 
 
-- Simple : 
-  - refresh_token and access_token are auto refreshed in background
-  - with the use of the Service Worker, you do not need to inject the access_token in every fetch, juste configure OidcTrustedDomains.js
-- No cookies problem : No silent signin mode inside in iframe
-- Secure : 
-  - with the use of Service Worker, your tokens are not accessible to the client (protect against XSRF attacks)
+- **Secure** :
+  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
   - OIDC using client side Code Credential Grant with pkce only
-- Multiple Authentification :
+- **Simple** :
+  - refresh_token and access_token are auto refreshed in background
+  - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
+- **No cookies problem** : No silent signin mode inside in iframe
+- **Multiple Authentification** :
   - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
-- Flexible :
+- **Flexible** :
   - Work with Service Worker (more secure) and whithout for older browser (less secure)
 
+<p align="center">
+    <img src="https://github.com/AxaGuilDEv/react-oidc/blob/master/docs/img/schema_pcke_client_side_with_service_worker.png?raw=true"
+     alt="Schema Authorization Code Grant with pcke flow on the using service worker"
+      />
+  <br>
+  The service worker catch <b>access_token</b> and <b>refresh_token</b> that will never be accessible to the client.
+</p>
 
 # Getting Started
 
