@@ -23,9 +23,19 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
 
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};
 
+const initTokens = (configurationName) => {
+    const getOidc =  Oidc.get;
+    const oidc = getOidc(configurationName);
+    if(oidc.tokens) {
+        const tokens = oidc.tokens;
+        return {accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload }
+    }
+    return accessTokenInitialState;
+}
+
 export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
-    const [state, setAccessToken] = useState<any>(accessTokenInitialState);
+    const [state, setAccessToken] = useState<any>(initTokens(configurationName));
     const [subscriptionId, setSubscriptionId] = useState(null);
     
     useEffect(() => {
@@ -60,10 +70,20 @@ export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>
 
 const idTokenInitialState = {idToken:null, idTokenPayload:null};
 
+const initIdToken= (configurationName) =>{
+    const getOidc =  Oidc.get;
+    const oidc = getOidc(configurationName);
+    if(oidc.tokens) {
+        const tokens = oidc.tokens;
+        return { idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload };
+    }
+    return idTokenInitialState
+}
+
 export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
     const [state, setIDToken] = useState<any>(idTokenInitialState);
-    const [subscriptionId, setSubscriptionId] = useState(null);
+    const [subscriptionId, setSubscriptionId] = useState(initIdToken(configurationName));
     
     useEffect(() => {
         let isMounted = true;
