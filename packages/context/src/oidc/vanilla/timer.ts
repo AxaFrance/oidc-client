@@ -1,10 +1,10 @@
 ﻿const timer = (function () {
-    var workerPort = (function () {
-        var worker;
-        var blobURL;
+    const workerPort = (function () {
+        let worker;
+        let blobURL;
 
-        var workerCode = function () {
-            var innerIdsByOuterIds = {};
+        const workerCode = function () {
+            const innerIdsByOuterIds = {};
 
             const methods = {
                 setTimeout: function (port, id, timeout) {
@@ -48,7 +48,7 @@
 
             // For Shared Worker
             this.onconnect = function (event) {
-                var port = event.ports[0];
+                const port = event.ports[0];
 
                 port.onmessage = function (event) {
                     onMessage(port, event);
@@ -57,7 +57,7 @@
         }.toString();
 
         try {
-            var blob = new Blob(['(', workerCode, ')()'], {type: 'application/javascript'});
+            const blob = new Blob(['(', workerCode, ')()'], {type: 'application/javascript'});
             blobURL = URL.createObjectURL(blob);
         } catch (error) {
             return null;
@@ -83,8 +83,8 @@
         };
     }
 
-    var getId = (function () {
-        var currentId = 0;
+    const getId = (function () {
+        let currentId = 0;
 
         return function () {
             currentId++;
@@ -92,27 +92,27 @@
         };
     }());
 
-    var timeoutCallbacksById = {};
-    var intervalCallbacksById = {};
+    const timeoutCallbacksById = {};
+    const intervalCallbacksById = {};
 
     workerPort.onmessage = function (event) {
-        var id = event.data;
+        const id = event.data;
 
-        var timeoutCallback = timeoutCallbacksById[id];
+        const timeoutCallback = timeoutCallbacksById[id];
         if (timeoutCallback) {
             timeoutCallback();
             timeoutCallbacksById[id] = null;
             return;
         }
 
-        var intervalCallback = intervalCallbacksById[id];
+        const intervalCallback = intervalCallbacksById[id];
         if (intervalCallback) {
             intervalCallback();
         }
     };
 
     function setTimeoutWorker(callback, timeout) {
-        var id = getId();
+        const id = getId();
         workerPort.postMessage(['setTimeout', id, timeout]);
         timeoutCallbacksById[id] = callback;
         return id;
@@ -124,7 +124,7 @@
     }
 
     function setIntervalWorker(callback, timeout) {
-        var id = getId();
+        const id = getId();
         workerPort.postMessage(['setInterval', id, timeout]);
         intervalCallbacksById[id] = callback;
         return id;

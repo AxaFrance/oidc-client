@@ -100,7 +100,8 @@ sessionLostComponent=SessionLost }) => {
             }
         });
 
-        const onVisibilitychange = (event) => {
+        const onVisibilitychange = () => {
+            const oidc = getOidc(configurationName);
             if(window.self === window.top) {
                 if (document.hidden) {
                     console.log('not visible');
@@ -111,14 +112,12 @@ sessionLostComponent=SessionLost }) => {
             }
         }
         window.addEventListener('visibilitychange', onVisibilitychange);
-
         
-        
-            if(isMounted) {
-                setConfigurationName(configurationName);
-                setSubscriptionId(newSubscriptionId);
-                setLoading(false);
-            }
+        if(isMounted) {
+            setConfigurationName(configurationName);
+            setSubscriptionId(newSubscriptionId);
+            setLoading(false);
+        }
         return () => {
             isMounted = false;
         }
