@@ -150,7 +150,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { databaseHasTokens: result.databaseHasTokens, tokens : result.tokens, isUpdateDetected };
+        return { databaseHasTokens: result.databaseHasTokens, tokens : result.tokens, isUpdateDetected:true };
     }
     keepAliveServiceWorker();
 

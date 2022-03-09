@@ -126,12 +126,12 @@ const keepAliveAsync = async (event) => {
 
 const handleFetch = async (event) => {
     const originalRequest = event.request;
-    
+
     if(originalRequest.url.includes(keepAliveJsonFilename) ){
         event.respondWith(keepAliveAsync(event));
         return;
     }
-    
+
     const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(database, originalRequest.url);
     if(currentDatabaseForRequestAccessToken && currentDatabaseForRequestAccessToken.tokens) {
         const newRequest = new Request(originalRequest, {
@@ -213,7 +213,7 @@ self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
 
-const databaseHasTokens=(database)=>{
+const databaseHasTokensFunc= (database) =>{
     for (const [key, value] of Object.entries(database)) {
         if(value.tokens){
             return true;
@@ -263,11 +263,11 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
-            const databaseHasTokens = databaseHasTokens(database);
+            const databaseHasTokens = databaseHasTokensFunc(database);
             if(!currentDatabase.tokens){
-                port.postMessage({ 
+                port.postMessage({
                     databaseHasTokens,
-                    tokens:null, 
+                    tokens:null,
                     configurationName});
             } else {
                 port.postMessage({
@@ -275,7 +275,7 @@ addEventListener('message', event => {
                         ...currentDatabase.tokens,
                         refresh_token: REFRESH_TOKEN + "_" + configurationName,
                         access_token: ACCESS_TOKEN + "_" + configurationName
-                    }, 
+                    },
                     configurationName,
                     databaseHasTokens
                 });
