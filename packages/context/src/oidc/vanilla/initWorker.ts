@@ -31,18 +31,22 @@
 
 let keepAliveServiceWorkerTimeoutId = null;
 
-const keepAlive = () => {
-    console.log('/OidcKeepAliveServiceWorker.json');
-    fetch('/OidcKeepAliveServiceWorker.json').then(() => {
-        keepAlive();
-    })
+const sleepAsync = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-const keepAliveServiceWorker = () => {
-    if(keepAliveServiceWorkerTimeoutId == null) {
-        keepAliveServiceWorkerTimeoutId = "not_null";
-        keepAlive();
-    }
+const keepAlive = () => {
+    const currentTimeUnixSecond = new Date().getTime() /1000;
+    console.log('/OidcKeepAliveServiceWorker.json');
+    fetch('/OidcKeepAliveServiceWorker.json').then(() => {
+        const newTimeUnixSecond = new Date().getTime() /1000;
+        if((newTimeUnixSecond - currentTimeUnixSecond) >4){
+            keepAlive();   
+        } else{
+            // security if service worker does not catcth the request
+            sleepAsync(2000).then(keepAlive);
+        }
+    })
 }
 
 const sendMessageAsync = (registration) => (data) =>{
@@ -104,7 +108,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         //await updateAsync();
     }
     
-        registration.addEventListener('updatefound', () => {
+        /*registration.addEventListener('updatefound', () => {
             console.log('Service Worker update detected!');
             if (registration.installing) {
                 // wait until the new Service worker is actually installed (ready to take over)
@@ -120,7 +124,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
                     }
                 })
             }
-        });
+        });*/
     
     const saveItemsAsync =(items) =>{
             return sendMessageAsync(registration)({type: "saveItems", data: items, configurationName});
@@ -150,9 +154,15 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { databaseHasTokens: result.databaseHasTokens, tokens : result.tokens, isUpdateDetected:true };
+        return { databaseHasTokens: result.databaseHasTokens, tokens : result.tokens/*, isUpdateDetected:true*/ };
     }
-    keepAliveServiceWorker();
+    
+    const startKeepAliveServiceWorker = () => {
+        if(keepAliveServiceWorkerTimeoutId == null) {
+            keepAliveServiceWorkerTimeoutId = "not_null";
+            keepAlive();
+        }
+    }
 
     return { 
         saveItemsAsync, 
@@ -160,5 +170,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         clearAsync, 
         initAsync, 
         getAccessTokenPayloadAsync, 
-        updateAsync };
+        updateAsync,
+        startKeepAliveServiceWorker
+    };
 }
