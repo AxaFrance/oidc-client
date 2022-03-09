@@ -213,6 +213,15 @@ self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
 
+const databaseHasTokens=(database)=>{
+    for (const [key, value] of Object.entries(database)) {
+        if(value.tokens){
+            return true;
+        }
+    }
+    return false;
+}
+
 addEventListener('message', event => {
     const port = event.ports[0];
     const data = event.data;
@@ -254,16 +263,21 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
+            const databaseHasTokens = databaseHasTokens(database);
             if(!currentDatabase.tokens){
-                port.postMessage({
-                    tokens:null, configurationName});
+                port.postMessage({ 
+                    databaseHasTokens,
+                    tokens:null, 
+                    configurationName});
             } else {
                 port.postMessage({
                     tokens: {
                         ...currentDatabase.tokens,
                         refresh_token: REFRESH_TOKEN + "_" + configurationName,
                         access_token: ACCESS_TOKEN + "_" + configurationName
-                    }, configurationName
+                    }, 
+                    configurationName,
+                    databaseHasTokens
                 });
             }
             return;

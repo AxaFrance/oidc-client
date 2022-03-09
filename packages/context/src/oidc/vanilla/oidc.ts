@@ -266,27 +266,30 @@ export class Oidc {
         }
     }
 
-    async loginAsync(callbackPath:string=undefined) {
+    async loginAsync(callbackPath:string=undefined, installServiceWorker=true) {
         try {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
             const state = url
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
-            const oidcServerConfiguration = await this.initAsync(configuration.authority);
             let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-            let storage;
-            if(serviceWorker){
-                const {isUpdateDetected} = await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
-                if(isUpdateDetected){
+            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            if(installServiceWorker) {
+                const {isUpdateDetected, databaseHasTokens} = await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                if(isUpdateDetected && !databaseHasTokens) {
                     // Install and activate new worker
                     await serviceWorker.updateAsync();
-                    // Init new worker
-                    await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                 }
-                
+                window.location.href = configuration.redirect_uri + "/service-worker-install?callbackPath="+encodeURIComponent(url);
+                return;
+            }
+            let storage;
+            if(serviceWorker){
+                // Init new worker
+                await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
-            } else{
+            } else {
                 const session = initSession(this.configurationName);
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }

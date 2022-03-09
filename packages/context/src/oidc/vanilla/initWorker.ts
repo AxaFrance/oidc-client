@@ -144,16 +144,21 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
     }
     const initAsync= async (oidcServerConfiguration, where) => {
-        
         const result = await sendMessageAsync(registration)({
             type: "init",
             data: {oidcServerConfiguration, where},
             configurationName
         });
         // @ts-ignore
-        return { tokens : result.tokens, isUpdateDetected };
+        return { databaseHasTokens: result.databaseHasTokens, tokens : result.tokens, isUpdateDetected };
     }
     keepAliveServiceWorker();
 
-    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync, getAccessTokenPayloadAsync, updateAsync };
+    return { 
+        saveItemsAsync, 
+        loadItemsAsync, 
+        clearAsync, 
+        initAsync, 
+        getAccessTokenPayloadAsync, 
+        updateAsync };
 }
