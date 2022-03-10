@@ -3,13 +3,13 @@ import AuthenticatingError from "./AuthenticateError.component";
 import Oidc from "../../vanilla/oidc";
 import Authenticating from "./Authenticating.component";
 
-const ServiceWorkerInstall: PropsWithChildren<any> = ({callBackError, callBackSuccess, configurationName }) => {
+const ServiceWorkerInstall: PropsWithChildren<any> = ({callBackError, authenticating, configurationName }) => {
     const getOidc =  Oidc.get;
     const [error, setError] = useState(false);
     const [isLoading, setLoading] = useState(true);
 
     const CallbackErrorComponent = callBackError || AuthenticatingError;
-    const CallbackSuccessComponent = callBackSuccess || Authenticating;
+    const CallbackSuccessComponent = authenticating || Authenticating;
 
     useEffect(() => {
         let isMounted = true;
