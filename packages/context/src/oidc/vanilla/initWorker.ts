@@ -37,7 +37,6 @@ const sleepAsync = (milliseconds) => {
 
 const keepAlive = () => {
     const currentTimeUnixSecond = new Date().getTime() /1000;
-    console.log('/OidcKeepAliveServiceWorker.json');
     fetch('/OidcKeepAliveServiceWorker.json').then(() => {
         const newTimeUnixSecond = new Date().getTime() /1000;
         if((newTimeUnixSecond - currentTimeUnixSecond) >4){
@@ -48,6 +47,16 @@ const keepAlive = () => {
         }
     })
 }
+
+const isServiceWorkerProxyActiveAsync = () => {
+    return fetch('/OidcKeepAliveServiceWorker.json', {
+        headers: {
+            'oidc-vanilla': "true"
+        }})
+        .then((response) => {
+            return response.statusText === 'oidc-service-worker';
+        });
+};
 
 const sendMessageAsync = (registration) => (data) =>{
     return new Promise(function(resolve, reject) {
@@ -62,8 +71,6 @@ const sendMessageAsync = (registration) => (data) =>{
         registration.active.postMessage(data, [messageChannel.port2]);
     });
 }
-
-let isUpdateDetected = false;
 
 export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
     
@@ -93,38 +100,10 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
 
     try {
         await navigator.serviceWorker.ready
-        console.log('[OidcServiceWorker] proxy server ready');
     }
     catch(err) {
-        console.error('[OidcServiceWorker] error registering:', err);
         return null;
     }
-
-    const updateAsync = () =>{
-        return sendMessageAsync(registration)({type: "skipWaiting", data: null, configurationName});
-    }
-
-    if (registration.waiting) {
-        //await updateAsync();
-    }
-    
-        /*registration.addEventListener('updatefound', () => {
-            console.log('Service Worker update detected!');
-            if (registration.installing) {
-                // wait until the new Service worker is actually installed (ready to take over)
-                registration.installing.addEventListener('statechange', () => {
-                    if (registration.waiting) {
-                        // if there's an existing controller (previous Service Worker), show the prompt
-                        if (navigator.serviceWorker.controller) {
-                            isUpdateDetected = true;
-                        } else {
-                            // otherwise it's the first install, nothing to do
-                            console.log('Service Worker initialized for the first time')
-                        }
-                    }
-                })
-            }
-        });*/
     
     const saveItemsAsync =(items) =>{
             return sendMessageAsync(registration)({type: "saveItems", data: items, configurationName});
@@ -169,8 +148,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         loadItemsAsync, 
         clearAsync, 
         initAsync, 
-        getAccessTokenPayloadAsync, 
-        updateAsync,
-        startKeepAliveServiceWorker
+        getAccessTokenPayloadAsync,
+        startKeepAliveServiceWorker,
+        isServiceWorkerProxyActiveAsync
     };
 }

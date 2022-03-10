@@ -277,13 +277,11 @@ export class Oidc {
             let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
             if(serviceWorker && installServiceWorker) {
-                const {databaseHasTokens} = await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
-                if(!databaseHasTokens) {
-                    // Install and activate new worker
-                   // await serviceWorker.updateAsync();
+                const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync()
+                if(!isServiceWorkerProxyActive) {
+                    window.location.href = configuration.redirect_uri + "/service-worker-install?callbackPath=" + encodeURIComponent(url);
+                    return;
                 }
-                window.location.href = configuration.redirect_uri + "/service-worker-install?callbackPath="+encodeURIComponent(url);
-                return;
             }
             let storage;
             if(serviceWorker){
