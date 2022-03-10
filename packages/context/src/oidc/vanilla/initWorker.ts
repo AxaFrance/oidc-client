@@ -42,7 +42,7 @@ const keepAlive = () => {
         if((newTimeUnixSecond - currentTimeUnixSecond) >4){
             keepAlive();   
         } else{
-            // security if service worker does not catcth the request
+            // security if service worker does not catch the request
             sleepAsync(2000).then(keepAlive);
         }
     })
@@ -133,7 +133,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { databaseHasTokens: result.databaseHasTokens, tokens : result.tokens/*, isUpdateDetected:true*/ };
+        return { tokens : result.tokens};
     }
     
     const startKeepAliveServiceWorker = () => {

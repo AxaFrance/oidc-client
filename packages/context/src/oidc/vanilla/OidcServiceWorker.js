@@ -127,7 +127,7 @@ const keepAliveAsync = async (event) => {
     const originalRequest = event.request;
     const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
     if(!isFromVanilla) {
-        await sleep(5000);
+        await sleep(15000);
     }
     return caches.open(assetCacheName).then(function(cache) {
         return cache.match(event.request).then(function (response) {
@@ -231,16 +231,6 @@ self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
-
-const databaseHasTokensFunc= (database) =>{
-    for (const [key, value] of Object.entries(database)) {
-        if(value.tokens){
-            return true;
-        }
-    }
-    return false;
-}
-
 addEventListener('message', event => {
     const port = event.ports[0];
     const data = event.data;
@@ -276,10 +266,8 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
-            const databaseHasTokens = databaseHasTokensFunc(database);
             if(!currentDatabase.tokens){
                 port.postMessage({
-                    databaseHasTokens,
                     tokens:null,
                     configurationName});
             } else {
@@ -289,8 +277,7 @@ addEventListener('message', event => {
                         refresh_token: REFRESH_TOKEN + "_" + configurationName,
                         access_token: ACCESS_TOKEN + "_" + configurationName
                     },
-                    configurationName,
-                    databaseHasTokens
+                    configurationName
                 });
             }
             return;
