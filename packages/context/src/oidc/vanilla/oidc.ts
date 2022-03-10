@@ -229,6 +229,7 @@ export class Oidc {
             if(serviceWorker) {
                 const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
                 if (tokens) {
+                    serviceWorker.startKeepAliveServiceWorker();
                     const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                     // @ts-ignore
                     this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
@@ -266,27 +267,28 @@ export class Oidc {
         }
     }
 
-    async loginAsync(callbackPath:string=undefined) {
+    async loginAsync(callbackPath:string=undefined, installServiceWorker=true) {
         try {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
             const state = url
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
-            const oidcServerConfiguration = await this.initAsync(configuration.authority);
             let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            if(serviceWorker && installServiceWorker) {
+                const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync()
+                if(!isServiceWorkerProxyActive) {
+                    window.location.href = configuration.redirect_uri + "/service-worker-install?callbackPath=" + encodeURIComponent(url);
+                    return;
+                }
+            }
             let storage;
             if(serviceWorker){
-                const {isUpdateDetected} = await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
-                if(isUpdateDetected){
-                    // Install and activate new worker
-                    await serviceWorker.updateAsync();
-                    // Init new worker
-                    await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
-                }
-                
+                serviceWorker.startKeepAliveServiceWorker();
+                await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
-            } else{
+            } else {
                 const session = initSession(this.configurationName);
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
@@ -318,6 +320,7 @@ export class Oidc {
             const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
             if(serviceWorker){
+                serviceWorker.startKeepAliveServiceWorker();
                 this.serviceWorker = serviceWorker;
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
                 const items = await serviceWorker.loadItemsAsync();

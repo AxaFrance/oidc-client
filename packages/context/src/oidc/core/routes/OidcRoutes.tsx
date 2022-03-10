@@ -2,6 +2,7 @@ import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from
 import PropTypes from 'prop-types';
 import { getPath } from './route-utils';
 import CallbackComponent from '../default-component/Callback.component';
+import ServiceWorkerInstall from "../default-component/ServiceWorkerInstall.component";
 
 const propTypes = {
   callbackComponent: PropTypes.elementType,
@@ -16,13 +17,16 @@ const defaultProps: Partial<OidcRoutesProps> = {
 type OidcRoutesProps = {
   callbackSuccessComponent?: ComponentType;
   callbackErrorComponent?: ComponentType;
+  authenticatingComponent?: ComponentType;
   configurationName:string;
   redirect_uri: string;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   callbackErrorComponent,
-  callbackSuccessComponent, redirect_uri,
+  callbackSuccessComponent,
+                                                              authenticatingComponent,  
+                                                              redirect_uri,
   children, configurationName
 }) => {
   // This exist because in next.js window outside useEffect is null
@@ -42,6 +46,8 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   switch (path) {
     case callbackPath:
       return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} />;
+    case callbackPath +"/service-worker-install" :
+      return <ServiceWorkerInstall callBackError={callbackErrorComponent} authenticating={authenticatingComponent} configurationName={configurationName} />;  
     default:
       return <>{children}</>;
   }

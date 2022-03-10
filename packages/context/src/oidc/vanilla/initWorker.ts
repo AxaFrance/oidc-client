@@ -31,19 +31,32 @@
 
 let keepAliveServiceWorkerTimeoutId = null;
 
+const sleepAsync = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
 const keepAlive = () => {
-    console.log('/OidcKeepAliveServiceWorker.json');
+    const currentTimeUnixSecond = new Date().getTime() /1000;
     fetch('/OidcKeepAliveServiceWorker.json').then(() => {
-        keepAlive();
+        const newTimeUnixSecond = new Date().getTime() /1000;
+        if((newTimeUnixSecond - currentTimeUnixSecond) >4){
+            keepAlive();   
+        } else{
+            // security if service worker does not catch the request
+            sleepAsync(2000).then(keepAlive);
+        }
     })
 }
 
-const keepAliveServiceWorker = () => {
-    if(keepAliveServiceWorkerTimeoutId == null) {
-        keepAliveServiceWorkerTimeoutId = "not_null";
-        keepAlive();
-    }
-}
+const isServiceWorkerProxyActiveAsync = () => {
+    return fetch('/OidcKeepAliveServiceWorker.json', {
+        headers: {
+            'oidc-vanilla': "true"
+        }})
+        .then((response) => {
+            return response.statusText === 'oidc-service-worker';
+        });
+};
 
 const sendMessageAsync = (registration) => (data) =>{
     return new Promise(function(resolve, reject) {
@@ -58,8 +71,6 @@ const sendMessageAsync = (registration) => (data) =>{
         registration.active.postMessage(data, [messageChannel.port2]);
     });
 }
-
-let isUpdateDetected = false;
 
 export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
     
@@ -89,38 +100,10 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
 
     try {
         await navigator.serviceWorker.ready
-        console.log('[OidcServiceWorker] proxy server ready');
     }
     catch(err) {
-        console.error('[OidcServiceWorker] error registering:', err);
         return null;
     }
-
-    const updateAsync = () =>{
-        return sendMessageAsync(registration)({type: "skipWaiting", data: null, configurationName});
-    }
-
-    if (registration.waiting) {
-        //await updateAsync();
-    }
-    
-        registration.addEventListener('updatefound', () => {
-            console.log('Service Worker update detected!');
-            if (registration.installing) {
-                // wait until the new Service worker is actually installed (ready to take over)
-                registration.installing.addEventListener('statechange', () => {
-                    if (registration.waiting) {
-                        // if there's an existing controller (previous Service Worker), show the prompt
-                        if (navigator.serviceWorker.controller) {
-                            isUpdateDetected = true;
-                        } else {
-                            // otherwise it's the first install, nothing to do
-                            console.log('Service Worker initialized for the first time')
-                        }
-                    }
-                })
-            }
-        });
     
     const saveItemsAsync =(items) =>{
             return sendMessageAsync(registration)({type: "saveItems", data: items, configurationName});
@@ -144,16 +127,29 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
     }
     const initAsync= async (oidcServerConfiguration, where) => {
-        
         const result = await sendMessageAsync(registration)({
             type: "init",
             data: {oidcServerConfiguration, where},
             configurationName
         });
         // @ts-ignore
-        return { tokens : result.tokens, isUpdateDetected };
+        return { tokens : result.tokens};
     }
-    keepAliveServiceWorker();
+    
+    const startKeepAliveServiceWorker = () => {
+        if(keepAliveServiceWorkerTimeoutId == null) {
+            keepAliveServiceWorkerTimeoutId = "not_null";
+            keepAlive();
+        }
+    }
 
-    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync, getAccessTokenPayloadAsync, updateAsync };
+    return { 
+        saveItemsAsync, 
+        loadItemsAsync, 
+        clearAsync, 
+        initAsync, 
+        getAccessTokenPayloadAsync,
+        startKeepAliveServiceWorker,
+        isServiceWorkerProxyActiveAsync
+    };
 }

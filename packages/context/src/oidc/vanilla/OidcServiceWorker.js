@@ -2,7 +2,7 @@
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
-const assetCacheName = "asset";
+const assetCacheName = "oidc_asset";
 const keepAliveJsonFilename = "OidcKeepAliveServiceWorker.json";
 const handleInstall = (event) => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
@@ -13,10 +13,12 @@ const handleInstall = (event) => {
                     keepAliveJsonFilename
                 ]);
         }));
+    self.skipWaiting();
 };
 
 const handleActivate = () => {
     console.log('[OidcServiceWorker] service worker activated ' + id);
+    self.clients.claim();
 };
 
 let currentLoginCallbackConfigurationName = null;
@@ -112,13 +114,30 @@ const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+
+const responseKeepAlive= (isFromVanilla, response) => {
+    if(!isFromVanilla) {
+        return response;
+    }
+    const init = {"status": 200, "statusText": 'oidc-service-worker'};
+    return new Response('{}', init);
+}
+
 const keepAliveAsync = async (event) => {
-    await sleep(5000);
+    const originalRequest = event.request;
+    const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
+    if(!isFromVanilla) {
+        await sleep(15000);
+    }
     return caches.open(assetCacheName).then(function(cache) {
         return cache.match(event.request).then(function (response) {
-            return response || fetch(event.request).then(function(response) {
+
+            if(response){
+                return responseKeepAlive(isFromVanilla, response);
+            }
+            return fetch(event.request).then(function(response) {
                 cache.put(event.request, response.clone());
-                return response;
+                return responseKeepAlive(isFromVanilla, response);
             });
         });
     });
@@ -126,12 +145,12 @@ const keepAliveAsync = async (event) => {
 
 const handleFetch = async (event) => {
     const originalRequest = event.request;
-    
+
     if(originalRequest.url.includes(keepAliveJsonFilename) ){
         event.respondWith(keepAliveAsync(event));
         return;
     }
-    
+
     const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(database, originalRequest.url);
     if(currentDatabaseForRequestAccessToken && currentDatabaseForRequestAccessToken.tokens) {
         const newRequest = new Request(originalRequest, {
@@ -212,7 +231,6 @@ self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
-
 addEventListener('message', event => {
     const port = event.ports[0];
     const data = event.data;
@@ -232,12 +250,6 @@ addEventListener('message', event => {
         }
     }
     switch (data.type){
-        case "skipWaiting":
-            self.skipWaiting().then(async () => {
-                await self.clients.claim();
-                port.postMessage({configurationName});
-            });
-            return;
         case "loadItems":
             port.postMessage(database[configurationName].items);
             return;
@@ -256,14 +268,16 @@ addEventListener('message', event => {
             }
             if(!currentDatabase.tokens){
                 port.postMessage({
-                    tokens:null, configurationName});
+                    tokens:null,
+                    configurationName});
             } else {
                 port.postMessage({
                     tokens: {
                         ...currentDatabase.tokens,
                         refresh_token: REFRESH_TOKEN + "_" + configurationName,
                         access_token: ACCESS_TOKEN + "_" + configurationName
-                    }, configurationName
+                    },
+                    configurationName
                 });
             }
             return;
