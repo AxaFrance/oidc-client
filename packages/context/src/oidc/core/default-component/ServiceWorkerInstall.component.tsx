@@ -21,10 +21,14 @@ const ServiceWorkerInstall: PropsWithChildren<any> = ({callBackError, callBackSu
                 });
                 // @ts-ignore
                 await getOidc(configurationName).loginAsync(decodeURIComponent(params.callbackPath), false);
-                setLoading(false);
+                if(isMounted) {
+                    setLoading(false);
+                }
             } catch (error) {
-                setError(true);
-                setLoading(false);
+                if(isMounted) {
+                    setError(true);
+                    setLoading(false);
+                }
             }
         };
         playCallbackAsync();

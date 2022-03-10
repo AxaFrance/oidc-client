@@ -29,8 +29,10 @@ const CallbackManager: PropsWithChildren<any> = ({callBackError, callBackSuccess
           history.replaceState(decodeURIComponent(state))
         }
       } catch (error) {
-        setLoading(false);
-        setError(true)
+        if(isMounted) {
+          setLoading(false);
+          setError(true);
+        }
       }
     };
     playCallbackAsync();
