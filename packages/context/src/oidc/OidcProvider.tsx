@@ -1,7 +1,7 @@
 import React, {ComponentType, FC, PropsWithChildren, useEffect, useState} from 'react';
 import Oidc, {Configuration} from './vanilla/oidc';
 import OidcRoutes from './core/routes/OidcRoutes';
-import {Authenticating, AuthenticateError, SessionLost, Loading, Callback} from './core/default-component/index';
+import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
 
@@ -63,7 +63,7 @@ const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({loadingComponent
 export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ children, 
                                                                              configuration, 
                                                                              configurationName = "default", 
-                                                                             callbackSuccessComponent = Callback, 
+                                                                             callbackSuccessComponent = CallBackSuccess, 
                                                                              callbackErrorComponent = AuthenticateError,
                                                                              authenticatingComponent = Authenticating,
                                                                              loadingComponent = Loading,
