@@ -42,6 +42,10 @@ const extractAccessTokenPayload = tokens => {
     return null;
 };
 
+export interface StringMap {
+    [key: string]: string;
+}
+
  export type Configuration = {
     client_id: string,
     redirect_uri: string,
@@ -50,6 +54,7 @@ const extractAccessTokenPayload = tokens => {
     refresh_time_before_tokens_expiration_in_second?: number,
     service_worker_relative_url?:string,
      service_worker_only?:boolean,
+     extras?:StringMap
 };
 
 const oidcDatabase = {};
@@ -271,7 +276,7 @@ export class Oidc {
         try {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
-            const state = url
+            const state = url;
             this.publishEvent(eventNames.loginAsync_begin, {});
             const configuration = this.configuration;
             let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
@@ -284,7 +289,7 @@ export class Oidc {
                 }
             }
             let storage;
-            if(serviceWorker){
+            if(serviceWorker) {
                 serviceWorker.startKeepAliveServiceWorker();
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
@@ -292,16 +297,16 @@ export class Oidc {
                 const session = initSession(this.configurationName);
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
-                
+            
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
-            
                     const authRequest = new AuthorizationRequest({
                         client_id: configuration.client_id,
                         redirect_uri: configuration.redirect_uri,
                         scope: configuration.scope,
                         response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
                         state,
+                        extras: configuration.extras
                     });
                     authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
         } catch(exception){
@@ -313,11 +318,12 @@ export class Oidc {
     async loginCallbackAsync() {
         try {
             this.publishEvent(eventNames.loginCallbackAsync_begin, {});
-            const clientId = this.configuration.client_id;
-            const redirectURL = this.configuration.redirect_uri;
-            const authority =  this.configuration.authority;
+            const configuration = this.configuration;
+            const clientId = configuration.client_id;
+            const redirectURL = configuration.redirect_uri;
+            const authority =  configuration.authority;
             const oidcServerConfiguration = await this.initAsync(authority);
-            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
             if(serviceWorker){
                 serviceWorker.startKeepAliveServiceWorker();
@@ -351,6 +357,11 @@ export class Oidc {
                     if (request && request.internal) {
                         extras = {};
                         extras.code_verifier = request.internal.code_verifier;
+                        if(configuration.extras) {
+                            for (let [key, value] of Object.entries(configuration.extras)) {
+                                extras[key] = value;
+                            }
+                        }
                     }
     
                     const tokenRequest = new TokenRequest({
@@ -361,8 +372,8 @@ export class Oidc {
                         refresh_token: undefined,
                         extras,
                     });
+                    
                     try {
-                        
                         const tokenResponse =  await tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest);
                         resolve({tokens:tokenResponse, state: request.state});
                         this.publishEvent(eventNames.loginCallbackAsync_end, {})
