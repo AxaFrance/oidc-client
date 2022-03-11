@@ -142,6 +142,7 @@ const propTypes = {
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
+    extras: StringMap // key/value that are send to the oidc server
   }).isRequired
 };
 ```
