@@ -71,7 +71,7 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     const tokens = response.tokens
     oidc.tokens = await setTokensAsync(oidc.serviceWorker, tokens);
     if(!oidc.serviceWorker){
-        oidc.session.setTokens(oidc.tokens);
+        await oidc.session.setTokens(oidc.tokens);
     }
     oidc.publishEvent(Oidc.eventNames.token_aquired, oidc.tokens);
     oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
@@ -84,7 +84,7 @@ const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) => {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
             oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
         if(!oidc.serviceWorker){
-            oidc.session.setTokens(oidc.tokens);
+            await oidc.session.setTokens(oidc.tokens);
         }
             if(!oidc.tokens){
                 return;                
@@ -244,17 +244,19 @@ export class Oidc {
                     return true;
                 }
                 this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no exiting session found"});
-            } else if(configuration.service_worker_relative_url) {
-                this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
-                    message: "service worker is not supported by this browser"
-                });
+            } else {
+                if(configuration.service_worker_relative_url) {
+                    this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
+                        message: "service worker is not supported by this browser"
+                    });
+                }
                 const session = initSession(this.configurationName);
                 const {tokens} = await session.initAsync();
                 if (tokens) {
                     const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
                     // @ts-ignore
                     this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
-                    session.setTokens(tokens);
+                    await session.setTokens(this.tokens);
                     this.session = session;
                     await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
