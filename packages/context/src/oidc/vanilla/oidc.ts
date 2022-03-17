@@ -244,10 +244,12 @@ export class Oidc {
                     return true;
                 }
                 this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no exiting session found"});
-            } else if(configuration.service_worker_relative_url) {
-                this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
-                    message: "service worker is not supported by this browser"
-                });
+            } else {
+                if(configuration.service_worker_relative_url) {
+                    this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
+                        message: "service worker is not supported by this browser"
+                    });
+                }
                 const session = initSession(this.configurationName);
                 const {tokens} = await session.initAsync();
                 if (tokens) {
