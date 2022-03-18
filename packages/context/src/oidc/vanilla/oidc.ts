@@ -265,7 +265,7 @@ export class Oidc {
                     const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
                     // @ts-ignore
                     this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
-                    await session.setTokens(this.tokens);
+                    session.setTokens(this.tokens);
                     this.session = session;
                     // @ts-ignore
                     await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
