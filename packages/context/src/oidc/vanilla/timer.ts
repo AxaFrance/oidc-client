@@ -62,22 +62,20 @@
         } catch (error) {
             return null;
         }
-        let worker = null;
+        
      try {
         if (SharedWorker) {
             worker = new SharedWorker(blobURL);
-         //   return worker.port;
+           return worker.port;
       } 
 } catch (error)
-{ console.log(error);
-worker=null;
-}
-        if (!worker && Worker) {
+{ console.log(error); }
+        if (Worker) {
             worker = new Worker(blobURL);
-          //  return worker;
+            return worker;
         }
 
-        return worker;
+        return null;
     }());
 
     if (!workerPort) {
