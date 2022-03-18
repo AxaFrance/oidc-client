@@ -63,10 +63,11 @@
             return null;
         }
 
-        if (SharedWorker) {
-            worker = new SharedWorker(blobURL);
-            return worker.port;
-        } else if (Worker) {
+        //if (SharedWorker) {
+       //     worker = new SharedWorker(blobURL);
+         //   return worker.port;
+      //  } else 
+        if (Worker) {
             worker = new Worker(blobURL);
             return worker;
         }
