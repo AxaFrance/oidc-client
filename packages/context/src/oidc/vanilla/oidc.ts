@@ -14,6 +14,7 @@ import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
 import {initWorkerAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
+import timer from './timer';
 
 const idTokenPayload = (token) => {
     const base64Url = token.split('.')[1];
@@ -74,24 +75,31 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
         await oidc.session.setTokens(oidc.tokens);
     }
     oidc.publishEvent(Oidc.eventNames.token_aquired, oidc.tokens);
-    oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
+    oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt)
     return response.state;
 }
 
-const autoRenewTokensAsync = async (oidc, refreshToken, intervalSeconds) => {
+const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
-    return setTimeout(async () => {
+    return  timer.setTimeout(async () => {
+        const currentTimeUnixSecond = new Date().getTime() /1000;
+        console.log("Temps restant: " + ((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond));
+        // console.log(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond));
+        if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
             oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
-        if(!oidc.serviceWorker){
-            await oidc.session.setTokens(oidc.tokens);
-        }
+            if(!oidc.serviceWorker){
+                await oidc.session.setTokens(oidc.tokens);
+            }
             if(!oidc.tokens){
                 return;                
             }
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
-            oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, tokens.expiresIn)
-      }, (intervalSeconds- refreshTimeBeforeTokensExpirationInSecond) *1000);
+            oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
+        } else{
+            oidc.timeoutId = await autoRenewTokensAsync(oidc, refreshToken, expiresAt)
+        }
+    }, 1000);
 }
 
 const userInfoAsync = async (oidc) => {
@@ -137,7 +145,7 @@ const setTokensAsync = async (serviceWorker, tokens) =>{
     else {
         accessTokenPayload = extractAccessTokenPayload(tokens);
     }
-    const expiresAt =  new Date().getTime() + (tokens.expiresIn * 1000);
+    const expiresAt =  tokens.issuedAt + tokens.expiresIn;
     return {...tokens, idTokenPayload: idTokenPayload(tokens.idToken), accessTokenPayload, expiresAt};
 }
 
@@ -239,7 +247,8 @@ export class Oidc {
                     // @ts-ignore
                     this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
                     this.serviceWorker = serviceWorker;
-                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
+                    // @ts-ignore
+                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
                 }
@@ -258,7 +267,8 @@ export class Oidc {
                     this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
                     await session.setTokens(this.tokens);
                     this.session = session;
-                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, updatedTokens.expiresIn);
+                    // @ts-ignore
+                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
                 }
