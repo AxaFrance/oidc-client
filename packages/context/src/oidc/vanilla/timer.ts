@@ -62,17 +62,22 @@
         } catch (error) {
             return null;
         }
-
-        //if (SharedWorker) {
-       //     worker = new SharedWorker(blobURL);
+        let worker = null;
+     try {
+        if (SharedWorker) {
+            worker = new SharedWorker(blobURL);
          //   return worker.port;
-      //  } else 
-        if (Worker) {
+      } 
+} catch (error)
+{ console.log(error);
+worker=null;
+}
+        if (!worker && Worker) {
             worker = new Worker(blobURL);
-            return worker;
+          //  return worker;
         }
 
-        return null;
+        return worker;
     }());
 
     if (!workerPort) {
