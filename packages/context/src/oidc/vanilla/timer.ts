@@ -63,13 +63,15 @@
             return null;
         }
         
-     try {
-        if (SharedWorker) {
-            worker = new SharedWorker(blobURL);
-           return worker.port;
-      } 
-} catch (error)
-{ console.log(error); }
+        try {
+            if (SharedWorker) {
+                worker = new SharedWorker(blobURL);
+               return worker.port;
+            } 
+        } catch (error)
+        { 
+            console.log(error); 
+        }
         if (Worker) {
             worker = new Worker(blobURL);
             return worker;

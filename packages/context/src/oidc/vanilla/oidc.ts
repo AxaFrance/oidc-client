@@ -83,8 +83,8 @@ const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return  timer.setTimeout(async () => {
         const currentTimeUnixSecond = new Date().getTime() /1000;
-        console.log("Temps restant: " + ((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond));
-        // console.log(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond));
+        const timeInfo = { timeLeft:((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond)};
+        oidc.publishEvent(Oidc.eventNames.token_renewed, timeInfo);
         if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
             oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
@@ -153,6 +153,7 @@ const eventNames = {
     service_worker_not_supported_by_browser: "service_worker_not_supported_by_browser",
     token_aquired: "token_aquired",
     token_renewed: "token_renewed",
+    token_timer: "token_timer",
     loginAsync_begin:"loginAsync_begin",
     loginAsync_error:"loginAsync_error",
     loginCallbackAsync_begin:"loginCallbackAsync_begin",

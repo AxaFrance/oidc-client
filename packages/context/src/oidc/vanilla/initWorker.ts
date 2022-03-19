@@ -1,5 +1,4 @@
 ﻿function get_browser() {
-    console.log(navigator.userAgent);
     let ua = navigator.userAgent, tem,
         M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
     if(/trident/i.test(M[1])){
