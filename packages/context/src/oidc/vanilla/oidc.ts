@@ -261,7 +261,8 @@ export class Oidc {
 
                 setTimeout(() => {
                     if(!isResolved) {
-                        resolve(null);
+                        reject("timeout");
+                        self.publishEvent(eventNames.silentSigninAsync_error, new Error("timeout"));
                         iframe.remove();
                         isResolved = true;
                     }
@@ -269,6 +270,7 @@ export class Oidc {
             } catch (e) {
                 iframe.remove();
                 reject(e);
+                self.publishEvent(eventNames.silentSigninAsync_error, e);
             }
         });
         return promise;
