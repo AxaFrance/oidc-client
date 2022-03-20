@@ -252,7 +252,7 @@ export class Oidc {
                     if (e.data && typeof (e.data) === "string" && e.data.startsWith('oidc_tokens:')) {
                         if(!isResolved){
                             self.publishEvent(eventNames.silentSigninAsync_end, {});
-                            resolve(JSON.parse(e.data.replace('tokens:','')));
+                            resolve(JSON.parse(e.data.replace('oidc_tokens:','')));
                             iframe.remove();
                             isResolved = true;
                         }
