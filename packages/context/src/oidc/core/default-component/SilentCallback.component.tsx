@@ -1,18 +1,19 @@
-﻿import React, { useEffect, useState, PropsWithChildren} from 'react';
+﻿import React, { useEffect, PropsWithChildren} from 'react';
 import Oidc from "../../vanilla/oidc";
 import {OidcSecure} from "../../OidcSecure";
 
-const CallBak = ({configurationName}) =>{
+const CallBack = ({configurationName}) =>{
     const getOidc =  Oidc.get;
     useEffect(() => {
         let isMounted = true;
-        if(getOidc(configurationName).tokens) {
-            const playCallbackAsync = async () => {
+        const playCallbackAsync = async () => {
+            if(isMounted) {
                 const oidc = getOidc(configurationName);
                 oidc.silentSigninCallbackFromIFrame();
-            };
-            playCallbackAsync();
-        }
+            }
+        };
+        playCallbackAsync();
+
         return () => {
             isMounted = false;
         };
@@ -23,7 +24,7 @@ const CallBak = ({configurationName}) =>{
 
 const CallbackManager: PropsWithChildren<any> = ({configurationName }) => {
     return <OidcSecure configurationName={configurationName}>
-        <CallBak configurationName={configurationName}/>
+        <CallBack configurationName={configurationName}/>
     </OidcSecure>;
 };
 
