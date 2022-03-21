@@ -6,21 +6,23 @@ const CallBak = ({configurationName}) =>{
     const getOidc =  Oidc.get;
     useEffect(() => {
         let isMounted = true;
-        const playCallbackAsync = async () => {
-            const oidc = getOidc(configurationName);
-            oidc.silentSigninCallbackFromIFrame();
-        };
-        playCallbackAsync();
-        return  () => {
+        if(getOidc(configurationName).tokens) {
+            const playCallbackAsync = async () => {
+                const oidc = getOidc(configurationName);
+                oidc.silentSigninCallbackFromIFrame();
+            };
+            playCallbackAsync();
+        }
+        return () => {
             isMounted = false;
         };
     },[]);
-
+    
     return <></>;
 }
 
 const CallbackManager: PropsWithChildren<any> = ({configurationName }) => {
-    return <OidcSecure>
+    return <OidcSecure configurationName={configurationName}>
         <CallBak configurationName={configurationName}/>
     </OidcSecure>;
 };
