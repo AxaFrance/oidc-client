@@ -27,7 +27,7 @@ It use AppAuthJS behind the scene.
 - **Simple** :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
-- **No cookies problem** : No silent signin mode inside in iframe
+- **No cookies problem** : You can disable silent signin (that internally use an iframe)
 - **Multiple Authentification** :
   - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
@@ -107,6 +107,7 @@ import Routes from './Router';
 const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
+  silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -137,6 +138,7 @@ const propTypes = {
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
+    silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,

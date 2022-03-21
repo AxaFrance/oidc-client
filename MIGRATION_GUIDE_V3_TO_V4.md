@@ -84,6 +84,7 @@ const propTypes = {
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
+    silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,

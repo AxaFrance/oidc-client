@@ -11,7 +11,7 @@ import {
     TokenRequest
 } from '@openid/appauth';
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
-import {initWorkerAsync} from './initWorker'
+import {initWorkerAsync, sleepAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
 import timer from './timer';
@@ -50,6 +50,7 @@ export interface StringMap {
  export type Configuration = {
     client_id: string,
     redirect_uri: string,
+     silent_redirect_uri?:string,
     scope: string,
     authority: string,
     refresh_time_before_tokens_expiration_in_second?: number,
@@ -168,6 +169,9 @@ const eventNames = {
     tryKeepExistingSessionAsync_begin: "tryKeepExistingSessionAsync_begin",
     tryKeepExistingSessionAsync_end: "tryKeepExistingSessionAsync_end",
     tryKeepExistingSessionAsync_error: "tryKeepExistingSessionAsync_error",
+    silentSigninAsync_begin: "silentSigninAsync_begin",
+    silentSigninAsync_end: "silentSigninAsync_end",
+    silentSigninAsync_error: "silentSigninAsync_error",
 }
 
 export class Oidc {
@@ -224,7 +228,55 @@ export class Oidc {
         return oidcDatabase[name];
     }
     static eventNames = eventNames;
+    
+    silentSigninCallbackFromIFrame(){
+        window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify(this.tokens)}`, window.location.origin);
+    }
+    async silentSigninAsync() {
+        if (!this.configuration.silent_redirect_uri) {
+            return Promise.resolve(null);
+        }
+        this.publishEvent(eventNames.silentSigninAsync_begin, {});
+        const link = this.configuration.silent_redirect_uri;
+        const iframe = document.createElement('iframe');
+        iframe.width = "0px";
+        iframe.height = "0px";
+        iframe.id = `${this.configurationName}_oidc_iframe`;
+        iframe.setAttribute("src", link);
+        document.body.appendChild(iframe);
+        const self = this;
+        const promise = new Promise((resolve, reject) => {
+            try {
+                let isResolved = false;
+                window.onmessage = function (e) {
+                    const key = `${self.configurationName}_oidc_tokens:`;
+                    if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
+                      
+                        if (!isResolved) {
+                            self.publishEvent(eventNames.silentSigninAsync_end, {});
+                            resolve(JSON.parse(e.data.replace(key, '')));
+                            iframe.remove();
+                            isResolved = true;
+                        }
+                    }
+                };
 
+                setTimeout(() => {
+                    if (!isResolved) {
+                        reject("timeout");
+                        self.publishEvent(eventNames.silentSigninAsync_error, new Error("timeout"));
+                        iframe.remove();
+                        isResolved = true;
+                    }
+                }, 8000);
+            } catch (e) {
+                iframe.remove();
+                reject(e);
+                self.publishEvent(eventNames.silentSigninAsync_error, e);
+            }
+        });
+        return promise;
+    }
     async initAsync(authority) {
         const oidcServerConfiguration = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
         return oidcServerConfiguration;
@@ -399,7 +451,7 @@ export class Oidc {
                 authorizationHandler.completeAuthorizationRequestIfPossible();
             });
             return promise;
-        } catch(exception){
+        } catch(exception) {
             console.error(exception);
             this.publishEvent(eventNames.loginCallbackAsync_error, exception);
             throw exception;
@@ -432,6 +484,11 @@ export class Oidc {
             return token_response;
         } catch(exception) {
             console.error(exception);
+            const silent_token_response =await this.silentSigninAsync();
+            if(silent_token_response){
+                return silent_token_response;
+            }
+            
             this.publishEvent( silentEvent ? eventNames.refreshTokensAsync_silent_error :eventNames.refreshTokensAsync_error, exception);
             return null;
         }
