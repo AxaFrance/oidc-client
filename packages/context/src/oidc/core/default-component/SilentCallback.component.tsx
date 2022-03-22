@@ -1,4 +1,4 @@
-﻿import React, { useEffect, PropsWithChildren} from 'react';
+import React, { useEffect, PropsWithChildren} from 'react';
 import Oidc from "../../vanilla/oidc";
 import {OidcSecure} from "../../OidcSecure";
 
