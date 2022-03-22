@@ -1,4 +1,6 @@
-﻿function get_browser() {
+﻿import timer from "./timer"
+
+function get_browser() {
     let ua = navigator.userAgent, tem,
         M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
     if(/trident/i.test(M[1])){
@@ -30,8 +32,8 @@
 
 let keepAliveServiceWorkerTimeoutId = null;
 
-const sleepAsync = (milliseconds) => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds))
+export const sleepAsync = (milliseconds) => {
+    return new Promise(resolve => timer.setTimeout(resolve, milliseconds))
 }
 
 const keepAlive = () => {
