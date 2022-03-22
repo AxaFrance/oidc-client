@@ -72,9 +72,14 @@
         { 
             console.log(error); 
         }
-        if (Worker) {
-            worker = new Worker(blobURL);
-            return worker;
+        try {
+            if (Worker) {
+                worker = new Worker(blobURL);
+                return worker;
+            }
+        } catch (error)
+        {
+            console.log(error);
         }
 
         return null;
