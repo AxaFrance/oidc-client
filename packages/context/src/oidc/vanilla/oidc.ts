@@ -232,17 +232,12 @@ export class Oidc {
     static eventNames = eventNames;
     
     silentSigninCallbackFromIFrame(){
-        window.top.postMessage('oidc_tokens:' + JSON.stringify(this.tokens), window.location.origin);
+        window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify(this.tokens)}`, window.location.origin);
     }
     async silentSigninAsync() {
         if (!this.configuration.silent_redirect_uri) {
             return Promise.resolve(null);
         }
-        while (isSilentSignin) {
-            console.log("while" +this.configurationName);
-            await sleepAsync(50);
-        }
-        isSilentSignin = true;
         this.publishEvent(eventNames.silentSigninAsync_begin, {});
         const link = this.configuration.silent_redirect_uri;
         const iframe = document.createElement('iframe');
@@ -256,15 +251,14 @@ export class Oidc {
             try {
                 let isResolved = false;
                 window.onmessage = function (e) {
-                    
-                    if (e.data && typeof (e.data) === "string" && e.data.startsWith('oidc_tokens:')) {
-                        console.log("ici" +self.configurationName);
+                    const key = `${self.configurationName}_oidc_tokens:`;
+                    if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
+                      
                         if (!isResolved) {
                             self.publishEvent(eventNames.silentSigninAsync_end, {});
-                            resolve(JSON.parse(e.data.replace('oidc_tokens:', '')));
+                            resolve(JSON.parse(e.data.replace(key, '')));
                             iframe.remove();
                             isResolved = true;
-                            isSilentSignin = false;
                         }
                     }
                 };
@@ -275,14 +269,12 @@ export class Oidc {
                         self.publishEvent(eventNames.silentSigninAsync_error, new Error("timeout"));
                         iframe.remove();
                         isResolved = true;
-                        isSilentSignin = false;
                     }
-                }, 4000);
+                }, 8000);
             } catch (e) {
                 iframe.remove();
                 reject(e);
                 self.publishEvent(eventNames.silentSigninAsync_error, e);
-                isSilentSignin = false;
             }
         });
         return promise;
@@ -461,7 +453,7 @@ export class Oidc {
                 authorizationHandler.completeAuthorizationRequestIfPossible();
             });
             return promise;
-        } catch(exception){
+        } catch(exception) {
             console.error(exception);
             this.publishEvent(eventNames.loginCallbackAsync_error, exception);
             throw exception;
@@ -496,9 +488,6 @@ export class Oidc {
             console.error(exception);
             const silent_token_response =await this.silentSigninAsync();
             if(silent_token_response){
-                console.log("tokens" +this.configurationName);
-                console.log(silent_token_response);
-                
                 return silent_token_response;
             }
             

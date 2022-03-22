@@ -44,7 +44,7 @@ For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATIO
 - **Simple** :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
-- **No cookies problem** : No silent signin mode inside in iframe
+- **No cookies problem** : You can disable silent signin (that internally use an iframe)
 - **Multiple Authentification** :
   - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
@@ -96,6 +96,7 @@ import Routes from './Router';
 const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
+  silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
