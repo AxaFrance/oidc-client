@@ -486,9 +486,13 @@ export class Oidc {
             return token_response;
         } catch(exception) {
             console.error(exception);
-            const silent_token_response =await this.silentSigninAsync();
-            if(silent_token_response){
-                return silent_token_response;
+            try {
+                const silent_token_response = await this.silentSigninAsync();
+                if (silent_token_response) {
+                    return silent_token_response;
+                }
+            } catch(exceptionSilent) {
+                console.error(exceptionSilent);
             }
             
             this.publishEvent( silentEvent ? eventNames.refreshTokensAsync_silent_error :eventNames.refreshTokensAsync_error, exception);
