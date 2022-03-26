@@ -7,12 +7,12 @@ const keepAliveJsonFilename = "OidcKeepAliveServiceWorker.json";
 const handleInstall = (event) => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
     event.waitUntil(
-        caches.open(assetCacheName).then(cache => {
+        /*caches.open(assetCacheName).then(cache => {
             return cache.addAll(
                 [
                     keepAliveJsonFilename
                 ]);
-        }));
+        })*/);
     self.skipWaiting();
 };
 
@@ -125,6 +125,8 @@ const responseKeepAlive= (isFromVanilla, response) => {
 
 const keepAliveAsync = async (event) => {
     const originalRequest = event.request;
+    const init = {"status": 200, "statusText": 'oidc-service-worker'};
+    return new Response('{}', init);
     const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
     if(!isFromVanilla) {
         await sleep(15000);
@@ -170,7 +172,7 @@ const handleFetch = async (event) => {
     const numberDatabase = currentDatabases.length;
     if(numberDatabase > 0) {
         const maPromesse = new Promise((resolve, reject) => {
-            const response = originalRequest.text().then(actualBody => {
+            const response = originalRequest.clone().text().then(actualBody => {
                 if(actualBody.includes(REFRESH_TOKEN)) {
                     let newBody = actualBody;
                     for(let i= 0;i<numberDatabase;i++){
