@@ -301,7 +301,7 @@ const DisplayUserInfo = () => {
 
 # Service Worker Support
 
-- Firefox : test on firefox 98.0.2
+- Firefox : tested on firefox 98.0.2
 - Chrome/Edge : tested on version upper to 90
 - Opera : tested on version upper to 80
 - Safari : tested on Safari/605.1.15
