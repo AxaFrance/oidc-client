@@ -79,9 +79,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return null;
     }
     const {name, version} = get_browser();
-    if(name == "firefox"){
-        return null;
-    }
     if(name == "chrome" && parseInt(version)<90){
         return null;
     }
@@ -138,7 +135,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     }
     
     const startKeepAliveServiceWorker = () => {
-        if(keepAliveServiceWorkerTimeoutId == null) {
+        if (keepAliveServiceWorkerTimeoutId == null) {
             keepAliveServiceWorkerTimeoutId = "not_null";
             keepAlive();
         }

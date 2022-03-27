@@ -2,17 +2,10 @@
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
-const assetCacheName = "oidc_asset";
 const keepAliveJsonFilename = "OidcKeepAliveServiceWorker.json";
 const handleInstall = (event) => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
-    event.waitUntil(
-        caches.open(assetCacheName).then(cache => {
-            return cache.addAll(
-                [
-                    keepAliveJsonFilename
-                ]);
-        }));
+    event.waitUntil();
     self.skipWaiting();
 };
 
@@ -114,33 +107,14 @@ const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-
-const responseKeepAlive= (isFromVanilla, response) => {
-    if(!isFromVanilla) {
-        return response;
-    }
-    const init = {"status": 200, "statusText": 'oidc-service-worker'};
-    return new Response('{}', init);
-}
-
 const keepAliveAsync = async (event) => {
     const originalRequest = event.request;
     const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
     if(!isFromVanilla) {
         await sleep(15000);
     }
-    return caches.open(assetCacheName).then(function(cache) {
-        return cache.match(event.request).then(function (response) {
-
-            if(response){
-                return responseKeepAlive(isFromVanilla, response);
-            }
-            return fetch(event.request).then(function(response) {
-                cache.put(event.request, response.clone());
-                return responseKeepAlive(isFromVanilla, response);
-            });
-        });
-    });
+    const init = {"status": 200, "statusText": 'oidc-service-worker'};
+    return new Response('{}', init);
 }
 
 const handleFetch = async (event) => {
@@ -170,7 +144,7 @@ const handleFetch = async (event) => {
     const numberDatabase = currentDatabases.length;
     if(numberDatabase > 0) {
         const maPromesse = new Promise((resolve, reject) => {
-            const response = originalRequest.text().then(actualBody => {
+            const response = originalRequest.clone().text().then(actualBody => {
                 if(actualBody.includes(REFRESH_TOKEN)) {
                     let newBody = actualBody;
                     for(let i= 0;i<numberDatabase;i++){
