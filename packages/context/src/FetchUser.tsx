@@ -9,7 +9,7 @@ const DisplayUserInfo = ({fetch}) => {
 
     useEffect(() => {
         const fetchUserInfoAsync = async () => {
-            const res = await fetch("https://demo.identityserver.io/connect/userinfo");
+            const res = await fetch("https://demo.duendesoftware.com/connect/userinfo");
             if (res.status != 200) {
                 return null;
             }

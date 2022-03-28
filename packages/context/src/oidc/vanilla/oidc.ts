@@ -525,7 +525,12 @@ export class Oidc {
         const oidcServerConfiguration = await this.initAsync(this.configuration.authority);
         // TODO implement real logout
         await this.destroyAsync();  
-        window.location.href = oidcServerConfiguration.endSessionEndpoint;
+        if(oidcServerConfiguration.endSessionEndpoint) {
+            window.location.href = oidcServerConfiguration.endSessionEndpoint;
+        }
+        else{
+            window.location.reload();
+        }
     }
   }
   
