@@ -69,8 +69,8 @@
                return worker.port;
             } 
         } catch (error)
-        { 
-            console.log(error); 
+        {
+            console.log("SharedWorker not available");
         }
         try {
             if (Worker) {
@@ -79,7 +79,7 @@
             }
         } catch (error)
         {
-            console.log(error);
+            console.log("Worker not available");
         }
 
         return null;
