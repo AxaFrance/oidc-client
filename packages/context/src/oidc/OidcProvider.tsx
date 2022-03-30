@@ -106,6 +106,7 @@ sessionLostComponent=SessionLost }) => {
                 setLoading(false);
             }
         return () => {
+            oidc.removeEventSubscription(subscriptionId);
             isMounted = false;
         }
     }, [configuration, configurationName]);
