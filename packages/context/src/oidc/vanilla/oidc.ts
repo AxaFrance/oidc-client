@@ -11,10 +11,18 @@ import {
     TokenRequest
 } from '@openid/appauth';
 import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
-import {initWorkerAsync, sleepAsync} from './initWorker'
+import {initWorkerAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
 import timer from './timer';
+
+const isInIframe = () => {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+}
 
 const idTokenPayload = (token) => {
     const base64Url = token.split('.')[1];
@@ -174,8 +182,6 @@ const eventNames = {
     silentSigninAsync_error: "silentSigninAsync_error",
 }
 
-let isSilentSignin = false;
-
 export class Oidc {
     public configuration: Configuration;
     public userInfo: null;
@@ -232,7 +238,9 @@ export class Oidc {
     static eventNames = eventNames;
     
     silentSigninCallbackFromIFrame(){
-        window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify(this.tokens)}`, window.location.origin);
+        if (this.configuration.silent_redirect_uri) {
+            window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify(this.tokens)}`, window.location.origin);
+        }
     }
     async silentSigninAsync() {
         if (!this.configuration.silent_redirect_uri) {
@@ -270,7 +278,7 @@ export class Oidc {
                         iframe.remove();
                         isResolved = true;
                     }
-                }, 8000);
+                }, 12000);
             } catch (e) {
                 iframe.remove();
                 reject(e);
@@ -345,7 +353,11 @@ export class Oidc {
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
             const state = url;
             this.publishEvent(eventNames.loginAsync_begin, {});
-            const configuration = this.configuration;
+            const configuration = this.configuration
+            // Security we cannot loggin from Iframe
+            if (!configuration.silent_redirect_uri && isInIframe()) {
+                throw new Error("Login from iframe is forbidden");
+            }
             let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             const oidcServerConfiguration = await this.initAsync(configuration.authority);
             if(serviceWorker && installServiceWorker) {

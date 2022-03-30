@@ -3,9 +3,7 @@ import {OidcProvider, useOidc, useOidcAccessToken} from "./oidc";
 import { configurationIdentityServer} from "./configurations";
 
 const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
-    
     const { login, logout, isLogged} = useOidc(configurationName);
-
     return (
         <div className="container-fluid mt-3">
             <div className="card">
@@ -22,7 +20,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                 </div>
             </div>
         </div>
-    )
+    );
 };
 
 if(!sessionStorage.configurationName){
@@ -34,8 +32,15 @@ export const MultiAuthContainer = () => {
     const callBack = window.location.origin+"/multi-auth/authentification/callback2";
     const silent_redirect_uri = window.location.origin+"/multi-auth/authentification/silent-callback2";
     const configurations = {
-        "config_1": {...configurationIdentityServer, redirect_uri:callBack, silent_redirect_uri},
-        "config_2": {...configurationIdentityServer, redirect_uri:callBack, silent_redirect_uri, scope: 'openid profile email api'}
+        config_1: {...configurationIdentityServer, 
+            redirect_uri:callBack, 
+            silent_redirect_uri,
+            scope: 'openid profile email api offline_access'
+        },
+        config_2: {...configurationIdentityServer, 
+            redirect_uri:callBack, 
+            silent_redirect_uri: "", 
+            scope: 'openid profile email api'}
     }
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
@@ -50,7 +55,6 @@ export const MultiAuthContainer = () => {
         </OidcProvider>
     );
 };
-
 
 const DisplayAccessToken = ({configurationName}) => {
     const{ accessToken, accessTokenPayload } = useOidcAccessToken(configurationName);
