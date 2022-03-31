@@ -311,7 +311,7 @@ export class Oidc {
                     this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
                     this.serviceWorker = serviceWorker;
                     // @ts-ignore
-                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                    this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
                 }
@@ -331,7 +331,7 @@ export class Oidc {
                     session.setTokens(this.tokens);
                     this.session = session;
                     // @ts-ignore
-                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                    this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
                 }
@@ -530,7 +530,7 @@ export class Oidc {
          this.tokens = null;
          this.userInfo = null;
          this.events = [];
-         window.clearTimeout(this.timeoutId);
+         timer.clearTimeout(this.timeoutId);
      }
      
     async logoutAsync() {
