@@ -25,23 +25,10 @@ const DisplayUserInfo = () => {
     )
 };
 
-const DisplayUserIsAuthenticated = () => {
-    const {isAuthenticated} = useOidc();
-
-    return (
-        <div className={isAuthenticated ? "card text-white bg-success mb-3" : "card text-white bg-warning mb-3"}>
-            <div className="card-body">
-                <h5 className="card-title">{isAuthenticated ? "User is authenticated" : "User is not authenticated"}</h5>
-            </div>
-        </div>
-    )
-}
-
 export const Profile = () => {
 
     return (
        <div className="container mt-3">
-           <DisplayUserIsAuthenticated/>
            <DisplayAccessToken/>
            <DisplayIdToken/>
            <DisplayUserInfo/>
