@@ -299,6 +299,30 @@ const DisplayUserInfo = () => {
 };
 ```
 
+## How to get check if user is authenticated : Hook Method
+
+You can use the `useUserIsAuthenticated()` hook to check if the user is logged-in/authenticated. You can also use the `useOidcUser()` hook as well but this one is less noisy - it does not cause unnecessary re-renders.
+
+```javascript
+import { useUserIsAuthenticated } from '@axa-fr/react-oidc-context';
+
+const DisplayIdToken =() => {
+  const isLoggedIn = useUserIsAuthenticated();
+
+  if(!isLoggedIn){
+    return <p>you are not authentified</p>
+  }
+
+  return (
+          <div className="card text-white bg-info mb-3">
+            <div className="card-body">
+              <h5 className="card-title">User is authenticated! :)</h5>
+            </div>
+          </div>
+  );
+}
+```
+
 # Service Worker Support
 
 - Firefox : tested on firefox 98.0.2
