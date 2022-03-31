@@ -1,35 +1,37 @@
 ﻿import { useEffect, useState} from "react";
 import Oidc from "./vanilla/oidc";
 
-export const useOidcUser =(configurationName="default") => {
-    const [oidcUser, setOidcUser] = useState(null);
-    const [isOidcUserLoading, setIsOidcUserLoading] = useState(false);
-    const getOidc =  Oidc.get;
-    useEffect(() => {
-        let isMounted = true;
-        const oidc = getOidc(configurationName);
-        if(oidc && oidc.tokens) {
-            setIsOidcUserLoading(true);
-            getOidc().userInfoAsync()
-                .then((info) => {
-                    if (isMounted) {
-                        setOidcUser(info);
-                        setIsOidcUserLoading(false);
-                    }
-                })
-        }
-        return  () => { isMounted = false };
-    }, [])
-
-    let isLogged = false;
-    const oidc = getOidc(configurationName);
-    if(oidc){
-        isLogged = oidc.tokens != null;
-    }
-
-    return {oidcUser, isOidcUserLoading, isLogged: isLogged}
+export enum UserStatus {
+    Unauthenticated= 'Unauthenticated',
+    Loading = 'Loading user',
+    Loaded = 'User loaded'
 }
 
-export const useUserIsAuthenticated =(configurationName="default") => {
-    return Oidc.get(configurationName).tokens != null
+type OidcUser = {
+    user: any,
+    status: UserStatus
+}
+
+export const useOidcUser = (configurationName="default") => {
+    const [oidcUser, setOidcUser] = useState<OidcUser>({user: null, status: UserStatus.Unauthenticated});
+
+    const oidc = Oidc.get(configurationName);
+    useEffect(() => {
+        let isMounted = true;
+
+        if(oidc && oidc.tokens) {
+            setOidcUser({...oidcUser, status: UserStatus.Loading});
+            oidc.userInfoAsync()
+                .then((info) => {
+                    if (isMounted) {
+                        setOidcUser({user: info, status: UserStatus.Loaded});
+                    }
+                })
+                .catch(() => setOidcUser({...oidcUser, status: UserStatus.Unauthenticated}));
+        }
+
+        return  () => { isMounted = false };
+    }, []);
+
+    return {oidcUser: oidcUser.user, isOidcUserLoading: oidcUser.status}
 }

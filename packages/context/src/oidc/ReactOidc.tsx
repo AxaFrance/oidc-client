@@ -4,21 +4,21 @@ import Oidc from "./vanilla/oidc";
 const defaultConfigurationName = "default";
 export const useOidc =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
-   
+
     const login = (callbackPath=undefined) => {
         return getOidc(configurationName).loginAsync(callbackPath);
     };
     const logout = () => {
         return getOidc(configurationName).logoutAsync();
     };
-    
-    let isLogged = false;
+
+    let isAuthenticated = false;
     const oidc = getOidc(configurationName);
     if(oidc){
-        isLogged = getOidc(configurationName).tokens != null;
+        isAuthenticated = getOidc(configurationName).tokens != null;
     }
-    
-    return {login, logout, isLogged };
+
+    return { login, logout, isAuthenticated };
 }
 
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};
@@ -37,7 +37,7 @@ export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>
     const getOidc =  Oidc.get;
     const [state, setAccessToken] = useState<any>(initTokens(configurationName));
     const [subscriptionId, setSubscriptionId] = useState(null);
-    
+
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
@@ -60,7 +60,7 @@ export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>
         if(isMounted){
             setSubscriptionId(newSubscriptionId);
         }
-        return  () => { 
+        return  () => {
             isMounted = false;
             oidc.removeEventSubscription(subscriptionId);
         };
@@ -84,14 +84,14 @@ export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
     const [state, setIDToken] = useState<any>(idTokenInitialState);
     const [subscriptionId, setSubscriptionId] = useState(initIdToken(configurationName));
-    
+
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
         if(oidc.tokens) {
             const tokens = oidc.tokens;
             setIDToken({idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload});
-        } 
+        }
         if(subscriptionId){
             oidc.removeEventSubscription(subscriptionId);
         }
