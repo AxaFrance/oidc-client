@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser} from "./oidc";
+import {useUserIsAuthenticated} from "./oidc/User";
 
 const DisplayUserInfo = () => {
     const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
@@ -24,10 +25,23 @@ const DisplayUserInfo = () => {
     )
 };
 
+const DisplayUserIsAuthenticated = () => {
+    const isAuthenticated = useUserIsAuthenticated();
+
+    return (
+        <div className={isAuthenticated ? "card text-white bg-success mb-3" : "card text-white bg-warning mb-3"}>
+            <div className="card-body">
+                <h5 className="card-title">{isAuthenticated ? "User is authenticated" : "User is not authenticated"}</h5>
+            </div>
+        </div>
+    )
+}
+
 export const Profile = () => {
 
     return (
        <div className="container mt-3">
+           <DisplayUserIsAuthenticated/>
            <DisplayAccessToken/>
            <DisplayIdToken/>
            <DisplayUserInfo/>
@@ -60,7 +74,7 @@ const DisplayIdToken =() => {
     if(!idToken){
         return <p>you are not authentified</p>
     }
-    
+
     return (
         <div className="card text-white bg-info mb-3">
             <div className="card-body">

@@ -20,12 +20,16 @@ export const useOidcUser =(configurationName="default") => {
         }
         return  () => { isMounted = false };
     }, [])
-    
+
     let isLogged = false;
     const oidc = getOidc(configurationName);
     if(oidc){
         isLogged = oidc.tokens != null;
     }
-    
+
     return {oidcUser, isOidcUserLoading, isLogged: isLogged}
+}
+
+export const useUserIsAuthenticated =(configurationName="default") => {
+    return Oidc.get(configurationName).tokens != null
 }
