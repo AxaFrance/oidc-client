@@ -55,16 +55,16 @@ export interface StringMap {
     [key: string]: string;
 }
 
- export type Configuration = {
+export type Configuration = {
     client_id: string,
     redirect_uri: string,
-     silent_redirect_uri?:string,
+    silent_redirect_uri?:string,
     scope: string,
     authority: string,
     refresh_time_before_tokens_expiration_in_second?: number,
     service_worker_relative_url?:string,
-     service_worker_only?:boolean,
-     extras?:StringMap
+    service_worker_only?:boolean,
+    extras?:StringMap
 };
 
 const oidcDatabase = {};
@@ -101,7 +101,7 @@ const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
                 await oidc.session.setTokens(oidc.tokens);
             }
             if(!oidc.tokens){
-                return;                
+                return;
             }
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
             oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
@@ -121,23 +121,23 @@ const userInfoAsync = async (oidc) => {
     const accessToken = oidc.tokens.accessToken;
 
     const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority);
-   const url = oidcServerConfiguration.userInfoEndpoint;
-   const fetchUserInfo = async (accessToken) => {
-       const res = await fetch(url, {
-           headers: {
-               authorization: `Bearer ${accessToken}`
-           }
-       });
+    const url = oidcServerConfiguration.userInfoEndpoint;
+    const fetchUserInfo = async (accessToken) => {
+        const res = await fetch(url, {
+            headers: {
+                authorization: `Bearer ${accessToken}`
+            }
+        });
 
-       if(res.status != 200 ){
-           return null;
-       }
+        if(res.status != 200 ){
+            return null;
+        }
 
-       return res.json();
-   };
-   const userInfo = await fetchUserInfo(accessToken);
-   oidc.userInfo= userInfo;
-   return userInfo;
+        return res.json();
+    };
+    const userInfo = await fetchUserInfo(accessToken);
+    oidc.userInfo= userInfo;
+    return userInfo;
 }
 
 const setTokensAsync = async (serviceWorker, tokens) =>{
@@ -192,22 +192,22 @@ export class Oidc {
     private configurationName: string;
     private session?: any;
     constructor(configuration:Configuration, configurationName="default") {
-      this.configuration = configuration
+        this.configuration = configuration
         this.configurationName= configurationName;
-      this.tokens = null
-      this.userInfo = null;
-      this.events = [];
-      this.timeoutId = null;
-      this.serviceWorker = null;
-      this.session = null;
-      this.refreshTokensAsync.bind(this);
-      this.loginCallbackWithAutoTokensRenewAsync.bind(this);
-      this.initAsync.bind(this);
-      this.loginCallbackAsync.bind(this);
-      this.subscriveEvents.bind(this);
-      this.removeEventSubscription.bind(this);
-      this.publishEvent.bind(this);
-      this.destroyAsync.bind(this);
+        this.tokens = null
+        this.userInfo = null;
+        this.events = [];
+        this.timeoutId = null;
+        this.serviceWorker = null;
+        this.session = null;
+        this.refreshTokensAsync.bind(this);
+        this.loginCallbackWithAutoTokensRenewAsync.bind(this);
+        this.initAsync.bind(this);
+        this.loginCallbackAsync.bind(this);
+        this.subscriveEvents.bind(this);
+        this.removeEventSubscription.bind(this);
+        this.publishEvent.bind(this);
+        this.destroyAsync.bind(this);
     }
 
     subscriveEvents(func){
@@ -220,7 +220,7 @@ export class Oidc {
         const event = this.events.find(e => e.id === id);
         const index =this.events.indexOf(event);
         if(index >=0){
-            this.events.slice(index, 1);    
+            this.events.slice(index, 1);
         }
     }
 
@@ -236,7 +236,7 @@ export class Oidc {
         return oidcDatabase[name];
     }
     static eventNames = eventNames;
-    
+
     silentSigninCallbackFromIFrame(){
         if (this.configuration.silent_redirect_uri) {
             window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify(this.tokens)}`, window.location.origin);
@@ -261,7 +261,7 @@ export class Oidc {
                 window.onmessage = function (e) {
                     const key = `${self.configurationName}_oidc_tokens:`;
                     if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
-                      
+
                         if (!isResolved) {
                             self.publishEvent(eventNames.silentSigninAsync_end, {});
                             resolve(JSON.parse(e.data.replace(key, '')));
@@ -291,7 +291,7 @@ export class Oidc {
         const oidcServerConfiguration = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
         return oidcServerConfiguration;
     }
-    
+
     async tryKeepExistingSessionAsync() {
         let serviceWorker
         if(this.tokens != null){
@@ -311,7 +311,7 @@ export class Oidc {
                     this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
                     this.serviceWorker = serviceWorker;
                     // @ts-ignore
-                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                    this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
                 }
@@ -331,7 +331,7 @@ export class Oidc {
                     session.setTokens(this.tokens);
                     this.session = session;
                     // @ts-ignore
-                    await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                    this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                     this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
                     return true;
                 }
@@ -376,21 +376,21 @@ export class Oidc {
                 const session = initSession(this.configurationName);
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
-            
+
             // @ts-ignore
             const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
-                    const authRequest = new AuthorizationRequest({
-                        client_id: configuration.client_id,
-                        redirect_uri: configuration.redirect_uri,
-                        scope: configuration.scope,
-                        response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
-                        state,
-                        extras: configuration.extras
-                    });
-                    authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
+            const authRequest = new AuthorizationRequest({
+                client_id: configuration.client_id,
+                redirect_uri: configuration.redirect_uri,
+                scope: configuration.scope,
+                response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+                state,
+                extras: configuration.extras
+            });
+            authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
         } catch(exception){
-                this.publishEvent(eventNames.loginAsync_error, exception);
-                throw exception;
+            this.publishEvent(eventNames.loginAsync_error, exception);
+            throw exception;
         }
     }
 
@@ -416,14 +416,14 @@ export class Oidc {
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
             }
-            
+
             const promise = new Promise((resolve, reject) => {
                 const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
                 // @ts-ignore
                 const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
                 const notifier = new AuthorizationNotifier();
                 authorizationHandler.setAuthorizationNotifier(notifier);
-            
+
                 notifier.setAuthorizationListener(async (request, response, error) => {
                     if(error){
                         reject(error);
@@ -431,7 +431,7 @@ export class Oidc {
                     if (!response) {
                         return;
                     }
-    
+
                     let extras = null;
                     if (request && request.internal) {
                         extras = {};
@@ -442,7 +442,7 @@ export class Oidc {
                             }
                         }
                     }
-    
+
                     const tokenRequest = new TokenRequest({
                         client_id: clientId,
                         redirect_uri: redirectURL,
@@ -451,7 +451,7 @@ export class Oidc {
                         refresh_token: undefined,
                         extras,
                     });
-                    
+
                     try {
                         const tokenResponse =  await tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest);
                         resolve({tokens:tokenResponse, state: request.state});
@@ -490,8 +490,8 @@ export class Oidc {
                 code: undefined,
                 refresh_token: refreshToken,
                 extras: undefined
-                });
-            
+            });
+
             const oidcServerConfiguration = await this.initAsync(authority);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
             this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end, token_response);
@@ -506,37 +506,37 @@ export class Oidc {
             } catch(exceptionSilent) {
                 console.error(exceptionSilent);
             }
-            
+
             this.publishEvent( silentEvent ? eventNames.refreshTokensAsync_silent_error :eventNames.refreshTokensAsync_error, exception);
             return null;
         }
-     }
-     
-     loginCallbackWithAutoTokensRenewAsync():Promise<string>{
+    }
+
+    loginCallbackWithAutoTokensRenewAsync():Promise<string>{
         return loginCallbackWithAutoTokensRenewAsync(this);
-     }
-     
-     userInfoAsync(){
-         return userInfoAsync(this);
-     }
-     
-     async destroyAsync() {
+    }
+
+    userInfoAsync(){
+        return userInfoAsync(this);
+    }
+
+    async destroyAsync() {
         if(this.serviceWorker){
             await this.serviceWorker.clearAsync();
         }
-         if(this.session){
-             await this.session.clearAsync();
-         }
-         this.tokens = null;
-         this.userInfo = null;
-         this.events = [];
-         window.clearTimeout(this.timeoutId);
-     }
-     
+        if(this.session){
+            await this.session.clearAsync();
+        }
+        this.tokens = null;
+        this.userInfo = null;
+        this.events = [];
+        timer.clearTimeout(this.timeoutId);
+    }
+
     async logoutAsync() {
         const oidcServerConfiguration = await this.initAsync(this.configuration.authority);
         // TODO implement real logout
-        await this.destroyAsync();  
+        await this.destroyAsync();
         if(oidcServerConfiguration.endSessionEndpoint) {
             window.location.href = oidcServerConfiguration.endSessionEndpoint;
         }
@@ -544,7 +544,7 @@ export class Oidc {
             window.location.reload();
         }
     }
-  }
-  
+}
 
-  export default Oidc;
+
+export default Oidc;
