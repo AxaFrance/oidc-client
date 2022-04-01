@@ -37,6 +37,8 @@ In the v4 we have chosen to remove a lot the surface API in order to simplify us
 In this version you can use a ServiceWorker that will hide the refresh_token and access_token (more secure).
 
 For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATION_GUIDE_V3_TO_V4.md)
+For migrating from v3 to v5 checkout our [`migration guide v3 to v5`](./MIGRATION_GUIDE_V3_TO_V5.md)
+For migrating from v4 to v5 checkout our [`migration guide v4 to v5`](./MIGRATION_GUIDE_V4_TO_V5.md)
 
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
@@ -155,7 +157,7 @@ const DisplayIdToken =() => {
         <div className="card text-white bg-info mb-3">
             <div className="card-body">
                 <h5 className="card-title">ID Token</h5>
-                {idToken != null && <p className="card-text">{JSON.stringify(idToken)}</p>}
+                {<p className="card-text">{JSON.stringify(idToken)}</p>}
                 {idTokenPayload != null && <p className="card-text">{JSON.stringify(idTokenPayload)}</p>}
             </div>
         </div>
@@ -170,27 +172,28 @@ How to get User Information
 import { useOidcUser } from '@axa-fr/react-oidc-context';
 
 const DisplayUserInfo = () => {
-    const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
+  const{ oidcUser, oidcUserLoadingState } = useOidcUser();
 
-    if(isOidcUserLoading) {
-        return <p>User Information are loading</p>
-    }
-
-    if(!isLogged){
-        return <p>you are not authentified</p>
-    }
-
-    return (
-        <div className="card text-white bg-success mb-3">
-            <div className="card-body">
-                <h5 className="card-title">User information</h5>
-                {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
-            </div>
-        </div>
-    )
+  switch (oidcUserLoadingState){
+    case UserStatus.Loading:
+      return <p>User Information are loading</p>;
+    case UserStatus.Unauthenticated:
+      return <p>you are not authenticated</p>;
+    case UserStatus.LoadingError:
+      return <p>Fail to load user information</p>;
+    default:
+      return (
+              <div className="card text-white bg-success mb-3">
+                <div className="card-body">
+                  <h5 className="card-title">User information</h5>
+                  <p className="card-text">{JSON.stringify(oidcUser)}</p>
+                </div>
+              </div>
+      );
+  }
 };
-```
 
+```
 
 More documentation :
 - [`@axa-fr/react-oidc-context`](./packages/context#readme)

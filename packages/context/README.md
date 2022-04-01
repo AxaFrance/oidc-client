@@ -238,7 +238,7 @@ const DisplayAccessToken = () => {
             <div className="card-body">
                 <h5 className="card-title">Access Token</h5>
                 <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. ""access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
-                {accessToken != null && <p className="card-text">{JSON.stringify(accessToken)}</p>}
+                {<p className="card-text">{JSON.stringify(accessToken)}</p>}
                 {accessTokenPayload != null && <p className="card-text">{JSON.stringify(accessTokenPayload)}</p>}
             </div>
         </div>
@@ -262,7 +262,7 @@ const DisplayIdToken =() => {
         <div className="card text-white bg-info mb-3">
             <div className="card-body">
                 <h5 className="card-title">ID Token</h5>
-                {idToken != null && <p className="card-text">{JSON.stringify(idToken)}</p>}
+                {<p className="card-text">{JSON.stringify(idToken)}</p>}
                 {idTokenPayload != null && <p className="card-text">{JSON.stringify(idTokenPayload)}</p>}
             </div>
         </div>
@@ -275,29 +275,30 @@ const DisplayIdToken =() => {
 ## How to get User Information : Hook method
 
 ```javascript
-import { useOidcUser } from '@axa-fr/react-oidc-context';
+import { useOidcUser, UserStatus } from '@axa-fr/react-oidc-context';
 
 const DisplayUserInfo = () => {
-    const{ oidcUser, isOidcUserLoading } = useOidcUser();
+  const{ oidcUser, oidcUserLoadingState } = useOidcUser();
 
-    if(isOidcUserLoading !== UserStatus.Loaded) {
-        return <p>User Information are loading</p>
-    }
-
-    if(!oidcUser){
-        return <p>you are not authenticated</p>
-    }
-
-    return (
-        <div className="card text-white bg-success mb-3">
-            <div className="card-body">
-                <h5 className="card-title">User information</h5>
-                <p>{oidcUser == null && "You are not logged" }</p>
-                {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
-            </div>
-        </div>
-    )
+  switch (oidcUserLoadingState){
+    case UserStatus.Loading:
+      return <p>User Information are loading</p>;
+    case UserStatus.Unauthenticated:
+      return <p>you are not authenticated</p>;
+    case UserStatus.LoadingError:
+      return <p>Fail to load user information</p>;
+    default:
+      return (
+              <div className="card text-white bg-success mb-3">
+                <div className="card-body">
+                  <h5 className="card-title">User information</h5>
+                  <p className="card-text">{JSON.stringify(oidcUser)}</p>
+                </div>
+              </div>
+      );
+  }
 };
+
 ```
 
 # Service Worker Support
