@@ -26,19 +26,12 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4 : use react-oidc-context which works with redux and in fact does not use any react context**
   - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
+- [Migrations](#migrations)
 - [Contribute](#contribute)
 
 ## About
 
 These libraries is used to manage client authentication.
-
-V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
-In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
-In this version you can use a ServiceWorker that will hide the refresh_token and access_token (more secure).
-
-For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATION_GUIDE_V3_TO_V4.md)
-For migrating from v3 to v5 checkout our [`migration guide v3 to v5`](./MIGRATION_GUIDE_V3_TO_V5.md)
-For migrating from v4 to v5 checkout our [`migration guide v4 to v5`](./MIGRATION_GUIDE_V4_TO_V5.md)
 
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
@@ -217,6 +210,16 @@ npm start
 
 These components encapsulate the use of "AppAuth-JS" in order to hide workfow complexity.
 Internally, native History API is used to be router library agnostic.
+
+## Migrations
+
+V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
+In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
+In this version you can use a ServiceWorker that will hide the refresh_token and access_token (more secure).
+
+- For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATION_GUIDE_V3_TO_V4.md)
+- For migrating from v3 to v5 checkout our [`migration guide v3 to v5`](./MIGRATION_GUIDE_V3_TO_V5.md)
+- For migrating from v4 to v5 checkout our [`migration guide v4 to v5`](./MIGRATION_GUIDE_V4_TO_V5.md)
 
 ## Contribute
 

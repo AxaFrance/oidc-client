@@ -23,7 +23,7 @@ import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
 </AuthenticationProvider>
 
-// in v4 become
+// in v5 become
 
 import { OidcProvider } from '@axa-fr/react-oidc-context';
 
@@ -73,7 +73,7 @@ const propTypes = {
   UserStore: PropTypes.func,
 };
 
-// new v4 
+// new v5
 const propTypes = {
   loadingComponent: PropTypes.elementType, // you can inject your own loading component
   sessionLostComponent: PropTypes.elementType, // you can inject your own session lost component
@@ -105,7 +105,7 @@ import { useReactOidc } from '@axa-fr/react-oidc-context';
 const  { isEnabled, login, logout, oidcUser, events } = useReactOidc(); 
 
 
-// new v45
+// new v5
 import { useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc-context';
 
 const { login, logout, isAuthenticated} = useOidc(); // login and logout return a Promise
@@ -123,7 +123,7 @@ import { withFetchRedirectionOn401,
          withAuthentication } from '@axa-fr/react-oidc-context-fetch';
 
 
-// new v4
+// new v5
 import { withOidcFetch } from '@axa-fr/react-oidc-context';
 
 
@@ -166,7 +166,7 @@ const trustedDomains = {
 ```
 
 
-In case v4 does not implement all features that you are using or this migration guide enought complete.
+In case v5 does not implement all features that you are using or this migration guide enought complete.
 
 Please make issues or PullRequest in order to help to complete it !
 
