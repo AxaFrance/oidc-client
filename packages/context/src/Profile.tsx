@@ -1,16 +1,21 @@
 import React from 'react';
 
-import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser} from "./oidc";
+import {OidcSecure, useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser} from "./oidc";
+import {UserStatus} from "./oidc/User";
 
 const DisplayUserInfo = () => {
-    const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
+    const{ oidcUser, oidcUserLoadingState } = useOidcUser();
 
-    if(isOidcUserLoading) {
+    if(oidcUserLoadingState === UserStatus.Loading) {
         return <p>User Information are loading</p>
     }
 
-    if(!isLogged){
-        return <p>you are not authentified</p>
+    if(oidcUserLoadingState === UserStatus.LoadingError) {
+        return <p>User Information loading errored.</p>
+    }
+
+    if(!oidcUser){
+        return <p>you are not authenticated</p>
     }
 
     return (
@@ -39,7 +44,7 @@ const DisplayAccessToken = () => {
     const{ accessToken, accessTokenPayload } = useOidcAccessToken();
 
     if(!accessToken){
-        return <p>you are not authentified</p>
+        return <p>you are not authenticated</p>
     }
     return (
         <div className="card text-white bg-info mb-3">
@@ -58,9 +63,9 @@ const DisplayIdToken =() => {
     const{ idToken, idTokenPayload } = useOidcIdToken();
 
     if(!idToken){
-        return <p>you are not authentified</p>
+        return <p>you are not authenticated</p>
     }
-    
+
     return (
         <div className="card text-white bg-info mb-3">
             <div className="card-body">

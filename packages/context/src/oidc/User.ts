@@ -1,31 +1,38 @@
 ﻿import { useEffect, useState} from "react";
 import Oidc from "./vanilla/oidc";
 
-export const useOidcUser =(configurationName="default") => {
-    const [oidcUser, setOidcUser] = useState(null);
-    const [isOidcUserLoading, setIsOidcUserLoading] = useState(false);
-    const getOidc =  Oidc.get;
+export enum UserStatus {
+    Unauthenticated= 'Unauthenticated',
+    Loading = 'Loading user',
+    Loaded = 'User loaded',
+    LoadingError = 'Error loading user'
+}
+
+type OidcUser = {
+    user: any,
+    status: UserStatus
+}
+
+export const useOidcUser = (configurationName="default") => {
+    const [oidcUser, setOidcUser] = useState<OidcUser>({user: null, status: UserStatus.Unauthenticated});
+
+    const oidc = Oidc.get(configurationName);
     useEffect(() => {
         let isMounted = true;
-        const oidc = getOidc(configurationName);
+
         if(oidc && oidc.tokens) {
-            setIsOidcUserLoading(true);
-            getOidc().userInfoAsync()
+            setOidcUser({...oidcUser, status: UserStatus.Loading});
+            oidc.userInfoAsync()
                 .then((info) => {
                     if (isMounted) {
-                        setOidcUser(info);
-                        setIsOidcUserLoading(false);
+                        setOidcUser({user: info, status: UserStatus.Loaded});
                     }
                 })
+                .catch(() => setOidcUser({...oidcUser, status: UserStatus.LoadingError}));
         }
+
         return  () => { isMounted = false };
-    }, [])
-    
-    let isLogged = false;
-    const oidc = getOidc(configurationName);
-    if(oidc){
-        isLogged = oidc.tokens != null;
-    }
-    
-    return {oidcUser, isOidcUserLoading, isLogged: isLogged}
+    }, []);
+
+    return {oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status}
 }

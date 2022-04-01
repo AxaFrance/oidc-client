@@ -158,7 +158,7 @@ import {useOidc} from "./oidc";
 
 export const Home = () => {
 
-    const { login, logout, isLogged} = useOidc();
+    const { login, logout, isAuthenticated} = useOidc();
     
     return (
         <div className="container-fluid mt-3">
@@ -166,8 +166,8 @@ export const Home = () => {
                 <div className="card-body">
                     <h5 className="card-title">Welcome !!!</h5>
                     <p className="card-text">React Demo Application protected by OpenId Connect</p>
-                    {!isLogged && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
-                    {isLogged && <button type="button" className="btn btn-primary" onClick={logout}>logout</button>}
+                    {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
+                    {isAuthenticated && <button type="button" className="btn btn-primary" onClick={logout}>logout</button>}
                 </div>
             </div>
         </div>
@@ -176,7 +176,7 @@ export const Home = () => {
 
 ```
 The Hook method exposes : 
-- isLogged : is the user logged?
+- isAuthenticated : if the user is logged in or not
 - logout: logout function (return a promise)
 - login: login function 'return a promise'
 
@@ -278,20 +278,21 @@ const DisplayIdToken =() => {
 import { useOidcUser } from '@axa-fr/react-oidc-context';
 
 const DisplayUserInfo = () => {
-    const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
+    const{ oidcUser, isOidcUserLoading } = useOidcUser();
 
-    if(isOidcUserLoading) {
+    if(isOidcUserLoading !== UserStatus.Loaded) {
         return <p>User Information are loading</p>
     }
 
-    if(!isLogged){
-        return <p>you are not authentified</p>
+    if(!oidcUser){
+        return <p>you are not authenticated</p>
     }
 
     return (
         <div className="card text-white bg-success mb-3">
             <div className="card-body">
                 <h5 className="card-title">User information</h5>
+                <p>{oidcUser == null && "You are not logged" }</p>
                 {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
             </div>
         </div>
