@@ -4,7 +4,8 @@ import Oidc from "./vanilla/oidc";
 export enum UserStatus {
     Unauthenticated= 'Unauthenticated',
     Loading = 'Loading user',
-    Loaded = 'User loaded'
+    Loaded = 'User loaded',
+    LoadingError = 'Error loading user'
 }
 
 type OidcUser = {
@@ -27,11 +28,11 @@ export const useOidcUser = (configurationName="default") => {
                         setOidcUser({user: info, status: UserStatus.Loaded});
                     }
                 })
-                .catch(() => setOidcUser({...oidcUser, status: UserStatus.Unauthenticated}));
+                .catch(() => setOidcUser({...oidcUser, status: UserStatus.LoadingError}));
         }
 
         return  () => { isMounted = false };
     }, []);
 
-    return {oidcUser: oidcUser.user, isOidcUserLoading: oidcUser.status}
+    return {oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status}
 }

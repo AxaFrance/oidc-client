@@ -194,7 +194,7 @@ const AdminSecure = () => (
   </OidcSecure>
 );
 
-// adding the oidc user in the propsis
+// adding the oidc user in the props
 export default AdminSecure;
 ```
 

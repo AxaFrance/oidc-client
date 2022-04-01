@@ -4,10 +4,14 @@ import {OidcSecure, useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser} fr
 import {UserStatus} from "./oidc/User";
 
 const DisplayUserInfo = () => {
-    const{ oidcUser, isOidcUserLoading } = useOidcUser();
+    const{ oidcUser, oidcUserLoadingState } = useOidcUser();
 
-    if(isOidcUserLoading !== UserStatus.Loaded) {
+    if(oidcUserLoadingState === UserStatus.Loading) {
         return <p>User Information are loading</p>
+    }
+
+    if(oidcUserLoadingState === UserStatus.LoadingError) {
+        return <p>User Information loading errored.</p>
     }
 
     if(!oidcUser){
