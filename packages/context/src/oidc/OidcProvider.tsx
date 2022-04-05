@@ -79,15 +79,8 @@ sessionLostComponent=SessionLost }) => {
     const [currentConfigurationName, setConfigurationName] = useState("default");
 
     useEffect(() => {
-        let isMounted = true;
         const oidc = getOidc(configurationName);
-        if(subscriptionId){
-            oidc.removeEventSubscription(subscriptionId);
-        }
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
-            if (!isMounted) {
-                return;
-            }
             if (name == Oidc.eventNames.loginAsync_begin
                 || name == Oidc.eventNames.loginCallbackAsync_end
                 || name == Oidc.eventNames.loginAsync_error
@@ -99,15 +92,11 @@ sessionLostComponent=SessionLost }) => {
                 setEvent({name, data});
             }
         });
-        
-            if(isMounted) {
-                setConfigurationName(configurationName);
-                setSubscriptionId(newSubscriptionId);
-                setLoading(false);
-            }
+        setConfigurationName(configurationName);
+        setSubscriptionId(newSubscriptionId);
+        setLoading(false);
         return () => {
             oidc.removeEventSubscription(subscriptionId);
-            isMounted = false;
         }
     }, [configuration, configurationName]);
     
