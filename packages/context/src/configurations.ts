@@ -28,4 +28,7 @@ export const configurationGoogle = {
     authority: 'https://accounts.google.com/',
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false,
+    token_request_extras: {
+        client_secret : "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"
+    }
 };

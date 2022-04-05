@@ -65,6 +65,7 @@ export interface StringMap {
     service_worker_relative_url?:string,
      service_worker_only?:boolean,
      extras?:StringMap
+     token_request_extras?:StringMap, 
 };
 
 const oidcDatabase = {};
@@ -482,6 +483,15 @@ export class Oidc {
             const authority =  configuration.authority;
 
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
+
+            let extras = undefined;
+            if(configuration.token_request_extras) {
+                extras = {}
+                for (let [key, value] of Object.entries(configuration.token_request_extras)) {
+                    extras[key] = value;
+                }
+            }
+            
             // use the token response to make a request for an access token
             const request = new TokenRequest({
                 client_id: clientId,
@@ -489,7 +499,7 @@ export class Oidc {
                 grant_type: GRANT_TYPE_REFRESH_TOKEN,
                 code: undefined,
                 refresh_token: refreshToken,
-                extras: undefined
+                extras
                 });
             
             const oidcServerConfiguration = await this.initAsync(authority);
