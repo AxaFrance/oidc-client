@@ -1,6 +1,6 @@
 ﻿import React, {useState} from 'react';
 import {OidcProvider, useOidc, useOidcAccessToken} from "./oidc";
-import { configurationIdentityServer} from "./configurations";
+import { configurationIdentityServer, configurationGoogle} from "./configurations";
 
 const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
     const { login, logout, isAuthenticated} = useOidc(configurationName);
@@ -14,6 +14,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                     <select value={configurationName} onChange={handleConfigurationChange} >
                         <option value="config_1">config_1</option>
                         <option value="config_2">config_2</option>
+                        <option value="google">google</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={logout}>logout</button>}
@@ -40,7 +41,8 @@ export const MultiAuthContainer = () => {
         config_2: {...configurationIdentityServer,
             redirect_uri:callBack,
             silent_redirect_uri: "",
-            scope: 'openid profile email api'}
+            scope: 'openid profile email api'},
+        google: { ...configurationGoogle }
     }
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
@@ -67,7 +69,7 @@ const DisplayAccessToken = ({configurationName}) => {
             <div className="card-body">
                 <h5 className="card-title">Access Token</h5>
                 <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. "access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
-                {accessToken != null && <p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
+                {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
                 {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
             </div>
         </div>
