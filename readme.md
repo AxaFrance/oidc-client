@@ -211,6 +211,10 @@ npm start
 These components encapsulate the use of "AppAuth-JS" in order to hide workfow complexity.
 Internally, native History API is used to be router library agnostic.
 
+More information about OIDC
+- French: https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284 
+- English: coming soon
+
 ## Migrations
 
 V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
