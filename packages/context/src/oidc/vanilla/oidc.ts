@@ -438,7 +438,7 @@ export class Oidc {
                         extras = {};
                         extras.code_verifier = request.internal.code_verifier;
                         if(configuration.token_request_extras) {
-                            for (let [key, value] of Object.entries(configuration.extras)) {
+                            for (let [key, value] of Object.entries(configuration.token_request_extras)) {
                                 extras[key] = value;
                             }
                         }
