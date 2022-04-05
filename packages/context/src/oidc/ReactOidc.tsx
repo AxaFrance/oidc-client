@@ -1,6 +1,5 @@
 ﻿import React, {useEffect, useState} from 'react';
 import Oidc from "./vanilla/oidc";
-import {UserStatus} from "./User";
 
 const defaultConfigurationName = "default";
 export const useOidc =(configurationName=defaultConfigurationName) =>{
