@@ -59,6 +59,7 @@ export interface StringMap {
     client_id: string,
     redirect_uri: string,
      silent_redirect_uri?:string,
+     silent_signin_timeout?:number,
     scope: string,
     authority: string,
     refresh_time_before_tokens_expiration_in_second?: number,
@@ -248,7 +249,8 @@ export class Oidc {
             return Promise.resolve(null);
         }
         this.publishEvent(eventNames.silentSigninAsync_begin, {});
-        const link = this.configuration.silent_redirect_uri;
+        const configuration = this.configuration 
+        const link = configuration.silent_redirect_uri;
         const iframe = document.createElement('iframe');
         iframe.width = "0px";
         iframe.height = "0px";
@@ -271,7 +273,7 @@ export class Oidc {
                         }
                     }
                 };
-
+                const silentSigninTimeout = configuration.silent_signin_timeout ? configuration.silent_signin_timeout : 12000 
                 setTimeout(() => {
                     if (!isResolved) {
                         reject("timeout");
@@ -279,7 +281,7 @@ export class Oidc {
                         iframe.remove();
                         isResolved = true;
                     }
-                }, 12000);
+                },  silentSigninTimeout);
             } catch (e) {
                 iframe.remove();
                 reject(e);

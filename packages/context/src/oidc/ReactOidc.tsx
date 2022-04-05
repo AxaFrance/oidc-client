@@ -1,5 +1,6 @@
 ﻿import React, {useEffect, useState} from 'react';
 import Oidc from "./vanilla/oidc";
+import {UserStatus} from "./User";
 
 const defaultConfigurationName = "default";
 export const useOidc =(configurationName=defaultConfigurationName) =>{
@@ -18,7 +19,7 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
         isAuthenticated = getOidc(configurationName).tokens != null;
     }
 
-    return { login, logout, isAuthenticated };
+    return { login, logout, isAuthenticated:Boolean };
 }
 
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};
@@ -33,9 +34,14 @@ const initTokens = (configurationName) => {
     return accessTokenInitialState;
 }
 
+type OidcAccessToken = {
+    accessToken?: any,
+    accessTokenPayload?: any
+}
+
 export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
-    const [state, setAccessToken] = useState<any>(initTokens(configurationName));
+    const [state, setAccessToken] = useState<OidcAccessToken>(initTokens(configurationName));
     const [subscriptionId, setSubscriptionId] = useState(null);
 
     useEffect(() => {
@@ -80,9 +86,14 @@ const initIdToken= (configurationName) =>{
     return idTokenInitialState
 }
 
+type OidcIdToken = {
+    idToken?: any,
+    idTokenPayload?: any
+}
+
 export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
-    const [state, setIDToken] = useState<any>(idTokenInitialState);
+    const [state, setIDToken] = useState<OidcIdToken>(idTokenInitialState);
     const [subscriptionId, setSubscriptionId] = useState(initIdToken(configurationName));
 
     useEffect(() => {
