@@ -12,13 +12,13 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
         return getOidc(configurationName).logoutAsync();
     };
 
-    let isAuthenticated = false;
+    let isAuthenticated:boolean = false;
     const oidc = getOidc(configurationName);
     if(oidc){
         isAuthenticated = getOidc(configurationName).tokens != null;
     }
 
-    return { login, logout, isAuthenticated:Boolean };
+    return { login, logout, isAuthenticated };
 }
 
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};
