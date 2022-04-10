@@ -12,7 +12,7 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
         return getOidc(configurationName).logoutAsync();
     };
 
-    let isAuthenticated = false;
+    let isAuthenticated:boolean = false;
     const oidc = getOidc(configurationName);
     if(oidc){
         isAuthenticated = getOidc(configurationName).tokens != null;
@@ -33,9 +33,14 @@ const initTokens = (configurationName) => {
     return accessTokenInitialState;
 }
 
+type OidcAccessToken = {
+    accessToken?: any,
+    accessTokenPayload?: any
+}
+
 export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
-    const [state, setAccessToken] = useState<any>(initTokens(configurationName));
+    const [state, setAccessToken] = useState<OidcAccessToken>(initTokens(configurationName));
     const [subscriptionId, setSubscriptionId] = useState(null);
 
     useEffect(() => {
@@ -80,9 +85,14 @@ const initIdToken= (configurationName) =>{
     return idTokenInitialState
 }
 
+type OidcIdToken = {
+    idToken?: any,
+    idTokenPayload?: any
+}
+
 export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
-    const [state, setIDToken] = useState<any>(idTokenInitialState);
+    const [state, setIDToken] = useState<OidcIdToken>(idTokenInitialState);
     const [subscriptionId, setSubscriptionId] = useState(initIdToken(configurationName));
 
     useEffect(() => {
