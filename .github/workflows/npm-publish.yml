@@ -92,7 +92,7 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
             
       - name: Commit updates package.json
-      - uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v4
         if: github.ref == 'refs/heads/master'
         with:
           commit_message: "[skip ci] Update version package.json"
