@@ -1,5 +1,5 @@
 import React, {ComponentType, FC, PropsWithChildren, useEffect, useState} from 'react';
-import Oidc, {Configuration} from './vanilla/oidc';
+import Oidc, {OidcConfiguration} from './vanilla/oidc';
 import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
@@ -21,7 +21,7 @@ export type OidcProviderProps = {
     authenticatingErrorComponent?: ComponentType;
     serviceWorkerNotSupportedComponent?: ComponentType;
     configurationName?: string;
-    configuration?: Configuration;
+    configuration?: OidcConfiguration;
     children: any;
 };
 

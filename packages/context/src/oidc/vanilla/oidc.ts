@@ -55,7 +55,7 @@ export interface StringMap {
     [key: string]: string;
 }
 
- export type Configuration = {
+ export type OidcConfiguration = {
     client_id: string,
     redirect_uri: string,
      silent_redirect_uri?:string,
@@ -70,7 +70,7 @@ export interface StringMap {
 };
 
 const oidcDatabase = {};
-const oidcFactory = (configuration: Configuration, name="default") => {
+const oidcFactory = (configuration: OidcConfiguration, name="default") => {
     if(oidcDatabase[name]){
         return oidcDatabase[name];
     }
@@ -185,7 +185,7 @@ const eventNames = {
 }
 
 export class Oidc {
-    public configuration: Configuration;
+    public configuration: OidcConfiguration;
     public userInfo: null;
     public tokens: null;
     public events: Array<any>;
@@ -193,7 +193,7 @@ export class Oidc {
     private serviceWorker?: any;
     private configurationName: string;
     private session?: any;
-    constructor(configuration:Configuration, configurationName="default") {
+    constructor(configuration:OidcConfiguration, configurationName="default") {
       this.configuration = configuration
         this.configurationName= configurationName;
       this.tokens = null
