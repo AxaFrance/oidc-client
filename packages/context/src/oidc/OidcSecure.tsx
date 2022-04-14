@@ -1,22 +1,23 @@
 import React, {useEffect, PropsWithChildren, FC} from 'react';
 
-import Oidc from "./vanilla/oidc";
+import Oidc, {StringMap} from "./vanilla/oidc";
 
 type OidcSecureProps = {
     callbackPath?:string;
+    extras?:StringMap
     configurationName?: string;
 };
 
-export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, configurationName="default"}) => {
+export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, extras=null, configurationName="default"}) => {
     const getOidc =  Oidc.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
-            oidc.loginAsync(callbackPath);
+            oidc.loginAsync(callbackPath, extras);
         }
         return () => {
         }
-    }, [configurationName])
+    }, [configurationName, callbackPath, extras])
 
     if(!oidc.tokens){
       return null;

@@ -350,7 +350,7 @@ export class Oidc {
         }
     }
 
-    async loginAsync(callbackPath:string=undefined, installServiceWorker=true) {
+    async loginAsync(callbackPath:string=undefined, extras:StringMap=null, installServiceWorker=true) {
         try {
             const location = window.location;
             const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
@@ -388,7 +388,7 @@ export class Oidc {
                         scope: configuration.scope,
                         response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
                         state,
-                        extras: configuration.extras
+                        extras: extras ?? configuration.extras
                     });
                     authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
         } catch(exception){
