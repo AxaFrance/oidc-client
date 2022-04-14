@@ -23,6 +23,8 @@ jobs:
     if: ${{ needs.skip_ci.outputs.canSkip != 'true' }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GIT_TOKEN }}
           
       - name: Bump version and push tag
         id: tag_version
