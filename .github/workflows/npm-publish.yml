@@ -10,9 +10,17 @@ on:
     branches: [ master ]
 
 jobs:
+  skip_ci:
+    runs-on: ubuntu-latest
+    outputs:
+      canSkip: ${{ steps.check.outputs.canSkip }}
+    steps:
+      - id: check
+        uses: Legorooj/skip-ci@main
   build:
     environment: react-oidc
     runs-on: ubuntu-latest
+    if: ${{ needs.skip_ci.outputs.canSkip != 'true' }}
     steps:
       - uses: actions/checkout@v2
           
@@ -82,6 +90,15 @@ jobs:
             -Dsonar.projectKey=AxaGuilDEv_react-oidc
             -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
             -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
+            
+      - name: Commit updates package.json
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        if: github.ref == 'refs/heads/master'
+        with:
+          commit_message: "[skip ci] Update version package.json"
+          commit_user_name: GitHub
+          commit_user_email: github-action@bot.com
+          commit_author: GitHub <github-action@bot.com>
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
