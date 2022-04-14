@@ -16,7 +16,8 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [Getting Started](#getting-started)
 - [Run The Demo](#run-the-demo)
 - [Examples](#examples)
-# About
+- [How It Works](#how-it-works)
+- [Service Worker Support](#service-worker-support)
 
 Easy set up of OIDC for react and use the new react context api as state management.
 It use AppAuthJS behind the scene. 
@@ -301,6 +302,15 @@ const DisplayUserInfo = () => {
 };
 
 ```
+
+# How It Works
+
+These components encapsulate the use of "AppAuth-JS" in order to hide workfow complexity.
+Internally, native History API is used to be router library agnostic.
+
+More information about OIDC
+- French: https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284
+- English: coming soon
 
 # Service Worker Support
 

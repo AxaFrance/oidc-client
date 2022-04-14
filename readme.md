@@ -33,9 +33,11 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 
 These libraries is used to manage client authentication.
 
+
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
   - OIDC using client side Code Credential Grant with pkce only
+- **Lightweight** 
 - **Simple** :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
