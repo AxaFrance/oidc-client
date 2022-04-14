@@ -2,7 +2,7 @@ import React, {useEffect, PropsWithChildren, FC} from 'react';
 
 import Oidc from "./vanilla/oidc";
 
-type OidcSecureProps = {
+export type OidcSecureProps = {
     callbackPath?:string;
     configurationName?: string;
 };

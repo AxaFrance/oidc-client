@@ -1,5 +1,6 @@
-﻿export { withOidcSecure, OidcSecure } from "./OidcSecure";
-export { useOidcUser, UserStatus } from "./User";
-export { useOidc, useOidcAccessToken, useOidcIdToken } from "./ReactOidc";
-export { withOidcFetch, fetchWithToken } from "./FetchToken";
-export { OidcProvider } from "./OidcProvider";
+﻿export { withOidcSecure, OidcSecure, OidcSecureProps } from "./OidcSecure";
+export { useOidcUser, OidcUserStatus, OidcUser } from "./User";
+export { useOidc, useOidcAccessToken, useOidcIdToken, OidcIdToken, OidcAccessToken } from "./ReactOidc";
+export { withOidcFetch, ComponentWithOidcFetchProps, Fetch } from "./FetchToken";
+export { OidcProvider, OidcProviderProps, OidcSessionProps, } from "./OidcProvider";
+export { Configuration as OidcConfiguration, StringMap } from "./vanilla/oidc";

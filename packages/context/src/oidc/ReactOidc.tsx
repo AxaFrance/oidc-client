@@ -33,7 +33,7 @@ const initTokens = (configurationName) => {
     return accessTokenInitialState;
 }
 
-type OidcAccessToken = {
+export type OidcAccessToken = {
     accessToken?: any,
     accessTokenPayload?: any
 }
@@ -85,7 +85,7 @@ const initIdToken= (configurationName) =>{
     return idTokenInitialState
 }
 
-type OidcIdToken = {
+export type OidcIdToken = {
     idToken?: any,
     idTokenPayload?: any
 }

@@ -12,7 +12,7 @@ export type oidcContext = {
 
 const defaultEventState = {name:"", data:null};
 
-type OidcProviderProps = {
+export type OidcProviderProps = {
     callbackSuccessComponent?: ComponentType;
     callbackErrorComponent?: ComponentType;
     sessionLostComponent?: ComponentType;
@@ -25,7 +25,7 @@ type OidcProviderProps = {
     children: any;
 };
 
-type OidcSessionProps = {
+export type OidcSessionProps = {
     configurationName: string;
     loadingComponent: ComponentType
 };
