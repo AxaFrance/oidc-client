@@ -1,17 +1,17 @@
 import React from 'react';
 
-import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser, UserStatus} from "./oidc";
+import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser, OidcUserStatus} from "./oidc";
 
 
 const DisplayUserInfo = () => {
     const{ oidcUser, oidcUserLoadingState } = useOidcUser();
 
     switch (oidcUserLoadingState){
-        case UserStatus.Loading:
+        case OidcUserStatus.Loading:
             return <p>User Information are loading</p>;
-        case UserStatus.Unauthenticated:
+        case OidcUserStatus.Unauthenticated:
             return <p>you are not authenticated</p>;
-        case UserStatus.LoadingError:
+        case OidcUserStatus.LoadingError:
             return <p>Fail to load user information</p>;
         default:
             return (

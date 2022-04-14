@@ -1,5 +1,5 @@
 ﻿export { withOidcSecure, OidcSecure } from "./OidcSecure";
-export { useOidcUser, UserStatus } from "./User";
+export { useOidcUser, OidcUserStatus} from "./User";
 export { useOidc, useOidcAccessToken, useOidcIdToken } from "./ReactOidc";
-export { withOidcFetch, fetchWithToken } from "./FetchToken";
+export { withOidcFetch } from "./FetchToken";
 export { OidcProvider } from "./OidcProvider";
