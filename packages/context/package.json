@@ -11,6 +11,7 @@
   },
   "files": [
     "dist",
+    "src",
     "README.md"
   ],
   "keywords": [
