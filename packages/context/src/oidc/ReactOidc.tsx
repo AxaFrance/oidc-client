@@ -1,12 +1,12 @@
 ﻿import React, {useEffect, useState} from 'react';
-import Oidc from "./vanilla/oidc";
+import Oidc, {StringMap} from "./vanilla/oidc";
 
 const defaultConfigurationName = "default";
 export const useOidc =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
 
-    const login = (callbackPath=undefined) => {
-        return getOidc(configurationName).loginAsync(callbackPath);
+    const login = (callbackPath=undefined, extras:StringMap=null) => {
+        return getOidc(configurationName).loginAsync(callbackPath, extras);
     };
     const logout = () => {
         return getOidc(configurationName).logoutAsync();
