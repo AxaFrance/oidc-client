@@ -34,10 +34,10 @@ const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => string | nul
   return await fetch(url, newOptions);
 };
 
-export const withOidcFetch = (fetch, configurationName=defaultConfigurationName) => (
+export const withOidcFetch = (fetch:Fetch=null, configurationName=defaultConfigurationName) => (
     WrappedComponent
   ) => (props: ComponentWithOidcFetchProps) => {
-    const previousFetch = fetch || props.fetch;
+    const previousFetch = fetch || window.fetch;
     const getOidc =  Oidc.get;
     const getAccessTokenInjected = () => { return getOidc(configurationName).tokens.accessToken; };
     const newFetch = fetchWithToken(previousFetch, getAccessTokenInjected);
@@ -45,7 +45,7 @@ export const withOidcFetch = (fetch, configurationName=defaultConfigurationName)
   };
 
 
-export const useOidcFetch =(fetch, configurationName=defaultConfigurationName) =>{
+export const useOidcFetch =(fetch:Fetch=null, configurationName=defaultConfigurationName) =>{
   const previousFetch = fetch || window.fetch;
   const getOidc =  Oidc.get;
   const getAccessTokenInjected = () => { return getOidc(configurationName).tokens.accessToken; };

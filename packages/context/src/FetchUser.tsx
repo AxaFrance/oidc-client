@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {withOidcFetch} from "./oidc/FetchToken";
+import {useOidcFetch, withOidcFetch} from "./oidc/FetchToken";
 import {OidcSecure} from "./oidc";
 
 const DisplayUserInfo = ({fetch}) => {
@@ -45,6 +45,12 @@ const DisplayUserInfo = ({fetch}) => {
 
 // @ts-ignore
 const UserInfoWithFetch = withOidcFetch(fetch)(DisplayUserInfo);
+
+const UserInfoWithFecthHook = () =>{
+    const { fetch } = useOidcFetch();
+    // @ts-ignore
+    return <DisplayUserInfo fetch={fetch} />
+}
 
 // @ts-ignore
 export const FetchUser =() => <OidcSecure><UserInfoWithFetch/></OidcSecure> 
