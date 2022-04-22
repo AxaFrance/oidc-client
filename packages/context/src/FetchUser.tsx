@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 
-import {withOidcFetch} from "./oidc/FetchToken";
+import {useOidcFetch, withOidcFetch} from "./oidc/FetchToken";
 import {OidcSecure} from "./oidc";
 
-const DisplayUserInfo = ({fetch}) => {
+const DisplayUserInfo = ({ fetch }) => {
     const [oidcUser, setOidcUser] = useState(null);
     const [isLoading, setLoading] = useState(true);
 
@@ -28,7 +28,7 @@ const DisplayUserInfo = ({fetch}) => {
     },[]);
     
     if(isLoading){
-        return "Loading";
+        return <>Loading</>;
     }
 
     return (
@@ -43,8 +43,11 @@ const DisplayUserInfo = ({fetch}) => {
     )
 };
 
-// @ts-ignore
-const UserInfoWithFetch = withOidcFetch(fetch)(DisplayUserInfo);
+const UserInfoWithFetchHoc = withOidcFetch(fetch)(DisplayUserInfo);
 
-// @ts-ignore
-export const FetchUser =() => <OidcSecure><UserInfoWithFetch/></OidcSecure> 
+export const FetchUserHoc= () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure>;
+
+export const FetchUserHook= () => {
+    const {fetch} = useOidcFetch();
+    return <OidcSecure><DisplayUserInfo fetch={fetch} /></OidcSecure>
+}

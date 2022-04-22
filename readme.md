@@ -56,6 +56,14 @@ These libraries is used to manage client authentication.
   The service worker catch <b>access_token</b> and <b>refresh_token</b> that will never be accessible to the client.
 </p>
 
+Work perfectly well with :
+- [auth0](https://auth0.com/)
+- [identity server](https://duendesoftware.com/)
+- google
+- aws
+- [keycloak](https://www.keycloak.org/)
+- all oidc compatible providers
+
 ## Getting Started
 
 ### Getting Started React using create-react-app
