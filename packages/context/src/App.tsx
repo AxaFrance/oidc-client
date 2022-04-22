@@ -4,7 +4,7 @@ import { Home } from "./Home";
 import { Profile, SecureProfile } from "./Profile";
 import { configurationAuth0, configurationIdentityServer } from './configurations';
 import { withOidcSecure, OidcProvider } from "./oidc";
-import { FetchUser } from "./FetchUser";
+import {FetchUserHoc, FetchUserHook} from "./FetchUser";
 import { MultiAuthContainer } from "./MultiAuth";
 
 function App() {
@@ -32,7 +32,10 @@ function App() {
                 <Link className="nav-link" to="/profile-secure-hoc">Secure Profile Hoc</Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/user-fetch-secure">Secure User Fetch</Link>
+                <Link className="nav-link" to="/user-fetch-secure-hoc">Secure User Fetch Hoc</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/user-fetch-secure-hook">Secure User Fetch Hook</Link>
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/multi-auth">Multi Auth</Link>
@@ -46,7 +49,8 @@ function App() {
           <Route exact path="/profile" component={Profile} />
           <Route exact path="/profile-secure-component" component={SecureProfile} />
           <Route exact path="/profile-secure-hoc" component={withOidcSecure(Profile)} />
-          <Route exact path="/user-fetch-secure" component={FetchUser} />
+          <Route exact path="/user-fetch-secure-hoc" component={FetchUserHoc} />
+          <Route exact path="/user-fetch-secure-hook" component={FetchUserHook} />
           <Route path="/multi-auth" component={MultiAuthContainer} />
         </div>
       </Router>

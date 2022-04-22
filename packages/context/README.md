@@ -25,6 +25,7 @@ It use AppAuthJS behind the scene.
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
   - OIDC using client side Code Credential Grant with pkce only
+- **Lightweight**
 - **Simple** :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
@@ -300,6 +301,110 @@ const DisplayUserInfo = () => {
       );
   }
 };
+
+```
+
+## How to get a fetch that inject Access_Token : Hook method
+
+```javascript
+import React, {useEffect, useState} from 'react';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
+
+const DisplayUserInfo = ({ fetch }) => {
+  const [oidcUser, setOidcUser] = useState(null);
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserInfoAsync = async () => {
+      const res = await fetch("https://demo.duendesoftware.com/connect/userinfo");
+      if (res.status != 200) {
+        return null;
+      }
+      return res.json();
+    };
+    let isMounted = true;
+    fetchUserInfoAsync().then((userInfo) => {
+      if(isMounted) {
+        setLoading(false);
+        setOidcUser(userInfo)
+      }
+    })
+    return  () => {
+      isMounted = false;
+    };
+  },[]);
+
+  if(isLoading){
+    return <>Loading</>;
+  }
+
+  return (
+          <div className="container mt-3">
+            <div className="card text-white bg-success mb-3">
+              <div className="card-body">
+                <h5 className="card-title">User information</h5>
+                {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
+              </div>
+            </div>
+          </div>
+  )
+};
+
+export const FetchUserHook= () => {
+  const {fetch} = useOidcFetch();
+  return <OidcSecure><DisplayUserInfo fetch={fetch} /></OidcSecure>
+}
+
+```
+
+## How to get a fetch that inject Access_Token : HOC method
+
+```javascript
+import React, {useEffect, useState} from 'react';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
+
+const DisplayUserInfo = ({ fetch }) => {
+  const [oidcUser, setOidcUser] = useState(null);
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserInfoAsync = async () => {
+      const res = await fetch("https://demo.duendesoftware.com/connect/userinfo");
+      if (res.status != 200) {
+        return null;
+      }
+      return res.json();
+    };
+    let isMounted = true;
+    fetchUserInfoAsync().then((userInfo) => {
+      if(isMounted) {
+        setLoading(false);
+        setOidcUser(userInfo)
+      }
+    })
+    return  () => {
+      isMounted = false;
+    };
+  },[]);
+
+  if(isLoading){
+    return <>Loading</>;
+  }
+
+  return (
+          <div className="container mt-3">
+            <div className="card text-white bg-success mb-3">
+              <div className="card-body">
+                <h5 className="card-title">User information</h5>
+                {oidcUser != null && <p className="card-text">{JSON.stringify(oidcUser)}</p>}
+              </div>
+            </div>
+          </div>
+  )
+};
+
+const UserInfoWithFetchHoc = withOidcFetch(fetch)(DisplayUserInfo);
+export const FetchUserHoc= () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure>;
 
 ```
 

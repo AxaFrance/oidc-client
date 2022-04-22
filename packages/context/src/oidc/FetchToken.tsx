@@ -1,9 +1,9 @@
 import React from 'react';
-import Oidc, {StringMap} from "./vanilla/oidc";
+import Oidc from "./vanilla/oidc";
 
 export type Fetch = typeof window.fetch;
 export interface ComponentWithOidcFetchProps {
-  fetch: Fetch;
+  fetch?: Fetch;
 }
 const defaultConfigurationName = "default";
 
@@ -37,10 +37,7 @@ const fetchWithToken = (fetch: Fetch, getAccessTokenInjected: () => string | nul
 export const withOidcFetch = (fetch:Fetch=null, configurationName=defaultConfigurationName) => (
     WrappedComponent
   ) => (props: ComponentWithOidcFetchProps) => {
-    const previousFetch = fetch || window.fetch;
-    const getOidc =  Oidc.get;
-    const getAccessTokenInjected = () => { return getOidc(configurationName).tokens.accessToken; };
-    const newFetch = fetchWithToken(previousFetch, getAccessTokenInjected);
+    const {fetch:newFetch} = useOidcFetch(fetch || props.fetch, configurationName)
     return <WrappedComponent {...props} fetch={newFetch} />;
   };
 
