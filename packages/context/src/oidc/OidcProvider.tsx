@@ -98,6 +98,7 @@ sessionLostComponent=SessionLost }) => {
         setLoading(false);
         return () => {
             oidc.removeEventSubscription(subscriptionId);
+            setEvent(defaultEventState);
         }
     }, [configuration, configurationName]);
     
@@ -117,9 +118,12 @@ sessionLostComponent=SessionLost }) => {
         case Oidc.eventNames.loginCallbackAsync_error:
             return <AuthenticatingErrorComponent />;
         case Oidc.eventNames.refreshTokensAsync_error:
-            return <SessionLostComponent>
+            return <> {(loading || (currentConfigurationName != configurationName )) ? (
+                <LoadingComponent/>
+            ) : (<SessionLostComponent>
                 {children}
-            </SessionLostComponent>;
+            </SessionLostComponent>)} 
+                </>;
         default:
             // @ts-ignore
             return (
