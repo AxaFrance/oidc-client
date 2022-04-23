@@ -4,6 +4,7 @@ import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
+import {SessionLostProps} from "./core/default-component/SessionLost.component";
 
 
 export type oidcContext = {
@@ -15,7 +16,7 @@ const defaultEventState = {name:"", data:null};
 export type OidcProviderProps = {
     callbackSuccessComponent?: ComponentType;
     callbackErrorComponent?: ComponentType;
-    sessionLostComponent?: ComponentType;
+    sessionLostComponent?: FC<PropsWithChildren<SessionLostProps>>;
     authenticatingComponent?: ComponentType;
     loadingComponent?: ComponentType;
     authenticatingErrorComponent?: ComponentType;
@@ -116,7 +117,9 @@ sessionLostComponent=SessionLost }) => {
         case Oidc.eventNames.loginCallbackAsync_error:
             return <AuthenticatingErrorComponent />;
         case Oidc.eventNames.refreshTokensAsync_error:
-            return <SessionLostComponent />;
+            return <SessionLostComponent>
+                {children}
+            </SessionLostComponent>;
         default:
             // @ts-ignore
             return (

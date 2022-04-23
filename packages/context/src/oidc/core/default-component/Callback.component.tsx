@@ -5,8 +5,8 @@ import Oidc from "../../vanilla/oidc";
 
 export const CallBackSuccess = () =>  (<div className="oidc-callback">
   <div className="oidc-callback__container">
-    <h1 className="oidc-callback__title">Authentification terminée</h1>
-    <p className="oidc-callback__content">Vous allez être redirigé sur votre application.</p>
+    <h1 className="oidc-callback__title">Authentication complete</h1>
+    <p className="oidc-callback__content">You will be redirected to your application.</p>
   </div>
 </div>);
 
