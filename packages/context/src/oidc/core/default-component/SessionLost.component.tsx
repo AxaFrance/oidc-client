@@ -9,7 +9,6 @@ export const SessionLost: FC<PropsWithChildren<SessionLostProps>> = ({children})
       <p className="oidc-session-lost__content">
           Your session has expired. Please re-authenticate.
       </p>
-        <>{children}</>
     </div>
   </div>
 );
