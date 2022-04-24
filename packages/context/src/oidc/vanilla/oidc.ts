@@ -34,6 +34,10 @@ const idTokenPayload = (token) => {
     return JSON.parse(jsonPayload);
 }
 
+const countLetter = (str, find)=> {
+    return (str.split(find)).length - 1;
+}
+
 const extractAccessTokenPayload = tokens => {
     if(tokens.accessTokenPayload)
     {
@@ -41,12 +45,12 @@ const extractAccessTokenPayload = tokens => {
     }
     const accessToken = tokens.accessToken;
     try{
-        if (!accessToken || !accessToken.includes('.')) {
+        if (!accessToken || countLetter(accessToken,'.') === 2) {
             return null;
         }
         return JSON.parse(atob(accessToken.split('.')[1]));
     } catch (e) {
-        console.error(e);
+        console.warn(e);
     }
     return null;
 };

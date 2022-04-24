@@ -23,18 +23,22 @@ let database = {
     }
 };
 
+const countLetter = (str, find)=> {
+    return (str.split(find)).length - 1;
+}
+
 function extractAccessTokenPayload(accessToken) {
     try{
         if (!accessToken) {
             return null;
         }
-        if(accessToken.includes('.')) {
+        if(countLetter(accessToken,'.') === 2) {
             return JSON.parse(atob(accessToken.split('.')[1]));
         } else {
             return null;
         }
     } catch (e) {
-        console.error(e);
+        console.warn(e);
     }
     return null;
 }
