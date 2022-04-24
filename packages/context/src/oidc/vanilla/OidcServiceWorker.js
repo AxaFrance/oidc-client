@@ -38,7 +38,7 @@ function extractAccessTokenPayload(accessToken) {
             return null;
         }
     } catch (e) {
-        console.error(e);
+        console.warn(e);
     }
     return null;
 }
