@@ -4,7 +4,6 @@ import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
-import {ComponentOidcProps} from "./core/default-component/ComponentTypes";
 
 
 export type oidcContext = {
@@ -14,13 +13,13 @@ export type oidcContext = {
 const defaultEventState = {name:"", data:null};
 
 export type OidcProviderProps = {
-    callbackSuccessComponent?: ComponentType;
-    callbackErrorComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
-    sessionLostComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
-    authenticatingComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
-    loadingComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
-    authenticatingErrorComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
-    serviceWorkerNotSupportedComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
+    callbackSuccessComponent?: PropsWithChildren<any>;
+    callbackErrorComponent?: PropsWithChildren<any>;
+    sessionLostComponent?: PropsWithChildren<any>;
+    authenticatingComponent?: PropsWithChildren<any>;
+    loadingComponent?: PropsWithChildren<any>;
+    authenticatingErrorComponent?: PropsWithChildren<any>;
+    serviceWorkerNotSupportedComponent?: PropsWithChildren<any>;
     configurationName?: string;
     configuration?: OidcConfiguration;
     children: any;
@@ -35,19 +34,20 @@ export type OidcSessionProps = {
 const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({loadingComponent, children, configurationName}) =>{
     const [loading, setLoading] = useState(true);
     const getOidc =  Oidc.get;
+    const oidc = getOidc(configurationName);
     useEffect(() => {
         let isMounted = true;
-        const oidc = getOidc(configurationName);
-        oidc.tryKeepExistingSessionAsync().then( () =>  {
-            if(isMounted){
-                setLoading(false);
-            }
-        })
- 
+        if(oidc) {
+            oidc.tryKeepExistingSessionAsync().then(() => {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            })
+        }
         return () => {
             isMounted = false;
         }
-    }, []);
+    }, [oidc, configurationName]);
     const LoadingComponent = loadingComponent;
     return (
         <>
@@ -78,13 +78,14 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              loadingComponent = Loading,
                                                                              serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
                                                                              authenticatingErrorComponent = AuthenticatingError,
+    
+    
 sessionLostComponent=SessionLost }) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
     }
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(defaultEventState);
-    const [subscriptionId, setSubscriptionId] = useState(null);
     const [currentConfigurationName, setConfigurationName] = useState("default");
 
     useEffect(() => {
@@ -102,14 +103,14 @@ sessionLostComponent=SessionLost }) => {
             }
         });
         setConfigurationName(configurationName);
-        setSubscriptionId(newSubscriptionId);
         setLoading(false);
         return () => {
-            oidc.removeEventSubscription(subscriptionId);
+            const previousOidc = getOidc(configurationName);
+            previousOidc.removeEventSubscription(newSubscriptionId);
             setEvent(defaultEventState);
         }
     }, [configuration, configurationName]);
-    
+
     
     const SessionLostComponent = sessionLostComponent;
     const AuthenticatingComponent = authenticatingComponent;
@@ -146,7 +147,6 @@ sessionLostComponent=SessionLost }) => {
                 </SessionLostComponent> 
             </Switch>;
         default:
-            // @ts-ignore
             return (
                 <Switch loadingComponent={LoadingComponent} isLoading={isLoading}>
                       <OidcRoutes redirect_uri={configuration.redirect_uri}

@@ -1,7 +1,6 @@
-import React, {FC, PropsWithChildren} from 'react';
-import {ComponentOidcProps} from "./ComponentTypes";
+import React, {PropsWithChildren} from 'react';
 
-export const SessionLost: FC<PropsWithChildren<ComponentOidcProps>> = () => (
+export const SessionLost: PropsWithChildren<any> = () => (
   <div className="oidc-session-lost">
     <div className="oidc-session-lost__container">
       <h1 className="oidc-session-lost__title">Session timed out</h1>

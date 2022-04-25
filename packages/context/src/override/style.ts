@@ -1,5 +1,5 @@
 ﻿export const style = {
-    "color": "rgb(255 53 53)",
+    "color": "rgb(53,110,255)",
     "backgroundColor": "rgb(255 255 255 / 95%)",
     "position": "absolute",
     "zIndex": 1000,

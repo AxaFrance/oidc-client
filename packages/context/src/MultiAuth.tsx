@@ -4,6 +4,7 @@ import { configurationIdentityServer, configurationGoogle} from "./configuration
 import AuthenticatingError from "./override/AuthenticateError.component"
 import Authenticating from "./override/Authenticating.component"
 import Loading from "./override/Loading.component"
+import {CallBackSuccess} from "./override/Callback.component"
 import SessionLost from "./override/SessionLost.component"
 import ServiceWorkerNotSupported from "./override/ServiceWorkerNotSupported.component"
 
@@ -58,11 +59,12 @@ export const MultiAuthContainer = () => {
     return (
         <OidcProvider configuration={configurations[configurationName]} 
                       configurationName={configurationName}
-                    //  loadingComponent={Loading}
+                      loadingComponent={Loading}
                       authenticatingErrorComponent={AuthenticatingError}
                       authenticatingComponent={Authenticating}
                       sessionLostComponent={SessionLost}
                       serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
+                      callbackSuccessComponent={CallBackSuccess}
         >
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
             <DisplayAccessToken configurationName={configurationName} />

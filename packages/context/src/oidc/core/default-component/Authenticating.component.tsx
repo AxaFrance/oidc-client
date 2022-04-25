@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {FC, PropsWithChildren} from "react";
-import {ComponentOidcProps} from "./ComponentTypes";
+import {PropsWithChildren} from "react";
 
-const Authenticating : FC<PropsWithChildren<ComponentOidcProps>> = () => (
+const Authenticating : PropsWithChildren<any> = () => (
   <div className="oidc-authenticating">
     <div className="oidc-authenticating__container">
       <h1 className="oidc-authenticating__title">Authentication in progress</h1>

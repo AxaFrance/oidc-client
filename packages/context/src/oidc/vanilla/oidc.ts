@@ -184,6 +184,10 @@ const eventNames = {
     silentSigninAsync_error: "silentSigninAsync_error",
 }
 
+const getRandomInt = (max) => {
+    return Math.floor(Math.random() * max);
+}
+
 export class Oidc {
     public configuration: OidcConfiguration;
     public userInfo: null;
@@ -213,17 +217,14 @@ export class Oidc {
     }
 
     subscriveEvents(func){
-        const id = new Date().getTime().toString();
+        const id = getRandomInt(9999999999999).toString();
         this.events.push({id, func});
         return id;
     }
 
     removeEventSubscription(id){
-        const event = this.events.find(e => e.id === id);
-        const index =this.events.indexOf(event);
-        if(index >=0){
-            this.events.slice(index, 1);    
-        }
+        const newEvents = this.events.filter(e =>  e.id === id);
+        this.events = newEvents;
     }
 
     publishEvent(eventName, data){

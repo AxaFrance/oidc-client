@@ -1,8 +1,7 @@
-import React, {FC, PropsWithChildren} from 'react';
-import {ComponentOidcProps} from "../oidc/core/default-component/ComponentTypes";
+import React, {PropsWithChildren} from 'react';
 import {style} from "./style"
 
-export const SessionLost: FC<PropsWithChildren<ComponentOidcProps>> = ({children}) => (
+export const SessionLost: PropsWithChildren<any> = ({children}) => (
     <>
   <div className="oidc-session-lost" style={style}>
     <div className="oidc-session-lost__container">

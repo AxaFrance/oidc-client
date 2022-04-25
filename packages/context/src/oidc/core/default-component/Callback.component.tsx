@@ -3,7 +3,7 @@ import {getCustomHistory} from "../routes/withRouter";
 import AuthenticatingError from "./AuthenticateError.component";
 import Oidc from "../../vanilla/oidc";
 
-export const CallBackSuccess = () =>  (<div className="oidc-callback">
+export const CallBackSuccess: PropsWithChildren<any> = () =>  (<div className="oidc-callback">
   <div className="oidc-callback__container">
     <h1 className="oidc-callback__title">Authentication complete</h1>
     <p className="oidc-callback__content">You will be redirected to your application.</p>

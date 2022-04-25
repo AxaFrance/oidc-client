@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {FC, PropsWithChildren} from "react";
-import {ComponentOidcProps} from "./ComponentTypes";
+import {PropsWithChildren} from "react";
 
-const Loading : FC<PropsWithChildren<ComponentOidcProps>> = () => (
+const Loading : PropsWithChildren<any> = () => (
   <span className="oidc-loading">
     Loading
   </span>
