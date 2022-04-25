@@ -306,6 +306,9 @@ const DisplayUserInfo = () => {
 
 ## How to get a fetch that inject Access_Token : Hook method
 
+If your are not using the service worker. Fetch function need to send AccessToken.
+This Hook give you a wrapped fetch that add the access token for you.
+
 ```javascript
 import React, {useEffect, useState} from 'react';
 import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
@@ -359,6 +362,9 @@ export const FetchUserHook= () => {
 
 ## How to get a fetch that inject Access_Token : HOC method
 
+If your are not using the service worker. Fetch function need to send AccessToken.
+This HOC give you a wrapped fetch that add the access token for you.
+
 ```javascript
 import React, {useEffect, useState} from 'react';
 import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
@@ -405,6 +411,61 @@ const DisplayUserInfo = ({ fetch }) => {
 
 const UserInfoWithFetchHoc = withOidcFetch(fetch)(DisplayUserInfo);
 export const FetchUserHoc= () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure>;
+
+```
+
+
+## Components override
+
+You can inject your own components. 
+All components definition receive props "children" and "configurationName". Please checkout and the the demo for more complexe exemple.
+
+```javascript
+
+import React from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { OidcProvider } from '@axa-fr/react-oidc-context';
+import Header from './Layout/Header';
+import Routes from './Router';
+
+// This configuration use hybrid mode
+// ServiceWorker are used if available (more secure) else tokens are given to the client
+// You need to give inside your code the "access_token" when using fetch
+const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:4200/authentication/callback',
+  silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.identityserver.io',
+  service_worker_relative_url:'/OidcServiceWorker.js',
+  service_worker_only:false,
+};
+
+const Loading = () => <p>Loading</p>
+const AuthenticatingError = () => <p>Authenticating error</p>
+const Authenticating = () => <p>Authenticating</p>
+const SessionLost = () => <p>Session Lost</p>
+const ServiceWorkerNotSupported = () => <p>Not supported</p>
+const CallBackSuccess = () => <p>Success</p>
+
+const App = () => (
+    <OidcProvider configuration={configuration}
+                  loadingComponent={Loading}
+                  authenticatingErrorComponent={AuthenticatingError}
+                  authenticatingComponent={Authenticating}
+                  sessionLostComponent={SessionLost}
+                  serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
+                  callbackSuccessComponent={CallBackSuccess}
+    >
+      <Router>
+        <Header />
+        <Routes />
+      </Router>
+    </OidcProvider>
+);
+
+render(<App />, document.getElementById('root'));
 
 ```
 
