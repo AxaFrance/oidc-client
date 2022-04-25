@@ -40,10 +40,10 @@ const CallbackManager: PropsWithChildren<any> = ({callBackError, callBackSuccess
   },[]);
   
   if(error){
-    return <CallbackErrorComponent />
+    return <CallbackErrorComponent configurationName={configurationName} />
   }
   
-  return <CallbackSuccessComponent />;
+  return <CallbackSuccessComponent configurationName={configurationName} />;
 };
 
 export default CallbackManager;
