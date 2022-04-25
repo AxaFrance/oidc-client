@@ -1,6 +1,6 @@
 ﻿export const style = {
-    "color": "#001fff",
-    "backgroundColor": "#d3d3d3f2",
+    "color": "rgb(255 53 53)",
+    "backgroundColor": "rgb(255 255 255 / 95%)",
     "position": "absolute",
     "zIndex": 1000,
     "top": "0px",
