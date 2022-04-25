@@ -42,10 +42,10 @@ const ServiceWorkerInstall: PropsWithChildren<any> = ({callBackError, authentica
     }
 
     if(error){
-        return <CallbackErrorComponent />
+        return <CallbackErrorComponent configurationName={configurationName} />
     }
 
-    return <CallbackSuccessComponent />;
+    return <CallbackSuccessComponent configurationName={configurationName} />;
 };
 
 export default ServiceWorkerInstall;

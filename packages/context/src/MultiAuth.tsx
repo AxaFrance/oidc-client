@@ -1,6 +1,12 @@
 ﻿import React, {useState} from 'react';
 import {OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken} from "./oidc";
 import { configurationIdentityServer, configurationGoogle} from "./configurations";
+import AuthenticatingError from "./override/AuthenticateError.component"
+import Authenticating from "./override/Authenticating.component"
+import Loading from "./override/Loading.component"
+import {CallBackSuccess} from "./override/Callback.component"
+import SessionLost from "./override/SessionLost.component"
+import ServiceWorkerNotSupported from "./override/ServiceWorkerNotSupported.component"
 
 const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
     const { login, logout, isAuthenticated} = useOidc(configurationName);
@@ -9,7 +15,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
             <div className="card">
                 <div className="card-body">
                     <h5 className="card-title">Work in progress</h5>
-                    <p className="card-text">React Demo Application protected by OpenId Connect with MultipleAUthentication.
+                    <p className="card-text">React Demo Application protected by OpenId Connect with MultipleAuthentication.
                         <br/>For example, config_1 can have other sensitive scope, config_2 does not ask for the "offline_access" so it does not retrieve the most sensitive token "refresh_token" for very sensitive operation, it retrive only access_token valid for a small amout of time.</p>
                     <select value={configurationName} onChange={handleConfigurationChange} >
                         <option value="config_1">config_1</option>
@@ -51,7 +57,15 @@ export const MultiAuthContainer = () => {
 
     }
     return (
-        <OidcProvider configuration={configurations[configurationName]} configurationName={configurationName}>
+        <OidcProvider configuration={configurations[configurationName]} 
+                      configurationName={configurationName}
+                      loadingComponent={Loading}
+                      authenticatingErrorComponent={AuthenticatingError}
+                      authenticatingComponent={Authenticating}
+                      sessionLostComponent={SessionLost}
+                      serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
+                      callbackSuccessComponent={CallBackSuccess}
+        >
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
             <DisplayAccessToken configurationName={configurationName} />
         </OidcProvider>

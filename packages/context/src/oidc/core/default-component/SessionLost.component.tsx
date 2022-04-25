@@ -1,23 +1,14 @@
-import React, {FC, MouseEventHandler} from 'react';
+import React, {PropsWithChildren} from 'react';
 
-type SessionLostProps = {
-  login?: MouseEventHandler;
-};
-
-export const SessionLost: FC<SessionLostProps> = () => (
+export const SessionLost: PropsWithChildren<any> = () => (
   <div className="oidc-session-lost">
     <div className="oidc-session-lost__container">
-      <h1 className="oidc-session-lost__title">Session expirée</h1>
+      <h1 className="oidc-session-lost__title">Session timed out</h1>
       <p className="oidc-session-lost__content">
-        Votre session est expirée. Veuillez vous ré-authentifier.
+          Your session has expired. Please re-authenticate.
       </p>
     </div>
   </div>
 );
 
-
-export const SessionLostContainer = () => {
-  return <SessionLost />;
-};
-
-export default SessionLostContainer;
+export default SessionLost;

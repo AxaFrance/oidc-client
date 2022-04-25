@@ -1,6 +1,7 @@
 import * as React from 'react';
+import {PropsWithChildren} from "react";
 
-const Loading = () => (
+const Loading : PropsWithChildren<any> = () => (
   <span className="oidc-loading">
     Loading
   </span>
