@@ -4,7 +4,7 @@ import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
-import {SessionLostProps} from "./core/default-component/SessionLost.component";
+import {ComponentOidcProps} from "./core/default-component/ComponentTypes";
 
 
 export type oidcContext = {
@@ -15,12 +15,12 @@ const defaultEventState = {name:"", data:null};
 
 export type OidcProviderProps = {
     callbackSuccessComponent?: ComponentType;
-    callbackErrorComponent?: ComponentType;
-    sessionLostComponent?: FC<PropsWithChildren<SessionLostProps>>;
-    authenticatingComponent?: ComponentType;
-    loadingComponent?: ComponentType;
-    authenticatingErrorComponent?: ComponentType;
-    serviceWorkerNotSupportedComponent?: ComponentType;
+    callbackErrorComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
+    sessionLostComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
+    authenticatingComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
+    loadingComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
+    authenticatingErrorComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
+    serviceWorkerNotSupportedComponent?: FC<PropsWithChildren<ComponentOidcProps>>;
     configurationName?: string;
     configuration?: OidcConfiguration;
     children: any;
@@ -58,6 +58,14 @@ const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({loadingComponent
             )}
         </>
     );
+}
+
+const Switch = ({isLoading, loadingComponent, children}) => {
+    const LoadingComponent = loadingComponent;
+    if(isLoading){
+        return <LoadingComponent>{children}</LoadingComponent>;
+    }
+    return <>{children}</>;
 }
 
 
@@ -109,43 +117,49 @@ sessionLostComponent=SessionLost }) => {
     const ServiceWorkerNotSupportedComponent = serviceWorkerNotSupportedComponent;
     const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
+    const isLoading = (loading || (currentConfigurationName != configurationName ));
+    
     switch(event.name){
         case Oidc.eventNames.service_worker_not_supported_by_browser:
-            return <ServiceWorkerNotSupportedComponent />;
+            return <Switch loadingComponent={LoadingComponent} isLoading={isLoading}>
+                <ServiceWorkerNotSupportedComponent>
+                    {children}
+                </ServiceWorkerNotSupportedComponent>
+            </Switch>;
         case Oidc.eventNames.loginAsync_begin:
-            return <AuthenticatingComponent />;
+            return  <Switch loadingComponent={LoadingComponent} isLoading={isLoading}>
+                <AuthenticatingComponent>
+                    {children}
+                </AuthenticatingComponent>
+            </Switch>;
         case Oidc.eventNames.loginAsync_error:
         case Oidc.eventNames.loginCallbackAsync_error:
-            return <AuthenticatingErrorComponent />;
+            return <Switch loadingComponent={LoadingComponent} isLoading={isLoading}>
+                <AuthenticatingErrorComponent>
+                    {children}
+                </AuthenticatingErrorComponent>;
+            </Switch>;
         case Oidc.eventNames.refreshTokensAsync_error:
-            return <> {(loading || (currentConfigurationName != configurationName )) ? (
-                <LoadingComponent/>
-            ) : (<SessionLostComponent>
-                {children}
-            </SessionLostComponent>)} 
-                </>;
+            return <Switch loadingComponent={LoadingComponent} isLoading={isLoading}>
+                <SessionLostComponent>
+                    {children}
+                </SessionLostComponent> 
+            </Switch>;
         default:
             // @ts-ignore
             return (
-                <>
-                    {(loading || (currentConfigurationName != configurationName )) ? (
-                        <LoadingComponent/>
-                    ) : (
-                            <>
-                                  <OidcRoutes redirect_uri={configuration.redirect_uri}
-                                              silent_redirect_uri={configuration.silent_redirect_uri}
-                                              callbackSuccessComponent={callbackSuccessComponent} 
-                                              callbackErrorComponent={callbackErrorComponent}
-                                              authenticatingComponent={authenticatingComponent}
-                                              configurationName={configurationName}
-                                                >
-                                      <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>
-                                        {children}
-                                      </OidcSession>
-                                </OidcRoutes>
-                            </> 
-                    )}
-                </>
+                <Switch loadingComponent={LoadingComponent} isLoading={isLoading}>
+                      <OidcRoutes redirect_uri={configuration.redirect_uri}
+                                  silent_redirect_uri={configuration.silent_redirect_uri}
+                                  callbackSuccessComponent={callbackSuccessComponent} 
+                                  callbackErrorComponent={callbackErrorComponent}
+                                  authenticatingComponent={authenticatingComponent}
+                                  configurationName={configurationName}>
+                          <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>
+                            {children}
+                          </OidcSession>
+                      </OidcRoutes>
+                </Switch>
             );
     }
 };

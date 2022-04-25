@@ -1,6 +1,11 @@
 ﻿import React, {useState} from 'react';
 import {OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken} from "./oidc";
 import { configurationIdentityServer, configurationGoogle} from "./configurations";
+import AuthenticatingError from "./override/AuthenticateError.component"
+import Authenticating from "./override/Authenticating.component"
+import Loading from "./override/Loading.component"
+import SessionLost from "./override/SessionLost.component"
+import ServiceWorkerNotSupported from "./override/ServiceWorkerNotSupported.component"
 
 const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
     const { login, logout, isAuthenticated} = useOidc(configurationName);
@@ -51,7 +56,14 @@ export const MultiAuthContainer = () => {
 
     }
     return (
-        <OidcProvider configuration={configurations[configurationName]} configurationName={configurationName}>
+        <OidcProvider configuration={configurations[configurationName]} 
+                      configurationName={configurationName}
+                    //  loadingComponent={Loading}
+                      authenticatingErrorComponent={AuthenticatingError}
+                      authenticatingComponent={Authenticating}
+                      sessionLostComponent={SessionLost}
+                      serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
+        >
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
             <DisplayAccessToken configurationName={configurationName} />
         </OidcProvider>
