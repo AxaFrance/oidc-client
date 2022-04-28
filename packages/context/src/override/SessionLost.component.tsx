@@ -1,8 +1,8 @@
-import React, {PropsWithChildren} from 'react';
+import React, {ComponentType, PropsWithChildren} from 'react';
 import {style} from "./style"
 import {useOidc} from "../oidc";
 
-export const SessionLost: PropsWithChildren<any> = ({children, configurationName}) => {
+export const SessionLost: ComponentType<any> = ({configurationName}) => {
     const { login} = useOidc(configurationName);
 
     return (<>
@@ -15,8 +15,6 @@ export const SessionLost: PropsWithChildren<any> = ({children, configurationName
             <button type="button" className="btn btn-primary" onClick={() => login(null)}>Login</button>
         </div>
       </div>
-            <div>
-    {children}</div>
     </>)
 };
 

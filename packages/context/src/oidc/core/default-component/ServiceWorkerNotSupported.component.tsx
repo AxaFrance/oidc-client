@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {PropsWithChildren} from "react";
+import {ComponentType} from "react";
 
-const ServiceWorkerNotSupported : PropsWithChildren<any> = () => (
+const ServiceWorkerNotSupported : ComponentType<any> = () => (
   <div className="oidc-serviceworker">
     <div className="oidc-serviceworker__container">
       <h1 className="oidc-serviceworker__title">Unable to authenticate on this browser</h1>

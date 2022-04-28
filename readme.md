@@ -223,7 +223,7 @@ Internally, native History API is used to be router library agnostic.
 
 More information about OIDC
 - French: https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284 
-- English: coming soon
+- English: https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d
 
 ## Migrations
 

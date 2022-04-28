@@ -1,4 +1,4 @@
-import React, { useEffect, PropsWithChildren} from 'react';
+import React, {useEffect, ComponentType} from 'react';
 import Oidc from "../../vanilla/oidc";
 import {OidcSecure} from "../../OidcSecure";
 
@@ -22,7 +22,7 @@ const CallBack = ({configurationName}) =>{
     return <></>;
 }
 
-const CallbackManager: PropsWithChildren<any> = ({configurationName }) => {
+const CallbackManager: ComponentType<any> = ({configurationName }) => {
     return <OidcSecure configurationName={configurationName}>
         <CallBack configurationName={configurationName}/>
     </OidcSecure>;
