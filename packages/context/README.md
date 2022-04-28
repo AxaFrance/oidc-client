@@ -144,6 +144,13 @@ const propTypes = {
     silent_signin_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
+    authority_configuration: PropTypes.shape({ // Optional if you want to use a different authority than the default or you want to skip CORS
+      authorization_endpoint: PropTypes.string,
+      token_endpoint: PropTypes.string,
+      userinfo_endpoint: PropTypes.string,
+      end_session_endpoint: PropTypes.string,
+      revocation_endpoint: PropTypes.string,
+    }),
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
