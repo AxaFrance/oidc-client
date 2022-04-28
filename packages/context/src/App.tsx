@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { Home } from "./Home";
 import { Profile, SecureProfile } from "./Profile";
-import { configurationAuth0, configurationIdentityServer } from './configurations';
+import { configurationAuth0, configurationIdentityServer, configurationIdentityServerWithoutDiscovery } from './configurations';
 import { withOidcSecure, OidcProvider } from "./oidc";
 import {FetchUserHoc, FetchUserHook} from "./FetchUser";
 import { MultiAuthContainer } from "./MultiAuth";
@@ -10,7 +10,7 @@ import { MultiAuthContainer } from "./MultiAuth";
 function App() {
   const [show, setShow] = React.useState(false);
   return (
-    <OidcProvider configuration={configurationIdentityServer}>
+    <OidcProvider configuration={configurationIdentityServerWithoutDiscovery}>
       <Router>
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
           <a className="navbar-brand" href="/">@axa-fr/react-oidc-context</a>

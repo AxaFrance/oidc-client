@@ -2,6 +2,7 @@ import {
     AuthorizationNotifier,
     AuthorizationRequest,
     AuthorizationServiceConfiguration,
+    AuthorizationServiceConfigurationJson,
     BaseTokenRequestHandler,
     DefaultCrypto,
     FetchRequestor,
@@ -59,18 +60,19 @@ export interface StringMap {
     [key: string]: string;
 }
 
- export type OidcConfiguration = {
+export type OidcConfiguration = {
     client_id: string,
     redirect_uri: string,
-     silent_redirect_uri?:string,
-     silent_signin_timeout?:number,
+    silent_redirect_uri?:string,
+    silent_signin_timeout?:number,
     scope: string,
     authority: string,
+    authority_configuration?: AuthorizationServiceConfigurationJson,
     refresh_time_before_tokens_expiration_in_second?: number,
     service_worker_relative_url?:string,
-     service_worker_only?:boolean,
-     extras?:StringMap
-     token_request_extras?:StringMap, 
+    service_worker_only?:boolean,
+    extras?:StringMap
+    token_request_extras?:StringMap,
 };
 
 const oidcDatabase = {};
@@ -295,8 +297,13 @@ export class Oidc {
         });
         return promise;
     }
-    async initAsync(authority) {
-        const oidcServerConfiguration = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
+    async initAsync(authority, authority_configuration?) {
+        let oidcServerConfiguration
+        if (authority_configuration != null) {
+            oidcServerConfiguration = authority_configuration;
+        } else {
+            oidcServerConfiguration = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
+        }
         return oidcServerConfiguration;
     }
     
@@ -308,7 +315,7 @@ export class Oidc {
         this.publishEvent(eventNames.tryKeepExistingSessionAsync_begin, {});
         try {
             const configuration = this.configuration;
-            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
             serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             if(serviceWorker) {
                 const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
@@ -367,7 +374,7 @@ export class Oidc {
                 throw new Error("Login from iframe is forbidden");
             }
             let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
             if(serviceWorker && installServiceWorker) {
                 const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync()
                 if(!isServiceWorkerProxyActive) {
@@ -409,7 +416,7 @@ export class Oidc {
             const clientId = configuration.client_id;
             const redirectURL = configuration.redirect_uri;
             const authority =  configuration.authority;
-            const oidcServerConfiguration = await this.initAsync(authority);
+            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
             if(serviceWorker){
@@ -488,6 +495,7 @@ export class Oidc {
             const clientId = configuration.client_id;
             const redirectUri = configuration.redirect_uri;
             const authority =  configuration.authority;
+            const authority_configuration = configuration.authority_configuration
 
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
 
@@ -509,7 +517,7 @@ export class Oidc {
                 extras
                 });
             
-            const oidcServerConfiguration = await this.initAsync(authority);
+            const oidcServerConfiguration = await this.initAsync(authority, authority_configuration);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
             this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end, token_response);
             return token_response;
@@ -551,7 +559,7 @@ export class Oidc {
      }
      
     async logoutAsync() {
-        const oidcServerConfiguration = await this.initAsync(this.configuration.authority);
+        const oidcServerConfiguration = await this.initAsync(this.configuration.authority, this.configuration.authority_configuration);
         // TODO implement real logout
         await this.destroyAsync();  
         if(oidcServerConfiguration.endSessionEndpoint) {
