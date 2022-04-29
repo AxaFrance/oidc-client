@@ -59,6 +59,7 @@ export interface StringMap {
     [key: string]: string;
 }
 
+const refresh_token_scope = "offline_access";
  export type OidcConfiguration = {
     client_id: string,
     redirect_uri: string,
@@ -482,13 +483,31 @@ export class Oidc {
     }
 
     async refreshTokensAsync(refreshToken, silentEvent = false) {
+        const localSilentSigninAsync= async (exception=null) => {
+            try {
+                const silent_token_response = await this.silentSigninAsync();
+                if (silent_token_response) {
+                    return silent_token_response;
+                }
+            } catch (exceptionSilent) {
+                console.error(exceptionSilent);
+            }
+
+            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_error : eventNames.refreshTokensAsync_error, exception);
+            return null;
+        }
+
         try{
             this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_begin : eventNames.refreshTokensAsync_begin, {})
             const configuration = this.configuration;
             const clientId = configuration.client_id;
             const redirectUri = configuration.redirect_uri;
             const authority =  configuration.authority;
-
+            
+            if(!configuration.scope.split(" ").find(s => s === refresh_token_scope))
+            {
+                return await localSilentSigninAsync();
+            }
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
 
             let extras = undefined;
@@ -515,17 +534,7 @@ export class Oidc {
             return token_response;
         } catch(exception) {
             console.error(exception);
-            try {
-                const silent_token_response = await this.silentSigninAsync();
-                if (silent_token_response) {
-                    return silent_token_response;
-                }
-            } catch(exceptionSilent) {
-                console.error(exceptionSilent);
-            }
-            
-            this.publishEvent( silentEvent ? eventNames.refreshTokensAsync_silent_error :eventNames.refreshTokensAsync_error, exception);
-            return null;
+            return await localSilentSigninAsync(exception);
         }
      }
      

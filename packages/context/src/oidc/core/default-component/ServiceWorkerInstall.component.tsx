@@ -1,9 +1,9 @@
-import React, { useEffect, useState, PropsWithChildren} from 'react';
+import React, {useEffect, useState, ComponentType} from 'react';
 import AuthenticatingError from "./AuthenticateError.component";
 import Oidc from "../../vanilla/oidc";
 import Authenticating from "./Authenticating.component";
 
-const ServiceWorkerInstall: PropsWithChildren<any> = ({callBackError, authenticating, configurationName }) => {
+const ServiceWorkerInstall: ComponentType<any> = ({callBackError, authenticating, configurationName }) => {
     const getOidc =  Oidc.get;
     const [error, setError] = useState(false);
     const [isLoading, setLoading] = useState(true);

@@ -5,7 +5,6 @@ import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
 
-
 export type oidcContext = {
     getOidc: Function;
 };
@@ -13,16 +12,17 @@ export type oidcContext = {
 const defaultEventState = {name:"", data:null};
 
 export type OidcProviderProps = {
-    callbackSuccessComponent?: PropsWithChildren<any>;
-    callbackErrorComponent?: PropsWithChildren<any>;
-    sessionLostComponent?: PropsWithChildren<any>;
-    authenticatingComponent?: PropsWithChildren<any>;
-    loadingComponent?: PropsWithChildren<any>;
-    authenticatingErrorComponent?: PropsWithChildren<any>;
-    serviceWorkerNotSupportedComponent?: PropsWithChildren<any>;
+    callbackSuccessComponent?: ComponentType<any>;
+    callbackErrorComponent?: ComponentType<any>;
+    sessionLostComponent?: ComponentType<any>;
+    authenticatingComponent?: ComponentType<any>;
+    loadingComponent?: ComponentType<any>;
+    authenticatingErrorComponent?: ComponentType<any>;
+    serviceWorkerNotSupportedComponent?: ComponentType<any>;
     configurationName?: string;
     configuration?: OidcConfiguration;
     children: any;
+    onSessionLost?: Function,
 };
 
 export type OidcSessionProps = {
@@ -78,9 +78,8 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              loadingComponent = Loading,
                                                                              serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
                                                                              authenticatingErrorComponent = AuthenticatingError,
-    
-    
-sessionLostComponent=SessionLost }) => {
+                                                                             sessionLostComponent=SessionLost,
+                                                                             onSessionLost=null}) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
     }
@@ -91,11 +90,17 @@ sessionLostComponent=SessionLost }) => {
     useEffect(() => {
         const oidc = getOidc(configurationName);
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
-            if (name == Oidc.eventNames.loginAsync_begin
+            if(name == Oidc.eventNames.refreshTokensAsync_error){
+                if(onSessionLost != null){
+                    onSessionLost();
+                    return;
+                }
+                setEvent({name, data});
+            }
+            else if (name == Oidc.eventNames.loginAsync_begin
                 || name == Oidc.eventNames.loginCallbackAsync_end
                 || name == Oidc.eventNames.loginAsync_error
                 || name == Oidc.eventNames.loginCallbackAsync_error
-                || name == Oidc.eventNames.refreshTokensAsync_error
             ) {
                 setEvent({name, data});
             } else if (name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
@@ -120,31 +125,24 @@ sessionLostComponent=SessionLost }) => {
 
     const isLoading = (loading || (currentConfigurationName != configurationName ));
     
-    switch(event.name){
+    let eventName = event.name;
+    switch(eventName){
         case Oidc.eventNames.service_worker_not_supported_by_browser:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
-                <ServiceWorkerNotSupportedComponent configurationName={configurationName} >
-                    {children}
-                </ServiceWorkerNotSupportedComponent>
+                <ServiceWorkerNotSupportedComponent configurationName={configurationName} />
             </Switch>;
         case Oidc.eventNames.loginAsync_begin:
             return  <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
-                <AuthenticatingComponent configurationName={configurationName}>
-                    {children}
-                </AuthenticatingComponent>
+                <AuthenticatingComponent configurationName={configurationName} />
             </Switch>;
         case Oidc.eventNames.loginAsync_error:
         case Oidc.eventNames.loginCallbackAsync_error:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
-                <AuthenticatingErrorComponent configurationName={configurationName}>
-                    {children}
-                </AuthenticatingErrorComponent>;
+                <AuthenticatingErrorComponent configurationName={configurationName} />;
             </Switch>;
         case Oidc.eventNames.refreshTokensAsync_error:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
-                <SessionLostComponent configurationName={configurationName}>
-                    {children}
-                </SessionLostComponent> 
+                <SessionLostComponent configurationName={configurationName} /> 
             </Switch>;
         default:
             return (

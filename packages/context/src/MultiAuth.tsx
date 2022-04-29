@@ -10,11 +10,22 @@ import ServiceWorkerNotSupported from "./override/ServiceWorkerNotSupported.comp
 
 const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
     const { login, logout, isAuthenticated} = useOidc(configurationName);
+    const [fname, setFname] = useState("")
+
+    const handleChange = e => {
+        setFname(e.target.value)
+    }
     return (
         <div className="container-fluid mt-3">
             <div className="card">
                 <div className="card-body">
-                    <h5 className="card-title">Work in progress</h5>
+                    <h5 className="card-title">Multiple Authentication</h5>
+                    <form>
+                        <label>
+                            First Name:{" "}
+                            <input type="text" value={fname} onChange={handleChange} />
+                        </label>
+                    </form>
                     <p className="card-text">React Demo Application protected by OpenId Connect with MultipleAuthentication.
                         <br/>For example, config_1 can have other sensitive scope, config_2 does not ask for the "offline_access" so it does not retrieve the most sensitive token "refresh_token" for very sensitive operation, it retrive only access_token valid for a small amout of time.</p>
                     <select value={configurationName} onChange={handleConfigurationChange} >
@@ -35,6 +46,7 @@ if(!sessionStorage.configurationName){
 }
 
 export const MultiAuthContainer = () => {
+    const [isSessionLost, setIsSessionLost] = useState(false)
     const [configurationName, setConfigurationName] = useState(sessionStorage.configurationName);
     const callBack = window.location.origin+"/multi-auth/authentification/callback2";
     const silent_redirect_uri = window.location.origin+"/multi-auth/authentification/silent-callback2";
@@ -56,19 +68,27 @@ export const MultiAuthContainer = () => {
         setConfigurationName(configurationName);
 
     }
+
+    const onSessionLost = ()=>{
+        setIsSessionLost(true);
+    }
+    
     return (
+        <>
         <OidcProvider configuration={configurations[configurationName]} 
                       configurationName={configurationName}
                       loadingComponent={Loading}
                       authenticatingErrorComponent={AuthenticatingError}
                       authenticatingComponent={Authenticating}
-                      sessionLostComponent={SessionLost}
                       serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
                       callbackSuccessComponent={CallBackSuccess}
+                      onSessionLost={onSessionLost}
         >
+            { isSessionLost && <SessionLost configurationName={configurationName}/>}
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
             <DisplayAccessToken configurationName={configurationName} />
         </OidcProvider>
+    </>
     );
 };
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {PropsWithChildren} from "react";
+import {ComponentType} from "react";
 
-const AuthenticatingError: PropsWithChildren<any> = () => (
+const AuthenticatingError: ComponentType<any> = () => (
   <div className="oidc-authenticating">
     <div className="oidc-authenticating__container">
       <h1 className="oidc-authenticating__title">Error authentication</h1>

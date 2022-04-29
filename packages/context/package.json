@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-context",
-  "version": "5.4.2",
+  "version": "5.5.0-alpha0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -16,11 +16,11 @@
   ],
   "keywords": [
     "oidc",
-    "context-api",
     "OpenID Connect",
     "openid",
     "oauth2",
-    "react-component"
+    "oauth",
+    "react"
   ],
   "scripts": {
     "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcTrustedDomains.js ./public",

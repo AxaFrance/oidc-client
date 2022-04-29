@@ -1,15 +1,12 @@
 import * as React from 'react';
-import {PropsWithChildren} from "react";
+import {ComponentType, PropsWithChildren} from "react";
 import {style} from "./style";
 
-const Loading :  PropsWithChildren<any> = ({children, configurationName}) => (
+const Loading :  ComponentType<any> = ({children, configurationName}) => (
   <>
       <span className="oidc-loading" style={style}>
     Loading for {configurationName}
   </span>
-      <div>
-      {children}
-      </div>
       </>
 );
 

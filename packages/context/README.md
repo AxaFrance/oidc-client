@@ -110,7 +110,7 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
-  scope: 'openid profile email api offline_access',
+  scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
   service_worker_only:false,
@@ -137,6 +137,7 @@ const propTypes = {
   callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
   callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
   serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
+  onSessionLost: PropTypes.function, // If set "sessionLostComponent" is not displayed and onSessionLost callback is called instead
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
@@ -418,7 +419,7 @@ export const FetchUserHoc= () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure
 ## Components override
 
 You can inject your own components. 
-All components definition receive props "children" and "configurationName". Please checkout and the the demo for more complexe exemple.
+All components definition receive props "configurationName". Please checkout and the the demo for more complexe exemple.
 
 ```javascript
 
@@ -449,15 +450,23 @@ const SessionLost = () => <p>Session Lost</p>
 const ServiceWorkerNotSupported = () => <p>Not supported</p>
 const CallBackSuccess = () => <p>Success</p>
 
+//const [isSessionLost, setIsSessionLost] = useState(false);
+
+//const onSessionLost = ()=>{
+//  setIsSessionLost(true);
+//}
+
 const App = () => (
     <OidcProvider configuration={configuration}
                   loadingComponent={Loading}
                   authenticatingErrorComponent={AuthenticatingError}
                   authenticatingComponent={Authenticating}
                   sessionLostComponent={SessionLost}
+                  //onSessionLost={onSessionLost} // If set "sessionLostComponent" is not displayed and onSessionLost callback is called instead
                   serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
                   callbackSuccessComponent={CallBackSuccess}
     >
+      {/* isSessionLost && <SessionLost />*/}
       <Router>
         <Header />
         <Routes />
@@ -476,7 +485,7 @@ Internally, native History API is used to be router library agnostic.
 
 More information about OIDC
 - French: https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284
-- English: coming soon
+- English: https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d
 
 # Service Worker Support
 
