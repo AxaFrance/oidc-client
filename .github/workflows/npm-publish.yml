@@ -56,7 +56,7 @@ jobs:
         
       - id: publish-context
         uses: JS-DevTools/npm-publish@v1
-       # if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/context/package.json

@@ -95,6 +95,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
             if(name == Oidc.eventNames.refreshTokensAsync_error){
                 if(onSessionLost != null){
                     onSessionLost();
+                    return;
                 }
                 setEvent({name, data});
             }
