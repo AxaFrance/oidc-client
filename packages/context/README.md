@@ -137,6 +137,7 @@ const propTypes = {
   callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
   callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
   serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
+  onSessionLost: PropTypes.function, // If set "sessionLostComponent" is not displayed and onSessionLost callback is called instead
   configuration: PropTypes.shape({
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
@@ -418,7 +419,7 @@ export const FetchUserHoc= () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure
 ## Components override
 
 You can inject your own components. 
-All components definition receive props "children" and "configurationName". Please checkout and the the demo for more complexe exemple.
+All components definition receive props "configurationName". Please checkout and the the demo for more complexe exemple.
 
 ```javascript
 
@@ -449,15 +450,23 @@ const SessionLost = () => <p>Session Lost</p>
 const ServiceWorkerNotSupported = () => <p>Not supported</p>
 const CallBackSuccess = () => <p>Success</p>
 
+//const [isSessionLost, setIsSessionLost] = useState(false);
+
+//const onSessionLost = ()=>{
+//  setIsSessionLost(true);
+//}
+
 const App = () => (
     <OidcProvider configuration={configuration}
                   loadingComponent={Loading}
                   authenticatingErrorComponent={AuthenticatingError}
                   authenticatingComponent={Authenticating}
                   sessionLostComponent={SessionLost}
+                  //onSessionLost={onSessionLost} // If set "sessionLostComponent" is not displayed and onSessionLost callback is called instead
                   serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
                   callbackSuccessComponent={CallBackSuccess}
     >
+      {/* isSessionLost && <SessionLost />*/}
       <Router>
         <Header />
         <Routes />

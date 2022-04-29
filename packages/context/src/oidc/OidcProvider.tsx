@@ -80,9 +80,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              loadingComponent = Loading,
                                                                              serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
                                                                              authenticatingErrorComponent = AuthenticatingError,
-    
-    
-sessionLostComponent=SessionLost,
+                                                                             sessionLostComponent=SessionLost,
                                                                              onSessionLost=null}) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
@@ -94,11 +92,16 @@ sessionLostComponent=SessionLost,
     useEffect(() => {
         const oidc = getOidc(configurationName);
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
-            if (name == Oidc.eventNames.loginAsync_begin
+            if(name == Oidc.eventNames.refreshTokensAsync_error){
+                if(onSessionLost != null){
+                    onSessionLost();
+                }
+                setEvent({name, data});
+            }
+            else if (name == Oidc.eventNames.loginAsync_begin
                 || name == Oidc.eventNames.loginCallbackAsync_end
                 || name == Oidc.eventNames.loginAsync_error
                 || name == Oidc.eventNames.loginCallbackAsync_error
-                || name == Oidc.eventNames.refreshTokensAsync_error
             ) {
                 setEvent({name, data});
             } else if (name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
@@ -124,15 +127,6 @@ sessionLostComponent=SessionLost,
     const isLoading = (loading || (currentConfigurationName != configurationName ));
     
     let eventName = event.name;
-    if(onSessionLost != null && eventName === Oidc.eventNames.refreshTokensAsync_error){
-        eventName = "";
-        const runEventAsync = async () => {
-            await sleepAsync(1);
-            onSessionLost();
-        }
-        runEventAsync();
-    }
-    
     switch(eventName){
         case Oidc.eventNames.service_worker_not_supported_by_browser:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
