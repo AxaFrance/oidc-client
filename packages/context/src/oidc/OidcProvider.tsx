@@ -4,8 +4,6 @@ import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
-import {sleepAsync} from "./vanilla/initWorker";
-
 
 export type oidcContext = {
     getOidc: Function;
