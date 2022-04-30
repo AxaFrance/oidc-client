@@ -34,7 +34,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                         <option value="google">google</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
-                    {isAuthenticated && <button type="button" className="btn btn-primary" onClick={logout}>logout</button>}
+                    {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
                 </div>
             </div>
         </div>

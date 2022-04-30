@@ -5,11 +5,11 @@ const defaultConfigurationName = "default";
 export const useOidc =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
 
-    const login = (callbackPath=undefined, extras:StringMap=null) => {
+    const login = (callbackPath:string | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).loginAsync(callbackPath, extras);
     };
-    const logout = () => {
-        return getOidc(configurationName).logoutAsync();
+    const logout = (callbackPath: string | undefined = undefined) => {
+        return getOidc(configurationName).logoutAsync(callbackPath);
     };
 
     let isAuthenticated:boolean = false;

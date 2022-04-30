@@ -559,12 +559,19 @@ export class Oidc {
          timer.clearTimeout(this.timeoutId);
      }
      
-    async logoutAsync() {
+    async logoutAsync(callbackPath: string | undefined = undefined) {
         const oidcServerConfiguration = await this.initAsync(this.configuration.authority);
         // TODO implement real logout
+        if(callbackPath && (typeof callbackPath !== 'string'))
+        {
+            callbackPath = undefined;
+            console.warn('callbackPath path is not a string');
+        }
+        const path = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
+        const url = window.location.origin +path;
         await this.destroyAsync();  
         if(oidcServerConfiguration.endSessionEndpoint) {
-            window.location.href = oidcServerConfiguration.endSessionEndpoint;
+            window.location.href = oidcServerConfiguration.endSessionEndpoint + "?redirect_uri=" + encodeURI(url);
         }
         else{
             window.location.reload();
