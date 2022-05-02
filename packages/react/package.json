@@ -1,5 +1,5 @@
 {
-  "name": "@axa-fr/react-oidc-context",
+  "name": "@axa-fr/react-oidc",
   "version": "5.5.1",
   "private": false,
   "main": "dist/index.js",

@@ -1,4 +1,4 @@
-<H1> @axa-fr/react-oidc</H1>
+<H1> @axa-fr/react-oidc-context</H1>
 
 Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 
