@@ -40,26 +40,26 @@ jobs:
       - name: npm version ${{ steps.tag_version.outputs.new_tag }}
         if: github.ref == 'refs/heads/master'
         run: npm version ${{ steps.tag_version.outputs.new_tag }}
-        working-directory: ./packages/context
+        working-directory: ./packages/react
       
       - name: npm ci
         run: npm ci
-        working-directory: ./packages/context
+        working-directory: ./packages/react
 
       - name: npm prepare
         run: npm run prepare
-        working-directory: ./packages/context
+        working-directory: ./packages/react
         
       - name: npm test
         run: npm test -- --runInBand --coverage --watchAll=false
-        working-directory: ./packages/context
+        working-directory: ./packages/react
         
-      - id: publish-context
+      - id: publish-react
         uses: JS-DevTools/npm-publish@v1
         if: github.ref == 'refs/heads/master'
         with:
           token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/context/package.json
+          package: ./packages/react/package.json
 
       - name: npm version ${{ steps.tag_version.outputs.new_tag }}
         run: npm version ${{ steps.tag_version.outputs.new_tag }}

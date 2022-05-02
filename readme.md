@@ -20,7 +20,8 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [Run The Demo](#run-the-demo)
 - [How It Works](#how-it-works)
 - Packages
-  - [`@axa-fr/react-oidc-context`](./packages/context#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context)
+  - [`@axa-fr/react-oidc`](./packages/react#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc)
+  - [`@axa-fr/react-oidc-context`](./packages/context#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context) **Will be Deprecated in v6 renamed to @axa-fr/react-oidc**
   - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc)
   - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4 : use react-oidc-context which works with redux and in fact does not use any react context**
@@ -68,7 +69,7 @@ Work perfectly well with :
 
 ### Getting Started React using create-react-app
 ```sh
-npm install @axa-fr/react-oidc-context copyfiles --save
+npm install @axa-fr/react-oidc copyfiles --save
 ```
 
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
@@ -80,7 +81,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 #package.json
 {
     "scripts": {
-        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc/dist/OidcTrustedDomains.js ./public",
         "start:server": "react-scripts start",
         "build:server": "npm run copy && react-scripts build",
         "prepare": "npm run copy"
@@ -92,7 +93,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { OidcProvider } from '@axa-fr/react-oidc-context';
+import { OidcProvider } from '@axa-fr/react-oidc';
 import Header from './Layout/Header';
 import Routes from './Router';
 
@@ -133,7 +134,7 @@ const trustedDomains = {
 
 ```javascript
 import React from 'react';
-import { OidcSecure } from '@axa-fr/react-oidc-context';
+import { OidcSecure } from '@axa-fr/react-oidc';
 
 const AdminSecure = () => (
   <OidcSecure>
@@ -147,7 +148,7 @@ export default AdminSecure;
 How to get IDToken
 
 ```javascript
-import { useOidcIdToken } from '@axa-fr/react-oidc-context';
+import { useOidcIdToken } from '@axa-fr/react-oidc';
 
 const DisplayIdToken =() => {
     const{ idToken, idTokenPayload } = useOidcIdToken();
@@ -172,7 +173,7 @@ const DisplayIdToken =() => {
 How to get User Information
 
 ```javascript
-import {useOidcUser} from '@axa-fr/react-oidc-context';
+import {useOidcUser} from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = () => {
   const {oidcUser, oidcUserLoadingState} = useOidcUser();
@@ -199,7 +200,7 @@ const DisplayUserInfo = () => {
 ```
 
 More documentation :
-- [`@axa-fr/react-oidc-context`](./packages/context#readme)
+- [`@axa-fr/react-oidc-context`](./packages/react#readme)
 
 ### Getting Started Vanilla
 

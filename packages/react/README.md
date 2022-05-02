@@ -47,7 +47,7 @@ It use AppAuthJS behind the scene.
 # Getting Started
 
 ```sh
-npm install @axa-fr/react-oidc-context copyfiles --save
+npm install @axa-fr/react-oidc copyfiles --save
 ```
 
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
@@ -59,7 +59,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 #package.json
 {
     "scripts": {
-        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc/dist/OidcTrustedDomains.js ./public",
         "start:server": "react-scripts start",
         "build:server": "npm run copy && react-scripts build",
         "prepare": "npm run copy"
@@ -79,7 +79,7 @@ const trustedDomains = {
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd react-oidc/packages/context
+cd react-oidc/packages/react
 npm install
 npm start
 # then navigate to http://localhost:4200
@@ -99,7 +99,7 @@ The default routes used internally :
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { OidcProvider } from '@axa-fr/react-oidc-context';
+import { OidcProvider } from '@axa-fr/react-oidc';
 import Header from './Layout/Header';
 import Routes from './Router';
 
@@ -190,7 +190,7 @@ The Hook method exposes :
 
 ```javascript
 import React from 'react';
-import { OidcSecure } from '@axa-fr/react-oidc-context';
+import { OidcSecure } from '@axa-fr/react-oidc';
 
 const AdminSecure = () => (
   <OidcSecure>
@@ -209,7 +209,7 @@ export default AdminSecure;
 ```javascript
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import { withOidcSecure } from '@axa-fr/react-oidc-context';
+import { withOidcSecure } from '@axa-fr/react-oidc';
 import Home from '../Pages/Home';
 import Dashboard from '../Pages/Dashboard';
 import Admin from '../Pages/Admin';
@@ -229,7 +229,7 @@ export default Routes;
 ## How to get "Access Token" : Hook method
 
 ```javascript
-import { useOidcAccessToken } from '@axa-fr/react-oidc-context';
+import { useOidcAccessToken } from '@axa-fr/react-oidc';
 
 const DisplayAccessToken = () => {
     const{ accessToken, accessTokenPayload } = useOidcAccessToken();
@@ -253,7 +253,7 @@ const DisplayAccessToken = () => {
 ## How to get IDToken : Hook method
 
 ```javascript
-import { useOidcIdToken } from '@axa-fr/react-oidc-context';
+import { useOidcIdToken } from '@axa-fr/react-oidc';
 
 const DisplayIdToken =() => {
     const{ idToken, idTokenPayload } = useOidcIdToken();
@@ -279,7 +279,7 @@ const DisplayIdToken =() => {
 ## How to get User Information : Hook method
 
 ```javascript
-import { useOidcUser, UserStatus } from '@axa-fr/react-oidc-context';
+import { useOidcUser, UserStatus } from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = () => {
   const{ oidcUser, oidcUserLoadingState } = useOidcUser();
@@ -312,7 +312,7 @@ This Hook give you a wrapped fetch that add the access token for you.
 
 ```javascript
 import React, {useEffect, useState} from 'react';
-import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = ({ fetch }) => {
   const [oidcUser, setOidcUser] = useState(null);
@@ -368,7 +368,7 @@ This HOC give you a wrapped fetch that add the access token for you.
 
 ```javascript
 import React, {useEffect, useState} from 'react';
-import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = ({ fetch }) => {
   const [oidcUser, setOidcUser] = useState(null);
