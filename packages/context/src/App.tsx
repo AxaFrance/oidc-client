@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { Home } from "./Home";
 import { Profile, SecureProfile } from "./Profile";
-import { configurationAuth0, configurationIdentityServer } from './configurations';
+import { configurationAuth0, configurationIdentityServer, configurationIdentityServerWithoutDiscovery } from './configurations';
 import { withOidcSecure, OidcProvider } from "./oidc";
 import {FetchUserHoc, FetchUserHook} from "./FetchUser";
 import { MultiAuthContainer } from "./MultiAuth";
