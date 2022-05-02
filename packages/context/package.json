@@ -26,7 +26,7 @@
   "scripts": {
     "clean": "rimraf dist && rimraf src",
     "copy": "copyfiles -f ../react/src/**/*.ts ./src",
-    "prepare": "npm run clean && npm run copy && && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist"
+    "prepare": "npm run clean && npm run copy && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist"
   },
   "license": "MIT",
   "publishConfig": {
