@@ -59,6 +59,14 @@ export interface StringMap {
     [key: string]: string;
 }
 
+export interface AuthorityConfiguration {
+    authorization_endpoint: string;
+    token_endpoint: string;
+    revocation_endpoint: string;
+    end_session_endpoint?: string;
+    userinfo_endpoint?: string;
+}
+
 const refresh_token_scope = "offline_access";
  export type OidcConfiguration = {
     client_id: string,
@@ -67,6 +75,7 @@ const refresh_token_scope = "offline_access";
      silent_signin_timeout?:number,
     scope: string,
     authority: string,
+     authority_configuration?: AuthorityConfiguration,
     refresh_time_before_tokens_expiration_in_second?: number,
     service_worker_relative_url?:string,
      service_worker_only?:boolean,
@@ -127,7 +136,7 @@ const userInfoAsync = async (oidc) => {
     }
     const accessToken = oidc.tokens.accessToken;
 
-    const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority);
+    const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
    const url = oidcServerConfiguration.userInfoEndpoint;
    const fetchUserInfo = async (accessToken) => {
        const res = await fetch(url, {
@@ -296,9 +305,16 @@ export class Oidc {
         });
         return promise;
     }
-    async initAsync(authority) {
-        const oidcServerConfiguration = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
-        return oidcServerConfiguration;
+    async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
+        if (authorityConfiguration != null) {
+            return new AuthorizationServiceConfiguration( {
+                authorization_endpoint: authorityConfiguration.authorization_endpoint,
+                end_session_endpoint: authorityConfiguration.end_session_endpoint,
+                revocation_endpoint: authorityConfiguration.revocation_endpoint,
+                token_endpoint: authorityConfiguration.token_endpoint,
+                userinfo_endpoint: authorityConfiguration.userinfo_endpoint});
+        }
+        return await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
     }
     
     async tryKeepExistingSessionAsync() {
@@ -309,7 +325,7 @@ export class Oidc {
         this.publishEvent(eventNames.tryKeepExistingSessionAsync_begin, {});
         try {
             const configuration = this.configuration;
-            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
             serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             if(serviceWorker) {
                 const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
@@ -368,7 +384,7 @@ export class Oidc {
                 throw new Error("Login from iframe is forbidden");
             }
             let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-            const oidcServerConfiguration = await this.initAsync(configuration.authority);
+            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
             if(serviceWorker && installServiceWorker) {
                 const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync()
                 if(!isServiceWorkerProxyActive) {
@@ -410,7 +426,7 @@ export class Oidc {
             const clientId = configuration.client_id;
             const redirectURL = configuration.redirect_uri;
             const authority =  configuration.authority;
-            const oidcServerConfiguration = await this.initAsync(authority);
+            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
             if(serviceWorker){
@@ -528,7 +544,7 @@ export class Oidc {
                 extras
                 });
             
-            const oidcServerConfiguration = await this.initAsync(authority);
+            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
             this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end, token_response);
             return token_response;
@@ -560,7 +576,8 @@ export class Oidc {
      }
      
     async logoutAsync(callbackPath: string | undefined = undefined) {
-        const oidcServerConfiguration = await this.initAsync(this.configuration.authority);
+        const configuration = this.configuration;
+        const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         // TODO implement real logout
         if(callbackPath && (typeof callbackPath !== 'string'))
         {
