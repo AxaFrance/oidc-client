@@ -34,7 +34,6 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 
 These libraries is used to manage client authentication.
 
-
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
   - OIDC using client side Code Credential Grant with pkce only
@@ -43,11 +42,11 @@ These libraries is used to manage client authentication.
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
 - **No cookies problem** : You can disable silent signin (that internally use an iframe)
-- **Multiple Authentification** :
-  - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
+- **Multiple Authentication** :
+  - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
 - **Flexible** :
-  - Work with Service Worker (more secure) and whithout for older browser (less secure)
+  - Work with Service Worker (more secure) and without for older browser (less secure)
 
 <p align="center">
     <img src="./docs/img/schema_pcke_client_side_with_service_worker.png"
@@ -200,7 +199,7 @@ const DisplayUserInfo = () => {
 ```
 
 More documentation :
-- [`@axa-fr/react-oidc-context`](./packages/react#readme)
+- [`@axa-fr/react-oidc`](./packages/react#readme)
 
 ### Getting Started Vanilla
 
@@ -211,7 +210,7 @@ More documentation :
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd react-oidc/packages/context
+cd react-oidc/packages/react
 npm install
 npm start
 # then navigate to http://localhost:4200
@@ -219,7 +218,7 @@ npm start
 
 ## How It Works
 
-These components encapsulate the use of "AppAuth-JS" in order to hide workfow complexity.
+These components encapsulate the use of "AppAuth-JS" in order to hide workflow complexity.
 Internally, native History API is used to be router library agnostic.
 
 More information about OIDC
