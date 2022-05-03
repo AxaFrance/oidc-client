@@ -75,7 +75,7 @@ jobs:
         run: npm run prepare
         working-directory: ./packages/context
 
-      - id: publish-vanilla
+      - id: publish-reacr
         uses: JS-DevTools/npm-publish@v1
        # if: github.ref == 'refs/heads/master'
         with:
