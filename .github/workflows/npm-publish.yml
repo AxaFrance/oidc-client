@@ -67,8 +67,8 @@ jobs:
         run: npm version ${{ steps.tag_version.outputs.new_tag }}
         working-directory: ./packages/context
 
-      - name: npm ci
-        run: npm ci
+      - name: npm install
+        run: npm install
         working-directory: ./packages/context
 
       - name: npm prepare
