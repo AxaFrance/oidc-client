@@ -20,8 +20,9 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [Run The Demo](#run-the-demo)
 - [How It Works](#how-it-works)
 - Packages
-  - [`@axa-fr/react-oidc-context`](./packages/context#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context)
+  - [`@axa-fr/react-oidc`](./packages/react#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc)
   - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc)
+  - [`@axa-fr/react-oidc-context`](./packages/context#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context) **Will be deprecated in v6: has been renamed to @axa-fr/react-oidc**
   - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4 : use react-oidc-context which works with redux and in fact does not use any react context**
   - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4**
@@ -33,7 +34,6 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 
 These libraries is used to manage client authentication.
 
-
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
   - OIDC using client side Code Credential Grant with pkce only
@@ -42,11 +42,11 @@ These libraries is used to manage client authentication.
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
 - **No cookies problem** : You can disable silent signin (that internally use an iframe)
-- **Multiple Authentification** :
-  - You can authenticate many times to the same provider with different scope (for exemple you can acquire a new 'payment' scope for a payment)
+- **Multiple Authentication** :
+  - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
 - **Flexible** :
-  - Work with Service Worker (more secure) and whithout for older browser (less secure)
+  - Work with Service Worker (more secure) and without for older browser (less secure)
 
 <p align="center">
     <img src="./docs/img/schema_pcke_client_side_with_service_worker.png"
@@ -68,7 +68,7 @@ Work perfectly well with :
 
 ### Getting Started React using create-react-app
 ```sh
-npm install @axa-fr/react-oidc-context copyfiles --save
+npm install @axa-fr/react-oidc copyfiles --save
 ```
 
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
@@ -80,7 +80,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 #package.json
 {
     "scripts": {
-        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc/dist/OidcTrustedDomains.js ./public",
         "start:server": "react-scripts start",
         "build:server": "npm run copy && react-scripts build",
         "prepare": "npm run copy"
@@ -92,7 +92,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { OidcProvider } from '@axa-fr/react-oidc-context';
+import { OidcProvider } from '@axa-fr/react-oidc';
 import Header from './Layout/Header';
 import Routes from './Router';
 
@@ -133,7 +133,7 @@ const trustedDomains = {
 
 ```javascript
 import React from 'react';
-import { OidcSecure } from '@axa-fr/react-oidc-context';
+import { OidcSecure } from '@axa-fr/react-oidc';
 
 const AdminSecure = () => (
   <OidcSecure>
@@ -147,7 +147,7 @@ export default AdminSecure;
 How to get IDToken
 
 ```javascript
-import { useOidcIdToken } from '@axa-fr/react-oidc-context';
+import { useOidcIdToken } from '@axa-fr/react-oidc';
 
 const DisplayIdToken =() => {
     const{ idToken, idTokenPayload } = useOidcIdToken();
@@ -172,7 +172,7 @@ const DisplayIdToken =() => {
 How to get User Information
 
 ```javascript
-import {useOidcUser} from '@axa-fr/react-oidc-context';
+import {useOidcUser} from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = () => {
   const {oidcUser, oidcUserLoadingState} = useOidcUser();
@@ -199,7 +199,7 @@ const DisplayUserInfo = () => {
 ```
 
 More documentation :
-- [`@axa-fr/react-oidc-context`](./packages/context#readme)
+- [`@axa-fr/react-oidc`](./packages/react#readme)
 
 ### Getting Started Vanilla
 
@@ -210,7 +210,7 @@ More documentation :
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd react-oidc/packages/context
+cd react-oidc/packages/react
 npm install
 npm start
 # then navigate to http://localhost:4200
@@ -218,7 +218,7 @@ npm start
 
 ## How It Works
 
-These components encapsulate the use of "AppAuth-JS" in order to hide workfow complexity.
+These components encapsulate the use of "AppAuth-JS" in order to hide workflow complexity.
 Internally, native History API is used to be router library agnostic.
 
 More information about OIDC

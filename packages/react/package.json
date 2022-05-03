@@ -1,5 +1,5 @@
 {
-  "name": "@axa-fr/react-oidc-context",
+  "name": "@axa-fr/react-oidc",
   "version": "5.7.0-alpha0",
   "private": false,
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
   },
   "files": [
     "dist",
-    "react",
+    "src",
     "README.md",
     "tsconfig.json",
     "package.json",
@@ -26,16 +26,31 @@
     "react"
   ],
   "scripts": {
-    "prepare": "tsc --build \"./tsconfig.json\"",
-    "postinstall": "echo \"warning: @axa-fr/react-oidc-context will be deprecated in V6, please use @axa-fr/react-oidc instead\""
+    "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcTrustedDomains.js ./public",
+    "start": "npm run copy && cross-env PORT=4200 react-scripts start",
+    "build": "npm i react react-dom && npm run copy && react-scripts build",
+    "test": "react-scripts test --coverage",
+    "eject": "react-scripts eject",
+    "clean": "rimraf dist",
+    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist"
   },
   "dependencies": {
-    "@axa-fr/react-oidc": "^5.7.0",
+    "@openid/appauth": "1.3.1",
     "react": "x",
     "react-dom": "x"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "5.16.4",
+    "@testing-library/react": "13.1.1",
+    "@testing-library/user-event": "14.1.1",
     "@types/react": "18.0.6",
+    "bootstrap": "4.6.1",
+    "copyfiles": "2.4.1",
+    "cross-env": "^7.0.3",
+    "cypress": "^9.5.0",
+    "msw": "0.39.2",
+    "react-router-dom": "5.3.0",
+    "react-scripts": "5.0.1",
     "typescript": "4.6.3"
   },
   "license": "MIT",
