@@ -59,7 +59,7 @@ jobs:
        # if: github.ref == 'refs/heads/master'
         with:
           token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/react/package.json*
+          package: ./packages/react/package.json
 
 # TO REMOVE IN V6
           
@@ -75,7 +75,7 @@ jobs:
         run: npm run prepare
         working-directory: ./packages/context
 
-      - id: publish-reacr
+      - id: publish-react-context
         uses: JS-DevTools/npm-publish@v1
        # if: github.ref == 'refs/heads/master'
         with:
