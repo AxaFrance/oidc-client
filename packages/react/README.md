@@ -1,4 +1,4 @@
-<H1> @axa-fr/react-oidc</H1>
+<H1> @axa-fr/react-oidc-context</H1>
 
 Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 
@@ -20,7 +20,7 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [Service Worker Support](#service-worker-support)
 
 Easy set up of OIDC for react and use the new react context api as state management.
-It use AppAuthJS behind the scene. 
+It use AppAuthJS behind the scene.
 
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
@@ -47,7 +47,7 @@ It use AppAuthJS behind the scene.
 # Getting Started
 
 ```sh
-npm install @axa-fr/react-oidc copyfiles --save
+npm install @axa-fr/react-oidc-context copyfiles --save
 ```
 
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
@@ -59,7 +59,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 #package.json
 {
     "scripts": {
-        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc/dist/OidcTrustedDomains.js ./public",
+        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc-context/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc-context/dist/OidcTrustedDomains.js ./public",
         "start:server": "react-scripts start",
         "build:server": "npm run copy && react-scripts build",
         "prepare": "npm run copy"
@@ -79,7 +79,7 @@ const trustedDomains = {
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd react-oidc/packages/react
+cd react-oidc/packages/context
 npm install
 npm start
 # then navigate to http://localhost:4200
@@ -99,7 +99,7 @@ The default routes used internally :
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { OidcProvider } from '@axa-fr/react-oidc';
+import { OidcProvider } from '@axa-fr/react-oidc-context';
 import Header from './Layout/Header';
 import Routes from './Router';
 
@@ -145,6 +145,13 @@ const propTypes = {
     silent_signin_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
+    authority_configuration: PropTypes.shape({ // Optional for providers that does not implement OIDC server auto discovery via a .wellknowurl
+      authorization_endpoint: PropTypes.string,
+      token_endpoint: PropTypes.string,
+      userinfo_endpoint: PropTypes.string,
+      end_session_endpoint: PropTypes.string,
+      revocation_endpoint: PropTypes.string,
+    }),
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
@@ -152,7 +159,7 @@ const propTypes = {
   }).isRequired
 };
 ```
-## How to consume 
+## How to consume
 
 "useOidc" returns all props from the Hook :
 
@@ -179,7 +186,7 @@ export const Home = () => {
 };
 
 ```
-The Hook method exposes : 
+The Hook method exposes :
 - isAuthenticated : if the user is logged in or not
 - logout: logout function (return a promise)
 - login: login function 'return a promise'
@@ -190,7 +197,7 @@ The Hook method exposes :
 
 ```javascript
 import React from 'react';
-import { OidcSecure } from '@axa-fr/react-oidc';
+import { OidcSecure } from '@axa-fr/react-oidc-context';
 
 const AdminSecure = () => (
   <OidcSecure>
@@ -209,7 +216,7 @@ export default AdminSecure;
 ```javascript
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import { withOidcSecure } from '@axa-fr/react-oidc';
+import { withOidcSecure } from '@axa-fr/react-oidc-context';
 import Home from '../Pages/Home';
 import Dashboard from '../Pages/Dashboard';
 import Admin from '../Pages/Admin';
@@ -229,7 +236,7 @@ export default Routes;
 ## How to get "Access Token" : Hook method
 
 ```javascript
-import { useOidcAccessToken } from '@axa-fr/react-oidc';
+import { useOidcAccessToken } from '@axa-fr/react-oidc-context';
 
 const DisplayAccessToken = () => {
     const{ accessToken, accessTokenPayload } = useOidcAccessToken();
@@ -253,7 +260,7 @@ const DisplayAccessToken = () => {
 ## How to get IDToken : Hook method
 
 ```javascript
-import { useOidcIdToken } from '@axa-fr/react-oidc';
+import { useOidcIdToken } from '@axa-fr/react-oidc-context';
 
 const DisplayIdToken =() => {
     const{ idToken, idTokenPayload } = useOidcIdToken();
@@ -279,7 +286,7 @@ const DisplayIdToken =() => {
 ## How to get User Information : Hook method
 
 ```javascript
-import { useOidcUser, UserStatus } from '@axa-fr/react-oidc';
+import { useOidcUser, UserStatus } from '@axa-fr/react-oidc-context';
 
 const DisplayUserInfo = () => {
   const{ oidcUser, oidcUserLoadingState } = useOidcUser();
@@ -312,7 +319,7 @@ This Hook give you a wrapped fetch that add the access token for you.
 
 ```javascript
 import React, {useEffect, useState} from 'react';
-import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
 
 const DisplayUserInfo = ({ fetch }) => {
   const [oidcUser, setOidcUser] = useState(null);
@@ -368,7 +375,7 @@ This HOC give you a wrapped fetch that add the access token for you.
 
 ```javascript
 import React, {useEffect, useState} from 'react';
-import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc-context';
 
 const DisplayUserInfo = ({ fetch }) => {
   const [oidcUser, setOidcUser] = useState(null);
@@ -418,7 +425,7 @@ export const FetchUserHoc= () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure
 
 ## Components override
 
-You can inject your own components. 
+You can inject your own components.
 All components definition receive props "configurationName". Please checkout and the the demo for more complexe exemple.
 
 ```javascript
@@ -457,21 +464,21 @@ const CallBackSuccess = () => <p>Success</p>
 //}
 
 const App = () => (
-    <OidcProvider configuration={configuration}
-                  loadingComponent={Loading}
-                  authenticatingErrorComponent={AuthenticatingError}
-                  authenticatingComponent={Authenticating}
-                  sessionLostComponent={SessionLost}
-                  //onSessionLost={onSessionLost} // If set "sessionLostComponent" is not displayed and onSessionLost callback is called instead
-                  serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
-                  callbackSuccessComponent={CallBackSuccess}
-    >
-      {/* isSessionLost && <SessionLost />*/}
-      <Router>
-        <Header />
-        <Routes />
-      </Router>
-    </OidcProvider>
+        <OidcProvider configuration={configuration}
+                      loadingComponent={Loading}
+                      authenticatingErrorComponent={AuthenticatingError}
+                      authenticatingComponent={Authenticating}
+                      sessionLostComponent={SessionLost}
+                //onSessionLost={onSessionLost} // If set "sessionLostComponent" is not displayed and onSessionLost callback is called instead
+                      serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
+                      callbackSuccessComponent={CallBackSuccess}
+        >
+          {/* isSessionLost && <SessionLost />*/}
+          <Router>
+            <Header />
+            <Routes />
+          </Router>
+        </OidcProvider>
 );
 
 render(<App />, document.getElementById('root'));

@@ -12,7 +12,10 @@
   "files": [
     "dist",
     "src",
-    "README.md"
+    "README.md",
+    "tsconfig.json",
+    "package.json",
+    "package-lock.json"
   ],
   "keywords": [
     "oidc",
