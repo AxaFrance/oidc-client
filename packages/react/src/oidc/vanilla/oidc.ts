@@ -588,7 +588,7 @@ export class Oidc {
         const url = window.location.origin +path;
         await this.destroyAsync();  
         if(oidcServerConfiguration.endSessionEndpoint) {
-            window.location.href = oidcServerConfiguration.endSessionEndpoint + "?redirect_uri=" + encodeURI(url);
+            window.location.href = oidcServerConfiguration.endSessionEndpoint + "?post_logout_redirect_uri=" + encodeURI(url);
         }
         else{
             window.location.reload();
