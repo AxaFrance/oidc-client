@@ -575,7 +575,7 @@ export class Oidc {
          timer.clearTimeout(this.timeoutId);
      }
      
-    async logoutAsync(callbackPath: string | undefined = undefined) {
+    async logoutAsync(callbackPath: string | undefined = undefined, extras:StringMap=null) {
         const configuration = this.configuration;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         // TODO implement real logout
@@ -586,9 +586,17 @@ export class Oidc {
         }
         const path = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
         const url = window.location.origin +path;
+        // @ts-ignore
+        const idToken = this.tokens ? this.tokens.idToken : "";
         await this.destroyAsync();  
         if(oidcServerConfiguration.endSessionEndpoint) {
-            window.location.href = oidcServerConfiguration.endSessionEndpoint + "?post_logout_redirect_uri=" + encodeURI(url);
+            let extraQueryString = "";
+            if(extras){
+                for (let [key, value] of Object.entries(extras)) {
+                    extraQueryString +=`?${key}=${encodeURIComponent(value)}`;
+                }
+            }
+            window.location.href = `${oidcServerConfiguration.endSessionEndpoint}?post_logout_redirect_uri=${encodeURIComponent(url)}&id_token_hint=${idToken}${extraQueryString}`;
         }
         else{
             window.location.reload();

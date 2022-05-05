@@ -8,8 +8,8 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
     const login = (callbackPath:string | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).loginAsync(callbackPath, extras);
     };
-    const logout = (callbackPath: string | undefined = undefined) => {
-        return getOidc(configurationName).logoutAsync(callbackPath);
+    const logout = (callbackPath: string | undefined = undefined, extras:StringMap=null) => {
+        return getOidc(configurationName).logoutAsync(callbackPath, extras);
     };
 
     let isAuthenticated:boolean = false;
