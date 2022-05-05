@@ -26,7 +26,8 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, ca
 }
 
 export const withOidcSecure = (
-  WrappedComponent, callbackPath=null
+  WrappedComponent, callbackPath=null,
+  extras=null, configurationName="default"
 ) => (props) => {
-  return <OidcSecure callbackPath={callbackPath}><WrappedComponent {...props} /></OidcSecure>;
+  return <OidcSecure callbackPath={callbackPath} extras={extras} configurationName={configurationName}><WrappedComponent {...props} /></OidcSecure>;
 };

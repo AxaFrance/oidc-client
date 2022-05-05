@@ -250,6 +250,10 @@ export class Oidc {
         return oidcFactory(configuration, name);
     }
     static get(name="default") {
+        if(!oidcDatabase.hasOwnProperty(name)){
+            throw Error(`Oidc library does seem initialized.
+Please checkout that you are using OIDC hook inside a <OidcProvider configurationName="${name}"></OidcProvider> compoment.`)
+        }
         return oidcDatabase[name];
     }
     static eventNames = eventNames;
