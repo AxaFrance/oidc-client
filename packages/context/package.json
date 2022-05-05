@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc-context",
-  "version": "5.7.2",
+  "version": "5.7.3-alpha0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -30,7 +30,9 @@
     "postinstall": "echo \"warning: @axa-fr/react-oidc-context will be deprecated in V6, please use @axa-fr/react-oidc instead\""
   },
   "dependencies": {
-    "@axa-fr/react-oidc": "^5.7.0",
+    "@axa-fr/react-oidc": "5.7.3-alpha0"
+  },
+  "peerDependencies": {
     "react": "x",
     "react-dom": "x"
   },
