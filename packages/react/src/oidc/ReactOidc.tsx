@@ -11,6 +11,9 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
     const logout = (callbackPath: string | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).logoutAsync(callbackPath, extras);
     };
+    const renewTokens = (extras:StringMap=null) =>{
+        return getOidc(configurationName).renewTokensAsync(extras);
+    }
 
     let isAuthenticated:boolean = false;
     const oidc = getOidc(configurationName);
@@ -18,7 +21,7 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
         isAuthenticated = getOidc(configurationName).tokens != null;
     }
 
-    return { login, logout, isAuthenticated };
+    return { login, logout, isAuthenticated, renewTokens };
 }
 
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};

@@ -104,23 +104,30 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     return response.state;
 }
 
+const renewTokenAsync = async (oidc, refreshToken, extras:StringMap=null) =>{
+    const tokens = await oidc.refreshTokensAsync(refreshToken, false, extras);
+    oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
+    if(!oidc.serviceWorker){
+        await oidc.session.setTokens(oidc.tokens);
+    }
+    if(!oidc.tokens){
+        return null;
+    }
+    oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
+    return oidc.tokens;
+}
+
 const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
-    return  timer.setTimeout(async () => {
+    return timer.setTimeout(async () => {
         const currentTimeUnixSecond = new Date().getTime() /1000;
         const timeInfo = { timeLeft:((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond)};
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
         if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
-            const tokens = await oidc.refreshTokensAsync(refreshToken);
-            oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
-            if(!oidc.serviceWorker){
-                await oidc.session.setTokens(oidc.tokens);
+            const tokens = await renewTokenAsync(oidc, refreshToken);
+            if(tokens) {
+                oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
             }
-            if(!oidc.tokens){
-                return;                
-            }
-            oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
-            oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
         } else{
             oidc.timeoutId = await autoRenewTokensAsync(oidc, refreshToken, expiresAt)
         }
@@ -501,8 +508,20 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
 
     }
+    
+    async renewTokensAsync(extras:StringMap=null)
+    {
+        // @ts-ignore
+        if(this.tokens && this.tokens.refreshToken && this.timeoutId) {
+            // @ts-ignore
+            clearTimeout(this.timeoutId);
+            // @ts-ignore
+            const tokens = await renewTokenAsync(this, this.tokens.refreshToken, extras);
+            await autoRenewTokensAsync(this, tokens.refreshToken, tokens.expiresAt);
+        }
+    }
 
-    async refreshTokensAsync(refreshToken, silentEvent = false) {
+    async refreshTokensAsync(refreshToken, silentEvent = false, extras:StringMap=null) {
         const localSilentSigninAsync= async (exception=null) => {
             try {
                 const silent_token_response = await this.silentSigninAsync();
@@ -530,11 +549,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
 
-            let extras = undefined;
-            if(configuration.token_request_extras) {
-                extras = {}
+            let extrasRequest = undefined;
+            if(extras){
+                extrasRequest = {}
+                for (let [key, value] of Object.entries(extras)) {
+                    extrasRequest[key] = value;
+                }
+            }
+            else if(configuration.token_request_extras) {
+                extrasRequest = {}
                 for (let [key, value] of Object.entries(configuration.token_request_extras)) {
-                    extras[key] = value;
+                    extrasRequest[key] = value;
                 }
             }
             
@@ -545,7 +570,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 grant_type: GRANT_TYPE_REFRESH_TOKEN,
                 code: undefined,
                 refresh_token: refreshToken,
-                extras
+                extras: extrasRequest
                 });
             
             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);

@@ -9,7 +9,7 @@ import SessionLost from "./override/SessionLost.component"
 import ServiceWorkerNotSupported from "./override/ServiceWorkerNotSupported.component"
 
 const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
-    const { login, logout, isAuthenticated} = useOidc(configurationName);
+    const { login, logout, isAuthenticated, renewTokens} = useOidc(configurationName);
     const [fname, setFname] = useState("")
 
     const handleChange = e => {
@@ -35,6 +35,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
+                    {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => renewTokens()}>Force renew tokens</button>}
                 </div>
             </div>
         </div>
