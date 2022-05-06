@@ -514,7 +514,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         // @ts-ignore
         if(this.tokens && this.tokens.refreshToken && this.timeoutId) {
             // @ts-ignore
-            clearTimeout(this.timeoutId);
+            timer.clearTimeout(this.timeoutId);
             // @ts-ignore
             const tokens = await renewTokenAsync(this, this.tokens.refreshToken, extras);
             await autoRenewTokensAsync(this, tokens.refreshToken, tokens.expiresAt);
