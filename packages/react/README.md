@@ -501,3 +501,33 @@ More information about OIDC
 - Chrome/Edge : tested on version upper to 90
 - Opera : tested on version upper to 80
 - Safari : tested on Safari/605.1.15
+
+# FAQ
+
+## Do not set OidcProvider Between Router and its routes
+
+Login callback won't work.
+Set OidcProvider before Router or inside a Route.
+
+```javascript
+import React from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { OidcProvider } from '@axa-fr/react-oidc';
+import Header from './Layout/Header';
+import Routes from './Router';
+
+const configuration = {};
+
+const App = () => (
+<Router>
+   <OidcProvider configuration={configuration} > // DONT DO THAT
+      <Header />
+      <Routes />
+   </OidcProvider>
+</Router>
+);
+
+render(<App />, document.getElementById('root'));
+```
+
