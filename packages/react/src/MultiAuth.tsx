@@ -1,6 +1,6 @@
 ﻿import React, {useState} from 'react';
 import {OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken} from "./oidc";
-import { configurationIdentityServer, configurationGoogle} from "./configurations";
+import { configurationIdentityServer, configurationIdentityServerWithHash, configurationGoogle} from "./configurations";
 import AuthenticatingError from "./override/AuthenticateError.component"
 import Authenticating from "./override/Authenticating.component"
 import Loading from "./override/Loading.component"
@@ -32,6 +32,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                         <option value="config_1">config_1</option>
                         <option value="config_2">config_2</option>
                         <option value="google">google</option>
+                        <option value="config_3">config_3</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
@@ -60,7 +61,8 @@ export const MultiAuthContainer = () => {
             redirect_uri:callBack,
             silent_redirect_uri: "",
             scope: 'openid profile email api'},
-        google: { ...configurationGoogle }
+        google: { ...configurationGoogle },
+        config_3: { ...configurationIdentityServerWithHash}
     }
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;

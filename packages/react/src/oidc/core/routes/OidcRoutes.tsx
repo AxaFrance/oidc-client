@@ -33,19 +33,13 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   children, configurationName
 }) => {
   // This exist because in next.js window outside useEffect is null
-  let pathname = window ? getPath(window.location.href) : '';
-
-  //const { hash } = window.location;
-  
-  if(redirect_uri.includes("#") && pathname.includes("#")){
-    pathname = pathname.split("?")[0];
-    console.log(pathname)
-  }
+  let pathname = window ? getPath(window.location.href).split("?")[0] : '';
+  console.log(pathname)
   
   const [path, setPath] = useState(pathname);
   
   useEffect(() => {
-    const setNewPath = () => setPath(getPath(window.location.href));
+    const setNewPath = () => setPath(getPath(window.location.href).split("?")[0]);
     setNewPath();
     window.addEventListener('popstate', setNewPath, false);
     return () => window.removeEventListener('popstate', setNewPath, false);
