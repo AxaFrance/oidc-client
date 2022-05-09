@@ -250,7 +250,8 @@ export class Oidc {
         return oidcFactory(configuration, name);
     }
     static get(name="default") {
-        if(!oidcDatabase.hasOwnProperty(name)){
+        const insideBrowser = (typeof process === 'undefined');
+        if(!oidcDatabase.hasOwnProperty(name) && insideBrowser){
             throw Error(`Oidc library does seem initialized.
 Please checkout that you are using OIDC hook inside a <OidcProvider configurationName="${name}"></OidcProvider> compoment.`)
         }
