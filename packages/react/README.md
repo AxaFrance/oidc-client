@@ -501,3 +501,43 @@ More information about OIDC
 - Chrome/Edge : tested on version upper to 90
 - Opera : tested on version upper to 80
 - Safari : tested on Safari/605.1.15
+
+# FAQ
+
+## Do not set OidcProvider Between Router and its routes
+
+Login callback won't work.
+
+```javascript
+import React from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { OidcProvider } from '@axa-fr/react-oidc';
+import Header from './Layout/Header';
+import Routes from './Router';
+
+// This configuration use hybrid mode
+// ServiceWorker are used if available (more secure) else tokens are given to the client
+// You need to give inside your code the "access_token" when using fetch
+const configuration = {
+client_id: 'interactive.public.short',
+redirect_uri: 'http://localhost:4200/authentication/callback',
+silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
+scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
+authority: 'https://demo.identityserver.io',
+service_worker_relative_url:'/OidcServiceWorker.js',
+service_worker_only:false,
+};
+
+const App = () => (
+<Router>
+   <OidcProvider configuration={configuration} > // DONT DO THAT
+      <Header />
+      <Routes />
+   </OidcProvider>
+</Router>
+);
+
+render(<App />, document.getElementById('root'));
+```
+
