@@ -62,7 +62,7 @@
         } catch (error) {
             return null;
         }
-        
+        const insideBrowser = (typeof process === 'undefined');
         try {
             if (SharedWorker) {
                 worker = new SharedWorker(blobURL);
@@ -70,7 +70,9 @@
             } 
         } catch (error)
         {
-            console.log("SharedWorker not available");
+            if(insideBrowser) {
+                console.warn("SharedWorker not available");
+            }
         }
         try {
             if (Worker) {
@@ -79,7 +81,9 @@
             }
         } catch (error)
         {
-            console.log("Worker not available");
+            if(insideBrowser) {
+                console.warn("Worker not available");
+            }
         }
 
         return null;
