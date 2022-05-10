@@ -583,7 +583,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     async logoutAsync(callbackPath: string | undefined = undefined, extras:StringMap=null) {
         const configuration = this.configuration;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        // TODO implement real logout
         if(callbackPath && (typeof callbackPath !== 'string'))
         {
             callbackPath = undefined;
