@@ -583,13 +583,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     async logoutAsync(callbackPath: string | undefined = undefined, extras:StringMap=null) {
         const configuration = this.configuration;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        // TODO implement real logout
         if(callbackPath && (typeof callbackPath !== 'string'))
         {
             callbackPath = undefined;
             console.warn('callbackPath path is not a string');
         }
-        const path = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
+        const path = (callbackPath === null || callbackPath === undefined) ? location.pathname + (location.search || '') + (location.hash || '') : callbackPath;
         const url = window.location.origin +path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
