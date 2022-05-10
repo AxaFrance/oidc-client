@@ -589,7 +589,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             callbackPath = undefined;
             console.warn('callbackPath path is not a string');
         }
-        const path = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
+        const path = (callbackPath === null || callbackPath === undefined) ? location.pathname + (location.search || '') + (location.hash || '') : callbackPath;
         const url = window.location.origin +path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
