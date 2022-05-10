@@ -13,7 +13,7 @@ export const Home = () => {
                     <p className="card-text">React Demo Application protected by OpenId Connect. More info on about oidc on <a href="https://github.com/AxaGuilDEv/react-oidc">GitHub @axa-fr/react-oidc</a> </p>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('/profile')}>logout /profile</button></p>}
-                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('')}>logout </button></p>}
+                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('')}>logout</button></p>}
                 </div>
             </div>
         </div>
