@@ -11,22 +11,19 @@ export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-
 </div>);
 
 const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, configurationName }) => {
-  const getOidc =  Oidc.get;
-  const [error, setError] = useState(false);
 
-  const CallbackErrorComponent = callBackError || AuthenticatingError;
-  const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
-  
+  const [error, setError] = useState(false);
+  console.log(configurationName)
   useEffect(() => {
     let isMounted = true;
+    console.log("useEffect")
     const playCallbackAsync = async () => {
      
       try {
+        const getOidc =  Oidc.get;
         const state = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
-        if (isMounted) {
-            const history = getCustomHistory()
-            history.replaceState(decodeURIComponent(state || "/"))
-        }
+        const history = getCustomHistory()
+        history.replaceState(decodeURIComponent(state || "/"))
       } catch (error) {
         if(isMounted) {
           setError(true);
@@ -35,10 +32,14 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
     };
     playCallbackAsync();
     return  () => {
+      console.log("isMounted = false;")
       isMounted = false;
     };
   },[]);
-  
+
+  const CallbackErrorComponent = callBackError || AuthenticatingError;
+  const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
+
   if(error){
     return <CallbackErrorComponent configurationName={configurationName} />
   }

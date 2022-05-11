@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import {BrowserRouter, Route, Link, Routes} from 'react-router-dom';
 import { Home } from "./Home";
 import { Profile, SecureProfile } from "./Profile";
 import { configurationAuth0, configurationIdentityServer, configurationIdentityServerWithoutDiscovery } from './configurations';
@@ -7,11 +7,13 @@ import { withOidcSecure, OidcProvider } from "./oidc";
 import {FetchUserHoc, FetchUserHook} from "./FetchUser";
 import { MultiAuthContainer } from "./MultiAuth";
 
+const OidcSecureHoc = withOidcSecure(Profile);
+
 function App() {
   const [show, setShow] = React.useState(false);
   return (
     <OidcProvider configuration={configurationIdentityServer}>
-      <Router>
+      <BrowserRouter>
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
           <a className="navbar-brand" href="/">@axa-fr/react-oidc</a>
           <button className="navbar-toggler" type="button" onClick={() => setShow(!show)} data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,15 +47,17 @@ function App() {
         </nav>
 
         <div>
-          <Route exact path="/" component={Home} />
-          <Route exact path="/profile" component={Profile} />
-          <Route exact path="/profile-secure-component" component={SecureProfile} />
-          <Route exact path="/profile-secure-hoc" component={withOidcSecure(Profile)} />
-          <Route exact path="/user-fetch-secure-hoc" component={FetchUserHoc} />
-          <Route exact path="/user-fetch-secure-hook" component={FetchUserHook} />
-          <Route path="/multi-auth" component={MultiAuthContainer} />
+          <Routes>
+            <Route path="/" element={<Home></Home>} />
+            <Route path="/profile" element={<Profile></Profile>} />
+            <Route path="/profile-secure-component" element={<SecureProfile></SecureProfile>} />
+            <Route path="/profile-secure-hoc" element={<OidcSecureHoc></OidcSecureHoc>} />
+            <Route path="/user-fetch-secure-hoc" element={<FetchUserHoc></FetchUserHoc>} />
+            <Route path="/user-fetch-secure-hook" element={<FetchUserHook></FetchUserHook>} />
+            <Route path="/multi-auth" element={<MultiAuthContainer></MultiAuthContainer>} />
+          </Routes>
         </div>
-      </Router>
+      </BrowserRouter>
     </OidcProvider>
   );
 }
