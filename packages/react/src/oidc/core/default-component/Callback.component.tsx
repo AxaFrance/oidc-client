@@ -17,7 +17,6 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
-     
       try {
         const getOidc =  Oidc.get;
         const state = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
