@@ -16,14 +16,15 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
   console.log(configurationName)
   useEffect(() => {
     let isMounted = true;
-    console.log("useEffect")
     const playCallbackAsync = async () => {
      
       try {
         const getOidc =  Oidc.get;
         const state = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
-        const history = getCustomHistory()
-        history.replaceState(decodeURIComponent(state || "/"))
+        if (isMounted) {
+            const history = getCustomHistory()
+            history.replaceState(decodeURIComponent(state || "/"))
+        }
       } catch (error) {
         if(isMounted) {
           setError(true);
@@ -31,8 +32,7 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
       }
     };
     playCallbackAsync();
-    return  () => {
-      console.log("isMounted = false;")
+    return () => {
       isMounted = false;
     };
   },[]);

@@ -39,11 +39,9 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   
   useEffect(() => {
     const setNewPath = () => {
-      console.log("router" + window.location.pathname)
       setPath(window.location.pathname);
       
     };
-    console.log("here")
     setNewPath();
     window.addEventListener('popstate', setNewPath, false);
     return () => window.removeEventListener('popstate', setNewPath, false);

@@ -54,7 +54,7 @@ function App() {
             <Route path="/profile-secure-hoc" element={<OidcSecureHoc></OidcSecureHoc>} />
             <Route path="/user-fetch-secure-hoc" element={<FetchUserHoc></FetchUserHoc>} />
             <Route path="/user-fetch-secure-hook" element={<FetchUserHook></FetchUserHook>} />
-            <Route path="/multi-auth" element={<MultiAuthContainer></MultiAuthContainer>} />
+            <Route path="/multi-auth/*" element={<MultiAuthContainer></MultiAuthContainer>} />
           </Routes>
         </div>
       </BrowserRouter>

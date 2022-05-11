@@ -321,60 +321,85 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
         return await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
     }
-    
+
+    tryKeepExistingSessionPromise = null;
     async tryKeepExistingSessionAsync() {
-        let serviceWorker
-        if(this.tokens != null){
-            return false;
+        if(this.tryKeepExistingSessionPromise !== null){
+            return this.tryKeepExistingSessionPromise;
         }
-        this.publishEvent(eventNames.tryKeepExistingSessionAsync_begin, {});
-        try {
-            const configuration = this.configuration;
-            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-            serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-            if(serviceWorker) {
-                const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
-                if (tokens) {
-                    serviceWorker.startKeepAliveServiceWorker();
-                    const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
-                    // @ts-ignore
-                    this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
-                    this.serviceWorker = serviceWorker;
-                    // @ts-ignore
-                    this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
-                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
-                    return true;
-                }
-                this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no exiting session found"});
-            } else {
-                if(configuration.service_worker_relative_url) {
-                    this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
-                        message: "service worker is not supported by this browser"
+        
+        const funcAsync  =async () => {
+            let serviceWorker
+            if (this.tokens != null) {
+                return false;
+            }
+            this.publishEvent(eventNames.tryKeepExistingSessionAsync_begin, {});
+            try {
+                const configuration = this.configuration;
+                const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
+                serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                if (serviceWorker) {
+                    const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
+                    if (tokens) {
+                        serviceWorker.startKeepAliveServiceWorker();
+                        const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
+                        // @ts-ignore
+                        this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
+                        this.serviceWorker = serviceWorker;
+                        // @ts-ignore
+                        this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                        this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
+                            success: true,
+                            message: "tokens inside ServiceWorker are valid"
+                        });
+                        return true;
+                    }
+                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
+                        success: false,
+                        message: "no exiting session found"
                     });
+                } else {
+                    if (configuration.service_worker_relative_url) {
+                        this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
+                            message: "service worker is not supported by this browser"
+                        });
+                    }
+                    const session = initSession(this.configurationName);
+                    const {tokens} = await session.initAsync();
+                    if (tokens) {
+                        const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
+                        // @ts-ignore
+                        this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
+                        session.setTokens(this.tokens);
+                        this.session = session;
+                        // @ts-ignore
+                        this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                        this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
+                            success: true,
+                            message: "tokens inside ServiceWorker are valid"
+                        });
+                        return true;
+                    }
                 }
-                const session = initSession(this.configurationName);
-                const {tokens} = await session.initAsync();
-                if (tokens) {
-                    const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
-                    // @ts-ignore
-                    this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
-                    session.setTokens(this.tokens);
-                    this.session = session;
-                    // @ts-ignore
-                    this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
-                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: true, message : "tokens inside ServiceWorker are valid"});
-                    return true;
+                this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
+                    success: false,
+                    message: "no service worker"
+                });
+                return false;
+            } catch (exception) {
+                if (serviceWorker) {
+                    await serviceWorker.clearAsync();
                 }
+                this.publishEvent(eventNames.tryKeepExistingSessionAsync_error, "tokens inside ServiceWorker are invalid");
+                return false;
             }
-            this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {success: false, message : "no service worker"});
-            return false;
-        } catch (exception) {
-            if(serviceWorker){
-                await serviceWorker.clearAsync();
-            }
-            this.publishEvent(eventNames.tryKeepExistingSessionAsync_error, "tokens inside ServiceWorker are invalid");
-            return false;
         }
+        
+        this.tryKeepExistingSessionPromise = funcAsync();
+        return this.tryKeepExistingSessionPromise.then((result) => {
+            this.tryKeepExistingSessionPromise =null;
+            return result;
+        });
     }
 
     async loginAsync(callbackPath:string=undefined, extras:StringMap=null, installServiceWorker=true) {
@@ -558,9 +583,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return await localSilentSigninAsync(exception);
         }
      }
-     
+
+    loginCallbackWithAutoTokensRenewPromise:Promise<string> = null;
      loginCallbackWithAutoTokensRenewAsync():Promise<string>{
-        return loginCallbackWithAutoTokensRenewAsync(this);
+         if(this.loginCallbackWithAutoTokensRenewPromise !== null){
+             return this.loginCallbackWithAutoTokensRenewPromise;
+         }
+         this.loginCallbackWithAutoTokensRenewPromise = loginCallbackWithAutoTokensRenewAsync(this);
+         return this.loginCallbackWithAutoTokensRenewPromise.then(result =>{
+             this.loginCallbackWithAutoTokensRenewPromise = null;
+             return result;
+         })
      }
      
      userInfoAsync(){
