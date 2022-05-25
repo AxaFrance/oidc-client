@@ -45,7 +45,7 @@ const extractAccessTokenPayload = tokens => {
     }
     const accessToken = tokens.accessToken;
     try{
-        if (!accessToken || countLetter(accessToken,'.') === 2) {
+        if (!accessToken || countLetter(accessToken,'.') != 2) {
             return null;
         }
         return JSON.parse(atob(accessToken.split('.')[1]));
