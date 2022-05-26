@@ -42,11 +42,15 @@ export interface ReactOidcHistory {
   replaceState: (url?: string | null, stateHistory?: WindowHistoryState) => void;
 }
 
+export type CustomHistory = {
+  replaceState(url?: string | null, stateHistory?: WindowHistoryState): void;
+}
+
 const getHistory = (
   windowInternal: WindowInternal,
   CreateEventInternal: (event: string, params?: InitCustomEventParams) => CustomEvent,
   generateKeyInternal: typeof generateKey
-) => {
+): CustomHistory => {
   return {
     replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {
       const key = generateKeyInternal();
