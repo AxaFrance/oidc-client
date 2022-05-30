@@ -246,8 +246,8 @@ export class Oidc {
     }
 
     removeEventSubscription(id){
-        const newEvents = this.events.filter(e =>  e.id === id);
-        this.events = newEvents;
+       const newEvents = this.events.filter(e =>  e.id !== id);
+       this.events = newEvents;
     }
 
     publishEvent(eventName, data){

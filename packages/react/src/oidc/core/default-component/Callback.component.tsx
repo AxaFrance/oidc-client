@@ -13,7 +13,6 @@ export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-
 const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, configurationName }) => {
 
   const [error, setError] = useState(false);
-  console.log(configurationName)
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {

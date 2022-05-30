@@ -40,7 +40,6 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   useEffect(() => {
     const setNewPath = () => {
       setPath(window.location.pathname);
-      
     };
     setNewPath();
     window.addEventListener('popstate', setNewPath, false);

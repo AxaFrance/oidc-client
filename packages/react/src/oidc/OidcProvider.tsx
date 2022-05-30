@@ -90,7 +90,6 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
     useEffect(() => {
         const oidc = getOidc(configurationName);
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
-            console.log(configurationName +" " + name) 
             if(name == Oidc.eventNames.refreshTokensAsync_error){
                 if(onSessionLost != null){
                     onSessionLost();
