@@ -19,10 +19,10 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
     const playCallbackAsync = async () => {
       try {
         const getOidc =  Oidc.get;
-        const state = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
+        const {callbackPath} = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
         if (isMounted) {
             const history = getCustomHistory()
-            history.replaceState(decodeURIComponent(state || "/"))
+            history.replaceState(callbackPath || "/")
         }
       } catch (error) {
         if(isMounted) {
