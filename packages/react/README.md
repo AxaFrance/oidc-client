@@ -156,6 +156,7 @@ const propTypes = {
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
     extras: StringMap|undefined // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
+    withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState()) 
   }).isRequired
 };
 ```
