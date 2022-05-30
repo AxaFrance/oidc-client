@@ -30,7 +30,7 @@
     "postinstall": "echo \"warning: @axa-fr/react-oidc-context will be deprecated in V6, please use @axa-fr/react-oidc instead\""
   },
   "dependencies": {
-    "@axa-fr/react-oidc": "5.7.7"
+    "@axa-fr/react-oidc": "5.8.0"
   },
   "peerDependencies": {
     "react": "x",
