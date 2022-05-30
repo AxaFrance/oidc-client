@@ -1,5 +1,5 @@
 import React, {useEffect, ComponentType} from 'react';
-import Oidc from "../../vanilla/oidc";
+import Oidc, {getLoginParams} from "../../vanilla/oidc";
 import {OidcSecure} from "../../OidcSecure";
 
 const CallBack = ({configurationName}) =>{
@@ -23,7 +23,8 @@ const CallBack = ({configurationName}) =>{
 }
 
 const CallbackManager: ComponentType<any> = ({configurationName }) => {
-    return <OidcSecure configurationName={configurationName}>
+    const loginParams = getLoginParams(configurationName);
+    return <OidcSecure configurationName={configurationName} state={loginParams.state} extras={loginParams.extras}>
         <CallBack configurationName={configurationName}/>
     </OidcSecure>;
 };
