@@ -19,10 +19,8 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
       try {
         const getOidc =  Oidc.get;
         const {callbackPath} = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
-        if (isMounted) {
-            const history = getCustomHistory()
-            history.replaceState(callbackPath || "/")
-        }
+        const history = getCustomHistory()
+        history.replaceState(callbackPath || "/")
       } catch (error) {
         if(isMounted) {
           setError(true);
