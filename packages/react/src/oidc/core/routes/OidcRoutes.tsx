@@ -38,11 +38,13 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   const [path, setPath] = useState(pathname);
   
   useEffect(() => {
-    const setNewPath = () => setPath(window.location.pathname);
+    const setNewPath = () => {
+      setPath(window.location.pathname);
+    };
     setNewPath();
     window.addEventListener('popstate', setNewPath, false);
     return () => window.removeEventListener('popstate', setNewPath, false);
-  });
+  }, []);
   
   const callbackPath = getPath(redirect_uri);
 
