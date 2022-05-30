@@ -6,14 +6,15 @@ export type OidcSecureProps = {
     callbackPath?:string;
     extras?:StringMap
     configurationName?: string;
+    state?: string|undefined;
 };
 
-export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, extras=null, configurationName="default"}) => {
+export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, extras=null, configurationName="default", state=undefined}) => {
     const getOidc =  Oidc.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
-            oidc.loginAsync(callbackPath, extras);
+            oidc.loginAsync(callbackPath, extras, true, state);
         }
         return () => {
         }
@@ -26,8 +27,11 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, ca
 }
 
 export const withOidcSecure = (
-  WrappedComponent, callbackPath=null,
-  extras=null, configurationName="default"
+  WrappedComponent: FC<PropsWithChildren<OidcSecureProps>>, 
+  callbackPath=null,
+  extras=null, 
+  configurationName="default", 
+  state: string|undefined=undefined
 ) => (props) => {
-  return <OidcSecure callbackPath={callbackPath} extras={extras} configurationName={configurationName}><WrappedComponent {...props} /></OidcSecure>;
+  return <OidcSecure state={state} callbackPath={callbackPath} extras={extras} configurationName={configurationName}><WrappedComponent {...props} /></OidcSecure>;
 };
