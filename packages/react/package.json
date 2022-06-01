@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc",
-  "version": "5.8.1",
+  "version": "5.9.0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
