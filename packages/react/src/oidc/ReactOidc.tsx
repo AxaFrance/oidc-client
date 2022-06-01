@@ -5,8 +5,8 @@ const defaultConfigurationName = "default";
 export const useOidc =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
 
-    const login = (callbackPath:string | undefined = undefined, extras:StringMap=null) => {
-        return getOidc(configurationName).loginAsync(callbackPath, extras);
+    const login = (callbackPath:string | undefined = undefined, extras:StringMap=null, state: string|undefined=undefined) => {
+        return getOidc(configurationName).loginAsync(callbackPath, extras, true, state);
     };
     const logout = (callbackPath: string | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).logoutAsync(callbackPath, extras);

@@ -1,6 +1,6 @@
 import React, {useEffect, useState, ComponentType} from 'react';
 import AuthenticatingError from "./AuthenticateError.component";
-import Oidc from "../../vanilla/oidc";
+import Oidc, {getLoginParams} from "../../vanilla/oidc";
 import Authenticating from "./Authenticating.component";
 
 const ServiceWorkerInstall: ComponentType<any> = ({callBackError, authenticating, configurationName }) => {
@@ -15,12 +15,9 @@ const ServiceWorkerInstall: ComponentType<any> = ({callBackError, authenticating
         let isMounted = true;
         const playCallbackAsync = async () => {
             try {
-                const params = new Proxy(new URLSearchParams(window.location.search), {
-                    // @ts-ignore
-                    get: (searchParams, prop) => searchParams.get(prop),
-                });
+                const loginParams = getLoginParams(configurationName)
                 // @ts-ignore
-                await getOidc(configurationName).loginAsync(decodeURIComponent(params.callbackPath), false);
+                await getOidc(configurationName).loginAsync(loginParams.callbackPath, loginParams.extras,false, loginParams.state);
                 if(isMounted) {
                     setLoading(false);
                 }
@@ -32,7 +29,7 @@ const ServiceWorkerInstall: ComponentType<any> = ({callBackError, authenticating
             }
         };
         playCallbackAsync();
-        return  () => {
+        return () => {
             isMounted = false;
         };
     },[]);
