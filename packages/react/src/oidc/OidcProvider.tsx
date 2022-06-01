@@ -4,6 +4,7 @@ import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
+import { CustomHistory } from "./core/routes/withRouter";
 
 export type oidcContext = {
     getOidc: Function;
@@ -23,6 +24,7 @@ export type OidcProviderProps = {
     configuration?: OidcConfiguration;
     children: any;
     onSessionLost?: Function,
+    withCustomHistory?: () => CustomHistory,
 };
 
 export type OidcSessionProps = {
@@ -79,7 +81,9 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
                                                                              authenticatingErrorComponent = AuthenticatingError,
                                                                              sessionLostComponent=SessionLost,
-                                                                             onSessionLost=null}) => {
+                                                                             onSessionLost=null,
+                                                                             withCustomHistory=null,
+                                                                         }) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
     }
@@ -152,7 +156,8 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                   callbackSuccessComponent={callbackSuccessComponent} 
                                   callbackErrorComponent={callbackErrorComponent}
                                   authenticatingComponent={authenticatingComponent}
-                                  configurationName={configurationName}>
+                                  configurationName={configurationName}
+                                  withCustomHistory={withCustomHistory}>
                           <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>
                             {children}
                           </OidcSession>

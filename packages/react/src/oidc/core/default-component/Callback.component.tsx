@@ -1,7 +1,7 @@
 import React, {useEffect, useState, ComponentType} from 'react';
-import {getCustomHistory} from "../routes/withRouter";
 import AuthenticatingError from "./AuthenticateError.component";
 import Oidc from "../../vanilla/oidc";
+import {getCustomHistory} from "../routes/withRouter";
 
 export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-callback">
   <div className="oidc-callback__container">
@@ -10,7 +10,7 @@ export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-
   </div>
 </div>);
 
-const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, configurationName }) => {
+const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, configurationName, withCustomHistory }) => {
 
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -19,7 +19,7 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
       try {
         const getOidc =  Oidc.get;
         const {callbackPath} = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
-        const history = getCustomHistory()
+        const history = (withCustomHistory)? withCustomHistory(): getCustomHistory();
         history.replaceState(callbackPath || "/")
       } catch (error) {
         if(isMounted) {
