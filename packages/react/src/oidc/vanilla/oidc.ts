@@ -628,7 +628,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          timer.clearTimeout(this.timeoutId);
      }
      
-    async logoutAsync(callbackPath: string | undefined = undefined, extras:StringMap=null) {
+    async logoutAsync(callbackPath: string | undefined = undefined, extras:StringMap=null, postLogoutRedirectUri: string | undefined = undefined) {
         const configuration = this.configuration;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         if(callbackPath && (typeof callbackPath !== 'string'))
@@ -636,8 +636,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             callbackPath = undefined;
             console.warn('callbackPath path is not a string');
         }
+		if(postLogoutRedirectUri && (typeof postLogoutRedirectUri !== 'string'))
+        {
+            postLogoutRedirectUri = undefined;
+            console.warn('postLogoutRedirectUri uri is not a string');
+        }
         const path = (callbackPath === null || callbackPath === undefined) ? location.pathname + (location.search || '') + (location.hash || '') : callbackPath;
-        const url = window.location.origin +path;
+        const url = postLogoutRedirectUri === undefined ? window.location.origin + path : postLogoutRedirectUri;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
         await this.destroyAsync();  
@@ -645,7 +650,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             let extraQueryString = "";
             if(extras){
                 for (let [key, value] of Object.entries(extras)) {
-                    extraQueryString +=`?${key}=${encodeURIComponent(value)}`;
+                    extraQueryString +=`&${key}=${encodeURIComponent(value)}`;
                 }
             }
             window.location.href = `${oidcServerConfiguration.endSessionEndpoint}?post_logout_redirect_uri=${encodeURIComponent(url)}&id_token_hint=${idToken}${extraQueryString}`;
