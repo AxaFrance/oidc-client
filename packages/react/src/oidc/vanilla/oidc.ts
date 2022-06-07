@@ -481,33 +481,33 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
             }
-            const promise = new Promise((resolve, reject) => {
-                const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
+            return new Promise((resolve, reject) => {
                 // @ts-ignore
                 const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
                 const notifier = new AuthorizationNotifier();
                 authorizationHandler.setAuthorizationNotifier(notifier);
-            
-                notifier.setAuthorizationListener(async (request, response, error) => {
-                    if(error){
+
+                notifier.setAuthorizationListener( (request, response, error) => {
+                    if (error) {
                         reject(error);
+                        return;
                     }
                     if (!response) {
                         reject("no response");
                         return;
                     }
-    
+
                     let extras = null;
                     if (request && request.internal) {
                         extras = {};
                         extras.code_verifier = request.internal.code_verifier;
-                        if(configuration.token_request_extras) {
+                        if (configuration.token_request_extras) {
                             for (let [key, value] of Object.entries(configuration.token_request_extras)) {
                                 extras[key] = value;
                             }
                         }
                     }
-    
+
                     const tokenRequest = new TokenRequest({
                         client_id: clientId,
                         redirect_uri: redirectURL,
@@ -516,17 +516,19 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         refresh_token: undefined,
                         extras,
                     });
-                    
+
                     try {
-                        const tokenResponse =  await tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest);
-                        const loginParams = getLoginParams(this.configurationName);
-                        resolve({
-                            tokens:tokenResponse, 
-                            state: request.state,
-                            callbackPath : loginParams.callbackPath,
+                        const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
+                        tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then((tokenResponse)=>{
+                            const loginParams = getLoginParams(this.configurationName);
+                            resolve({
+                                tokens: tokenResponse,
+                                state: request.state,
+                                callbackPath: loginParams.callbackPath,
+                            });
+                            this.publishEvent(eventNames.loginCallbackAsync_end, {})
                         });
-                        this.publishEvent(eventNames.loginCallbackAsync_end, {})
-                    } catch(exception){
+                    } catch (exception) {
                         this.publishEvent(eventNames.loginCallbackAsync_error, exception);
                         console.error(exception);
                         reject(exception);
@@ -534,7 +536,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 });
                 authorizationHandler.completeAuthorizationRequestIfPossible();
             });
-            return promise;
         } catch(exception) {
             console.error(exception);
             this.publishEvent(eventNames.loginCallbackAsync_error, exception);
