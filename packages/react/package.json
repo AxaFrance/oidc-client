@@ -23,7 +23,8 @@
     "openid",
     "oauth2",
     "oauth",
-    "react"
+    "react",
+    "next"
   ],
   "scripts": {
     "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcTrustedDomains.js ./public",

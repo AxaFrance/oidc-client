@@ -23,7 +23,8 @@
     "openid",
     "oauth2",
     "oauth",
-    "react"
+    "react",
+    "next"
   ],
   "scripts": {
     "prepare": "tsc --build \"./tsconfig.json\"",
