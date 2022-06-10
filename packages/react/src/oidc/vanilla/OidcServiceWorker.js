@@ -114,7 +114,7 @@ const keepAliveAsync = async (event) => {
     const originalRequest = event.request;
     const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
     if(!isFromVanilla) {
-        await sleep(15000);
+        await sleep(150000);
     }
     const init = {"status": 200, "statusText": 'oidc-service-worker'};
     return new Response('{}', init);
