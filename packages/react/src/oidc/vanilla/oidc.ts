@@ -465,7 +465,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
 
+    syncTokensAsyncPromise=null;
     async syncTokensAsync() {
+        // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
         const configuration = this.configuration;
         if(!this.tokens){
             return;
@@ -476,7 +478,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
             if(!tokens){
                 try {
-                    const silent_token_response = await this.silentSigninAsync();
+                    this.syncTokensAsyncPromise = this.silentSigninAsync();
+                    const silent_token_response = await this.syncTokensAsyncPromise;
                     if (silent_token_response) {
                         this.tokens = await setTokensAsync(serviceWorker, silent_token_response);
                     } else{
@@ -486,11 +489,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     console.error(exceptionSilent);
                     this.publishEvent(eventNames.refreshTokensAsync_error, exceptionSilent);
                 }
-                return;
+                this.syncTokensAsyncPromise = null;
             }
         }
-        // TODO
-        return;
     }
 
     async loginCallbackAsync(){
