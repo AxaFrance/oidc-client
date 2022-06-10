@@ -673,7 +673,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             console.warn('callbackPathOrUrl path is not a string');
         }
         const path = (callbackPathOrUrl === null || callbackPathOrUrl === undefined) ? location.pathname + (location.search || '') + (location.hash || '') : callbackPathOrUrl;
-		const isUri = callbackPathOrUrl.includes("https://") || callbackPathOrUrl.includes("http://");
+		let isUri = false;
+        if(callbackPathOrUrl) {
+            isUri = callbackPathOrUrl.includes("https://") || callbackPathOrUrl.includes("http://");
+        }
 		const url = isUri ? callbackPathOrUrl : window.location.origin + path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
