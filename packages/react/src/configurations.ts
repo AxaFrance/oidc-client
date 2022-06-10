@@ -1,5 +1,5 @@
 export const configurationIdentityServer = {
-    client_id: 'interactive.public.short', 
+    client_id: 'interactive.public', 
     redirect_uri: window.location.origin+'/authentication/callback', 
     //silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
     scope: 'openid profile email api offline_access',
