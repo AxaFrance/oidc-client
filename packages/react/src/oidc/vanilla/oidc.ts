@@ -144,6 +144,9 @@ const userInfoAsync = async (oidc) => {
     if(!oidc.tokens){
         return null;
     }
+    if(oidc.syncTokensAsyncPromise){
+        await oidc.syncTokensAsyncPromise;
+    }
     const accessToken = oidc.tokens.accessToken;
 
     const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
@@ -288,13 +291,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         iframe.setAttribute("src", link);
         document.body.appendChild(iframe);
         const self = this;
-        const promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             try {
                 let isResolved = false;
                 window.onmessage = function (e) {
                     const key = `${self.configurationName}_oidc_tokens:`;
                     if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
-                      
+
                         if (!isResolved) {
                             self.publishEvent(eventNames.silentSigninAsync_end, {});
                             resolve(JSON.parse(e.data.replace(key, '')));
@@ -303,7 +306,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         }
                     }
                 };
-                const silentSigninTimeout = configuration.silent_signin_timeout ? configuration.silent_signin_timeout : 12000 
+                const silentSigninTimeout = configuration.silent_signin_timeout ? configuration.silent_signin_timeout : 12000
                 setTimeout(() => {
                     if (!isResolved) {
                         reject("timeout");
@@ -311,14 +314,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         iframe.remove();
                         isResolved = true;
                     }
-                },  silentSigninTimeout);
+                }, silentSigninTimeout);
             } catch (e) {
                 iframe.remove();
                 reject(e);
                 self.publishEvent(eventNames.silentSigninAsync_error, e);
             }
         });
-        return promise;
     }
     initAsyncPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {

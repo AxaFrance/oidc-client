@@ -111,19 +111,6 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 setEvent({name, data});
             }
         });
-
-        /*const onVisibilitychange = () => {
-            const oidc = getOidc(configurationName);
-            if(window.self === window.top) {
-                if (document.hidden) {
-                    console.log('not visible');
-                } else {
-                    console.log('visible');
-                    oidc.syncTokensAsync();
-                }
-            }
-        }
-        window.addEventListener('visibilitychange', onVisibilitychange);*/
         
         setConfigurationName(configurationName);
         setLoading(false);
