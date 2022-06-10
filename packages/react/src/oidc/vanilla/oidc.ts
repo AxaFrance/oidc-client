@@ -111,7 +111,7 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
 
 const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
-    return  timer.setTimeout(async () => {
+    return timer.setTimeout(async () => {
         const currentTimeUnixSecond = new Date().getTime() /1000;
         const timeInfo = { timeLeft:((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond)};
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
@@ -127,6 +127,7 @@ const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
             oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
         } else{
+            await oidc.syncTokensAsync();
             oidc.timeoutId = await autoRenewTokensAsync(oidc, refreshToken, expiresAt)
         }
     }, 1000);
@@ -319,6 +320,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         });
         return promise;
     }
+    initAsyncPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
         if (authorityConfiguration != null) {
             return new AuthorizationServiceConfiguration( {
@@ -328,7 +330,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 token_endpoint: authorityConfiguration.token_endpoint,
                 userinfo_endpoint: authorityConfiguration.userinfo_endpoint});
         }
-        return await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
+        if(this.initAsyncPromise){
+            return this.initAsyncPromise;
+        }
+        this.initAsyncPromise = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
+        return this.initAsyncPromise;
     }
 
     tryKeepExistingSessionPromise = null;
@@ -457,6 +463,34 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             this.publishEvent(eventNames.loginAsync_error, exception);
             throw exception;
         }
+    }
+
+    async syncTokensAsync() {
+        const configuration = this.configuration;
+        if(!this.tokens){
+            return;
+        }
+        const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
+        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+        if (serviceWorker) {
+            const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
+            if(!tokens){
+                try {
+                    const silent_token_response = await this.silentSigninAsync();
+                    if (silent_token_response) {
+                        this.tokens = await setTokensAsync(serviceWorker, silent_token_response);
+                    } else{
+                        this.publishEvent(eventNames.refreshTokensAsync_error, null);
+                    }
+                } catch (exceptionSilent) {
+                    console.error(exceptionSilent);
+                    this.publishEvent(eventNames.refreshTokensAsync_error, exceptionSilent);
+                }
+                return;
+            }
+        }
+        // TODO
+        return;
     }
 
     async loginCallbackAsync(){
