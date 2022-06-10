@@ -12,7 +12,7 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 </p>
 
 <p align="center">
-  A set of react components to make Oidc (OpenID Connect) client easy. It aim to simplify OAuth authentication between multiples providers.
+  A set of react components to make Oidc (OpenID Connect) client easy. It aim to simplify OAuth authentication between multiples providers. It is compatible with NextJS.
 </p>
 
 - [About](#about)

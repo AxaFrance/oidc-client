@@ -17,6 +17,7 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [Run The Demo](#run-the-demo)
 - [Examples](#examples)
 - [How It Works](#how-it-works)
+- [NextJS](#NextJS)
 - [Service Worker Support](#service-worker-support)
 
 Easy set up of OIDC for react.
@@ -496,39 +497,53 @@ More information about OIDC
 - French: https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284
 - English: https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d
 
+
+
+# NextJS
+
+To work with NextJS you need to inject your own history surcharge like the sample below.
+
+```javascript
+const MyApp: React.FC<AppProps> = ({ Component, pageProps: { session, ...pageProps }, router }) => {
+  const [loading, setLoading] = useState(router.asPath.includes('access_token'));
+
+  const store = useStore(pageProps.initialReduxState);
+  let searchRedirectPage: PageUrl;
+
+  const withCustomHistory: () => CustomHistory = () => {
+    return {
+      replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {
+      router.replace({
+        pathname: url,
+      });
+    }
+  };
+  };
+  // Code omitted...
+
+  return !loading ? (
+          <>
+            <Head>
+              <meta
+                      name="viewport"
+                      content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no;user-scalable=0;"
+              />
+            </Head>
+            <OidcProvider configuration={OIDC_CONFIGURATION} withCustomHistory={withCustomHistory}>
+              <Provider store={store}>
+                <RouterScrollProvider>{layout}</RouterScrollProvider>
+              </Provider>
+            </OidcProvider>
+          </>
+  ) : null;
+};
+
+
+```
+
 # Service Worker Support
 
 - Firefox : tested on firefox 98.0.2
 - Chrome/Edge : tested on version upper to 90
 - Opera : tested on version upper to 80
 - Safari : tested on Safari/605.1.15
-
-# FAQ
-
-## Do not set OidcProvider Between Router and its routes
-
-Login callback won't work.
-Set OidcProvider before Router or inside a Route.
-
-```javascript
-import React from 'react';
-import { render } from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { OidcProvider } from '@axa-fr/react-oidc';
-import Header from './Layout/Header';
-import Routes from './Router';
-
-const configuration = {};
-
-const App = () => (
-<Router>
-   <OidcProvider configuration={configuration} > // DONT DO THAT
-      <Header />
-      <Routes />
-   </OidcProvider>
-</Router>
-);
-
-render(<App />, document.getElementById('root'));
-```
-
