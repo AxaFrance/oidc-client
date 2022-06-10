@@ -111,6 +111,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 setEvent({name, data});
             }
         });
+        
         setConfigurationName(configurationName);
         setLoading(false);
         return () => {

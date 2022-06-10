@@ -37,8 +37,6 @@ export const configurationAuth0 = {
     service_worker_only: false,
 };
 
-
-
 export const configurationGoogle = {
     client_id: '908893276222-f2drloh56ll0g99md38lv2k810d0nk0p.apps.googleusercontent.com',
     redirect_uri: `${window.location.origin}/multi-auth/callback-google`,
