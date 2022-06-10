@@ -1,7 +1,7 @@
 export const configurationIdentityServer = {
     client_id: 'interactive.public.short', 
     redirect_uri: window.location.origin+'/authentication/callback', 
-    silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
+    //silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
     refresh_time_before_tokens_expiration_in_second: 70,
@@ -12,7 +12,7 @@ export const configurationIdentityServer = {
 export const configurationIdentityServerWithoutDiscovery = {
     client_id: 'interactive.public.short',
     redirect_uri: window.location.origin+'/authentication/callback',
-    silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
+    //silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
     authority_configuration: {
@@ -37,12 +37,10 @@ export const configurationAuth0 = {
     service_worker_only: false,
 };
 
-
-
 export const configurationGoogle = {
     client_id: '908893276222-f2drloh56ll0g99md38lv2k810d0nk0p.apps.googleusercontent.com',
     redirect_uri: `${window.location.origin}/multi-auth/callback-google`,
-    silent_redirect_uri: window.location.origin+'/multi-auth/silent-callback-google',
+    //silent_redirect_uri: window.location.origin+'/multi-auth/silent-callback-google',
     scope: 'openid profile email',
     authority: 'https://accounts.google.com/',
     service_worker_relative_url:'/OidcServiceWorker.js',
