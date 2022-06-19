@@ -82,6 +82,7 @@ const refresh_token_scope = "offline_access";
     authority: string,
      authority_configuration?: AuthorityConfiguration,
     refresh_time_before_tokens_expiration_in_second?: number,
+    token_request_timeout?: number,
     service_worker_relative_url?:string,
      service_worker_only?:boolean,
      extras?:StringMap
@@ -503,6 +504,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const clientId = configuration.client_id;
             const redirectURL = configuration.redirect_uri;
             const authority =  configuration.authority;
+            const tokenRequestTimeout =  configuration.token_request_timeout;
             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
@@ -554,21 +556,31 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         extras,
                     });
 
+                    let timeoutId = setTimeout(function(){
+                        reject("performTokenRequest timeout");
+                        timeoutId=null;
+                    }, tokenRequestTimeout ?? 12000);
                     try {
                         const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
                         tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then((tokenResponse)=>{
-                            const loginParams = getLoginParams(this.configurationName);
-                            resolve({
-                                tokens: tokenResponse,
-                                state: request.state,
-                                callbackPath: loginParams.callbackPath,
-                            });
-                            this.publishEvent(eventNames.loginCallbackAsync_end, {})
+                            if(timeoutId) {
+                                const loginParams = getLoginParams(this.configurationName);
+                                clearTimeout(timeoutId);
+                                resolve({
+                                    tokens: tokenResponse,
+                                    state: request.state,
+                                    callbackPath: loginParams.callbackPath,
+                                });
+                                this.publishEvent(eventNames.loginCallbackAsync_end, {});
+                            }
                         });
                     } catch (exception) {
-                        this.publishEvent(eventNames.loginCallbackAsync_error, exception);
-                        console.error(exception);
-                        reject(exception);
+                        if(timeoutId) {
+                            clearTimeout(timeoutId);
+                            this.publishEvent(eventNames.loginCallbackAsync_error, exception);
+                            console.error(exception);
+                            reject(exception);
+                        }
                     }
                 });
                 authorizationHandler.completeAuthorizationRequestIfPossible();
