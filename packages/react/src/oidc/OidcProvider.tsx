@@ -75,7 +75,6 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              configuration, 
                                                                              configurationName = "default", 
                                                                              callbackSuccessComponent = CallBackSuccess, 
-                                                                             callbackErrorComponent = AuthenticateError,
                                                                              authenticatingComponent = Authenticating,
                                                                              loadingComponent = Loading,
                                                                              serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
@@ -155,7 +154,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                       <OidcRoutes redirect_uri={configuration.redirect_uri}
                                   silent_redirect_uri={configuration.silent_redirect_uri}
                                   callbackSuccessComponent={callbackSuccessComponent} 
-                                  callbackErrorComponent={callbackErrorComponent}
+                                  callbackErrorComponent={authenticatingErrorComponent}
                                   authenticatingComponent={authenticatingComponent}
                                   configurationName={configurationName}
                                   withCustomHistory={withCustomHistory}>
