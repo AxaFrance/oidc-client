@@ -25,6 +25,7 @@ export type OidcProviderProps = {
     children: any;
     onSessionLost?: Function,
     withCustomHistory?: () => CustomHistory,
+    onEvent?:Function
 };
 
 export type OidcSessionProps = {
@@ -82,6 +83,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              sessionLostComponent=SessionLost,
                                                                              onSessionLost=null,
                                                                              withCustomHistory=null,
+                                                                             onEvent=null,
                                                                          }) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
@@ -93,6 +95,10 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
     useEffect(() => {
         const oidc = getOidc(configurationName);
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+            if(onEvent)
+            {
+                onEvent(configurationName, name, data);
+            }
             if(name == Oidc.eventNames.refreshTokensAsync_error){
                 if(onSessionLost != null){
                     onSessionLost();
