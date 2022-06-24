@@ -9,10 +9,16 @@ import { MultiAuthContainer } from "./MultiAuth";
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
+
+
+const onEvent=(configurationName, eventName, data )=>{
+  console.log(configurationName + ":" + eventName, data);
+}
+
 function App() {
   const [show, setShow] = React.useState(false);
   return (
-    <OidcProvider configuration={configurationIdentityServer}>
+    <OidcProvider configuration={configurationIdentityServer} onEvent={onEvent}>
       <BrowserRouter>
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
           <a className="navbar-brand" href="/">@axa-fr/react-oidc</a>

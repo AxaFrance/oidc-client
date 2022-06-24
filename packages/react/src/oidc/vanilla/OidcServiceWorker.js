@@ -8,9 +8,9 @@ const handleInstall = (event) => {
     self.skipWaiting();
 };
 
-const handleActivate = () => {
+const handleActivate = (event) => {
     console.log('[OidcServiceWorker] service worker activated ' + id);
-    self.clients.claim();
+    event.waitUntil(self.clients.claim());
 };
 
 let currentLoginCallbackConfigurationName = null;

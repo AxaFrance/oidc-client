@@ -446,6 +446,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 serviceWorker.startKeepAliveServiceWorker();
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
+                await storage.setItem("dummy",{});
             } else {
                 const session = initSession(this.configurationName);
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
@@ -514,6 +515,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
                 const items = await serviceWorker.loadItemsAsync();
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
+                const dummy =await storage.getItem("dummy");
+                if(!dummy){
+                    throw new Error("Service Worker storage disapear");
+                }
+                await storage.removeItem("dummy");
             }else{
                 const session = initSession(this.configurationName);
                 this.session = session;
