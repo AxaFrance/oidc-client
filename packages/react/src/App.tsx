@@ -12,7 +12,7 @@ const OidcSecureHoc = withOidcSecure(Profile);
 
 
 const onEvent=(configurationName, eventName, data )=>{
-  console.log(configurationName + ":" + eventName, data);
+  console.log(`oidc:${configurationName}:${eventName}`, data);
 }
 
 function App() {
