@@ -83,7 +83,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              sessionLostComponent=SessionLost,
                                                                              onSessionLost=null,
                                                                              withCustomHistory=null,
-                                                                             onEvent=Function,
+                                                                             onEvent=null,
                                                                          }) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
