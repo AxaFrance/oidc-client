@@ -10,7 +10,7 @@ import {
     RedirectRequestHandler,
     TokenRequest
 } from '@openid/appauth';
-import {NoHashQueryStringUtils} from './noHashQueryStringUtils';
+import {NoHashQueryStringUtils, HashQueryStringUtils} from './noHashQueryStringUtils';
 import {initWorkerAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
@@ -453,7 +453,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
             
             // @ts-ignore
-            const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
+            const queryStringUtil = configuration.redirect_uri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
+            const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
                     const authRequest = new AuthorizationRequest({
                         client_id: configuration.client_id,
                         redirect_uri: configuration.redirect_uri,
@@ -528,7 +529,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
             return new Promise((resolve, reject) => {
                 // @ts-ignore
-                const authorizationHandler = new RedirectRequestHandler(storage, new NoHashQueryStringUtils(), window.location, new DefaultCrypto());
+                const queryStringUtil = configuration.redirect_uri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
+                // @ts-ignore
+                const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location , new DefaultCrypto());
                 const notifier = new AuthorizationNotifier();
                 authorizationHandler.setAuthorizationNotifier(notifier);
 
