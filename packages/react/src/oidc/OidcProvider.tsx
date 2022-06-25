@@ -4,6 +4,7 @@ import OidcRoutes from './core/routes/OidcRoutes';
 import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
+import { CustomHistory } from "./core/routes/withRouter";
 
 export type oidcContext = {
     getOidc: Function;
@@ -23,6 +24,8 @@ export type OidcProviderProps = {
     configuration?: OidcConfiguration;
     children: any;
     onSessionLost?: Function,
+    withCustomHistory?: () => CustomHistory,
+    onEvent?:Function
 };
 
 export type OidcSessionProps = {
@@ -73,13 +76,15 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              configuration, 
                                                                              configurationName = "default", 
                                                                              callbackSuccessComponent = CallBackSuccess, 
-                                                                             callbackErrorComponent = AuthenticateError,
                                                                              authenticatingComponent = Authenticating,
                                                                              loadingComponent = Loading,
                                                                              serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
                                                                              authenticatingErrorComponent = AuthenticatingError,
                                                                              sessionLostComponent=SessionLost,
-                                                                             onSessionLost=null}) => {
+                                                                             onSessionLost=null,
+                                                                             withCustomHistory=null,
+                                                                             onEvent=null,
+                                                                         }) => {
     const getOidc =(configurationName="default") => {
         return Oidc.getOrCreate(configuration, configurationName);
     }
@@ -90,6 +95,10 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
     useEffect(() => {
         const oidc = getOidc(configurationName);
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+            if(onEvent)
+            {
+                onEvent(configurationName, name, data);
+            }
             if(name == Oidc.eventNames.refreshTokensAsync_error){
                 if(onSessionLost != null){
                     onSessionLost();
@@ -107,6 +116,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 setEvent({name, data});
             }
         });
+        
         setConfigurationName(configurationName);
         setLoading(false);
         return () => {
@@ -150,9 +160,10 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                       <OidcRoutes redirect_uri={configuration.redirect_uri}
                                   silent_redirect_uri={configuration.silent_redirect_uri}
                                   callbackSuccessComponent={callbackSuccessComponent} 
-                                  callbackErrorComponent={callbackErrorComponent}
+                                  callbackErrorComponent={authenticatingErrorComponent}
                                   authenticatingComponent={authenticatingComponent}
-                                  configurationName={configurationName}>
+                                  configurationName={configurationName}
+                                  withCustomHistory={withCustomHistory}>
                           <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>
                             {children}
                           </OidcSession>

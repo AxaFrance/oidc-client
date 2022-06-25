@@ -62,7 +62,7 @@
         } catch (error) {
             return null;
         }
-        
+        const insideBrowser = (typeof process === 'undefined');
         try {
             if (SharedWorker) {
                 worker = new SharedWorker(blobURL);
@@ -70,7 +70,9 @@
             } 
         } catch (error)
         {
-            console.log("SharedWorker not available");
+            if(insideBrowser) {
+                console.warn("SharedWorker not available");
+            }
         }
         try {
             if (Worker) {
@@ -79,18 +81,24 @@
             }
         } catch (error)
         {
-            console.log("Worker not available");
+            if(insideBrowser) {
+                console.warn("Worker not available");
+            }
         }
 
         return null;
     }());
 
     if (!workerPort) {
+        // In NextJS with SSR (Server Side Rendering) during rending in Node JS, the window object is undefined,
+        // the global object is used instead as it is the closest approximation of a browsers window object.
+        const bindContext = (typeof window === 'undefined')? global: window;
+
         return {
-            setTimeout: setTimeout.bind(window),
-            clearTimeout: clearTimeout.bind(window),
-            setInterval: setInterval.bind(window),
-            clearInterval: clearInterval.bind(window)
+            setTimeout: setTimeout.bind(bindContext),
+            clearTimeout: clearTimeout.bind(bindContext),
+            setInterval: setInterval.bind(bindContext),
+            clearInterval: clearInterval.bind(bindContext)
         };
     }
 

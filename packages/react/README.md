@@ -17,6 +17,7 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [Run The Demo](#run-the-demo)
 - [Examples](#examples)
 - [How It Works](#how-it-works)
+- [NextJS](#NextJS)
 - [Service Worker Support](#service-worker-support)
 
 Easy set up of OIDC for react.
@@ -155,7 +156,8 @@ const propTypes = {
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
-    extras: StringMap|undefined // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
+    extras: StringMap|undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
+    withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState()) 
   }).isRequired
 };
 ```
@@ -494,6 +496,50 @@ It use AppAuthJS behind the scene because it very lightweight and created by ope
 More information about OIDC
 - French: https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284
 - English: https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d
+
+
+
+# NextJS
+
+To work with NextJS you need to inject your own history surcharge like the sample below.
+
+```javascript
+const MyApp: React.FC<AppProps> = ({ Component, pageProps: { session, ...pageProps }, router }) => {
+  const [loading, setLoading] = useState(router.asPath.includes('access_token'));
+
+  const store = useStore(pageProps.initialReduxState);
+  let searchRedirectPage: PageUrl;
+
+  const withCustomHistory: () => CustomHistory = () => {
+    return {
+      replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {
+      router.replace({
+        pathname: url,
+      });
+    }
+  };
+  };
+  // Code omitted...
+
+  return !loading ? (
+          <>
+            <Head>
+              <meta
+                      name="viewport"
+                      content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no;user-scalable=0;"
+              />
+            </Head>
+            <OidcProvider configuration={OIDC_CONFIGURATION} withCustomHistory={withCustomHistory}>
+              <Provider store={store}>
+                <RouterScrollProvider>{layout}</RouterScrollProvider>
+              </Provider>
+            </OidcProvider>
+          </>
+  ) : null;
+};
+
+
+```
 
 # Service Worker Support
 

@@ -4,6 +4,7 @@ import { getPath } from './route-utils';
 import CallbackComponent from '../default-component/Callback.component';
 import SilentCallbackComponent from "../default-component/SilentCallback.component";
 import ServiceWorkerInstall from "../default-component/ServiceWorkerInstall.component";
+import { CustomHistory } from "./withRouter";
 
 const propTypes = {
   callbackComponent: PropTypes.elementType,
@@ -22,6 +23,7 @@ type OidcRoutesProps = {
   configurationName:string;
   redirect_uri: string;
   silent_redirect_uri?: string;
+  withCustomHistory?: () => CustomHistory;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
@@ -30,7 +32,8 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
                                                               authenticatingComponent,  
                                                               redirect_uri,
                                                               silent_redirect_uri,
-  children, configurationName
+  children, configurationName,
+  withCustomHistory=null,
 }) => {
   // This exist because in next.js window outside useEffect is null
   let pathname = window ? getPath(window.location.href).split("?")[0] : '';
@@ -43,7 +46,7 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
     setNewPath();
     window.addEventListener('popstate', setNewPath, false);
     return () => window.removeEventListener('popstate', setNewPath, false);
-  });
+  }, []);
   
   const callbackPath = getPath(redirect_uri);
   console.log("callbackPath " +callbackPath )
@@ -55,7 +58,7 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
 
   switch (path) {
     case callbackPath:
-      return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} />;
+      return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} withCustomHistory={withCustomHistory} />;
     case callbackPath +"/service-worker-install" :
       return <ServiceWorkerInstall callBackError={callbackErrorComponent} authenticating={authenticatingComponent} configurationName={configurationName} />;  
     default:

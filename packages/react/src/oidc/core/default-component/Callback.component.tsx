@@ -1,7 +1,7 @@
 import React, {useEffect, useState, ComponentType} from 'react';
-import {getCustomHistory} from "../routes/withRouter";
 import AuthenticatingError from "./AuthenticateError.component";
 import Oidc from "../../vanilla/oidc";
+import {getCustomHistory} from "../routes/withRouter";
 
 export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-callback">
   <div className="oidc-callback__container">
@@ -10,23 +10,17 @@ export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-
   </div>
 </div>);
 
-const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, configurationName }) => {
-  const getOidc =  Oidc.get;
-  const [error, setError] = useState(false);
+const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, configurationName, withCustomHistory }) => {
 
-  const CallbackErrorComponent = callBackError || AuthenticatingError;
-  const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
-  
+  const [error, setError] = useState(false);
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
-     
       try {
-        const state = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
-        if (state != null && isMounted) {
-          const history = getCustomHistory()
-          history.replaceState(decodeURIComponent(state))
-        }
+        const getOidc =  Oidc.get;
+        const {callbackPath} = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
+        const history = (withCustomHistory)? withCustomHistory(): getCustomHistory();
+        history.replaceState(callbackPath || "/")
       } catch (error) {
         if(isMounted) {
           setError(true);
@@ -34,11 +28,14 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
       }
     };
     playCallbackAsync();
-    return  () => {
+    return () => {
       isMounted = false;
     };
   },[]);
-  
+
+  const CallbackErrorComponent = callBackError || AuthenticatingError;
+  const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
+
   if(error){
     return <CallbackErrorComponent configurationName={configurationName} />
   }
