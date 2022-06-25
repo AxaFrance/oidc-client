@@ -37,7 +37,6 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
 }) => {
   // This exist because in next.js window outside useEffect is null
   let pathname = window ? getPath(window.location.href).split("?")[0] : '';
-  console.log(pathname)
   
   const [path, setPath] = useState(pathname);
   
@@ -49,7 +48,7 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   }, []);
   
   const callbackPath = getPath(redirect_uri);
-  console.log("callbackPath " +callbackPath )
+
   if(silent_redirect_uri){
     if(path === getPath(silent_redirect_uri)){
       return <SilentCallbackComponent configurationName={configurationName} />
