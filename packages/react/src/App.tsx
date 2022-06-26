@@ -9,8 +9,6 @@ import { MultiAuthContainer } from "./MultiAuth";
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
-
-
 const onEvent=(configurationName, eventName, data )=>{
   console.log(`oidc:${configurationName}:${eventName}`, data);
 }

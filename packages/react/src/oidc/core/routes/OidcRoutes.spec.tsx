@@ -1,6 +1,5 @@
 import * as React from 'react';
 import OidcRoutes from './OidcRoutes';
-import { FC } from 'react';
 import {render} from "@testing-library/react";
 
 describe('Authenticating test suite', () => {

@@ -504,43 +504,55 @@ More information about OIDC
 
 To work with NextJS you need to inject your own history surcharge like the sample below.
 
+component/layout.js
 ```javascript
-const MyApp: React.FC<AppProps> = ({ Component, pageProps: { session, ...pageProps }, router }) => {
-  const [loading, setLoading] = useState(router.asPath.includes('access_token'));
+import { OidcProvider } from '@axa-fr/react-oidc';
+import { useRouter } from 'next/router'
 
-  const store = useStore(pageProps.initialReduxState);
-  let searchRedirectPage: PageUrl;
-
-  const withCustomHistory: () => CustomHistory = () => {
-    return {
-      replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {
-      router.replace({
-        pathname: url,
-      });
-    }
-  };
-  };
-  // Code omitted...
-
-  return !loading ? (
-          <>
-            <Head>
-              <meta
-                      name="viewport"
-                      content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no;user-scalable=0;"
-              />
-            </Head>
-            <OidcProvider configuration={OIDC_CONFIGURATION} withCustomHistory={withCustomHistory}>
-              <Provider store={store}>
-                <RouterScrollProvider>{layout}</RouterScrollProvider>
-              </Provider>
-            </OidcProvider>
-          </>
-  ) : null;
+const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:3001/#authentication/callback',
+  silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.identityserver.io',
+  authority_configuration: {
+    authorization_endpoint: 'https://demo.duendesoftware.com/connect/authorize',
+    token_endpoint: 'https://demo.duendesoftware.com/connect/token',
+    userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
+    end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
+    revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
+  },
 };
 
+const onEvent=(configurationName, eventName, data )=>{
+  console.log(`oidc:${configurationName}:${eventName}`, data);
+}
+
+export default function Layout({ children }) {
+  const router = useRouter()
+  const withCustomHistory= () => {
+    return {
+      replaceState: (url) => {
+        router.replace({
+          pathname: url,
+        });
+        window.dispatchEvent(new Event('popstate'));
+      }
+    };
+  };
+  
+  return (
+          <>
+            <OidcProvider configuration={configuration} onEvent={onEvent} withCustomHistory={withCustomHistory} >
+              <main>{children}</main>
+            </OidcProvider>
+          </>
+  )
+}
 
 ```
+
+For more information checkout the nextjs react oidc demo: https://github.com/AxaGuilDEv/react-oidc/tree/master/packages/nextjs-demo
 
 # Hash route
 
