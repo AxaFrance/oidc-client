@@ -1,16 +1,9 @@
 import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { getPath } from './route-utils';
 import CallbackComponent from '../default-component/Callback.component';
 import SilentCallbackComponent from "../default-component/SilentCallback.component";
 import ServiceWorkerInstall from "../default-component/ServiceWorkerInstall.component";
 import { CustomHistory } from "./withRouter";
-
-const propTypes = {
-  callbackComponent: PropTypes.elementType,
-  redirect_uri: PropTypes.string.isRequired,
-  children: PropTypes.node,
-};
 
 const defaultProps: Partial<OidcRoutesProps> = {
 
