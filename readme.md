@@ -18,6 +18,7 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [About](#about)
 - [Getting Started](#getting-started)
 - [Run The Demo](#run-the-demo)
+- [Run The Nextjs Demo](#run-the-nextjs-demo)
 - [How It Works](#how-it-works)
 - Packages
   - [`@axa-fr/react-oidc`](./packages/react#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc)
@@ -214,6 +215,16 @@ cd react-oidc/packages/react
 npm install
 npm start
 # then navigate to http://localhost:4200
+```
+
+## Run The NextJS Demo
+
+```sh
+git clone https://github.com/AxaGuilDEv/react-oidc.git
+cd react-oidc/packages/nextjs-demo
+npm install
+npm run dev
+# then navigate to http://localhost:3001
 ```
 
 ## How It Works
