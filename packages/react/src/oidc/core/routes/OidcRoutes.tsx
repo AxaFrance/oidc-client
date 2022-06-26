@@ -61,7 +61,6 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
 };
 
 // @ts-ignore
-OidcRoutes.propTypes = propTypes;
 OidcRoutes.defaultProps = defaultProps;
 
 export default React.memo(OidcRoutes);
