@@ -18,6 +18,7 @@ Try the demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - [Examples](#examples)
 - [How It Works](#how-it-works)
 - [NextJS](#NextJS)
+- [Hash route](#Hash-route)
 - [Service Worker Support](#service-worker-support)
 
 Easy set up of OIDC for react.
@@ -553,6 +554,24 @@ export default function Layout({ children }) {
 
 For more information checkout the nextjs react oidc demo: https://github.com/AxaGuilDEv/react-oidc/tree/master/packages/nextjs-demo
 
+# Hash route
+
+React oidc work also with hash router.
+
+```javascript
+export const configurationIdentityServerWithHash = {
+client_id: 'interactive.public.short',
+redirect_uri: window.location.origin+'#authentication-callback',
+silent_redirect_uri: window.location.origin+'#authentication-silent-callback',
+scope: 'openid profile email api offline_access',
+authority: 'https://demo.duendesoftware.com',
+refresh_time_before_tokens_expiration_in_second: 70,
+service_worker_relative_url:'/OidcServiceWorker.js',
+service_worker_only: false,
+};
+
+
+```
 
 # Service Worker Support
 

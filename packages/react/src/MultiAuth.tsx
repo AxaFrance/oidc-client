@@ -1,6 +1,6 @@
 ﻿import React, {useState} from 'react';
 import {OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken} from "./oidc";
-import { configurationIdentityServer, configurationGoogle} from "./configurations";
+import { configurationIdentityServer, configurationIdentityServerWithHash, configurationGoogle} from "./configurations";
 import AuthenticatingError from "./override/AuthenticateError.component"
 import Authenticating from "./override/Authenticating.component"
 import Loading from "./override/Loading.component"
@@ -29,9 +29,10 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                     <p className="card-text">React Demo Application protected by OpenId Connect with MultipleAuthentication.
                         <br/>For example, config_1 can have other sensitive scope, config_2 does not ask for the "offline_access" so it does not retrieve the most sensitive token "refresh_token" for very sensitive operation, it retrive only access_token valid for a small amout of time.</p>
                     <select value={configurationName} onChange={handleConfigurationChange} >
-                        <option value="config_1">config_1</option>
-                        <option value="config_2">config_2</option>
+                        <option value="config_classic">config_classic</option>
+                        <option value="config_without_refresh_token">config_without_refresh_token</option>
                         <option value="google">google</option>
+                        <option value="config_with_hash">config_with_hash</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
@@ -42,7 +43,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
 };
 
 if(!sessionStorage.configurationName){
-    sessionStorage.configurationName = "config_1";
+    sessionStorage.configurationName = "config_classic";
 }
 
 export const MultiAuthContainer = () => {
@@ -51,16 +52,17 @@ export const MultiAuthContainer = () => {
     const callBack = window.location.origin+"/multi-auth/authentification/callback2";
     const silent_redirect_uri = window.location.origin+"/multi-auth/authentification/silent-callback2";
     const configurations = {
-        config_1: {...configurationIdentityServer,
+        config_classic: {...configurationIdentityServer,
             redirect_uri:callBack,
             silent_redirect_uri,
             scope: 'openid profile email api offline_access'
         },
-        config_2: {...configurationIdentityServer,
+        config_without_refresh_token: {...configurationIdentityServer,
             redirect_uri:callBack,
             silent_redirect_uri: "",
             scope: 'openid profile email api'},
-        google: { ...configurationGoogle }
+        google: { ...configurationGoogle },
+        config_with_hash: { ...configurationIdentityServerWithHash}
     }
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
