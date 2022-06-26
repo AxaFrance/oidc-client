@@ -1,6 +1,6 @@
-    import { OidcProvider } from '@axa-fr/react-oidc';
+import { OidcProvider } from '@axa-fr/react-oidc';
+import { useRouter } from 'next/router'
 
-    import { useRouter } from 'next/router'
 const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:3001/#authentication/callback',
