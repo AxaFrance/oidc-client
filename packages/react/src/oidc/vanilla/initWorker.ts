@@ -37,8 +37,8 @@ export const sleepAsync = (milliseconds) => {
 }
 
 const keepAlive = () => {
-    const currentTimeUnixSecond = new Date().getTime() /1000;
-    fetch('/OidcKeepAliveServiceWorker.json').then(() => {
+   // const currentTimeUnixSecond = new Date().getTime() /1000;
+    fetch('/OidcKeepAliveServiceWorker.json');/*.then(() => {
         const newTimeUnixSecond = new Date().getTime() /1000;
         if((newTimeUnixSecond - currentTimeUnixSecond) >4){
             keepAlive();   
@@ -46,7 +46,8 @@ const keepAlive = () => {
             // security if service worker does not catch the request
             sleepAsync(2000).then(keepAlive);
         }
-    })
+    });*/
+    sleepAsync(230*1000).then(keepAlive);
 }
 
 const isServiceWorkerProxyActiveAsync = () => {
