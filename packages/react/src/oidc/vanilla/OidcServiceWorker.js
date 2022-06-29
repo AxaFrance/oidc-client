@@ -113,11 +113,18 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const keepAliveAsync = async (event) => {
     const originalRequest = event.request;
     const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
-    if(!isFromVanilla) {
-        await sleep(40000);
-    }
     const init = {"status": 200, "statusText": 'oidc-service-worker'};
-    return new Response('{}', init);
+    const response = new Response('{}', init);
+    if(!isFromVanilla) {
+        for(let i=0; i<200;i++){
+            await sleep(1000 + Math.floor(Math.random() * 1000));
+            const cache = await caches.open("oidc_dummy_cache");
+            await cache.put(event.request, response.clone());
+            console.log(`[OidcServiceWorker] wait ${id}`);
+        }
+    }
+   
+    return response;
 }
 
 const handleFetch = async (event) => {
