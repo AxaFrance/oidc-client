@@ -16,14 +16,19 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
+      const getOidc =  Oidc.get;
       try {
-        const getOidc =  Oidc.get;
         const {callbackPath} = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
         const history = (withCustomHistory)? withCustomHistory(): getCustomHistory();
         history.replaceState(callbackPath || "/")
       } catch (error) {
-        if(isMounted) {
-          setError(true);
+        try {
+          // for service worker only
+          await getOidc(configurationName).silentSigninAsync();
+        }catch (error) {
+          if(isMounted) {
+            setError(true);
+          }
         }
       }
     };
