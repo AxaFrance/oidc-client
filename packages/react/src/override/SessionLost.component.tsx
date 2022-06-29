@@ -1,4 +1,4 @@
-import React, {ComponentType, PropsWithChildren} from 'react';
+import React, {ComponentType} from 'react';
 import {style} from "./style"
 import {useOidc} from "../oidc";
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ComponentType, PropsWithChildren} from "react";
+import {ComponentType} from "react";
 import {style} from "./style";
 
 const AuthenticatingError:  ComponentType<any> = ({configurationName}) => (
