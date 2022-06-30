@@ -22,14 +22,14 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
         const history = (withCustomHistory)? withCustomHistory(): getCustomHistory();
         history.replaceState(callbackPath || "/")
       } catch (error) {
-        try {
+     //   try {
           // for service worker only
-          await getOidc(configurationName).silentSigninAsync();
-        }catch (error) {
+       //   await getOidc(configurationName).silentSigninAsync();
+    //    }catch (error) {
           if(isMounted) {
             setError(true);
           }
-        }
+    //    }
       }
     };
     playCallbackAsync();
