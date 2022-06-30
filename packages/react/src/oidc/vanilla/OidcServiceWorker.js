@@ -120,7 +120,6 @@ const keepAliveAsync = async (event) => {
             await sleep(1000 + Math.floor(Math.random() * 1000));
             const cache = await caches.open("oidc_dummy_cache");
             await cache.put(event.request, response.clone());
-            console.log(`[OidcServiceWorker] wait ${id}`);
         }
     }
    

@@ -9,12 +9,18 @@ import { MultiAuthContainer } from "./MultiAuth";
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
-const onEvent=(configurationName, eventName, data )=>{
-  console.log(`oidc:${configurationName}:${eventName}`, data);
-}
+
 
 function App() {
   const [show, setShow] = React.useState(false);
+  const [events, setEvents] = React.useState([]);
+
+  const onEvent=(configurationName, eventName, data )=>{
+    console.log(`oidc:${configurationName}:${eventName}`, data);
+    const newEvents = [...events];
+    newEvents.push({name: `oidc:${configurationName}:${eventName}`, data});
+    setEvents(newEvents);
+  }
   return (
     <OidcProvider configuration={configurationIdentityServer} onEvent={onEvent}>
       <BrowserRouter>
@@ -60,6 +66,10 @@ function App() {
             <Route path="/user-fetch-secure-hook" element={<FetchUserHook></FetchUserHook>} />
             <Route path="/multi-auth/*" element={<MultiAuthContainer></MultiAuthContainer>} />
           </Routes>
+        </div>
+        <div>{events.map(e => {
+          return <p>{e.name}: { JSON.stringify(e.data)}</p>
+        })}
         </div>
       </BrowserRouter>
     </OidcProvider>

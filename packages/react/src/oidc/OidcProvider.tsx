@@ -99,7 +99,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
             {
                 onEvent(configurationName, name, data);
             }
-            if(name == Oidc.eventNames.refreshTokensAsync_error){
+            if(name == Oidc.eventNames.refreshTokensAsync_error || name == Oidc.eventNames.syncTokensAsync_error){
                 if(onSessionLost != null){
                     onSessionLost();
                     return;
@@ -151,6 +151,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 <AuthenticatingErrorComponent configurationName={configurationName} />;
             </Switch>;
         case Oidc.eventNames.refreshTokensAsync_error:
+        case Oidc.eventNames.syncTokensAsync_error:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <SessionLostComponent configurationName={configurationName} /> 
             </Switch>;
