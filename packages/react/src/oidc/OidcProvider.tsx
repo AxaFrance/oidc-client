@@ -124,7 +124,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
             previousOidc.removeEventSubscription(newSubscriptionId);
             setEvent(defaultEventState);
         }
-    }, [configuration, configurationName]);
+    }, [configuration, configurationName, onEvent]);
 
     
     const SessionLostComponent = sessionLostComponent;
