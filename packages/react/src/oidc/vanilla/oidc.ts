@@ -209,7 +209,11 @@ const eventNames = {
     tryKeepExistingSessionAsync_error: "tryKeepExistingSessionAsync_error",
     silentSigninAsync_begin: "silentSigninAsync_begin",
     silentSigninAsync_end: "silentSigninAsync_end",
-    silentSigninAsync_error: "silentSigninAsync_error",
+    silentSigninAsync_error: "silentSigninAsync_error", 
+    syncTokensAsync_begin: "syncTokensAsync_begin",
+    syncTokensAsync_end: "syncTokensAsync_end",
+    syncTokensAsync_error: "syncTokensAsync_error"
+
 }
 
 const getRandomInt = (max) => {
@@ -477,24 +481,27 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if(!this.tokens){
             return;
         }
+       
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
         if (serviceWorker) {
             const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
             if(!tokens){
                 try {
+                    this.publishEvent(eventNames.syncTokensAsync_begin, {});
                     this.syncTokensAsyncPromise = this.silentSigninAsync();
                     const silent_token_response = await this.syncTokensAsyncPromise;
                     if (silent_token_response) {
                         this.tokens = await setTokensAsync(serviceWorker, silent_token_response);
                     } else{
-                        this.publishEvent(eventNames.refreshTokensAsync_error, null);
+                        this.publishEvent(eventNames.syncTokensAsync_error, null);
                     }
                 } catch (exceptionSilent) {
                     console.error(exceptionSilent);
-                    this.publishEvent(eventNames.refreshTokensAsync_error, exceptionSilent);
+                    this.publishEvent(eventNames.syncTokensAsync_error, exceptionSilent);
                 }
                 this.syncTokensAsyncPromise = null;
+                this.publishEvent(eventNames.syncTokensAsync_end, {});
             }
         }
     }
