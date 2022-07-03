@@ -286,6 +286,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (!this.configuration.silent_redirect_uri) {
             return Promise.resolve(null);
         }
+try {
         this.publishEvent(eventNames.silentSigninAsync_begin, {});
         const configuration = this.configuration 
         const link = configuration.silent_redirect_uri;
@@ -328,6 +329,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 reject(e);
             }
         });
+} catch (e) {
+        console.warn(e);
+this.publishEvent(eventNames.silentSigninAsync_error, e);
+return Promise.resolve(null);
+    }
     }
     initAsyncPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
