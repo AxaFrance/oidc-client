@@ -27,6 +27,7 @@ function App() {
     dispatch({type: 'event', data: {name: `oidc:${configurationName}:${eventName}`, data}})
   }
   return (<>
+
     <OidcProvider configuration={configurationIdentityServer} onEvent={onEvent}>
       <BrowserRouter>
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -73,7 +74,6 @@ function App() {
           </Routes>
         </div>
 
-       
       </BrowserRouter>
     </OidcProvider>
        <div className="container-fluid mt-3">
