@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useReducer} from 'react';
 import {BrowserRouter, Route, Link, Routes} from 'react-router-dom';
 import { Home } from "./Home";
 import { Profile, SecureProfile } from "./Profile";
@@ -9,16 +9,22 @@ import { MultiAuthContainer } from "./MultiAuth";
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
-
+function reducer(state, action) {
+  switch (action.type) {
+    case 'event':
+      return [action.data, ...state]
+    default:
+      throw new Error();
+  }
+}
 
 function App() {
   const [show, setShow] = React.useState(false);
-  const [events, setEvents] = React.useState([]);
+  const [events, dispatch] = useReducer(reducer, []);
 
   const onEvent=(configurationName, eventName, data )=>{
     console.log(`oidc:${configurationName}:${eventName}`, data);
-    const newEvents = [{name: `oidc:${configurationName}:${eventName}`, data}, ...events];
-    setEvents(newEvents);
+    dispatch({type: 'event', data: {name: `oidc:${configurationName}:${eventName}`, data}})
   }
   return (<>
     <OidcProvider configuration={configurationIdentityServer} onEvent={onEvent}>

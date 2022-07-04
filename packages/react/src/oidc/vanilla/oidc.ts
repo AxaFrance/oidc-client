@@ -310,17 +310,18 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const key = `${self.configurationName}_oidc_tokens:`;
                         if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
                             if (!isResolved) {
-                                self.publishEvent(eventNames.silentSigninAsync_end, {});
+                                const result = JSON.parse(e.data.replace(key, ''));
+                                self.publishEvent(eventNames.silentSigninAsync_end, result);
                                 iframe.remove();
                                 isResolved = true;
-                                resolve(JSON.parse(e.data.replace(key, '')));
+                                resolve(result);
                             }
                         }
                     };
                     const silentSigninTimeout = configuration.silent_signin_timeout ? configuration.silent_signin_timeout : 12000
                     setTimeout(() => {
                         if (!isResolved) {
-                            self.publishEvent(eventNames.silentSigninAsync_error, new Error("timeout"));
+                            self.publishEvent(eventNames.silentSigninAsync_error, "timeout");
                             iframe.remove();
                             isResolved = true;
                             reject("timeout");
