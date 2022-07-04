@@ -114,7 +114,7 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return timer.setTimeout(async () => {
         const currentTimeUnixSecond = new Date().getTime() /1000;
-        const timeInfo = { timeLeft:((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond)};
+        const timeInfo = { timeLeft: Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond))};
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
         if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
