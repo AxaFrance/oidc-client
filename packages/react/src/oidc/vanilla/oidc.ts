@@ -106,11 +106,11 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
         await oidc.session.setTokens(oidc.tokens);
     }
     oidc.publishEvent(Oidc.eventNames.token_aquired, oidc.tokens);
-    oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt)
+    oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt)
     return { state:response.state, callbackPath : response.callbackPath };
 }
 
-const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
+const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
     return timer.setTimeout(async () => {
         const currentTimeUnixSecond = new Date().getTime() /1000;
@@ -126,10 +126,14 @@ const autoRenewTokensAsync = async (oidc, refreshToken, expiresAt) => {
                 return;                
             }
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
-            oidc.timeoutId = await autoRenewTokensAsync(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
+            if(oidc.timeoutId) {
+                oidc.timeoutId = await autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
+            }
         } else{
             await oidc.syncTokensAsync();
-            oidc.timeoutId = await autoRenewTokensAsync(oidc, refreshToken, expiresAt)
+            if(oidc.timeoutId) {
+                oidc.timeoutId = autoRenewTokens(oidc, refreshToken, expiresAt);
+            }
         }
     }, 1000);
 }
@@ -229,6 +233,7 @@ export class Oidc {
     private serviceWorker?: any;
     private configurationName: string;
     private session?: any;
+    private iFrameSession= {}
     constructor(configuration:OidcConfiguration, configurationName="default") {
       this.configuration = configuration
         this.configurationName= configurationName;
@@ -286,46 +291,51 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (!this.configuration.silent_redirect_uri) {
             return Promise.resolve(null);
         }
-        this.publishEvent(eventNames.silentSigninAsync_begin, {});
-        const configuration = this.configuration 
-        const link = configuration.silent_redirect_uri;
-        const iframe = document.createElement('iframe');
-        iframe.width = "0px";
-        iframe.height = "0px";
-        iframe.id = `${this.configurationName}_oidc_iframe`;
-        iframe.setAttribute("src", link);
-        document.body.appendChild(iframe);
-        const self = this;
-        return new Promise((resolve, reject) => {
-            try {
-                let isResolved = false;
-                window.onmessage = function (e) {
-                    const key = `${self.configurationName}_oidc_tokens:`;
-                    if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
+        try {
 
+            this.publishEvent(eventNames.silentSigninAsync_begin, {});
+            const configuration = this.configuration
+            const link = configuration.silent_redirect_uri;
+            const iframe = document.createElement('iframe');
+            iframe.width = "0px";
+            iframe.height = "0px";
+            iframe.id = `${this.configurationName}_oidc_iframe`;
+            iframe.setAttribute("src", link);
+            document.body.appendChild(iframe);
+            const self = this;
+            return new Promise((resolve, reject) => {
+                try {
+                    let isResolved = false;
+                    window.onmessage = function (e) {
+                        const key = `${self.configurationName}_oidc_tokens:`;
+                        if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
+                            if (!isResolved) {
+                                self.publishEvent(eventNames.silentSigninAsync_end, {});
+                                iframe.remove();
+                                isResolved = true;
+                                resolve(JSON.parse(e.data.replace(key, '')));
+                            }
+                        }
+                    };
+                    const silentSigninTimeout = configuration.silent_signin_timeout ? configuration.silent_signin_timeout : 12000
+                    setTimeout(() => {
                         if (!isResolved) {
-                            self.publishEvent(eventNames.silentSigninAsync_end, {});
-                            resolve(JSON.parse(e.data.replace(key, '')));
+                            self.publishEvent(eventNames.silentSigninAsync_error, new Error("timeout"));
                             iframe.remove();
                             isResolved = true;
+                            reject("timeout");
                         }
-                    }
-                };
-                const silentSigninTimeout = configuration.silent_signin_timeout ? configuration.silent_signin_timeout : 12000
-                setTimeout(() => {
-                    if (!isResolved) {
-                        reject("timeout");
-                        self.publishEvent(eventNames.silentSigninAsync_error, new Error("timeout"));
-                        iframe.remove();
-                        isResolved = true;
-                    }
-                }, silentSigninTimeout);
-            } catch (e) {
-                iframe.remove();
-                reject(e);
-                self.publishEvent(eventNames.silentSigninAsync_error, e);
-            }
-        });
+                    }, silentSigninTimeout);
+                } catch (e) {
+                    iframe.remove();
+                    self.publishEvent(eventNames.silentSigninAsync_error, e);
+                    reject(e);
+                }
+            });
+        } catch (e) {
+            this.publishEvent(eventNames.silentSigninAsync_error, e);
+            throw e;
+        }
     }
     initAsyncPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
@@ -405,7 +415,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
                 this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                     success: false,
-                    message: "no service worker"
+                    message: serviceWorker ? "service worker sessions not retrieved" : "session storage sessions not retrieved"
                 });
                 return false;
             } catch (exception) {
@@ -491,14 +501,26 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     this.publishEvent(eventNames.syncTokensAsync_begin, {});
                     this.syncTokensAsyncPromise = this.silentSigninAsync();
                     const silent_token_response = await this.syncTokensAsyncPromise;
+                    console.log("silent_token_response")
+                    console.log(silent_token_response)
                     if (silent_token_response) {
                         this.tokens = await setTokensAsync(serviceWorker, silent_token_response);
                     } else{
                         this.publishEvent(eventNames.syncTokensAsync_error, null);
+                        if(this.timeoutId){
+                           timer.clearTimeout(this.timeoutId);
+                           this.timeoutId=null;
+                        }
+                        return;
                     }
                 } catch (exceptionSilent) {
                     console.error(exceptionSilent);
                     this.publishEvent(eventNames.syncTokensAsync_error, exceptionSilent);
+                    if(this.timeoutId){
+                        timer.clearTimeout(this.timeoutId);
+                        this.timeoutId=null;
+                    }
+                    return;
                 }
                 this.syncTokensAsyncPromise = null;
                 this.publishEvent(eventNames.syncTokensAsync_end, {});
@@ -582,17 +604,19 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             if(timeoutId) {
                                 const loginParams = getLoginParams(this.configurationName);
                                 clearTimeout(timeoutId);
+                                this.timeoutId=null;
+                                this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                 resolve({
                                     tokens: tokenResponse,
                                     state: request.state,
                                     callbackPath: loginParams.callbackPath,
                                 });
-                                this.publishEvent(eventNames.loginCallbackAsync_end, {});
                             }
                         });
                     } catch (exception) {
                         if(timeoutId) {
                             clearTimeout(timeoutId);
+                            this.timeoutId=null;
                             this.publishEvent(eventNames.loginCallbackAsync_error, exception);
                             console.error(exception);
                             reject(exception);
@@ -692,6 +716,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          this.userInfo = null;
          this.events = [];
          timer.clearTimeout(this.timeoutId);
+         this.timeoutId=null;
      }
      
     async logoutAsync(callbackPathOrUrl: string | undefined = undefined, extras: StringMap = null) {
