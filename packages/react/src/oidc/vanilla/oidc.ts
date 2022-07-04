@@ -127,7 +127,7 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
             }
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
             if(oidc.timeoutId) {
-                oidc.timeoutId = await autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
+                oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
             }
         } else{
             await oidc.syncTokensAsync();
@@ -380,7 +380,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
                         this.serviceWorker = serviceWorker;
                         // @ts-ignore
-                        this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                        this.timeoutId = autoRenewTokens(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
                             message: "tokens inside ServiceWorker are valid"
@@ -406,7 +406,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         session.setTokens(this.tokens);
                         this.session = session;
                         // @ts-ignore
-                        this.timeoutId = await autoRenewTokensAsync(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                        this.timeoutId = autoRenewTokens(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
                             message: "tokens inside ServiceWorker are valid"
