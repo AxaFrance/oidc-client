@@ -644,7 +644,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             } catch (exceptionSilent) {
                 console.error(exceptionSilent);
             }
-
+            if(this.timeoutId){
+                timer.clearTimeout(this.timeoutId);
+                this.timeoutId=null;
+            }
             this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_error : eventNames.refreshTokensAsync_error, exception);
             return null;
         }
