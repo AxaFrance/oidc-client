@@ -99,6 +99,16 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
             {
                 onEvent(configurationName, name, data);
             }
+        });
+        return () => {
+            const previousOidc = getOidc(configurationName);
+            previousOidc.removeEventSubscription(newSubscriptionId);
+        }
+    }, [configurationName, onEvent]);
+
+    useEffect(() => {
+        const oidc = getOidc(configurationName);
+        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.refreshTokensAsync_error || name == Oidc.eventNames.syncTokensAsync_error){
                 if(onSessionLost != null){
                     onSessionLost();
