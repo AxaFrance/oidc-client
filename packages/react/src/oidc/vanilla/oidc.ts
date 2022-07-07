@@ -659,10 +659,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const redirectUri = configuration.redirect_uri;
             const authority =  configuration.authority;
             
-            if(!configuration.scope.split(" ").find(s => s === refresh_token_scope))
+           /* if(!configuration.scope.split(" ").find(s => s === refresh_token_scope))
             {
                 return await localSilentSigninAsync();
-            }
+            }*/
             const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
 
             let extras = undefined;
