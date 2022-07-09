@@ -690,7 +690,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             
             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
-            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end, token_response);
+            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end,  {message:"success"});
             return token_response;
         } catch(exception) {
             console.error(exception);
