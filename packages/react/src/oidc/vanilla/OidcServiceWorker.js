@@ -51,8 +51,10 @@ function hideTokens(currentDatabaseElement) {
             const secureTokens = {
                 ...tokens,
                 access_token: ACCESS_TOKEN +"_" + configurationName,
-                refresh_token: REFRESH_TOKEN + "_" + configurationName,
             };
+            if(tokens.refresh_token){
+                secureTokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
+            }
             const body = JSON.stringify(secureTokens)
             return new Response(body, response);
         });
@@ -254,12 +256,15 @@ addEventListener('message', event => {
                     tokens:null,
                     configurationName});
             } else {
+                const tokens = {
+                    ...currentDatabase.tokens,
+                    access_token: ACCESS_TOKEN + "_" + configurationName
+                };
+                if(currentDatabase.refresh_token){
+                    tokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
+                }
                 port.postMessage({
-                    tokens: {
-                        ...currentDatabase.tokens,
-                        refresh_token: REFRESH_TOKEN + "_" + configurationName,
-                        access_token: ACCESS_TOKEN + "_" + configurationName
-                    },
+                    tokens,
                     configurationName
                 });
             }

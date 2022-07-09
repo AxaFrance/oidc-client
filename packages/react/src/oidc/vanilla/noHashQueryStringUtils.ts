@@ -7,6 +7,8 @@ export class NoHashQueryStringUtils extends BasicQueryStringUtils {
     }
 }
 
+const keys = ["code", "session_state", "state"]
+
 export class HashQueryStringUtils extends BasicQueryStringUtils {
     parse(input, useHash) {
         const output =  super.parse(input, true /* use hash */);
@@ -14,10 +16,12 @@ export class HashQueryStringUtils extends BasicQueryStringUtils {
         // Fix AppAuthJs behavior
         let propertyToDelelete = null;
         Object.entries(output).map(([key, value]) => {
-            if(key.endsWith("?code")){
-                output["code"]= value;
-                propertyToDelelete = key;
-            }
+            keys.forEach(k => {
+                if(key.endsWith(`?${k}`)){
+                    output[k]= value;
+                    propertyToDelelete = key;
+                }
+            })
         });
         
         if(propertyToDelelete){

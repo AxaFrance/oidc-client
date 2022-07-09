@@ -11,7 +11,7 @@ import {
     TokenRequest
 } from '@openid/appauth';
 import {NoHashQueryStringUtils, HashQueryStringUtils} from './noHashQueryStringUtils';
-import {initWorkerAsync} from './initWorker'
+import {initWorkerAsync, sleepAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
 import timer from './timer';
@@ -212,6 +212,7 @@ const eventNames = {
     tryKeepExistingSessionAsync_end: "tryKeepExistingSessionAsync_end",
     tryKeepExistingSessionAsync_error: "tryKeepExistingSessionAsync_error",
     silentSigninAsync_begin: "silentSigninAsync_begin",
+    silentSigninAsync: "silentSigninAsync",
     silentSigninAsync_end: "silentSigninAsync_end",
     silentSigninAsync_error: "silentSigninAsync_error", 
     syncTokensAsync_begin: "syncTokensAsync_begin",
@@ -291,8 +292,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (!this.configuration.silent_redirect_uri) {
             return Promise.resolve(null);
         }
+        while (document.hidden) {
+            await sleepAsync(1000);
+            this.publishEvent(eventNames.silentSigninAsync, {message:"wait because document is hidden"});
+        }
+            
         try {
-
             this.publishEvent(eventNames.silentSigninAsync_begin, {});
             const configuration = this.configuration
             const link = configuration.silent_redirect_uri;
@@ -659,7 +664,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const redirectUri = configuration.redirect_uri;
             const authority =  configuration.authority;
             
-            if(!configuration.scope.split(" ").find(s => s === refresh_token_scope))
+            if(!refreshToken)
             {
                 return await localSilentSigninAsync();
             }
@@ -685,7 +690,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             
             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
-            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end, token_response);
+            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end,  {message:"success"});
             return token_response;
         } catch(exception) {
             console.error(exception);
