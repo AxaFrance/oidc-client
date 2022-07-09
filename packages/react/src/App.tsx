@@ -12,7 +12,7 @@ const OidcSecureHoc = withOidcSecure(Profile);
 function reducer(state, action) {
   switch (action.type) {
     case 'event':
-      return [action.data, ...state]
+      return [{...action.data, date:Date.now()}, ...state]
     default:
       throw new Error();
   }
@@ -81,7 +81,7 @@ function App() {
           <div className="card-body" >
             <h5 className="card-title">Default configuration Events</h5>
             <div style={{"overflowX": "hidden", "overflowY": "scroll", "maxHeight": "400px"}}>
-              {events.map(e => {
+              {events.map((e) => {
                 return <p>{e.name}: { JSON.stringify(e.data)}</p>
               })}
             </div>
