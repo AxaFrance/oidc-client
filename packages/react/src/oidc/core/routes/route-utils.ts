@@ -24,15 +24,11 @@ export const getPath = (href: string) => {
   if(path.endsWith('/')){
       path = path.slice(0, -1);
   }
-  const { search, hash } = location;
-
-  /*if (search) {
-    path += search;
-  }*/
+  const { hash } = location;
 
   if (hash) {
-    path += hash;
+    path += hash.split("?")[0];
   }
 
-  return path.split("?")[0];
+  return path;
 };
