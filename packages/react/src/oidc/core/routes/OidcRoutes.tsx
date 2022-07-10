@@ -29,12 +29,12 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   withCustomHistory=null,
 }) => {
   // This exist because in next.js window outside useEffect is null
-  let pathname = window ? getPath(window.location.href).split("?")[0] : '';
+  let pathname = window ? getPath(window.location.href) : '';
   
   const [path, setPath] = useState(pathname);
   
   useEffect(() => {
-    const setNewPath = () => setPath(getPath(window.location.href).split("?")[0]);
+    const setNewPath = () => setPath(getPath(window.location.href));
     setNewPath();
     window.addEventListener('popstate', setNewPath, false);
     return () => window.removeEventListener('popstate', setNewPath, false);
