@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { OidcProvider, OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser, OidcUserStatus} from '@axa-fr/react-oidc';
+import { OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser, OidcUserStatus} from '@axa-fr/react-oidc';
 
 
 const DisplayUserInfo = () => {
