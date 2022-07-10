@@ -24,14 +24,16 @@ export default function Layout({ children }) {
     const router = useRouter()
     const withCustomHistory= () => {
         return {
-          replaceState: (url) => {
-          router.replace({
-            pathname: url,
-          });
-          window.dispatchEvent(new Event('popstate'));
-        }
-      };
-      };
+            replaceState: (url) => {
+                router.replace({
+                    pathname: url,
+                }).then(() => {
+                        window.dispatchEvent(new Event('popstate'));
+                    }
+                )
+            }
+        };
+    };
   return (
     <>
     <OidcProvider configuration={configuration} onEvent={onEvent} withCustomHistory={withCustomHistory} >

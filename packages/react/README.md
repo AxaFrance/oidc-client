@@ -535,8 +535,9 @@ export default function Layout({ children }) {
       replaceState: (url) => {
         router.replace({
           pathname: url,
+        }).then(() => {
+          window.dispatchEvent(new Event('popstate'));
         });
-        window.dispatchEvent(new Event('popstate'));
       }
     };
   };
