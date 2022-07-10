@@ -20,14 +20,14 @@ const getLocation = (href: string) => {
 export const getPath = (href: string) => {
   const location = getLocation(href);
   let { path } = location;
-  const { search, hash } = location;
-
-  if (search) {
-    path += search;
+  
+  if(path.endsWith('/')){
+      path = path.slice(0, -1);
   }
+  const { hash } = location;
 
   if (hash) {
-    path += hash;
+    path += hash.split("?")[0];
   }
 
   return path;
