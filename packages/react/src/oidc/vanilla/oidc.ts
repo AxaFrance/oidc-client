@@ -565,9 +565,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return new Promise((resolve, reject) => {
                 // @ts-ignore
                 let queryStringUtil = new NoHashQueryStringUtils();
-                const splithash = configuration.redirect_uri.split("#");
-                if(splithash.length === 2 && splithash[1].includes("?")) {
-                    queryStringUtil = new HashQueryStringUtils();
+                if(configuration.redirect_uri.includes("#")) {
+                    const splithash = window.location.href.split("#");
+                    if (splithash.length === 2 && splithash[1].includes("?")) {
+                        queryStringUtil = new HashQueryStringUtils();
+                    }
                 }
                 // @ts-ignore
                 const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location , new DefaultCrypto());
