@@ -557,7 +557,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 await storage.removeItem("dummy");
             }else{
                 
-                this.session = initSession(this.configurationName, configuration.storage);
+                this.session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
                 const session = initSession(this.configurationName);
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
