@@ -413,7 +413,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         this.timeoutId = autoRenewTokens(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
-                            message: "tokens inside ServiceWorker are valid"
+                            message: `tokens inside storage are valid`
                         });
                         return true;
                     }
