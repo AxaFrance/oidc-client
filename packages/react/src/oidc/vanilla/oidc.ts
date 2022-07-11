@@ -72,21 +72,21 @@ export interface AuthorityConfiguration {
     userinfo_endpoint?: string;
 }
 
-const refresh_token_scope = "offline_access";
  export type OidcConfiguration = {
-    client_id: string,
-    redirect_uri: string,
+     client_id: string,
+     redirect_uri: string,
      silent_redirect_uri?:string,
      silent_signin_timeout?:number,
-    scope: string,
-    authority: string,
+     scope: string,
+     authority: string,
      authority_configuration?: AuthorityConfiguration,
-    refresh_time_before_tokens_expiration_in_second?: number,
-    token_request_timeout?: number,
-    service_worker_relative_url?:string,
+     refresh_time_before_tokens_expiration_in_second?: number,
+     token_request_timeout?: number,
+     service_worker_relative_url?:string,
      service_worker_only?:boolean,
      extras?:StringMap
-     token_request_extras?:StringMap, 
+     token_request_extras?:StringMap,
+     storage?: Storage
 };
 
 const oidcDatabase = {};
@@ -234,7 +234,6 @@ export class Oidc {
     private serviceWorker?: any;
     private configurationName: string;
     private session?: any;
-    private iFrameSession= {}
     constructor(configuration:OidcConfiguration, configurationName="default") {
       this.configuration = configuration
         this.configurationName= configurationName;
@@ -402,7 +401,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             message: "service worker is not supported by this browser"
                         });
                     }
-                    const session = initSession(this.configurationName);
+                    const session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
                     const {tokens} = await session.initAsync();
                     if (tokens) {
                         const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
@@ -414,7 +413,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         this.timeoutId = autoRenewTokens(this, updatedTokens.refreshToken, this.tokens.expiresAt);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
-                            message: "tokens inside ServiceWorker are valid"
+                            message: `tokens inside storage are valid`
                         });
                         return true;
                     }
@@ -557,8 +556,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
                 await storage.removeItem("dummy");
             }else{
+                
+                this.session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
                 const session = initSession(this.configurationName);
-                this.session = session;
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
             }

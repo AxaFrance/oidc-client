@@ -147,6 +147,7 @@ const propTypes = {
     silent_signin_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
+    storage: Storage, // Default sessionStorage, you can set localStorage but it is less secure to XSS attacks
     authority_configuration: PropTypes.shape({ // Optional for providers that does not implement OIDC server auto discovery via a .wellknowurl
       authorization_endpoint: PropTypes.string,
       token_endpoint: PropTypes.string,
