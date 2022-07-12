@@ -517,7 +517,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
             
-            const extraFinal = extras ?? configuration.extras;
+            const extraFinal = extras ?? configuration.extras ?? {};
             if(isInIframe()){
                 extraFinal["prompt"]= "none";
             }
