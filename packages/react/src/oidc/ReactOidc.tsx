@@ -51,7 +51,8 @@ export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>
         }
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
-                || name == Oidc.eventNames.token_aquired){
+                || name == Oidc.eventNames.token_aquired 
+                || name === Oidc.eventNames.logout){
                 if(isMounted) {
                     const tokens = oidc.tokens;
                     setAccessToken(tokens != null  ? {accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload } : accessTokenInitialState);
@@ -96,7 +97,8 @@ export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
         }
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
-                || name == Oidc.eventNames.token_aquired){
+                || name == Oidc.eventNames.token_aquired
+                || name === Oidc.eventNames.logout){
                 if(isMounted) {
                     const tokens = oidc.tokens;
                     setIDToken(tokens != null  ? {idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload} : idTokenInitialState);

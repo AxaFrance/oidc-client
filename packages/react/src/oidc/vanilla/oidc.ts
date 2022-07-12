@@ -18,6 +18,26 @@ import timer from './timer';
 
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "../core/routes/route-utils";
+import {JQueryRequestor, Requestor} from "@openid/appauth/src/xhr";
+import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
+
+export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
+    check_session_iframe?: string;
+}
+
+export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceConfiguration{
+    private check_session_iframe: string;
+    
+    constructor(request: any) {
+        super(request);
+        this.authorizationEndpoint = request.authorization_endpoint;
+        this.tokenEndpoint = request.token_endpoint;
+        this.revocationEndpoint = request.revocation_endpoint;
+        this.userInfoEndpoint = request.userinfo_endpoint;
+        this.check_session_iframe = request.check_session_iframe;
+    }
+    
+}
 
 const isInIframe = () => {
     try {
@@ -73,6 +93,7 @@ export interface AuthorityConfiguration {
     revocation_endpoint: string;
     end_session_endpoint?: string;
     userinfo_endpoint?: string;
+    check_session_iframe?:string;
 }
 
  export type OidcConfiguration = {
@@ -198,6 +219,7 @@ const setTokensAsync = async (serviceWorker, tokens) =>{
 const eventNames = {
     service_worker_not_supported_by_browser: "service_worker_not_supported_by_browser",
     token_aquired: "token_aquired",
+    logout: "logout",
     token_renewed: "token_renewed",
     token_timer: "token_timer",
     loginAsync_begin:"loginAsync_begin",
@@ -226,6 +248,23 @@ const eventNames = {
 
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
+}
+
+const WELL_KNOWN_PATH = '.well-known';
+const OPENID_CONFIGURATION = 'openid-configuration';
+
+const fetchFromIssuer = async (openIdIssuerUrl: string):
+    Promise<OidcAuthorizationServiceConfiguration> => {
+    const fullUrl = `${openIdIssuerUrl}/${WELL_KNOWN_PATH}/${OPENID_CONFIGURATION}`;
+
+    const res = await fetch(fullUrl);
+
+    if (res.status != 200) {
+        return null;
+    }
+
+    const result = await res.json();
+    return new OidcAuthorizationServiceConfiguration(result);
 }
 
 export class Oidc {
@@ -349,17 +388,20 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     initAsyncPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
         if (authorityConfiguration != null) {
-            return new AuthorizationServiceConfiguration( {
+            return new OidcAuthorizationServiceConfiguration( {
                 authorization_endpoint: authorityConfiguration.authorization_endpoint,
                 end_session_endpoint: authorityConfiguration.end_session_endpoint,
                 revocation_endpoint: authorityConfiguration.revocation_endpoint,
                 token_endpoint: authorityConfiguration.token_endpoint,
-                userinfo_endpoint: authorityConfiguration.userinfo_endpoint});
+                userinfo_endpoint: authorityConfiguration.userinfo_endpoint,
+                check_session_iframe:authorityConfiguration.check_session_iframe,
+            });
         }
         if(this.initAsyncPromise){
             return this.initAsyncPromise;
         }
-        this.initAsyncPromise = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
+        
+        this.initAsyncPromise = await fetchFromIssuer(authority);
         return this.initAsyncPromise;
     }
 
@@ -475,6 +517,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
             
+            const extraFinal = extras ?? configuration.extras;
+            if(isInIframe()){
+                extraFinal["prompt"]= "none";
+            }
+            
             // @ts-ignore
             const queryStringUtil = configuration.redirect_uri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
             const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
@@ -484,7 +531,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         scope: configuration.scope,
                         response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
                         state,
-                        extras: extras ?? configuration.extras
+                        extras: extraFinal
                     });
                     authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
         } catch(exception) {
@@ -510,8 +557,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     this.publishEvent(eventNames.syncTokensAsync_begin, {});
                     this.syncTokensAsyncPromise = this.silentSigninAsync();
                     const silent_token_response = await this.syncTokensAsyncPromise;
-                    console.log("silent_token_response")
-                    console.log(silent_token_response)
                     if (silent_token_response) {
                         this.tokens = await setTokensAsync(serviceWorker, silent_token_response);
                     } else{
@@ -610,7 +655,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         extras,
                     });
 
-                    let timeoutId = setTimeout(function(){
+                    let timeoutId = setTimeout(()=>{
                         reject("performTokenRequest timeout");
                         timeoutId=null;
                     }, tokenRequestTimeout ?? 12000);
@@ -618,26 +663,38 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
                         tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then((tokenResponse)=>{
                             if(timeoutId) {
-                                const loginParams = getLoginParams(this.configurationName);
                                 clearTimeout(timeoutId);
                                 this.timeoutId=null;
-                                this.publishEvent(eventNames.loginCallbackAsync_end, {});
-                              
-                                const url ="https://demo.duendesoftware.com/connect/checksession";
-                                const callback = data=>{console.debug(data)};
+                                const loginParams = getLoginParams(this.configurationName);
                                 const queryParams = getParseQueryStringFromLocation(window.location.href);
+                                console.debug("queryParams");
                                 console.debug(queryParams);
-                                this.checkSessionIFrame = new CheckSessionIFrame(callback, configuration.client_id, url);
                                 
-                                this.checkSessionIFrame.load().then(()=>{
-                                    this.checkSessionIFrame.start(queryParams.session_state)
+                                if(oidcServerConfiguration.check_session_iframe && queryParams.session_state) {
+                                    const callback = () => {
+                                        console.log("callback logout");
+                                        this.destroyAsync();
+                                        this.publishEvent(eventNames.logout, {});
+                                    };
+                                    
+                                    this.checkSessionIFrame = new CheckSessionIFrame(callback, configuration.client_id, oidcServerConfiguration.check_session_iframe);
+                                    this.checkSessionIFrame.load().then(() => {
+                                        this.checkSessionIFrame.start(queryParams.session_state);
+                                        this.publishEvent(eventNames.loginCallbackAsync_end, {});
+                                        resolve({
+                                            tokens: tokenResponse,
+                                            state: request.state,
+                                            callbackPath: loginParams.callbackPath,
+                                        });
+                                    });
+                                } else {
+                                    this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                     resolve({
                                         tokens: tokenResponse,
                                         state: request.state,
                                         callbackPath: loginParams.callbackPath,
                                     });
-                                });
-                                
+                                }
                             }
                         });
                     } catch (exception) {
