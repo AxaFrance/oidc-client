@@ -23,7 +23,7 @@ function App() {
   const [events, dispatch] = useReducer(reducer, []);
 
   const onEvent=(configurationName, eventName, data )=>{
-    console.log(`oidc:${configurationName}:${eventName}`, data);
+   // console.log(`oidc:${configurationName}:${eventName}`, data);
     dispatch({type: 'event', data: {name: `oidc:${configurationName}:${eventName}`, data}})
   }
   return (<>

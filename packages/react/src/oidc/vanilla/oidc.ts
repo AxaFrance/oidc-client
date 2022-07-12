@@ -16,6 +16,9 @@ import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
 import timer from './timer';
 
+import {CheckSessionIFrame} from "./checkSessionIFrame"
+import {getParseQueryStringFromLocation} from "../core/routes/route-utils";
+
 const isInIframe = () => {
     try {
         return window.self !== window.top;
@@ -234,6 +237,7 @@ export class Oidc {
     private serviceWorker?: any;
     private configurationName: string;
     private session?: any;
+    private checkSessionIFrame: CheckSessionIFrame;
     constructor(configuration:OidcConfiguration, configurationName="default") {
       this.configuration = configuration
         this.configurationName= configurationName;
@@ -618,11 +622,22 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 clearTimeout(timeoutId);
                                 this.timeoutId=null;
                                 this.publishEvent(eventNames.loginCallbackAsync_end, {});
-                                resolve({
-                                    tokens: tokenResponse,
-                                    state: request.state,
-                                    callbackPath: loginParams.callbackPath,
+                              
+                                const url ="https://demo.duendesoftware.com/connect/checksession";
+                                const callback = data=>{console.debug(data)};
+                                const queryParams = getParseQueryStringFromLocation(window.location.href);
+                                console.debug(queryParams);
+                                this.checkSessionIFrame = new CheckSessionIFrame(callback, configuration.client_id, url);
+                                
+                                this.checkSessionIFrame.load().then(()=>{
+                                    this.checkSessionIFrame.start(queryParams.session_state)
+                                    resolve({
+                                        tokens: tokenResponse,
+                                        state: request.state,
+                                        callbackPath: loginParams.callbackPath,
+                                    });
                                 });
+                                
                             }
                         });
                     } catch (exception) {
