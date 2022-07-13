@@ -1,6 +1,7 @@
 import React, {useEffect, ComponentType} from 'react';
 import Oidc, {getLoginParams} from "../../vanilla/oidc";
 import {OidcSecure} from "../../OidcSecure";
+import {getParseQueryStringFromLocation} from "../routes/route-utils";
 
 const CallBack = ({configurationName}) =>{
     const getOidc =  Oidc.get;
@@ -9,6 +10,7 @@ const CallBack = ({configurationName}) =>{
         const playCallbackAsync = async () => {
             if(isMounted) {
                 const oidc = getOidc(configurationName);
+               
                 oidc.silentSigninCallbackFromIFrame();
             }
         };

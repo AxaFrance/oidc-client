@@ -19,12 +19,9 @@ export class CheckSessionIFrame {
         this._url = url;
         this._interval = interval || DefaultInterval;
         this._stopOnError = stopOnError;
-
         const idx = url.indexOf("/", url.indexOf("//") + 2);
         this._frame_origin = url.substr(0, idx);
-
         this._frame = window.document.createElement("iframe");
-
         // shotgun approach
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
@@ -41,7 +38,6 @@ export class CheckSessionIFrame {
             this._frame.onload = () => {
                 resolve();
             }
-
             window.document.body.appendChild(this._frame);
             this._boundMessageEvent = this._message.bind(this);
             window.addEventListener("message", this._boundMessageEvent, false);
@@ -58,6 +54,7 @@ export class CheckSessionIFrame {
                 }
             }
             else if (e.data === "changed") {
+                Log.debug(e)
                 Log.debug("CheckSessionIFrame: changed message from check session op iframe");
                 this.stop();
                 this._callback();
@@ -70,18 +67,13 @@ export class CheckSessionIFrame {
     start(session_state) {
         if (this._session_state !== session_state) {
             Log.debug("CheckSessionIFrame.start");
-
             this.stop();
-
             this._session_state = session_state;
-
             let send = () => {
                 this._frame.contentWindow.postMessage(this._client_id + " " + this._session_state, this._frame_origin);
             };
-
             // trigger now
             send();
-
             // and setup timer
             this._timer = window.setInterval(send, this._interval);
         }
@@ -92,7 +84,6 @@ export class CheckSessionIFrame {
 
         if (this._timer) {
             Log.debug("CheckSessionIFrame.stop");
-
             window.clearInterval(this._timer);
             this._timer = null;
         }

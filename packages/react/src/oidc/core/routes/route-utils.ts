@@ -8,11 +8,15 @@ const getLocation = (href: string) => {
   let hash = match[7];
 
     if (hash) {
-        const splits = hash.split("?";
+        const splits = hash.split("?");
         if(splits.length ==2){
             hash = splits[0];
             search = splits[1];
         }
+    }
+    
+    if(search){
+        search = search.slice(1);
     }
   
   return (
