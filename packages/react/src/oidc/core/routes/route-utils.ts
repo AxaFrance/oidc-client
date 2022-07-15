@@ -1,4 +1,4 @@
-const getLocation = (href: string) => {
+export const getLocation = (href: string) => {
   const match = href.match(
     // eslint-disable-next-line no-useless-escape
     /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/

@@ -1,37 +1,33 @@
-import React, {useEffect, ComponentType} from 'react';
+import React, {useEffect, ComponentType, useState} from 'react';
 import Oidc, {getLoginParams} from "../../vanilla/oidc";
 import {OidcSecure} from "../../OidcSecure";
 import {getParseQueryStringFromLocation} from "../routes/route-utils";
+import {getCustomHistory} from "../routes/withRouter";
 
-const CallBack = ({configurationName}) =>{
-    const getOidc =  Oidc.get;
+
+const CallbackManager: ComponentType<any> = ({configurationName }) => {
+
     useEffect(() => {
         let isMounted = true;
         const playCallbackAsync = async () => {
-            if(isMounted) {
-                const oidc = getOidc(configurationName);
-               
+            const getOidc =  Oidc.get;
+            const oidc = getOidc(configurationName);
+            try {
+                await oidc.loginCallbackAsync();
+                console.log("silient success");
                 oidc.silentSigninCallbackFromIFrame();
+            } catch (error) {
+                console.log("silient error");
+                oidc.silentSigninErrorCallbackFromIFrame();
             }
         };
         playCallbackAsync();
-
         return () => {
             isMounted = false;
         };
     },[]);
-    
-    return <></>;
-}
 
-const CallbackManager: ComponentType<any> = ({configurationName }) => {
-    //const loginParams = getLoginParams(configurationName);
-    const queryParams = getParseQueryStringFromLocation(window.location.href);
-    console.log(window.location.href)
-    console.log(queryParams)
-    return <OidcSecure configurationName={configurationName} extras={queryParams}>
-        <CallBack configurationName={configurationName}/>
-    </OidcSecure>;
+    return <></>;
 };
 
 export default CallbackManager;
