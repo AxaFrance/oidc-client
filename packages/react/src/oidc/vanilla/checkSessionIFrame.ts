@@ -66,7 +66,7 @@ export class CheckSessionIFrame {
     }
     start(session_state) {
         if (this._session_state !== session_state) {
-            Log.debug("CheckSessionIFrame.start");
+            Log.debug("CheckSessionIFrame.start :" + session_state);
             this.stop();
             this._session_state = session_state;
             let send = () => {

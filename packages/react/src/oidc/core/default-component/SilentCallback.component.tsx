@@ -25,8 +25,11 @@ const CallBack = ({configurationName}) =>{
 }
 
 const CallbackManager: ComponentType<any> = ({configurationName }) => {
-    const loginParams = getLoginParams(configurationName);
-    return <OidcSecure configurationName={configurationName} state={loginParams.state} extras={loginParams.extras}>
+    //const loginParams = getLoginParams(configurationName);
+    const queryParams = getParseQueryStringFromLocation(window.location.href);
+    console.log(window.location.href)
+    console.log(queryParams)
+    return <OidcSecure configurationName={configurationName} extras={queryParams}>
         <CallBack configurationName={configurationName}/>
     </OidcSecure>;
 };

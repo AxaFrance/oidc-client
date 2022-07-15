@@ -40,7 +40,11 @@ export const getPath = (href: string) => {
   if(path.endsWith('/')){
       path = path.slice(0, -1);
   }
-  const { hash } = location;
+  let { hash } = location;
+  
+  if(hash === "#_=_"){
+      hash = "";
+  }
 
   if (hash) {
     path += hash;

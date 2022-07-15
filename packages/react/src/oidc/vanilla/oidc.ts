@@ -332,6 +332,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({tokens:this.tokens, sessionState:queryParams.session_state})}`, window.location.origin);
         }
     }
+    silentSigninErrorCallbackFromIFrame(){
+        if (this.configuration.silent_redirect_uri) {
+            const queryParams = getParseQueryStringFromLocation(window.location.href);
+            window.top.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({error:queryParams.error})}`, window.location.origin);
+        }
+    }
     async silentSigninAsync(extras:StringMap=null) {
         if (!this.configuration.silent_redirect_uri) {
             return Promise.resolve(null);
@@ -369,13 +375,23 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     let isResolved = false;
                     window.onmessage = function (e) {
                         const key = `${self.configurationName}_oidc_tokens:`;
-                        if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
+                        const key_error = `${self.configurationName}_oidc_error:`;
+                        if (e.data && typeof (e.data) === "string") {
                             if (!isResolved) {
-                                const result = JSON.parse(e.data.replace(key, ''));
-                                self.publishEvent(eventNames.silentSigninAsync_end, result);
-                                iframe.remove();
-                                isResolved = true;
-                                resolve(result);
+                                if(e.data.startsWith(key)) {
+                                    const result = JSON.parse(e.data.replace(key, ''));
+                                    self.publishEvent(eventNames.silentSigninAsync_end, result);
+                                    iframe.remove();
+                                    isResolved = true;
+                                    resolve(result);
+                                }
+                                else if(e.data.startsWith(key_error)) {
+                                    const result = JSON.parse(e.data.replace(key_error, ''));
+                                    self.publishEvent(eventNames.silentSigninAsync_error, result);
+                                    iframe.remove();
+                                    isResolved = true;
+                                    reject(result);
+                                }
                             }
                         }
                     };
@@ -532,19 +548,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
             
             const extraFinal = extras ?? configuration.extras ?? {};
-            if(isInIframe()){
-                extraFinal["prompt"]= "none";
-                const queryParams = getParseQueryStringFromLocation(window.location.href);
-                if(queryParams.session_state){
-                    extraFinal.session_state = queryParams.session_state;
-                }
-                if(queryParams.id_token_hint)   {
-                    extraFinal.id_token_hint = queryParams.id_token_hint;
-                }
-                
-                console.log("extraFinal")
-                console.log(extraFinal)
-            }
+            
+            console.log("extraFinal");
+            console.log(extraFinal);
             
             // @ts-ignore
             const queryStringUtil = configuration.redirect_uri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
@@ -555,6 +561,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         scope: configuration.scope,
                         response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
                         state,
+                        //internal: extraFinal,
                         extras: extraFinal
                     });
                     authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
@@ -566,6 +573,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     
     async loginCallbackAsync(){
         try {
+            
+            console.log("loginCallbackAsync")
+            console.log(window.location.href)
             this.publishEvent(eventNames.loginCallbackAsync_begin, {});
             const configuration = this.configuration;
             const clientId = configuration.client_id;
@@ -652,19 +662,23 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 console.debug("queryParams");
                                 console.debug(queryParams);
                                 
-                                if(oidcServerConfiguration.check_session_iframe && queryParams.session_state) {
+                                if(oidcServerConfiguration.check_session_iframe && queryParams.session_state && !isInIframe()) {
                                     const sessionState = queryParams.session_state;
                                     const callback = () => {
-                                        console.log("callback logout");
-                                        
+                                        console.log("callback logout ");
+                                        console.log(tokenResponse);
                                         const idToken = tokenResponse.idToken;
-                                        this.silentSigninAsync({session_state: sessionState, id_token_hint: idToken}).then((silentSigninResponse) =>{
-                                            console.log("to ckeck tokens !!!!!!!!!!!!!!");
-                                            console.log(silentSigninResponse);
-                                            //this.destroyAsync();
+                                        this.checkSessionIFrame.stop();
+                                        this.silentSigninAsync({ prompt: "none",/*, session_state: sessionState,*/ id_token_hint: idToken}).then((silentSigninResponse) =>{
+                                                console.log("to ckeck tokens !!!!!!!!!!!!!!");
+                                                console.log(silentSigninResponse);
+                                                
+                                                
+                                            }).catch((e) => {
+                                            console.log("apply logout");
+                                            this.destroyAsync();
                                             this.publishEvent(eventNames.logout, {});
-                                            }
-                                        )
+                                        });
                                         
                                     };
                                     

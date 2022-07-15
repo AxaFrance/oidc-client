@@ -47,6 +47,9 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
       return <SilentCallbackComponent configurationName={configurationName} />
     }
   }
+ // console.log(path);
+  //console.log(callbackPath);
+  //console.log(silent_redirect_uri);
 
   switch (path) {
     case callbackPath:
