@@ -24,6 +24,7 @@ export type OidcProviderProps = {
     configuration?: OidcConfiguration;
     children: any;
     onSessionLost?: Function,
+    onLogout?:Function,
     withCustomHistory?: () => CustomHistory,
     onEvent?:Function
 };
@@ -82,6 +83,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              authenticatingErrorComponent = AuthenticatingError,
                                                                              sessionLostComponent=SessionLost,
                                                                              onSessionLost=null,
+                                                                             onLogout=null,
                                                                              withCustomHistory=null,
                                                                              onEvent=null,
                                                                          }) => {
@@ -115,6 +117,13 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                     return;
                 }
                 setEvent({name, data});
+            }
+            else  if(name === Oidc.eventNames.logout){
+                if(onLogout != null){
+                    onLogout();
+                    return;
+                }
+                oidc.logoutAsync();
             }
             else if (name == Oidc.eventNames.loginAsync_begin
                 || name == Oidc.eventNames.loginCallbackAsync_end

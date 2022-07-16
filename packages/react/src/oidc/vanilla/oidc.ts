@@ -148,6 +148,10 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
                 await oidc.session.setTokens(oidc.tokens);
             }
             if(!oidc.tokens){
+                if(oidc.checkSessionIFrame){
+                    oidc.checkSessionIFrame.stop();
+                    oidc.checkSessionIFrame = null;
+                }
                 return;                
             }
             oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
@@ -502,6 +506,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
                     const {tokens} = await session.initAsync();
                     if (tokens) {
+
+                        const sessionState = session.getSessionState();
+                        
+                        await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         //const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
                         // @ts-ignore
                         this.tokens = await setTokensAsync(serviceWorker, tokens);
@@ -592,6 +600,46 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
     
+    async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState){
+        return new Promise((resolve:Function, reject) => {
+            if (checkSessionIFrameUri && sessionState) {
+                const checkSessionCallback = () => {
+                    this.checkSessionIFrame.stop();
+                    
+                    if(this.tokens === null){
+                        return;
+                    }
+                    // @ts-ignore
+                    const idToken = this.tokens.idToken;
+                    
+                    this.silentSigninAsync({
+                        prompt: "none",
+                        id_token_hint: idToken,
+                        scope: "openid"
+                    }).then((silentSigninResponse) => {
+                        console.log("to ckeck tokens !!!!!!!!!!!!!!");
+                        console.log(silentSigninResponse);
+                    }).catch((e) => {
+                        console.log("apply logout");
+                        this.publishEvent(eventNames.logout, {});
+                    });
+
+                };
+
+                this.checkSessionIFrame = new CheckSessionIFrame(checkSessionCallback, clientId, checkSessionIFrameUri);
+                this.checkSessionIFrame.load().then(() => {
+                    this.checkSessionIFrame.start(sessionState);
+                    this.publishEvent(eventNames.loginCallbackAsync_end, {});
+                    resolve();
+                }).catch((e) =>{
+                    reject(e);
+                });
+            } else {
+                resolve();
+            }
+        });
+    }
+    
     async loginCallbackAsync(isSilentSignin:boolean=false){
         try {
             console.log("loginCallbackAsync")
@@ -603,6 +651,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const authority =  configuration.authority;
             const tokenRequestTimeout =  configuration.token_request_timeout;
             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
+            const queryParams = getParseQueryStringFromLocation(window.location.href);
+            const sessionState =  queryParams.session_state;
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
             if(serviceWorker){
@@ -620,6 +670,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 
                 this.session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
                 const session = initSession(this.configurationName);
+                session.setSessionState(sessionState);
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
             }
@@ -678,46 +729,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 clearTimeout(timeoutId);
                                 this.timeoutId=null;
                                 const loginParams = getLoginParams(this.configurationName);
-                                const queryParams = getParseQueryStringFromLocation(window.location.href);
-                                console.debug("queryParams");
-                                console.debug(queryParams);
-                                
-                                if(oidcServerConfiguration.check_session_iframe && queryParams.session_state) {
-                                  
-                                    const callback = () => {
-                                        console.log("callback logout ");
-                                        console.log(tokenResponse);
-                                        const idToken = tokenResponse.idToken;
-                                        this.checkSessionIFrame.stop();
-                                        this.silentSigninAsync({ prompt: "none", id_token_hint: idToken, scope: "openid"}).then((silentSigninResponse) =>{
-                                                console.log("to ckeck tokens !!!!!!!!!!!!!!");
-                                                console.log(silentSigninResponse);
-                                            }).catch((e) => {
-                                            console.log("apply logout");
-                                            this.logoutAsync();
-                                            //this.publishEvent(eventNames.logout, {});
-                                        });
-                                        
-                                    };
-                                    
-                                    this.checkSessionIFrame = new CheckSessionIFrame(callback, configuration.client_id, oidcServerConfiguration.check_session_iframe);
-                                    this.checkSessionIFrame.load().then(() => {
-                                        this.checkSessionIFrame.start(queryParams.session_state);
-                                        this.publishEvent(eventNames.loginCallbackAsync_end, {});
-                                        resolve({
-                                            tokens: tokenResponse,
-                                            state: request.state,
-                                            callbackPath: loginParams.callbackPath,
-                                        });
-                                    });
-                                } else {
-                                    this.publishEvent(eventNames.loginCallbackAsync_end, {});
+                                this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState).then(() =>{
                                     resolve({
                                         tokens: tokenResponse,
                                         state: request.state,
                                         callbackPath: loginParams.callbackPath,
                                     });
-                                }
+                                });
                             }
                         });
                     } catch (exception) {

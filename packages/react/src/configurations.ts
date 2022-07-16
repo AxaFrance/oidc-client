@@ -5,11 +5,11 @@ export const configurationIdentityServer = {
     silent_signin_uri: window.location.origin+'/authentication/silent-sign-in',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
-    refresh_time_before_tokens_expiration_in_second: -2,
+    //refresh_time_before_tokens_expiration_in_second: -2,
     //service_worker_relative_url:'/OidcServiceWorker.js',
     //service_worker_only: false, 
     // storage: localStorage
-    silent_signin_timeout: 3333000
+    //silent_signin_timeout: 3333000
   };
 
 export const configurationIdentityServerWithHash = {
