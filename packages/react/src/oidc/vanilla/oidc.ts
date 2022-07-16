@@ -473,11 +473,24 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 if (serviceWorker) {
                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
+                    console.log("tokens sesion ------------------------------")
+                    console.log(tokens)
                     if (tokens) {
                         serviceWorker.startKeepAliveServiceWorker();
+                        const sessionState = await serviceWorker.getSessionStateAsync();
+                        console.log("sessionState")
+                        console.log(sessionState)
+                        await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         //const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                         // @ts-ignore
-                        this.tokens = await setTokensAsync(serviceWorker, tokens);
+                        const reformattedToken = {
+                            accessToken : tokens.access_token,
+                            expiresIn: tokens.expires_in,
+                            idToken: tokens.id_token,
+                            scope: tokens.scope,
+                            tokenType: tokens.token_type
+                        }
+                        this.tokens = await setTokensAsync(serviceWorker, reformattedToken);
                         this.serviceWorker = serviceWorker;
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt);
@@ -502,7 +515,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     if (tokens) {
 
                         const sessionState = session.getSessionState();
-                        
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         //const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
                         // @ts-ignore
@@ -524,6 +536,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 });
                 return false;
             } catch (exception) {
+                console.error(exception);
                 if (serviceWorker) {
                     await serviceWorker.clearAsync();
                 }
@@ -594,9 +607,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
     
-    async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState){
+    async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin=false){
         return new Promise((resolve:Function, reject) => {
-            if (checkSessionIFrameUri && sessionState) {
+            if (checkSessionIFrameUri && sessionState && !isSilentSignin) {
                 const checkSessionCallback = () => {
                     this.checkSessionIFrame.stop();
                     
@@ -633,19 +646,32 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
         });
     }
-    
-    async loginCallbackAsync(isSilenSigin:boolean=false){
-        const response = await this._loginCallbackAsync(isSilenSigin);
-        // @ts-ignore
-        const tokens = response.tokens;
-        const parsedTokens = await setTokensAsync(this.serviceWorker, tokens);
-        this.tokens = parsedTokens;
-        if(!this.serviceWorker){
-            await this.session.setTokens(parsedTokens);
+
+    loginCallbackPromise : Promise<any>=null
+    async loginCallbackAsync(isSilenSignin:boolean=false){
+        if(this.loginCallbackPromise !== null){
+            return this.loginCallbackPromise;
         }
-        this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
-        // @ts-ignore
-        return  { parsedTokens, state:response.state, callbackPath : response.callbackPath};
+        
+        const loginCallbackLocalAsync= async( ) =>{
+            const response = await this._loginCallbackAsync(isSilenSignin);
+            // @ts-ignore
+            const tokens = response.tokens;
+            const parsedTokens = await setTokensAsync(this.serviceWorker, tokens);
+            this.tokens = parsedTokens;
+            if(!this.serviceWorker){
+                await this.session.setTokens(parsedTokens);
+            }
+            this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
+            // @ts-ignore
+            return  { parsedTokens, state:response.state, callbackPath : response.callbackPath};
+        }
+        
+        this.loginCallbackPromise = loginCallbackLocalAsync();
+        return this.loginCallbackPromise.then(result =>{
+            this.loginCallbackPromise = null;
+            return result;
+        })
     }
     
     async _loginCallbackAsync(isSilentSignin:boolean=false){
@@ -674,6 +700,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     throw new Error("Service Worker storage disapear");
                 }
                 await storage.removeItem("dummy");
+                await serviceWorker.setSessionStateAsync(sessionState);
             }else{
                 
                 this.session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
@@ -737,7 +764,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 clearTimeout(timeoutId);
                                 this.timeoutId=null;
                                 const loginParams = getLoginParams(this.configurationName);
-                                this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState).then(() =>{
+                                this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() =>{
                                     resolve({
                                         tokens: tokenResponse,
                                         state: request.state,

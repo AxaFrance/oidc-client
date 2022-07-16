@@ -274,6 +274,14 @@ addEventListener('message', event => {
             const accessTokenPayload = extractAccessTokenPayload(currentDatabase.tokens.access_token);
             port.postMessage({configurationName, accessTokenPayload});
             return;
+        case "setSessionState":
+            currentDatabase.sessionState = data.data.sessionState;
+            port.postMessage({configurationName});
+            return;
+        case "getSessionState":
+            const sessionState = currentDatabase.sessionState;
+            port.postMessage({configurationName, sessionState});
+            return;
         default:
             currentDatabase.items = data.data;
             port.postMessage({configurationName});

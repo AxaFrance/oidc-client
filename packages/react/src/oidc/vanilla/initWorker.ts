@@ -133,6 +133,16 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         }
     }
 
+    const setSessionStateAsync = (sessionState) => {
+        return sendMessageAsync(registration)({type: "setSessionState", data: {sessionState}, configurationName});
+    }
+
+    const getSessionStateAsync= async () => {
+        const result = await sendMessageAsync(registration)({type: "getSessionState", data: null, configurationName});
+        // @ts-ignore
+        return result.sessionState;
+    }
+
     return { 
         saveItemsAsync, 
         loadItemsAsync, 
@@ -140,6 +150,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         initAsync, 
         getAccessTokenPayloadAsync,
         startKeepAliveServiceWorker,
-        isServiceWorkerProxyActiveAsync
+        isServiceWorkerProxyActiveAsync,
+        setSessionStateAsync,
+        getSessionStateAsync,
     };
 }
