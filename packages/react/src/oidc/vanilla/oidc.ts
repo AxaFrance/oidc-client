@@ -103,6 +103,7 @@ export interface AuthorityConfiguration {
      silent_signin_timeout?:number,
      scope: string,
      authority: string,
+     authority_time_cache_wellknowurl_in_second?: number,
      authority_configuration?: AuthorityConfiguration,
      refresh_time_before_tokens_expiration_in_second?: number,
      token_request_timeout?: number,
@@ -111,6 +112,7 @@ export interface AuthorityConfiguration {
      extras?:StringMap
      token_request_extras?:StringMap,
      storage?: Storage
+     monitor_session?: boolean
 };
 
 const oidcDatabase = {};
@@ -257,17 +259,31 @@ const getRandomInt = (max) => {
 const WELL_KNOWN_PATH = '.well-known';
 const OPENID_CONFIGURATION = 'openid-configuration';
 
-const fetchFromIssuer = async (openIdIssuerUrl: string):
+
+const oneHourSecond = 60 * 60;
+const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond):
     Promise<OidcAuthorizationServiceConfiguration> => {
     const fullUrl = `${openIdIssuerUrl}/${WELL_KNOWN_PATH}/${OPENID_CONFIGURATION}`;
-
+    
+    const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
+    const cacheJson = window.localStorage.getItem(localStorageKey);
+    
+    const oneHourMinisecond = 1000 * timeCacheSecond;
+    // @ts-ignore
+    if(cacheJson && (cacheJson.timestamp + oneHourMinisecond) > Date.now()){
+        return new OidcAuthorizationServiceConfiguration(JSON.parse(cacheJson));
+    }
+    
     const res = await fetch(fullUrl);
 
     if (res.status != 200) {
         return null;
     }
-
+    
+    
     const result = await res.json();
+    window.localStorage.setItem(localStorageKey, JSON.stringify({result, timestamp:Date.now()}));
+    
     return new OidcAuthorizationServiceConfiguration(result);
 }
 
@@ -451,7 +467,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return this.initAsyncPromise;
         }
         
-        this.initAsyncPromise = await fetchFromIssuer(authority);
+        this.initAsyncPromise = await fetchFromIssuer(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60);
         return this.initAsyncPromise;
     }
 
@@ -552,64 +568,77 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         });
     }
 
+    loginPromise: Promise<any>=null;
     async loginAsync(callbackPath:string=undefined, extras:StringMap=null, installServiceWorker=true, state:string=undefined, isSilentSignin:boolean=false, scope:string=undefined) {
-        try {
-            const location = window.location;
-            const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
-            this.publishEvent(eventNames.loginAsync_begin, {});
-            const configuration = this.configuration;
-            
-            const redirectUri = isSilentSignin ? configuration.silent_redirect_uri : configuration.redirect_uri;
-            if(!scope){
-                scope = configuration.scope;
-            }
-
-            const sessionKey =getLoginSessionKey(this.configurationName);
-            sessionStorage[sessionKey] = JSON.stringify({callbackPath:url,extras,state});
-            
-            let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-            if(serviceWorker && installServiceWorker) {
-                const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync();
-                if(!isServiceWorkerProxyActive) {
-                    window.location.href = `${redirectUri}/service-worker-install`;
-                    return;
-                }
-            }
-            let storage;
-            if(serviceWorker) {
-                serviceWorker.startKeepAliveServiceWorker();
-                await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
-                storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
-                await storage.setItem("dummy",{});
-            } else {
-                const session = initSession(this.configurationName);
-                storage = new MemoryStorageBackend(session.saveItemsAsync, {});
-            }
-            
-            const extraFinal = extras ?? configuration.extras ?? {};
-            
-            // @ts-ignore
-            const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
-            const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
-                    const authRequest = new AuthorizationRequest({
-                        client_id: configuration.client_id,
-                        redirect_uri: redirectUri,
-                        scope,
-                        response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
-                        state,
-                        extras: extraFinal
-                    });
-                    authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
-        } catch(exception) {
-            this.publishEvent(eventNames.loginAsync_error, exception);
-            throw exception;
+        if(this.loginPromise !== null){
+            return this.loginPromise;
         }
+        
+        const loginLocalAsync=async () => {
+            try {
+                const location = window.location;
+                const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
+                this.publishEvent(eventNames.loginAsync_begin, {});
+                const configuration = this.configuration;
+
+                const redirectUri = isSilentSignin ? configuration.silent_redirect_uri : configuration.redirect_uri;
+                if (!scope) {
+                    scope = configuration.scope;
+                }
+
+                const sessionKey = getLoginSessionKey(this.configurationName);
+                sessionStorage[sessionKey] = JSON.stringify({callbackPath: url, extras, state});
+
+                let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
+                if (serviceWorker && installServiceWorker) {
+                    const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync();
+                    if (!isServiceWorkerProxyActive) {
+                        window.location.href = `${redirectUri}/service-worker-install`;
+                        return;
+                    }
+                }
+                let storage;
+                if (serviceWorker) {
+                    serviceWorker.startKeepAliveServiceWorker();
+                    await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                    storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
+                    await storage.setItem("dummy", {});
+                } else {
+                    const session = initSession(this.configurationName);
+                    storage = new MemoryStorageBackend(session.saveItemsAsync, {});
+                }
+
+                const extraFinal = extras ?? configuration.extras ?? {};
+
+                // @ts-ignore
+                const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
+                const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
+                const authRequest = new AuthorizationRequest({
+                    client_id: configuration.client_id,
+                    redirect_uri: redirectUri,
+                    scope,
+                    response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+                    state,
+                    extras: extraFinal
+                });
+                authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
+            } catch (exception) {
+                this.publishEvent(eventNames.loginAsync_error, exception);
+                throw exception;
+            }
+        }
+        this.loginPromise = loginLocalAsync();
+        return this.loginPromise.then(result =>{
+            this.loginPromise = null;
+            return result;
+        });
+
     }
     
     async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin=false){
         return new Promise((resolve:Function, reject) => {
-            if (checkSessionIFrameUri && sessionState && !isSilentSignin) {
+            if ( this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
                 const checkSessionCallback = () => {
                     this.checkSessionIFrame.stop();
                     
@@ -626,6 +655,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }).then((silentSigninResponse) => {
                         console.log("to ckeck tokens !!!!!!!!!!!!!!");
                         console.log(silentSigninResponse);
+                        
+                        
+                        
                     }).catch((e) => {
                         console.log("apply logout");
                         this.publishEvent(eventNames.logout, {});
@@ -866,7 +898,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             if(!tokens){
                 try {
                     this.publishEvent(eventNames.syncTokensAsync_begin, {});
-                    this.syncTokensAsyncPromise = this.silentSigninAsync();
+                    this.syncTokensAsyncPromise = this.silentSigninAsync({prompt:"none"});
                     const silent_token_response = await this.syncTokensAsyncPromise;
                     if (silent_token_response && silent_token_response.tokens) {
                         this.tokens = await setTokensAsync(serviceWorker, silent_token_response.tokens);
