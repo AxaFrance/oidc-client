@@ -123,16 +123,9 @@ const oidcFactory = (configuration: OidcConfiguration, name="default") => {
 }
 
 const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
-    const response = await oidc.loginCallbackAsync();
-    const tokens = response.tokens
-    const parsedTokens = await setTokensAsync(oidc.serviceWorker, tokens);
-    oidc.tokens = parsedTokens;
-    if(!oidc.serviceWorker){
-        await oidc.session.setTokens(parsedTokens);
-    }
-    oidc.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
-    oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, parsedTokens.expiresAt)
-    return { state:response.state, callbackPath : response.callbackPath };
+    const { parsedTokens, state, callbackPath } = await oidc.loginCallbackAsync();
+    oidc.timeoutId = autoRenewTokens(oidc, parsedTokens.refreshToken, parsedTokens.expiresAt)
+    return { state, callbackPath };
 }
 
 const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
@@ -301,6 +294,7 @@ export class Oidc {
       this.loginCallbackWithAutoTokensRenewAsync.bind(this);
       this.initAsync.bind(this);
       this.loginCallbackAsync.bind(this);
+      this._loginCallbackAsync.bind(this);
       this.subscriveEvents.bind(this);
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
@@ -640,7 +634,21 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         });
     }
     
-    async loginCallbackAsync(isSilentSignin:boolean=false){
+    async loginCallbackAsync(isSilenSigin:boolean=false){
+        const response = await this._loginCallbackAsync(isSilenSigin);
+        // @ts-ignore
+        const tokens = response.tokens;
+        const parsedTokens = await setTokensAsync(this.serviceWorker, tokens);
+        this.tokens = parsedTokens;
+        if(!this.serviceWorker){
+            await this.session.setTokens(parsedTokens);
+        }
+        this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
+        // @ts-ignore
+        return  { parsedTokens, state:response.state, callbackPath : response.callbackPath};
+    }
+    
+    async _loginCallbackAsync(isSilentSignin:boolean=false){
         try {
             console.log("loginCallbackAsync")
             console.log(window.location.href)
@@ -755,7 +763,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             this.publishEvent(eventNames.loginCallbackAsync_error, exception);
             throw exception;
         }
-
     }
 
     async refreshTokensAsync(refreshToken, silentEvent = false) {

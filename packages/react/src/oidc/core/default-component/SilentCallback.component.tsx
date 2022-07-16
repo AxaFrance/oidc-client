@@ -13,7 +13,7 @@ const CallbackManager: ComponentType<any> = ({configurationName }) => {
             const getOidc =  Oidc.get;
             const oidc = getOidc(configurationName);
             try {
-                await oidc.loginCallbackAsync();
+                await oidc.loginCallbackAsync(true);
                 console.log("silient success");
                 oidc.silentSigninCallbackFromIFrame();
             } catch (error) {
