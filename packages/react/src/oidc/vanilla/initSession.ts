@@ -10,19 +10,22 @@
     }
 
     const clearAsync=() =>{
-        storage[`oidc.${configurationName}`] = JSON.stringify({tokens:null});
+        storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens:null});
         return Promise.resolve();
     }
 
     const initAsync=async () => {
         if(!storage[`oidc.${configurationName}:${redirectUri}`]){
             storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens:null});
+            return {tokens:null};
         }
         return Promise.resolve({ tokens : JSON.parse(storage[`oidc.${configurationName}:${redirectUri}`]).tokens });
     }
 
     const setTokens = (tokens) => {
-        storage[`oidc.${configurationName}`] = JSON.stringify({tokens});
+        //console.log("setTokens");
+        //console.log(tokens);
+        storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens});
     }
 
     const setSessionState = (sessionState) => {
@@ -34,6 +37,7 @@
     }
 
     const getTokens = () => {
+       
         if(!storage[`oidc.${configurationName}:${redirectUri}`]){
             return null;
         }

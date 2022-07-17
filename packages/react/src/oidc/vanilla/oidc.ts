@@ -17,7 +17,7 @@ import {initSession} from "./initSession";
 import timer from './timer';
 
 import {CheckSessionIFrame} from "./checkSessionIFrame"
-import {getLocation, getParseQueryStringFromLocation} from "../core/routes/route-utils";
+import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
 
 export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
@@ -165,8 +165,7 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
 const getLoginSessionKey = (configurationName:string, redirectUri:string) => {
     return `oidc_login.${configurationName}:${redirectUri}`;
 }
-
-export const getLoginParams = (configurationName, redirectUri) => {
+const getLoginParams = (configurationName, redirectUri) => {
     return JSON.parse(sessionStorage[getLoginSessionKey(configurationName, redirectUri)]);
 }
 
@@ -541,10 +540,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             message: "service worker is not supported by this browser"
                         });
                     }
-                    const session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
+                    const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
                     const {tokens} = await session.initAsync();
+                    console.log("const {tokens} = await session.initAsync();")
+                    console.log(tokens)
                     if (tokens) {
-
                         const sessionState = session.getSessionState();
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         //const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
@@ -952,6 +952,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
                 this.syncTokensAsyncPromise = null;
                 this.publishEvent(eventNames.syncTokensAsync_end, {});
+            }
+        } else {
+            const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
+            const {tokens} = await session.initAsync();
+            if(!tokens){
+                this.publishEvent(eventNames.logout_from_another_tab, {});
+                await this.destroyAsync();
             }
         }
     }

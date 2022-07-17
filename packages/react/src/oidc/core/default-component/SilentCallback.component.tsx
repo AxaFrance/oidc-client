@@ -1,9 +1,5 @@
-import React, {useEffect, ComponentType, useState} from 'react';
-import Oidc, {getLoginParams} from "../../vanilla/oidc";
-import {OidcSecure} from "../../OidcSecure";
-import {getParseQueryStringFromLocation} from "../routes/route-utils";
-import {getCustomHistory} from "../routes/withRouter";
-
+import React, {useEffect, ComponentType} from 'react';
+import Oidc from "../../vanilla/oidc";
 
 const CallbackManager: ComponentType<any> = ({configurationName }) => {
 

@@ -1,8 +1,8 @@
 import React, {useEffect, useState, ComponentType} from 'react';
 import AuthenticatingError from "./AuthenticateError.component";
-import Oidc, {getLoginParams} from "../../vanilla/oidc";
+import Oidc from "../../vanilla/oidc";
 import Authenticating from "./Authenticating.component";
-import {getParseQueryStringFromLocation} from "../routes/route-utils";
+import {getParseQueryStringFromLocation} from "../../vanilla/route-utils";
 
 const ServiceWorkerInstall: ComponentType<any> = ({callBackError, authenticating, configurationName }) => {
     const getOidc =  Oidc.get;

@@ -1,5 +1,5 @@
 import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
-import { getPath } from './route-utils';
+import { getPath } from '../../vanilla/route-utils';
 import CallbackComponent from '../default-component/Callback.component';
 import SilentCallbackComponent from "../default-component/SilentCallback.component";
 import ServiceWorkerInstall from "../default-component/ServiceWorkerInstall.component";

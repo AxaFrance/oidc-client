@@ -1,6 +1,6 @@
 import React, {useEffect, ComponentType} from 'react';
 import Oidc from "../../vanilla/oidc";
-import {getParseQueryStringFromLocation} from "../routes/route-utils";
+import {getParseQueryStringFromLocation} from "../../vanilla/route-utils";
 
 
 const SilentSignin: ComponentType<any> = (({configurationName }) => {
