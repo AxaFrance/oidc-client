@@ -12,7 +12,6 @@ export class CheckSessionIFrame {
     private _frame: HTMLIFrameElement;
     private _boundMessageEvent: any;
     private _timer: number;
-    private _session_state: Boolean;
     constructor(callback, client_id, url, interval=DefaultInterval, stopOnError = true) {
         this._callback = callback;
         this._client_id = client_id;
@@ -64,23 +63,16 @@ export class CheckSessionIFrame {
         }
     }
     start(session_state) {
-        if (this._session_state !== session_state) {
             Log.debug("CheckSessionIFrame.start :" + session_state);
             this.stop();
-            this._session_state = session_state;
             let send = () => {
-                this._frame.contentWindow.postMessage(this._client_id + " " + this._session_state, this._frame_origin);
+                this._frame.contentWindow.postMessage(this._client_id + " " + session_state, this._frame_origin);
             };
-            // trigger now
             send();
-            // and setup timer
             this._timer = window.setInterval(send, this._interval);
-        }
     }
 
     stop() {
-        this._session_state = null;
-
         if (this._timer) {
             Log.debug("CheckSessionIFrame.stop");
             window.clearInterval(this._timer);

@@ -287,6 +287,20 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     return new OidcAuthorizationServiceConfiguration(result);
 }
 
+const buildQueries = (extras:StringMap) => {
+    let queries = '';
+    if(extras != null){
+        for (let [key, value] of Object.entries(extras)) {
+            if (queries === ""){
+                queries = `?${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+            } else {
+                queries+= `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+            }
+        }
+    }
+    return queries;
+}
+
 export class Oidc {
     public configuration: OidcConfiguration;
     public userInfo: null;
@@ -359,7 +373,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
     async silentSigninAsync(extras:StringMap=null, state:string=null, scope:string=null) {
-        if (!this.configuration.silent_redirect_uri) {
+        if (!this.configuration.silent_redirect_uri || !this.configuration.silent_signin_uri) {
             return Promise.resolve(null);
         }
         while (document.hidden) {
@@ -494,13 +508,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 if (serviceWorker) {
                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
-                    console.log("tokens sesion ------------------------------")
-                    console.log(tokens)
                     if (tokens) {
                         serviceWorker.startKeepAliveServiceWorker();
                         const sessionState = await serviceWorker.getSessionStateAsync();
-                        console.log("sessionState")
-                        console.log(sessionState)
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         //const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                         // @ts-ignore
@@ -596,15 +606,18 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
                 let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-                if (serviceWorker && installServiceWorker) {
+                /*if (serviceWorker && installServiceWorker) {
                     const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync();
-                    console.log("isServiceWorkerProxyActive")
-                    console.log(isServiceWorkerProxyActive)
                     if (!isServiceWorkerProxyActive) {
-                        window.location.href = `${redirectUri}/service-worker-install`;
+                        await serviceWorker.unregisterAsync();
+                        const extrasQueries = extras != null ? {...extras}: {};
+                        extrasQueries.callbackPath = url;
+                        extrasQueries.state = state;
+                        const queryString = buildQueries(extrasQueries);
+                        window.location.href = `${redirectUri}/service-worker-install${queryString}`;
                         return;
                     }
-                }
+                }*/
                 let storage;
                 if (serviceWorker) {
                     serviceWorker.startKeepAliveServiceWorker();
@@ -645,7 +658,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     
     async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin=false){
         return new Promise((resolve:Function, reject) => {
-            if ( this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
+            if (this.configuration.silent_signin_uri && this.configuration.silent_redirect_uri && this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
                 const checkSessionCallback = () => {
                     this.checkSessionIFrame.stop();
                     
@@ -654,19 +667,27 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }
                     // @ts-ignore
                     const idToken = this.tokens.idToken;
-                    
+                    // @ts-ignore
+                    const idTokenPayload = this.tokens.idTokenPayload;
                     this.silentSigninAsync({
                         prompt: "none",
                         id_token_hint: idToken,
                         scope: "openid"
                     }).then((silentSigninResponse) => {
-                        console.log("to ckeck tokens !!!!!!!!!!!!!!");
-                        console.log(silentSigninResponse);
-
-                        this.checkSessionIFrame.start(silentSigninResponse.sessionState);
-                        
+                        const iFrameIdTokenPayload = silentSigninResponse.tokens.idTokenPayload;
+                        if (idTokenPayload.sub === iFrameIdTokenPayload.sub) {
+                            const sessionState = silentSigninResponse.sessionState;
+                            this.checkSessionIFrame.start(silentSigninResponse.sessionState);
+                            if (idTokenPayload.sid === iFrameIdTokenPayload.sid) {
+                                console.debug("SessionMonitor._callback: Same sub still logged in at OP, restarting check session iframe; session_state:", sessionState);
+                            } else {
+                                console.debug("SessionMonitor._callback: Same sub still logged in at OP, session state has changed, restarting check session iframe; session_state:", sessionState);
+                            }
+                        }
+                        else {
+                            console.debug("SessionMonitor._callback: Different subject signed into OP:", iFrameIdTokenPayload.sub);
+                        }
                     }).catch((e) => {
-                        console.log("apply logout");
                         this.publishEvent(eventNames.logout_from_another_tab, {});
                         this.destroyAsync();
                     });
@@ -676,7 +697,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 this.checkSessionIFrame = new CheckSessionIFrame(checkSessionCallback, clientId, checkSessionIFrameUri);
                 this.checkSessionIFrame.load().then(() => {
                     this.checkSessionIFrame.start(sessionState);
-                    this.publishEvent(eventNames.loginCallbackAsync_end, {});
                     resolve();
                 }).catch((e) =>{
                     reject(e);
@@ -803,6 +823,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 this.timeoutId=null;
                                 const loginParams = getLoginParams(this.configurationName, redirectUri);
                                 this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() =>{
+                                    this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                     resolve({
                                         tokens: tokenResponse,
                                         state: request.state,

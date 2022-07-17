@@ -102,6 +102,10 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const loadItemsAsync=() =>{
         return sendMessageAsync(registration)({type: "loadItems", data: null, configurationName});
     }
+    
+    const unregisterAsync = async () => {
+        await registration.unregister()
+    }
 
     const getAccessTokenPayloadAsync=async () => {
         const result = await sendMessageAsync(registration)({
@@ -153,5 +157,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         isServiceWorkerProxyActiveAsync,
         setSessionStateAsync,
         getSessionStateAsync,
+        unregisterAsync,
     };
 }
