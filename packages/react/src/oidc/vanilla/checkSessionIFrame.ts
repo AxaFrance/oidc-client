@@ -22,7 +22,6 @@ export class CheckSessionIFrame {
         const idx = url.indexOf("/", url.indexOf("//") + 2);
         this._frame_origin = url.substr(0, idx);
         this._frame = window.document.createElement("iframe");
-        // shotgun approach
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
         this._frame.style.display = "none";

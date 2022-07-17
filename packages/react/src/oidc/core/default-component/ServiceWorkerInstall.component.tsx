@@ -15,7 +15,7 @@ const ServiceWorkerInstall: ComponentType<any> = ({callBackError, authenticating
         let isMounted = true;
         const playCallbackAsync = async () => {
             try {
-                const loginParams = getLoginParams(configurationName)
+                const loginParams = getLoginParams(configurationName, "")
                 // @ts-ignore
                 await getOidc(configurationName).loginAsync(loginParams.callbackPath, loginParams.extras,false, loginParams.state);
                 if(isMounted) {
