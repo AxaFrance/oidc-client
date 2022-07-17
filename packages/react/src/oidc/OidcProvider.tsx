@@ -118,12 +118,12 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 }
                 setEvent({name, data});
             }
-            else  if(name === Oidc.eventNames.logout){
+            else if(name === Oidc.eventNames.logout_from_another_tab){
                 if(onLogout != null){
                     onLogout();
                     return;
                 }
-                oidc.logoutAsync();
+                setEvent({name, data});
             }
             else if (name == Oidc.eventNames.loginAsync_begin
                 || name == Oidc.eventNames.loginCallbackAsync_end
@@ -171,6 +171,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
             </Switch>;
         case Oidc.eventNames.refreshTokensAsync_error:
         case Oidc.eventNames.syncTokensAsync_error:
+        case Oidc.eventNames.logout_from_another_tab:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <SessionLostComponent configurationName={configurationName} /> 
             </Switch>;

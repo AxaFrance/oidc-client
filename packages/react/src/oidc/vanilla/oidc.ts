@@ -225,7 +225,7 @@ const setTokensAsync = async (serviceWorker, tokens) =>{
 const eventNames = {
     service_worker_not_supported_by_browser: "service_worker_not_supported_by_browser",
     token_aquired: "token_aquired",
-    logout: "logout",
+    logout_from_another_tab: "logout_from_another_tab",
     token_renewed: "token_renewed",
     token_timer: "token_timer",
     loginAsync_begin:"loginAsync_begin",
@@ -655,12 +655,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }).then((silentSigninResponse) => {
                         console.log("to ckeck tokens !!!!!!!!!!!!!!");
                         console.log(silentSigninResponse);
-                        
-                        
-                        
                     }).catch((e) => {
                         console.log("apply logout");
-                        this.publishEvent(eventNames.logout, {});
+                        this.publishEvent(eventNames.logout_from_another_tab, {});
                     });
 
                 };
@@ -894,8 +891,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
         if (serviceWorker) {
-            const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
-            if(!tokens){
+            const { isLogin } = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
+            if(isLogin == false){
+                
+                this.publishEvent(eventNames.logout_from_another_tab, {});
+                await this.destroyAsync();
+            }
+            else if(isLogin == null){
                 try {
                     this.publishEvent(eventNames.syncTokensAsync_begin, {});
                     this.syncTokensAsyncPromise = this.silentSigninAsync({prompt:"none"});

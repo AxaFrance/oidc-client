@@ -11,6 +11,7 @@ export const configurationIdentityServer = {
     service_worker_only: false, 
     // storage: localStorage
     //silent_signin_timeout: 3333000
+    monitor_session:false,
   };
 
 export const configurationIdentityServerWithHash = {

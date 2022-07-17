@@ -18,6 +18,7 @@ let database = {
     default: {
         configurationName: "default",
         tokens: null,
+        isLogin:null,
         items:[],
         oidcServerConfiguration: null
     }
@@ -48,6 +49,7 @@ function hideTokens(currentDatabaseElement) {
     return (response) => {
         return response.json().then(tokens => {
             currentDatabaseElement.tokens = tokens;
+            currentDatabaseElement.isLogin = true;
             const secureTokens = {
                 ...tokens,
                 access_token: ACCESS_TOKEN +"_" + configurationName,
@@ -241,6 +243,7 @@ addEventListener('message', event => {
         case "clear":
             currentDatabase.tokens = null;
             currentDatabase.items = null;
+            currentDatabase.isLogin = false;
             port.postMessage({configurationName});
             return;
         case "init":
@@ -254,6 +257,7 @@ addEventListener('message', event => {
             if(!currentDatabase.tokens){
                 port.postMessage({
                     tokens:null,
+                    isLogin: currentDatabase.isLogin,
                     configurationName});
             } else {
                 const tokens = {
@@ -265,6 +269,7 @@ addEventListener('message', event => {
                 }
                 port.postMessage({
                     tokens,
+                    isLogin: currentDatabase.isLogin,
                     configurationName
                 });
             }

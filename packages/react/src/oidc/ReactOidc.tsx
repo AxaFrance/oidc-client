@@ -2,8 +2,36 @@
 import Oidc, {StringMap} from "./vanilla/oidc";
 
 const defaultConfigurationName = "default";
+
+const defaultIsAuthenticated = (getOidc, configurationName) =>{
+    let isAuthenticated:boolean = false;
+    const oidc = getOidc(configurationName);
+    if(oidc){
+        isAuthenticated = getOidc(configurationName).tokens != null;
+    }
+    return isAuthenticated;
+}
+
 export const useOidc =(configurationName=defaultConfigurationName) =>{
     const getOidc =  Oidc.get;
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(defaultIsAuthenticated(getOidc, configurationName));
+
+    useEffect(() => {
+        let isMounted = true;
+        const oidc = getOidc(configurationName);
+        setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
+        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+            if(name === Oidc.eventNames.logout_from_another_tab){
+                if(isMounted) {
+                    setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
+                }
+            }
+        });
+        return () => {
+            isMounted = false;
+            oidc.removeEventSubscription(newSubscriptionId);
+        };
+    }, [configurationName]);
 
     const login = (callbackPath:string | undefined = undefined, extras:StringMap=null, state: string|undefined=undefined) => {
         return getOidc(configurationName).loginAsync(callbackPath, extras, true, state);
@@ -11,12 +39,6 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
     const logout = (callbackPath: string | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).logoutAsync(callbackPath, extras);
     };
-
-    let isAuthenticated:boolean = false;
-    const oidc = getOidc(configurationName);
-    if(oidc){
-        isAuthenticated = getOidc(configurationName).tokens != null;
-    }
 
     return { login, logout, isAuthenticated };
 }
@@ -52,7 +74,7 @@ export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired 
-                || name === Oidc.eventNames.logout){
+                || name === Oidc.eventNames.logout_from_another_tab){
                 if(isMounted) {
                     const tokens = oidc.tokens;
                     setAccessToken(tokens != null  ? {accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload } : accessTokenInitialState);
@@ -98,7 +120,7 @@ export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == Oidc.eventNames.token_renewed
                 || name == Oidc.eventNames.token_aquired
-                || name === Oidc.eventNames.logout){
+                || name === Oidc.eventNames.logout_from_another_tab){
                 if(isMounted) {
                     const tokens = oidc.tokens;
                     setIDToken(tokens != null  ? {idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload} : idTokenInitialState);

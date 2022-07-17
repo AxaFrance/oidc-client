@@ -123,7 +123,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { tokens : result.tokens};
+        return { tokens : result.tokens, isLogin: result.isLogin};
     }
     
     const startKeepAliveServiceWorker = () => {
