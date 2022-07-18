@@ -31,7 +31,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                     <select value={configurationName} onChange={handleConfigurationChange} >
                         <option value="config_classic">config_classic</option>
                         <option value="config_without_refresh_token">config_without_refresh_token</option>
-                        <option value="google">google</option>
+                        <option value="config_google">google</option>
                         <option value="config_with_hash">config_with_hash</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
@@ -61,7 +61,7 @@ export const MultiAuthContainer = () => {
             redirect_uri:callBack,
             silent_redirect_uri: "",
             scope: 'openid profile email api'},
-        google: { ...configurationGoogle },
+        config_google: { ...configurationGoogle },
         config_with_hash: { ...configurationIdentityServerWithHash}
     }
     const handleConfigurationChange = (event) => {

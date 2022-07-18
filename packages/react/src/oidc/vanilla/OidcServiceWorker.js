@@ -1,4 +1,6 @@
-﻿this.importScripts('OidcTrustedDomains.js');
+﻿import oidc from "./oidc";
+
+this.importScripts('OidcTrustedDomains.js');
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
@@ -218,6 +220,14 @@ self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
+
+const checkDomain =(domains, tokenEndpoint) => {
+    const domain = domains.find(domain => domain.startsWith(tokenEndpoint));
+    if(!domain){
+        throw new Error("Domain " + tokenEndpoint+ " is not trusted, please add domain in TrustedDomains.js");
+    }
+}
+
 addEventListener('message', event => {
     const port = event.ports[0];
     const data = event.data;
@@ -229,6 +239,7 @@ addEventListener('message', event => {
             tokens: null,
             items:[],
             oidcServerConfiguration: null,
+            isLogin:null,
             configurationName: configurationName,
         };
         currentDatabase = database[configurationName];
@@ -247,7 +258,13 @@ addEventListener('message', event => {
             port.postMessage({configurationName});
             return;
         case "init":
-            currentDatabase.oidcServerConfiguration = data.data.oidcServerConfiguration;
+            const oidcServerConfiguration = data.data.oidcServerConfiguration;
+            const tokenEndpoint = oidcServerConfiguration.tokenEndpoint;
+            const domains = trustedDomains[configurationName];
+            checkDomain(domains, tokenEndpoint);
+            const userInfoEndpoint = oidcServerConfiguration.userInfoEndpoint;
+            checkDomain(domains, userInfoEndpoint);
+            currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
             const where = data.data.where;
             if(where === "loginCallbackAsync" || where === "tryKeepExistingSessionAsync") {
                 currentLoginCallbackConfigurationName = configurationName;
