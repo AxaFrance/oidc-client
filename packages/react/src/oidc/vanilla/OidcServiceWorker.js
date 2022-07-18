@@ -1,6 +1,4 @@
-﻿import oidc from "./oidc";
-
-this.importScripts('OidcTrustedDomains.js');
+﻿this.importScripts('OidcTrustedDomains.js');
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
@@ -222,7 +220,7 @@ self.addEventListener('fetch', handleFetch);
 
 
 const checkDomain =(domains, tokenEndpoint) => {
-    const domain = domains.find(domain => domain.startsWith(tokenEndpoint));
+    const domain = domains.find(domain => tokenEndpoint.startsWith(domain));
     if(!domain){
         throw new Error("Domain " + tokenEndpoint+ " is not trusted, please add domain in TrustedDomains.js");
     }
