@@ -7,4 +7,3 @@ const trustedDomains = {
     config_google: ["https://oauth2.googleapis.com", "https://openidconnect.googleapis.com"],
     config_with_hash: ["https://demo.duendesoftware.com"]
 };
-6
