@@ -104,7 +104,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     }
     
     const unregisterAsync = async () => {
-        await registration.unregister()
+        return await registration.unregister();
     }
 
     const getAccessTokenPayloadAsync=async () => {

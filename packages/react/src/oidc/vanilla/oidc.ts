@@ -599,12 +599,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync();
                     if (!isServiceWorkerProxyActive) {
                         const isUnregistered = await serviceWorker.unregisterAsync();
-                        const extrasQueries = extras != null ? {...extras}: {};
+                        console.log("isUnregistered")
+                        console.log(isUnregistered)
+                        if(isUnregistered){
+                            serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                        }
+                        /*const extrasQueries = extras != null ? {...extras}: {};
                         extrasQueries.callbackPath = url;
                         extrasQueries.state = state;
                         const queryString = buildQueries(extrasQueries);
-                        window.location.href = `${redirectUri}/service-worker-install${queryString}`;
-                        return;
+                        window.location.href = `${redirectUri}/service-worker-install${queryString}`;*/
+                        //return;
                     }
                 }
                 let storage;

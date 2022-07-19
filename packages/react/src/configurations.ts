@@ -6,7 +6,7 @@ export const configurationIdentityServer = {
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
     authority_time_cache_wellknowurl_in_second: 60* 60,
-    //refresh_time_before_tokens_expiration_in_second: 260,
+    refresh_time_before_tokens_expiration_in_second: 280,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false, 
     //storage: localStorage,
