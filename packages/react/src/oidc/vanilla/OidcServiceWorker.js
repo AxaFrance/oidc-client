@@ -148,6 +148,7 @@ const handleFetch = async (event) => {
             }
         });
         event.waitUntil(event.respondWith(fetch(newRequest)));
+        return;
     }
 
     if(event.request.method !== "POST"){

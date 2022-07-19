@@ -20,6 +20,30 @@ import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
 
+
+const internalFetch = async (url, headers, numberRetry=0) => {
+    let response;
+    try {
+        response = await Promise.race([
+            fetch(url, headers),
+            new Promise((_, reject) => setTimeout(
+                () => reject(new Error('Timeout')), 10000))]);
+    } catch (e) {
+        if (e.message === 'Timeout'
+            || e.message === 'Network request failed') {
+            if(numberRetry <=2) {
+                return await internalFetch(url, headers, numberRetry + 1);
+            } 
+            else {
+                throw e;
+            }
+        } else {
+            throw e; // rethrow other unexpected errors
+        }
+    }
+    return response;
+}
+
 export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
     check_session_iframe?: string;
 }
@@ -925,7 +949,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
                 const formBodyString = formBody.join("&");
 
-                const response = await fetch(url, {
+                const response = await internalFetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
