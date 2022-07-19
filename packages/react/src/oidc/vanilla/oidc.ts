@@ -225,6 +225,7 @@ const eventNames = {
     loginCallbackAsync_end:"loginCallbackAsync_end",
     loginCallbackAsync_error:"loginCallbackAsync_error",
     refreshTokensAsync_begin: "refreshTokensAsync_begin",
+    refreshTokensAsync: "refreshTokensAsync",
     refreshTokensAsync_end: "refreshTokensAsync_end",
     refreshTokensAsync_error: "refreshTokensAsync_error",
     refreshTokensAsync_silent_error: "refreshTokensAsync_silent_error",
@@ -845,6 +846,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     async refreshTokensAsync(refreshToken) {
+
+        while (document.hidden) {
+            await sleepAsync(1000);
+            this.publishEvent(eventNames.refreshTokensAsync, {message:"wait because document is hidden"});
+        }
+        
         const localSilentSigninAsync= async (exception=null) => {
             try {
                 const silent_token_response = await this.silentSigninAsync();
@@ -863,7 +870,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
 
         try{
-            this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken})
+            this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken});
+            
             const configuration = this.configuration;
             const clientId = configuration.client_id;
             const redirectUri = configuration.redirect_uri;
