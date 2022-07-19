@@ -103,6 +103,7 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
+  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin', // Required if is silent_redirect_uri set 
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',

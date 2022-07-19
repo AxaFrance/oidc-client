@@ -112,6 +112,7 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
+  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin',
   scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -144,6 +145,7 @@ const propTypes = {
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
     silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
+    silent_sigin_uri: PropTypes.string, // Optional but require if silent_redirect_uri is set
     silent_signin_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
@@ -160,6 +162,9 @@ const propTypes = {
     service_worker_only: PropTypes.boolean, // default false
     extras: StringMap|undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
     withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState()) 
+    authority_time_cache_wellknowurl_in_second: 60* 60, // Time to cache in second of openid wellknowurl, default is 1 hour
+    monitor_session:true, // Add OpenId monitor session, default is true (more information https://openid.net/specs/openid-connect-session-1_0.html)
+    onLogout: Function // Optional, can be set to override the default behavior, this function is triggered when user is logout from another tab
   }).isRequired
 };
 ```
@@ -448,6 +453,7 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
+  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -514,15 +520,9 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:3001/#authentication/callback',
   silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
+  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin',
   scope: 'openid profile email api offline_access',
-  authority: 'https://demo.identityserver.io',
-  authority_configuration: {
-    authorization_endpoint: 'https://demo.duendesoftware.com/connect/authorize',
-    token_endpoint: 'https://demo.duendesoftware.com/connect/token',
-    userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
-    end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
-    revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
-  },
+  authority: 'https://demo.duendesoftware.com',
 };
 
 const onEvent=(configurationName, eventName, data )=>{
@@ -564,7 +564,8 @@ React oidc work also with hash router.
 export const configurationIdentityServerWithHash = {
 client_id: 'interactive.public.short',
 redirect_uri: window.location.origin+'#authentication-callback',
-silent_redirect_uri: window.location.origin+'#authentication-silent-callback',
+silent_redirect_uri: window.location.origin+'#authentication-silent-callback', 
+silent_signin_uri: window.location.origin+'#authentication-silent-signin',
 scope: 'openid profile email api offline_access',
 authority: 'https://demo.duendesoftware.com',
 refresh_time_before_tokens_expiration_in_second: 70,

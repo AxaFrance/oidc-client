@@ -264,14 +264,14 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
         return new OidcAuthorizationServiceConfiguration(JSON.parse(cacheJson));
     }
     
-    const res = await fetch(fullUrl);
+    const response = await fetch(fullUrl);
 
-    if (res.status != 200) {
+    if (response.status != 200) {
         return null;
     }
     
     
-    const result = await res.json();
+    const result = await response.json();
     window.localStorage.setItem(localStorageKey, JSON.stringify({result, timestamp:Date.now()}));
     
     return new OidcAuthorizationServiceConfiguration(result);
@@ -533,8 +533,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }
                     const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
                     const {tokens} = await session.initAsync();
-                    console.log("const {tokens} = await session.initAsync();")
-                    console.log(tokens)
                     if (tokens) {
                         // @ts-ignore
                         this.tokens = await setTokensAsync(serviceWorker, tokens);
@@ -847,10 +845,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     async refreshTokensAsync(refreshToken) {
 
-        while (document.hidden) {
+        /*while (document.hidden) {
             await sleepAsync(1000);
             this.publishEvent(eventNames.refreshTokensAsync, {message:"wait because document is hidden"});
-        }
+        }*/
         
         const localSilentSigninAsync= async (exception=null) => {
             try {
@@ -881,16 +879,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             {
                 return await localSilentSigninAsync();
             }
-            const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
+            
 
-            let extras = undefined;
+            let extras = {};
             if(configuration.token_request_extras) {
-                extras = {}
                 for (let [key, value] of Object.entries(configuration.token_request_extras)) {
                     extras[key] = value;
                 }
             }
+            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
             
+            /*const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
             // use the token response to make a request for an access token
             const request = new TokenRequest({
                 client_id: clientId,
@@ -901,10 +900,53 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 extras
                 });
             
-            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
+           
             const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
+            */
+            const performTokenRequestAsync= async (url) => {
+                const details = {
+                    client_id: clientId,
+                    redirect_uri: redirectUri,
+                    grant_type: GRANT_TYPE_REFRESH_TOKEN,
+                    refresh_token: refreshToken,
+                };
+
+                for (let [key, value] of Object.entries(extras)) {
+                    if (details[key] === undefined) {
+                        details[key] = value;
+                    }
+                }
+
+                let formBody = [];
+                for (const property in details) {
+                    const encodedKey = encodeURIComponent(property);
+                    const encodedValue = encodeURIComponent(details[property]);
+                    formBody.push(`${encodedKey}=${encodedValue}`);
+                }
+                const formBodyString = formBody.join("&");
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    },
+                    body: formBodyString,
+                });
+                const result = await response.json();
+                return {
+                    accessToken: result.access_token,
+                    expiresIn: result.expires_in,
+                    idToken: result.id_token, 
+                    refreshToken: result.refresh_token,
+                    scope: result.scope,
+                    tokenType: result.token_type,
+                };
+            }
+            
+            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint)
+            
             this.publishEvent(eventNames.refreshTokensAsync_end,  {message:"success"});
-            return token_response;
+            return tokenResponse;
         } catch(exception) {
             console.error(exception);
             this.publishEvent(eventNames.refreshTokensAsync_silent_error, exception);

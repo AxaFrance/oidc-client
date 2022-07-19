@@ -1,6 +1,7 @@
 ﻿# Migrate from v5 to v6
 
 V6 offer a better silent signin and add session monitor feature.
+Monitor session feature allow to logout the same user from all tabs and from all websites where the user is logged to.
 
 ```javascript
 
@@ -29,12 +30,12 @@ const trustedDomains = {
 
 ```javascript
 
-// new properties    
+// New properties    
 export const configurationIdentityServer = {
     ...,
-    authority_time_cache_wellknowurl_in_second: 60* 60,
-    refresh_time_before_tokens_expiration_in_second: 280,
-    monitor_session:true,
+    authority_time_cache_wellknowurl_in_second: 60* 60, // Time to cache in second of openid wellknowurl, default is 1 hour
+    monitor_session:true, // Add OpenId monitor session, default is true (more information https://openid.net/specs/openid-connect-session-1_0.html)
+    onLogout: Function // Optional, can be set to override the default behavior, this function is triggered when user is logout from another tab
 };
 
 ```
