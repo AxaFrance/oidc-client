@@ -13,3 +13,8 @@ const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser();
 const { login, logout, isAuthenticated} = useOidc();
 const{ oidcUser, oidcUserLoadingState } = useOidcUser();
 ```
+
+
+### Other breaking change
+
+callbackErrorComponent is replaced by authenticatingErrorComponent n OidcProvider component.

@@ -137,8 +137,8 @@ const propTypes = {
   loadingComponent: PropTypes.elementType, // you can inject your own loading component
   sessionLostComponent: PropTypes.elementType, // you can inject your own session lost component
   authenticating: PropTypes.elementType, // you can inject your own authenticationg component
+  authenticatingErrorComponent: PropTypes.elementType,
   callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
-  callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
   serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
   onSessionLost: PropTypes.function, // If set "sessionLostComponent" is not displayed and onSessionLost callback is called instead
   configuration: PropTypes.shape({
