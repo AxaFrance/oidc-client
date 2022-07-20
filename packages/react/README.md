@@ -145,7 +145,7 @@ const propTypes = {
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
     silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
-    silent_sigin_uri: PropTypes.string, // Optional but require if silent_redirect_uri is set
+    silent_sigin_uri: PropTypes.string, // Optional but require if silent_redirect_uri is set, route that trigger the signin
     silent_signin_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,

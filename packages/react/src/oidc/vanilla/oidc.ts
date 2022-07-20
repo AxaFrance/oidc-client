@@ -205,7 +205,8 @@ const userInfoAsync = async (oidc) => {
    const fetchUserInfo = async (accessToken) => {
        const res = await fetch(url, {
            headers: {
-               authorization: `Bearer ${accessToken}`
+               authorization: `Bearer ${accessToken}`,
+               credentials: 'same-origin'
            }
        });
 
