@@ -30,7 +30,7 @@ const internalFetch = async (url, headers, numberRetry=0) => {
                 () => reject(new Error('Timeout')), 10000))]);
     } catch (e) {
         if (e.message === 'Timeout'
-            || e.message === 'Network request failed') {
+            || e.message === 'Network request failed' || e.message === "Failed to fetch") {
             if(numberRetry <=2) {
                 return await internalFetch(url, headers, numberRetry + 1);
             } 
@@ -38,6 +38,8 @@ const internalFetch = async (url, headers, numberRetry=0) => {
                 throw e;
             }
         } else {
+            
+            console.error(e.message);
             throw e; // rethrow other unexpected errors
         }
     }
