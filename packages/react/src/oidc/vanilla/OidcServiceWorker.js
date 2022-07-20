@@ -77,6 +77,11 @@ const getCurrentDatabaseDomain = (database, url) => {
     for (const [key, currentDatabase] of Object.entries(database)) {
 
         const oidcServerConfiguration = currentDatabase.oidcServerConfiguration;
+
+        if(url === oidcServerConfiguration.tokenEndpoint){
+            continue;
+        }
+        
         const domainsToSendTokens = oidcServerConfiguration != null ? [
             oidcServerConfiguration.userInfoEndpoint, ...trustedDomains[key]
         ] : [...trustedDomains[key]];
@@ -125,7 +130,7 @@ const keepAliveAsync = async (event) => {
             const cache = await caches.open("oidc_dummy_cache");
             await cache.put(event.request, response.clone());
         }*/
-        await sleep(15000);
+        await sleep(10000);
     }
    
     return response;
