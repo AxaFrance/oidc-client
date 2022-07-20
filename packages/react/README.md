@@ -112,7 +112,7 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
-  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin',
+  silent_login_uri: 'http://localhost:4200/authentication/silent-signin',
   scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -145,8 +145,8 @@ const propTypes = {
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
     silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
-    silent_sigin_uri: PropTypes.string, // Optional but require if silent_redirect_uri is set, route that trigger the signin
-    silent_signin_timeout: PropTypes.number, // Optional default is 12000 milliseconds
+    silent_login_uri: PropTypes.string, // Optional but require if silent_redirect_uri is set, route that trigger the signin
+    silent_login_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
     storage: Storage, // Default sessionStorage, you can set localStorage but it is less secure to XSS attacks
@@ -453,7 +453,7 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
-  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin',
+  silent_login_uri: 'http://localhost:4200/authentication/silent-login',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -519,10 +519,17 @@ import { useRouter } from 'next/router'
 const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:3001/#authentication/callback',
-  silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
-  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin',
+  silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-login that use cookies between OIDC server and client javascript to restore the session
+  silent_login_uri: 'http://localhost:4200/authentication/silent-login',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  authority_configuration: {
+    authorization_endpoint: 'https://demo.duendesoftware.com/connect/authorize',
+    token_endpoint: 'https://demo.duendesoftware.com/connect/token',
+    userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
+    end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
+    revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
+  },
 };
 
 const onEvent=(configurationName, eventName, data )=>{
@@ -565,7 +572,7 @@ export const configurationIdentityServerWithHash = {
 client_id: 'interactive.public.short',
 redirect_uri: window.location.origin+'#authentication-callback',
 silent_redirect_uri: window.location.origin+'#authentication-silent-callback', 
-silent_signin_uri: window.location.origin+'#authentication-silent-signin',
+silent_login_uri: window.location.origin+'#authentication-silent-login',
 scope: 'openid profile email api offline_access',
 authority: 'https://demo.duendesoftware.com',
 refresh_time_before_tokens_expiration_in_second: 70,

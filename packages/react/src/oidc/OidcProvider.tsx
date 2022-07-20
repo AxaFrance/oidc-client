@@ -179,7 +179,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                       <OidcRoutes redirect_uri={configuration.redirect_uri}
                                   silent_redirect_uri={configuration.silent_redirect_uri}
-                                  silent_signin_uri={configuration.silent_signin_uri}
+                                  silent_login_uri={configuration.silent_login_uri}
                                   callbackSuccessComponent={callbackSuccessComponent} 
                                   callbackErrorComponent={authenticatingErrorComponent}
                                   authenticatingComponent={authenticatingComponent}

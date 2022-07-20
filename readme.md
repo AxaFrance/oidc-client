@@ -103,7 +103,7 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
-  silent_signin_uri: 'http://localhost:4200/authentication/silent-signin', // Required if is silent_redirect_uri set 
+  silent_login_uri: 'http://localhost:4200/authentication/silent-login', // Required if is silent_redirect_uri set 
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -246,6 +246,7 @@ In this version you can use a ServiceWorker that will hide the refresh_token and
 - For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATION_GUIDE_V3_TO_V4.md)
 - For migrating from v3 to v5 checkout our [`migration guide v3 to v5`](./MIGRATION_GUIDE_V3_TO_V5.md)
 - For migrating from v4 to v5 checkout our [`migration guide v4 to v5`](./MIGRATION_GUIDE_V4_TO_V5.md)
+- For migrating from v5 to v6 checkout our [`migration guide v5 to v6`](./MIGRATION_GUIDE_V5_TO_V6.md)
 
 ## Contribute
 

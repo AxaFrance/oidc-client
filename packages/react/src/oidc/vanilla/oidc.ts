@@ -63,14 +63,13 @@ const performTokenRequestAsync= async (url, details, extras) => {
 const internalFetch = async (url, headers, numberRetry=0) => {
     let response;
     try {
-        response = await Promise.race([
-            fetch(url, headers),
-            new Promise((_, reject) => setTimeout(
-                () => reject(new Error('Timeout')), 10000))]);
+        let controller = new AbortController();
+        setTimeout(() => controller.abort(), 10000);
+        response = await fetch(url, {...headers, signal: controller.signal});
     } catch (e) {
-        if (e.message === 'Timeout'
+        if (e.message === 'AbortError'
             || e.message === 'Network request failed') {
-            if(numberRetry <=2) {
+            if(numberRetry <=1) {
                 return await internalFetch(url, headers, numberRetry + 1);
             } 
             else {
@@ -156,8 +155,8 @@ export interface AuthorityConfiguration {
      client_id: string,
      redirect_uri: string,
      silent_redirect_uri?:string,
-     silent_signin_uri?:string,
-     silent_signin_timeout?:number,
+     silent_login_uri?:string,
+     silent_login_timeout?:number,
      scope: string,
      authority: string,
      authority_time_cache_wellknowurl_in_second?: number,
@@ -298,10 +297,10 @@ const eventNames = {
     tryKeepExistingSessionAsync_begin: "tryKeepExistingSessionAsync_begin",
     tryKeepExistingSessionAsync_end: "tryKeepExistingSessionAsync_end",
     tryKeepExistingSessionAsync_error: "tryKeepExistingSessionAsync_error",
-    silentSigninAsync_begin: "silentSigninAsync_begin",
-    silentSigninAsync: "silentSigninAsync",
-    silentSigninAsync_end: "silentSigninAsync_end",
-    silentSigninAsync_error: "silentSigninAsync_error", 
+    silentLoginAsync_begin: "silentLoginAsync_begin",
+    silentLoginAsync: "silentLoginAsync",
+    silentLoginAsync_end: "silentLoginAsync_end",
+    silentLoginAsync_error: "silentLoginAsync_error", 
     syncTokensAsync_begin: "syncTokensAsync_begin",
     syncTokensAsync_end: "syncTokensAsync_end",
     syncTokensAsync_error: "syncTokensAsync_error"
@@ -322,7 +321,7 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     const fullUrl = `${openIdIssuerUrl}/${WELL_KNOWN_PATH}/${OPENID_CONFIGURATION}`;
     
     const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
-    const cacheJson = window.localStorage.getItem(localStorageKey);
+    const cacheJson = window.sessionStorage.getItem(localStorageKey);
     
     const oneHourMinisecond = 1000 * timeCacheSecond;
     // @ts-ignore
@@ -336,9 +335,8 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
         return null;
     }
     
-    
     const result = await response.json();
-    window.localStorage.setItem(localStorageKey, JSON.stringify({result, timestamp:Date.now()}));
+    window.sessionStorage.setItem(localStorageKey, JSON.stringify({result, timestamp:Date.now()}));
     
     return new OidcAuthorizationServiceConfiguration(result);
 }
@@ -385,6 +383,7 @@ export class Oidc {
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
+      this.logoutAsync.bind(this);
     }
 
     subscriveEvents(func){
@@ -416,29 +415,29 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
     static eventNames = eventNames;
     
-    silentSigninCallbackFromIFrame(){
-        if (this.configuration.silent_redirect_uri && this.configuration.silent_signin_uri) {
+    silentLoginCallbackFromIFrame(){
+        if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
             window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({tokens:this.tokens, sessionState:queryParams.session_state})}`, window.location.origin);
         }
     }
-    silentSigninErrorCallbackFromIFrame(){
-        if (this.configuration.silent_redirect_uri && this.configuration.silent_signin_uri) {
+    silentLoginErrorCallbackFromIFrame(){
+        if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
             window.top.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({error:queryParams.error})}`, window.location.origin);
         }
     }
-    async silentSigninAsync(extras:StringMap=null, state:string=null, scope:string=null) {
-        if (!this.configuration.silent_redirect_uri || !this.configuration.silent_signin_uri) {
+    async silentLoginAsync(extras:StringMap=null, state:string=null, scope:string=null) {
+        if (!this.configuration.silent_redirect_uri || !this.configuration.silent_login_uri) {
             return Promise.resolve(null);
         }
         while (document.hidden) {
             await sleepAsync(1000);
-            this.publishEvent(eventNames.silentSigninAsync, {message:"wait because document is hidden"});
+            this.publishEvent(eventNames.silentLoginAsync, {message:"wait because document is hidden"});
         }
             
         try {
-            this.publishEvent(eventNames.silentSigninAsync_begin, {});
+            this.publishEvent(eventNames.silentLoginAsync_begin, {});
             const configuration = this.configuration
             let queries = "";
             
@@ -465,7 +464,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }
                 }
             }
-            const link = configuration.silent_signin_uri  + queries;
+            const link = configuration.silent_login_uri  + queries;
             const idx = link.indexOf("/", link.indexOf("//") + 2);
             const iFrameOrigin = link.substr(0, idx);
             const iframe = document.createElement('iframe');
@@ -490,14 +489,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 if (!isResolved) {
                                     if(data.startsWith(key)) {
                                         const result = JSON.parse(e.data.replace(key, ''));
-                                        self.publishEvent(eventNames.silentSigninAsync_end, {});
+                                        self.publishEvent(eventNames.silentLoginAsync_end, {});
                                         iframe.remove();
                                         isResolved = true;
                                         resolve(result);
                                     }
                                     else if(data.startsWith(key_error)) {
                                         const result = JSON.parse(e.data.replace(key_error, ''));
-                                        self.publishEvent(eventNames.silentSigninAsync_error, result);
+                                        self.publishEvent(eventNames.silentLoginAsync_error, result);
                                         iframe.remove();
                                         isResolved = true;
                                         reject(result);
@@ -506,10 +505,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             }
                         }
                     };
-                    const silentSigninTimeout = configuration.silent_signin_timeout ?? 12000
+                    const silentSigninTimeout = configuration.silent_login_timeout ?? 12000
                     setTimeout(() => {
                         if (!isResolved) {
-                            self.publishEvent(eventNames.silentSigninAsync_error, "timeout");
+                            self.publishEvent(eventNames.silentLoginAsync_error, "timeout");
                             iframe.remove();
                             isResolved = true;
                             reject("timeout");
@@ -517,12 +516,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }, silentSigninTimeout);
                 } catch (e) {
                     iframe.remove();
-                    self.publishEvent(eventNames.silentSigninAsync_error, e);
+                    self.publishEvent(eventNames.silentLoginAsync_error, e);
                     reject(e);
                 }
             });
         } catch (e) {
-            this.publishEvent(eventNames.silentSigninAsync_error, e);
+            this.publishEvent(eventNames.silentLoginAsync_error, e);
             throw e;
         }
     }
@@ -712,12 +711,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             this.loginPromise = null;
             return result;
         });
-
     }
     
     async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin=false){
         return new Promise((resolve:Function, reject) => {
-            if (this.configuration.silent_signin_uri && this.configuration.silent_redirect_uri && this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
+            if (this.configuration.silent_login_uri && this.configuration.silent_redirect_uri && this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
                 const checkSessionCallback = () => {
                     this.checkSessionIFrame.stop();
                     
@@ -728,7 +726,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const idToken = this.tokens.idToken;
                     // @ts-ignore
                     const idTokenPayload = this.tokens.idTokenPayload;
-                    this.silentSigninAsync({
+                    this.silentLoginAsync({
                         prompt: "none",
                         id_token_hint: idToken,
                         scope: "openid"
@@ -911,9 +909,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     async refreshTokensAsync(refreshToken) {
         
-        const localSilentSigninAsync= async () => {
+        const localsilentLoginAsync= async () => {
             try {
-                const silent_token_response = await this.silentSigninAsync();
+                const silent_token_response = await this.silentLoginAsync();
                 if (silent_token_response) {
                     return silent_token_response.tokens;
                 }
@@ -935,7 +933,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             
             if(!refreshToken)
             {
-                return await localSilentSigninAsync();
+                return await localsilentLoginAsync();
             }
             
             let extras = {};
@@ -969,11 +967,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         return tokenResponse.data;
                     } else {
                         this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "bad request" , tokenResponse: tokenResponse});
-                        return await localSilentSigninAsync();
+                        return await localsilentLoginAsync();
                     }
                 } catch (exception) {
                     console.error(exception);
-                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exception" ,exception: exception});
+                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exception" ,exception: exception.message});
                 }
                 index++;
             }
@@ -999,7 +997,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             else if (isLogin == null){
                 try {
                     this.publishEvent(eventNames.syncTokensAsync_begin, {});
-                    this.syncTokensAsyncPromise = this.silentSigninAsync({prompt:"none"});
+                    this.syncTokensAsyncPromise = this.silentLoginAsync({prompt:"none"});
                     const silent_token_response = await this.syncTokensAsyncPromise;
                     if (silent_token_response && silent_token_response.tokens) {
                         this.tokens = await setTokensAsync(serviceWorker, silent_token_response.tokens);

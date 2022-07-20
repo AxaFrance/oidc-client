@@ -4,7 +4,7 @@ import CallbackComponent from '../default-component/Callback.component';
 import SilentCallbackComponent from "../default-component/SilentCallback.component";
 import ServiceWorkerInstall from "../default-component/ServiceWorkerInstall.component";
 import { CustomHistory } from "./withRouter";
-import SilentSigninComponent from "../default-component/SilentSignin.component";
+import SilentLoginComponent from "../default-component/SilentLogin.component";
 
 const defaultProps: Partial<OidcRoutesProps> = {
 
@@ -17,7 +17,7 @@ type OidcRoutesProps = {
   configurationName:string;
   redirect_uri: string;
   silent_redirect_uri?: string;
-  silent_signin_uri?:string;
+  silent_login_uri?:string;
   withCustomHistory?: () => CustomHistory;
 };
 
@@ -27,7 +27,7 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
                                                               authenticatingComponent,  
                                                               redirect_uri,
                                                               silent_redirect_uri,
-                                                              silent_signin_uri,
+                                                              silent_login_uri,
   children, configurationName,
   withCustomHistory=null,
 }) => {
@@ -51,9 +51,9 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
     }
   }
 
-  if(silent_signin_uri){
-    if(path === getPath(silent_signin_uri)){
-      return <SilentSigninComponent configurationName={configurationName} />
+  if(silent_login_uri){
+    if(path === getPath(silent_login_uri)){
+      return <SilentLoginComponent configurationName={configurationName} />
     }
   }
   

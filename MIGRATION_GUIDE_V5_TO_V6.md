@@ -1,7 +1,11 @@
 ﻿# Migrate from v5 to v6
 
-V6 offer a better silent signin and add session monitor feature.
-Monitor session feature allow to logout the same user from all tabs and from all websites where the user is logged to.
+V6 offer:
+- More efficient silent login 
+- More robust algorithm in order to keep the session alive
+- Add session monitor feature: Monitor session feature allow to logout the same user from all tabs and from all websites where the user is logged to.
+- Authority wellknowurl response can be cached inside sessionStorage
+- Increase security
 
 ```javascript
 
@@ -9,7 +13,7 @@ Monitor session feature allow to logout the same user from all tabs and from all
 export const configuration = {
     ...,
     redirect_uri: window.location.origin+'/authentication/callback', // now this callback must be declared to your OIDC server, manage callback information after login
-    silent_signin_uri: window.location.origin+'/authentication/silent-sign-in', // new property optional but necessary for a working silent signin, route that trigger silent signin
+    silent_login_uri: window.location.origin+'/authentication/silent-login-in', // new property optional but necessary for a working silent signin, route that trigger silent signin
     ...,
 };
 

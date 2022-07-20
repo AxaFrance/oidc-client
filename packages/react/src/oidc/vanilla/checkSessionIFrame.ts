@@ -3,13 +3,13 @@
 const Log = console;
 
 export class CheckSessionIFrame {
-    private _client_id: any;
-    private _callback: any;
+    private readonly _client_id: any;
+    private readonly _callback: any;
     private _url: any;
-    private _interval: number;
-    private _stopOnError: boolean;
-    private _frame_origin: string;
-    private _frame: HTMLIFrameElement;
+    private readonly _interval: number;
+    private readonly _stopOnError: boolean;
+    private readonly _frame_origin: string;
+    private readonly _frame: HTMLIFrameElement;
     private _boundMessageEvent: any;
     private _timer: number;
     constructor(callback, client_id, url, interval=DefaultInterval, stopOnError = true) {
@@ -46,7 +46,7 @@ export class CheckSessionIFrame {
             e.source === this._frame.contentWindow
         ) {
             if (e.data === "error") {
-                console.error("CheckSessionIFrame: error message from check session op iframe");
+                Log.error("CheckSessionIFrame: error message from check session op iframe");
                 if (this._stopOnError) {
                     this.stop();
                 }

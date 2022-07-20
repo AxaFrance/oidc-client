@@ -3,7 +3,7 @@ import Oidc from "../../vanilla/oidc";
 import {getParseQueryStringFromLocation} from "../../vanilla/route-utils";
 
 
-const SilentSignin: ComponentType<any> = (({configurationName }) => {
+const SilentLogin: ComponentType<any> = (({configurationName }) => {
     const queryParams = getParseQueryStringFromLocation(window.location.href);
 
     const getOidc =  Oidc.get;
@@ -32,4 +32,4 @@ const SilentSignin: ComponentType<any> = (({configurationName }) => {
     return <></>;
 });
 
-export default SilentSignin;
+export default SilentLogin;
