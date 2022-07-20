@@ -9,7 +9,7 @@ Monitor session feature allow to logout the same user from all tabs and from all
 export const configuration = {
     ...,
     redirect_uri: window.location.origin+'/authentication/callback', // now this callback must be declared to your OIDC server
-    silent_signin_uri: window.location.origin+'/authentication/silent-sign-in', // new property optinal but necessary for a working silent signin 
+    silent_signin_uri: window.location.origin+'/authentication/silent-sign-in', // new property optional but necessary for a working silent signin 
     ...,
 };
 
@@ -27,6 +27,9 @@ const trustedDomains = {
 
 
 ```
+
+- redirect_uri: manage callback inforation after login and must be declared to your OIDC server
+- silent_signin_uri: route that trigger silent signin
 
 ```javascript
 

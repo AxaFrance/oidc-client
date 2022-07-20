@@ -125,11 +125,11 @@ const keepAliveAsync = async (event) => {
     const init = {"status": 200, "statusText": 'oidc-service-worker'};
     const response = new Response('{}', init);
     if(!isFromVanilla) {
-        //for(let i=0; i<10;i++){
-        await sleep(10000);
-        // const cache = await caches.open("oidc_dummy_cache");
-        //await cache.put(event.request, response.clone());
-        //}
+        for(let i=0; i<240;i++){
+            await sleep(1000 + Math.floor(Math.random() * 1000));
+            const cache = await caches.open("oidc_dummy_cache");
+            await cache.put(event.request, response.clone());
+        }
     }
 
     return response;
@@ -175,9 +175,7 @@ const handleFetch = async (event) => {
                             break;
                         }
                     }
-
-                    console.log("currentDatabase");
-                    console.log(currentDatabase);
+                    
                     return fetch(originalRequest, {
                         body: newBody,
                         method: originalRequest.method,
@@ -191,7 +189,7 @@ const handleFetch = async (event) => {
                         credentials: originalRequest.credentials,
                         integrity: originalRequest.integrity
                     }).then(hideTokens(currentDatabase));
-                } else if(currentLoginCallbackConfigurationName){
+                } else if(actualBody.includes("code_verifier=") && currentLoginCallbackConfigurationName){
                     currentDatabase = database[currentLoginCallbackConfigurationName];
                     currentLoginCallbackConfigurationName=null;
                     return fetch(originalRequest,{
@@ -294,7 +292,7 @@ addEventListener('message', event => {
                     ...currentDatabase.tokens,
                     access_token: ACCESS_TOKEN + "_" + configurationName
                 };
-                if(currentDatabase.refresh_token){
+                if(tokens.refresh_token){
                     tokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
                 }
                 port.postMessage({

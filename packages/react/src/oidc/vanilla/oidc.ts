@@ -958,6 +958,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     },
                     body: formBodyString,
                 });
+                if(response.status >= 299){
+                    throw new Error("Error refreshing token");
+                }
                 const result = await response.json();
                 return {
                     accessToken: result.access_token,

@@ -37,9 +37,8 @@ export const sleepAsync = (milliseconds) => {
 }
 
 const keepAlive = () => {
-    fetch('/OidcKeepAliveServiceWorker.json').then(() => {
-        keepAlive();
-    })
+    fetch('/OidcKeepAliveServiceWorker.json');
+    sleepAsync(230*1000).then(keepAlive);
 }
 
 const isServiceWorkerProxyActiveAsync = () => {
