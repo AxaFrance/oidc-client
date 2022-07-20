@@ -81,7 +81,7 @@ const getCurrentDatabaseDomain = (database, url) => {
         if(url === oidcServerConfiguration.tokenEndpoint){
             continue;
         }
-        
+
         const domainsToSendTokens = oidcServerConfiguration != null ? [
             oidcServerConfiguration.userInfoEndpoint, ...trustedDomains[key]
         ] : [...trustedDomains[key]];
@@ -125,14 +125,13 @@ const keepAliveAsync = async (event) => {
     const init = {"status": 200, "statusText": 'oidc-service-worker'};
     const response = new Response('{}', init);
     if(!isFromVanilla) {
-        /*for(let i=0; i<10;i++){
-            await sleep(1000);
-            const cache = await caches.open("oidc_dummy_cache");
-            await cache.put(event.request, response.clone());
-        }*/
+        //for(let i=0; i<10;i++){
         await sleep(10000);
+        // const cache = await caches.open("oidc_dummy_cache");
+        //await cache.put(event.request, response.clone());
+        //}
     }
-   
+
     return response;
 }
 
@@ -176,6 +175,9 @@ const handleFetch = async (event) => {
                             break;
                         }
                     }
+
+                    console.log("currentDatabase");
+                    console.log(currentDatabase);
                     return fetch(originalRequest, {
                         body: newBody,
                         method: originalRequest.method,
@@ -210,10 +212,16 @@ const handleFetch = async (event) => {
             response.then(r => {
                 if(r !== undefined){
                     resolve(r);
+                } else{
+                    console.log("success undefined");
+                    reject(new Error("Response is undefined inside a success"));
                 }
             }).catch(err => {
                 if(err !== undefined) {
                     reject(err);
+                } else{
+                    console.log("error undefined");
+                    reject(new Error("Response is undefined inside a error"));
                 }
             });
         });

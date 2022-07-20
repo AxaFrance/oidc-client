@@ -618,7 +618,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
                 let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-                if (serviceWorker && installServiceWorker) {
+                /*if (serviceWorker && installServiceWorker) {
                     const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync();
                     if (!isServiceWorkerProxyActive) {
                         const isUnregistered = await serviceWorker.unregisterAsync();
@@ -627,14 +627,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         if(isUnregistered){
                             serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                         }
-                        /*const extrasQueries = extras != null ? {...extras}: {};
+                        const extrasQueries = extras != null ? {...extras}: {};
                         extrasQueries.callbackPath = url;
                         extrasQueries.state = state;
                         const queryString = buildQueries(extrasQueries);
-                        window.location.href = `${redirectUri}/service-worker-install${queryString}`;*/
+                        window.location.href = `${redirectUri}/service-worker-install${queryString}`;
                         //return;
                     }
-                }
+                }*/
                 let storage;
                 if (serviceWorker) {
                     serviceWorker.startKeepAliveServiceWorker();
