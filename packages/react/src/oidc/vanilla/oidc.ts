@@ -20,6 +20,45 @@ import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
 
+const performTokenRequestAsync= async (url, details, extras) => {
+
+
+    for (let [key, value] of Object.entries(extras)) {
+        if (details[key] === undefined) {
+            details[key] = value;
+        }
+    }
+
+    let formBody = [];
+    for (const property in details) {
+        const encodedKey = encodeURIComponent(property);
+        const encodedValue = encodeURIComponent(details[property]);
+        formBody.push(`${encodedKey}=${encodedValue}`);
+    }
+    const formBodyString = formBody.join("&");
+
+    const response = await internalFetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+        body: formBodyString,
+    });
+    if(response.status !== 200){
+        return {success:false, status: response.status}
+    }
+    const result = await response.json();
+    return { success : true,
+        data : {
+            accessToken: result.access_token,
+            expiresIn: result.expires_in,
+            idToken: result.id_token,
+            refreshToken: result.refresh_token,
+            scope: result.scope,
+            tokenType: result.token_type,
+        }
+    };
+}
 
 const internalFetch = async (url, headers, numberRetry=0) => {
     let response;
@@ -30,7 +69,7 @@ const internalFetch = async (url, headers, numberRetry=0) => {
                 () => reject(new Error('Timeout')), 10000))]);
     } catch (e) {
         if (e.message === 'Timeout'
-            || e.message === 'Network request failed' || e.message === "Failed to fetch") {
+            || e.message === 'Network request failed') {
             if(numberRetry <=2) {
                 return await internalFetch(url, headers, numberRetry + 1);
             } 
@@ -378,13 +417,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     static eventNames = eventNames;
     
     silentSigninCallbackFromIFrame(){
-        if (this.configuration.silent_redirect_uri) {
+        if (this.configuration.silent_redirect_uri && this.configuration.silent_signin_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
             window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({tokens:this.tokens, sessionState:queryParams.session_state})}`, window.location.origin);
         }
     }
     silentSigninErrorCallbackFromIFrame(){
-        if (this.configuration.silent_redirect_uri) {
+        if (this.configuration.silent_redirect_uri && this.configuration.silent_signin_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
             window.top.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({error:queryParams.error})}`, window.location.origin);
         }
@@ -871,13 +910,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     async refreshTokensAsync(refreshToken) {
-
-        /*while (document.hidden) {
-            await sleepAsync(1000);
-            this.publishEvent(eventNames.refreshTokensAsync, {message:"wait because document is hidden"});
-        }*/
         
-        const localSilentSigninAsync= async (exception=null) => {
+        const localSilentSigninAsync= async () => {
             try {
                 const silent_token_response = await this.silentSigninAsync();
                 if (silent_token_response) {
@@ -890,13 +924,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 timer.clearTimeout(this.timeoutId);
                 this.timeoutId=null;
             }
-            this.publishEvent(eventNames.refreshTokensAsync_error, exception);
+            this.publishEvent(eventNames.refreshTokensAsync_error, {message: "refresh token and silent refresh failed"});
             return null;
         }
-
-        try{
-            this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken});
-            
+        
             const configuration = this.configuration;
             const clientId = configuration.client_id;
             const redirectUri = configuration.redirect_uri;
@@ -907,7 +938,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 return await localSilentSigninAsync();
             }
             
-
             let extras = {};
             if(configuration.token_request_extras) {
                 for (let [key, value] of Object.entries(configuration.token_request_extras)) {
@@ -915,73 +945,39 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
             }
             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-            
-            /*const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-            // use the token response to make a request for an access token
-            const request = new TokenRequest({
+
+            const details = {
                 client_id: clientId,
                 redirect_uri: redirectUri,
                 grant_type: GRANT_TYPE_REFRESH_TOKEN,
-                code: undefined,
                 refresh_token: refreshToken,
-                extras
-                });
+            };
             
-           
-            const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
-            */
-            const performTokenRequestAsync= async (url) => {
-                const details = {
-                    client_id: clientId,
-                    redirect_uri: redirectUri,
-                    grant_type: GRANT_TYPE_REFRESH_TOKEN,
-                    refresh_token: refreshToken,
-                };
-
-                for (let [key, value] of Object.entries(extras)) {
-                    if (details[key] === undefined) {
-                        details[key] = value;
+            let index = 0;
+            while (index <=2) {
+                try {
+                    this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
+                    if(index > 1) {
+                        while (document.hidden) {
+                            await sleepAsync(1000);
+                            this.publishEvent(eventNames.refreshTokensAsync, {message: "wait because document is hidden"});
+                        }
                     }
+                    const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
+                    if (tokenResponse.success) {
+                        this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
+                        return tokenResponse.data;
+                    } else {
+                        this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "bad request" , tokenResponse: tokenResponse});
+                        return await localSilentSigninAsync();
+                    }
+                } catch (exception) {
+                    console.error(exception);
+                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exception" ,exception: exception});
                 }
-
-                let formBody = [];
-                for (const property in details) {
-                    const encodedKey = encodeURIComponent(property);
-                    const encodedValue = encodeURIComponent(details[property]);
-                    formBody.push(`${encodedKey}=${encodedValue}`);
-                }
-                const formBodyString = formBody.join("&");
-
-                const response = await internalFetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-                    },
-                    body: formBodyString,
-                });
-                if(response.status >= 299){
-                    throw new Error("Error refreshing token");
-                }
-                const result = await response.json();
-                return {
-                    accessToken: result.access_token,
-                    expiresIn: result.expires_in,
-                    idToken: result.id_token, 
-                    refreshToken: result.refresh_token,
-                    scope: result.scope,
-                    tokenType: result.token_type,
-                };
+                index++;
             }
-            
-            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint)
-            
-            this.publishEvent(eventNames.refreshTokensAsync_end,  {message:"success"});
-            return tokenResponse;
-        } catch(exception) {
-            console.error(exception);
-            this.publishEvent(eventNames.refreshTokensAsync_silent_error, exception);
-            return await localSilentSigninAsync(exception);
-        }
+        
      }
 
     syncTokensAsyncPromise=null;
@@ -1008,7 +1004,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     if (silent_token_response && silent_token_response.tokens) {
                         this.tokens = await setTokensAsync(serviceWorker, silent_token_response.tokens);
                     } else{
-                        this.publishEvent(eventNames.syncTokensAsync_error, null);
+                        this.publishEvent(eventNames.syncTokensAsync_error, {message:"no token found in result"});
                         if(this.timeoutId){
                             timer.clearTimeout(this.timeoutId);
                             this.timeoutId=null;
