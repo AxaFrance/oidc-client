@@ -14,11 +14,10 @@ const defaultEventState = {name:"", data:null};
 
 export type OidcProviderProps = {
     callbackSuccessComponent?: ComponentType<any>;
-    callbackErrorComponent?: ComponentType<any>;
     sessionLostComponent?: ComponentType<any>;
     authenticatingComponent?: ComponentType<any>;
-    loadingComponent?: ComponentType<any>;
     authenticatingErrorComponent?: ComponentType<any>;
+    loadingComponent?: ComponentType<any>;
     serviceWorkerNotSupportedComponent?: ComponentType<any>;
     configurationName?: string;
     configuration?: OidcConfiguration;
