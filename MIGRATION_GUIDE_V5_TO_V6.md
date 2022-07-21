@@ -6,6 +6,7 @@ V6 offer:
 - Add session monitor feature: Monitor session feature allow to logout the same user from all tabs and from all websites where the user is logged to.
 - Authority wellknowurl response can be cached inside sessionStorage
 - Increase security
+- Does not refresh token when refreshing the page if token is still valid
 
 ```javascript
 
