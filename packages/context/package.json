@@ -11,6 +11,7 @@
   },
   "files": [
     "dist",
+    "src",
     "react",
     "README.md",
     "tsconfig.json",
