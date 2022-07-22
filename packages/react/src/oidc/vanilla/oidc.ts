@@ -310,19 +310,19 @@ const getRandomInt = (max) => {
 }
 
 const oneHourSecond = 60 * 60;
+let fetchFromIssuerCache = null;
 const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond):
     Promise<OidcAuthorizationServiceConfiguration> => {
     const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
     
-    const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
-    const cacheJson = window.sessionStorage.getItem(localStorageKey);
+    //const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
+    //const cacheJson = window.sessionStorage.getItem(localStorageKey);
     
     const oneHourMinisecond = 1000 * timeCacheSecond;
     // @ts-ignore
-    if(cacheJson && (cacheJson.timestamp + oneHourMinisecond) > Date.now()){
-        return new OidcAuthorizationServiceConfiguration(JSON.parse(cacheJson));
+    if(fetchFromIssuerCache && (fetchFromIssuerCache.timestamp + oneHourMinisecond) > Date.now()){
+        return new OidcAuthorizationServiceConfiguration(fetchFromIssuerCache.result);
     }
-    
     const response = await fetch(fullUrl);
 
     if (response.status != 200) {
@@ -330,7 +330,8 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     }
     
     const result = await response.json();
-    window.sessionStorage.setItem(localStorageKey, JSON.stringify({result, timestamp:Date.now()}));
+    fetchFromIssuerCache = {result, timestamp:Date.now()};
+    //window.sessionStorage.setItem(localStorageKey, JSON.stringify({result, timestamp:Date.now()}));
     
     return new OidcAuthorizationServiceConfiguration(result);
 }
