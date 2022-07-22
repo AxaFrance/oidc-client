@@ -23,7 +23,7 @@ export type OidcProviderProps = {
     configuration?: OidcConfiguration;
     children: any;
     onSessionLost?: Function,
-    onLogout?:Function,
+    onLogoutFromAnotherTab?:Function,
     withCustomHistory?: () => CustomHistory,
     onEvent?:Function
 };
@@ -82,7 +82,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              authenticatingErrorComponent = AuthenticatingError,
                                                                              sessionLostComponent=SessionLost,
                                                                              onSessionLost=null,
-                                                                             onLogout=null,
+                                                                             onLogoutFromAnotherTab=null,
                                                                              withCustomHistory=null,
                                                                              onEvent=null,
                                                                          }) => {
@@ -118,8 +118,8 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 setEvent({name, data});
             }
             else if(name === Oidc.eventNames.logout_from_another_tab){
-                if(onLogout != null){
-                    onLogout();
+                if(onLogoutFromAnotherTab != null){
+                    onLogoutFromAnotherTab();
                     return;
                 }
                 setEvent({name, data});
@@ -152,7 +152,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
     const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
     const isLoading = (loading || (currentConfigurationName != configurationName ));
-    
+    const oidc = getOidc(configurationName);
     let eventName = event.name;
     switch(eventName){
         case Oidc.eventNames.service_worker_not_supported_by_browser:
@@ -177,9 +177,9 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
         default:
             return (
                 <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
-                      <OidcRoutes redirect_uri={configuration.redirect_uri}
-                                  silent_redirect_uri={configuration.silent_redirect_uri}
-                                  silent_login_uri={configuration.silent_login_uri}
+                      <OidcRoutes redirect_uri={oidc.configuration.redirect_uri}
+                                  silent_redirect_uri={oidc.configuration.silent_redirect_uri}
+                                  silent_login_uri={oidc.configuration.silent_login_uri}
                                   callbackSuccessComponent={callbackSuccessComponent} 
                                   callbackErrorComponent={authenticatingErrorComponent}
                                   authenticatingComponent={authenticatingComponent}

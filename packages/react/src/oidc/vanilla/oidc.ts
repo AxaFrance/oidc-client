@@ -21,8 +21,7 @@ import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
 
 const performTokenRequestAsync= async (url, details, extras) => {
-
-
+    
     for (let [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
@@ -244,7 +243,7 @@ const userInfoAsync = async (oidc) => {
        const res = await fetch(url, {
            headers: {
                authorization: `Bearer ${accessToken}`,
-               credentials: 'same-origin'
+               credentials: 'include'
            }
        });
 
@@ -304,21 +303,16 @@ const eventNames = {
     syncTokensAsync_begin: "syncTokensAsync_begin",
     syncTokensAsync_end: "syncTokensAsync_end",
     syncTokensAsync_error: "syncTokensAsync_error"
-
 }
 
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-const WELL_KNOWN_PATH = '.well-known';
-const OPENID_CONFIGURATION = 'openid-configuration';
-
-
 const oneHourSecond = 60 * 60;
 const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond):
     Promise<OidcAuthorizationServiceConfiguration> => {
-    const fullUrl = `${openIdIssuerUrl}/${WELL_KNOWN_PATH}/${OPENID_CONFIGURATION}`;
+    const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
     
     const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
     const cacheJson = window.sessionStorage.getItem(localStorageKey);
@@ -366,7 +360,12 @@ export class Oidc {
     private session?: any;
     private checkSessionIFrame: CheckSessionIFrame;
     constructor(configuration:OidcConfiguration, configurationName="default") {
-      this.configuration = configuration
+        let silent_login_uri = configuration.silent_login_uri;
+        if(configuration.silent_redirect_uri && !configuration.silent_login_uri){
+            silent_login_uri = `${configuration.silent_redirect_uri}-login`; 
+        }
+        
+        this.configuration = {...configuration, silent_login_uri};
         this.configurationName= configurationName;
       this.tokens = null
       this.userInfo = null;
@@ -415,18 +414,29 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
     static eventNames = eventNames;
     
-    silentLoginCallbackFromIFrame(){
+    _silentLoginCallbackFromIFrame(){
         if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
             window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({tokens:this.tokens, sessionState:queryParams.session_state})}`, window.location.origin);
         }
     }
-    silentLoginErrorCallbackFromIFrame(){
+    _silentLoginErrorCallbackFromIFrame() {
         if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
-            window.top.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({error:queryParams.error})}`, window.location.origin);
+            window.top.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({error: queryParams.error})}`, window.location.origin);
         }
     }
+    
+    async silentLoginCallBackAsync() {
+        try {
+            await this.loginCallbackAsync(true);
+            this._silentLoginCallbackFromIFrame();
+        } catch (error) {
+            console.error(error)
+            this._silentLoginErrorCallbackFromIFrame();
+        }
+    }
+    
     async silentLoginAsync(extras:StringMap=null, state:string=null, scope:string=null) {
         if (!this.configuration.silent_redirect_uri || !this.configuration.silent_login_uri) {
             return Promise.resolve(null);

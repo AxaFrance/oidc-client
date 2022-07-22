@@ -14,7 +14,7 @@ V6 offer:
 export const configuration = {
     ...,
     redirect_uri: window.location.origin+'/authentication/callback', // now this callback must be declared to your OIDC server, manage callback information after login
-    silent_login_uri: window.location.origin+'/authentication/silent-login-in', // new property optional but necessary for a working silent signin, route that trigger silent signin
+    silent_login_uri: window.location.origin+'/authentication/silent-login', // new property optional, route that trigger silent signin
     ...,
 };
 
@@ -40,7 +40,7 @@ export const configurationIdentityServer = {
     ...,
     authority_time_cache_wellknowurl_in_second: 60* 60, // Time to cache in second of openid wellknowurl, default is 1 hour
     monitor_session:true, // Add OpenId monitor session, default is true (more information https://openid.net/specs/openid-connect-session-1_0.html)
-    onLogout: Function // Optional, can be set to override the default behavior, this function is triggered when user is logout from another tab
+    onLogoutFromAnotherTab: Function // Optional, can be set to override the default behavior, this function is triggered when user is logout from another tab
 };
 
 ```

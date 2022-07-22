@@ -112,7 +112,6 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
-  silent_login_uri: 'http://localhost:4200/authentication/silent-signin',
   scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -145,7 +144,7 @@ const propTypes = {
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
     silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
-    silent_login_uri: PropTypes.string, // Optional but require if silent_redirect_uri is set, route that trigger the signin
+    silent_login_uri: PropTypes.string, // Optional, route that trigger the signin
     silent_login_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
@@ -164,7 +163,7 @@ const propTypes = {
     withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState()) 
     authority_time_cache_wellknowurl_in_second: 60* 60, // Time to cache in second of openid wellknowurl, default is 1 hour
     monitor_session:true, // Add OpenId monitor session, default is true (more information https://openid.net/specs/openid-connect-session-1_0.html)
-    onLogout: Function // Optional, can be set to override the default behavior, this function is triggered when user is logout from another tab
+    onLogoutFromAnotherTab: Function // Optional, can be set to override the default behavior, this function is triggered when user is logout from another tab
   }).isRequired
 };
 ```
@@ -453,7 +452,6 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:4200/authentication/callback',
   silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
-  silent_login_uri: 'http://localhost:4200/authentication/silent-login',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.identityserver.io',
   service_worker_relative_url:'/OidcServiceWorker.js',
@@ -520,7 +518,6 @@ const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:3001/#authentication/callback',
   silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-login that use cookies between OIDC server and client javascript to restore the session
-  silent_login_uri: 'http://localhost:4200/authentication/silent-login',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
   authority_configuration: {
@@ -572,7 +569,6 @@ export const configurationIdentityServerWithHash = {
 client_id: 'interactive.public.short',
 redirect_uri: window.location.origin+'#authentication-callback',
 silent_redirect_uri: window.location.origin+'#authentication-silent-callback', 
-silent_login_uri: window.location.origin+'#authentication-silent-login',
 scope: 'openid profile email api offline_access',
 authority: 'https://demo.duendesoftware.com',
 refresh_time_before_tokens_expiration_in_second: 70,

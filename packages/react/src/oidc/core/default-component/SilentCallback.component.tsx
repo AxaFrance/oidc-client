@@ -8,12 +8,7 @@ const CallbackManager: ComponentType<any> = ({configurationName }) => {
         const playCallbackAsync = async () => {
             const getOidc =  Oidc.get;
             const oidc = getOidc(configurationName);
-            try {
-                await oidc.loginCallbackAsync(true);
-                oidc.silentLoginCallbackFromIFrame();
-            } catch (error) {
-                oidc.silentLoginErrorCallbackFromIFrame();
-            }
+            oidc.silentLoginCallBackAsync();
         };
         playCallbackAsync();
         return () => {
