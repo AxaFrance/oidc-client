@@ -280,7 +280,7 @@ const setTokensAsync = async (serviceWorker, tokens) =>{
         accessTokenPayload = extractAccessTokenPayload(tokens);
     }
     const _idTokenPayload = idTokenPayload(tokens.idToken);
-    const expiresAt =  /*(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp :*/  tokens.issuedAt + tokens.expiresIn;
+    const expiresAt =  (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
     return {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
 }
 
