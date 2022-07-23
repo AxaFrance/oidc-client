@@ -80,11 +80,16 @@ const getCurrentDatabaseDomain = (database, url) => {
     }
     for (const [key, currentDatabase] of Object.entries(database)) {
         const oidcServerConfiguration = currentDatabase.oidcServerConfiguration;
-        if(url === oidcServerConfiguration.tokenEndpoint){
+        
+        if(!oidcServerConfiguration){
+            continue;
+        }
+        
+        if(oidcServerConfiguration.tokenEndpoint && url === oidcServerConfiguration.tokenEndpoint){
             continue;
         }
 
-        const domainsToSendTokens = oidcServerConfiguration != null ? [
+        const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint ? [
             oidcServerConfiguration.userInfoEndpoint, ...trustedDomains[key]
         ] : [...trustedDomains[key]];
 
@@ -235,6 +240,11 @@ self.addEventListener('fetch', handleFetch);
 
 
 const checkDomain =(domains, tokenEndpoint) => {
+    
+    if(!tokenEndpoint){
+        return;
+    }
+    
     const domain = domains.find(domain => tokenEndpoint.startsWith(domain));
     if(!domain){
         throw new Error("Domain " + tokenEndpoint+ " is not trusted, please add domain in TrustedDomains.js");
