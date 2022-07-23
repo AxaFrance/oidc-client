@@ -311,13 +311,17 @@ const getRandomInt = (max) => {
 
 const oneHourSecond = 60 * 60;
 let fetchFromIssuerCache = null;
-const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond):
+const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage= window.sessionStorage):
     Promise<OidcAuthorizationServiceConfiguration> => {
     const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
     
-    //const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
-    //const cacheJson = window.sessionStorage.getItem(localStorageKey);
-    
+    const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
+    if(!fetchFromIssuerCache && storage) {
+        const cacheJson = storage.getItem(localStorageKey);
+        if(cacheJson){
+            fetchFromIssuerCache = JSON.parse(cacheJson);
+        }
+    }
     const oneHourMinisecond = 1000 * timeCacheSecond;
     // @ts-ignore
     if(fetchFromIssuerCache && (fetchFromIssuerCache.timestamp + oneHourMinisecond) > Date.now()){
@@ -330,9 +334,12 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     }
     
     const result = await response.json();
-    fetchFromIssuerCache = {result, timestamp:Date.now()};
-    //window.sessionStorage.setItem(localStorageKey, JSON.stringify({result, timestamp:Date.now()}));
     
+    const timestamp = Date.now();
+    fetchFromIssuerCache = {result, timestamp};
+    if(storage) {
+        storage.setItem(localStorageKey, JSON.stringify({result, timestamp}));
+    }
     return new OidcAuthorizationServiceConfiguration(result);
 }
 
@@ -363,7 +370,7 @@ export class Oidc {
     constructor(configuration:OidcConfiguration, configurationName="default") {
         let silent_login_uri = configuration.silent_login_uri;
         if(configuration.silent_redirect_uri && !configuration.silent_login_uri){
-            silent_login_uri = `${configuration.silent_redirect_uri}-login`; 
+            silent_login_uri = `${configuration.silent_redirect_uri.replace("-callback", "")}-login`; 
         }
         
         this.configuration = {...configuration, silent_login_uri};
@@ -384,6 +391,8 @@ export class Oidc {
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
       this.logoutAsync.bind(this);
+      
+      this.initAsync(this.configuration.authority, this.configuration.authority_configuration);
     }
 
     subscriveEvents(func){
@@ -536,7 +545,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             throw e;
         }
     }
-    initAsyncPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
         if (authorityConfiguration != null) {
             return new OidcAuthorizationServiceConfiguration( {
@@ -548,12 +556,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 check_session_iframe:authorityConfiguration.check_session_iframe,
             });
         }
-        if(this.initAsyncPromise){
-            return this.initAsyncPromise;
-        }
-        
-        this.initAsyncPromise = await fetchFromIssuer(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60);
-        return this.initAsyncPromise;
+
+        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+        const storage = serviceWorker ? window.localStorage : null;
+        const initAsyncPromise = await fetchFromIssuer(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage);
+        return initAsyncPromise;
     }
 
     tryKeepExistingSessionPromise = null;
@@ -590,6 +597,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt);
                         const sessionState = await serviceWorker.getSessionStateAsync();
+                        // @ts-ignore
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
@@ -617,6 +625,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt);
                         const sessionState = session.getSessionState();
+                        // @ts-ignore
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
@@ -889,6 +898,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 clearTimeout(timeoutId);
                                 this.timeoutId=null;
                                 const loginParams = getLoginParams(this.configurationName, redirectUri);
+                                // @ts-ignore
                                 this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() =>{
                                     this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                     resolve({
