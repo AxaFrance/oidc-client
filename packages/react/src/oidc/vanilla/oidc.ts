@@ -46,15 +46,22 @@ const performTokenRequestAsync= async (url, details, extras) => {
     if(response.status !== 200){
         return {success:false, status: response.status}
     }
-    const result = await response.json();
+    const tokens = await response.json();
+
+    if(!tokens.issued_at) {
+        const currentTimeUnixSecond = new Date().getTime() /1000;
+        tokens.issued_at = currentTimeUnixSecond;
+    }
+    
     return { success : true,
         data : {
-            accessToken: result.access_token,
-            expiresIn: result.expires_in,
-            idToken: result.id_token,
-            refreshToken: result.refresh_token,
-            scope: result.scope,
-            tokenType: result.token_type,
+            accessToken: tokens.access_token,
+            expiresIn: tokens.expires_in,
+            idToken: tokens.id_token,
+            refreshToken: tokens.refresh_token,
+            scope: tokens.scope,
+            tokenType: tokens.token_type,
+            issuedAt: tokens.issued_at
         }
     };
 }
@@ -273,7 +280,7 @@ const setTokensAsync = async (serviceWorker, tokens) =>{
         accessTokenPayload = extractAccessTokenPayload(tokens);
     }
     const _idTokenPayload = idTokenPayload(tokens.idToken);
-    const expiresAt =  (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp :  tokens.issuedAt + tokens.expiresIn;
+    const expiresAt =  /*(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp :*/  tokens.issuedAt + tokens.expiresIn;
     return {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
 }
 
@@ -370,7 +377,7 @@ export class Oidc {
     constructor(configuration:OidcConfiguration, configurationName="default") {
         let silent_login_uri = configuration.silent_login_uri;
         if(configuration.silent_redirect_uri && !configuration.silent_login_uri){
-            silent_login_uri = `${configuration.silent_redirect_uri.replace("-callback", "")}-login`; 
+            silent_login_uri = `${configuration.silent_redirect_uri.replace("-callback", "").replace("callback", "")}-login`; 
         }
         
         this.configuration = {...configuration, silent_login_uri};
@@ -590,7 +597,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             expiresIn: tokens.expires_in,
                             idToken: tokens.id_token,
                             scope: tokens.scope,
-                            tokenType: tokens.token_type
+                            tokenType: tokens.token_type,
+                            issuedAt: tokens.issued_at
                         }
                         this.tokens = await setTokensAsync(serviceWorker, reformattedToken);
                         this.serviceWorker = serviceWorker;

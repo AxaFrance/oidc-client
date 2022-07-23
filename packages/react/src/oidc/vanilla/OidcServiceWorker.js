@@ -48,6 +48,10 @@ function hideTokens(currentDatabaseElement) {
     const configurationName = currentDatabaseElement.configurationName;
     return (response) => {
         return response.json().then(tokens => {
+            if(!tokens.issued_at) {
+                const currentTimeUnixSecond = new Date().getTime() /1000;
+                tokens.issued_at = currentTimeUnixSecond;
+            }
             currentDatabaseElement.tokens = tokens;
             currentDatabaseElement.isLogin = true;
             const secureTokens = {
@@ -57,6 +61,7 @@ function hideTokens(currentDatabaseElement) {
             if(tokens.refresh_token){
                 secureTokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
             }
+            
             const body = JSON.stringify(secureTokens)
             return new Response(body, response);
         });
