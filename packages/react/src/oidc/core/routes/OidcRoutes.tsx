@@ -2,7 +2,6 @@ import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from
 import { getPath } from '../../vanilla/route-utils';
 import CallbackComponent from '../default-component/Callback.component';
 import SilentCallbackComponent from "../default-component/SilentCallback.component";
-import ServiceWorkerInstall from "../default-component/ServiceWorkerInstall.component";
 import { CustomHistory } from "./withRouter";
 import SilentLoginComponent from "../default-component/SilentLogin.component";
 
@@ -24,7 +23,6 @@ type OidcRoutesProps = {
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   callbackErrorComponent,
   callbackSuccessComponent,
-                                                              authenticatingComponent,  
                                                               redirect_uri,
                                                               silent_redirect_uri,
                                                               silent_login_uri,
@@ -60,8 +58,6 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   switch (path) {
     case callbackPath:
       return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} withCustomHistory={withCustomHistory} />;
-    case callbackPath +"/service-worker-install" :
-      return <ServiceWorkerInstall callBackError={callbackErrorComponent} authenticating={authenticatingComponent} configurationName={configurationName} />;  
     default:
       return <>{children}</>;
   }

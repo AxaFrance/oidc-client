@@ -29,8 +29,6 @@ const trustedDomains = {
     config_with_hash: ["https://demo.duendesoftware.com"]
 };
 
-
-
 ```
 
 ```javascript

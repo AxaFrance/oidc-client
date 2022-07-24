@@ -218,7 +218,7 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
         } else{
             const tokens = await oidc.syncTokensAsync();
             if(tokens && oidc.timeoutId) {
-                oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, expiresAt);
+                oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, tokens.expiresAt);
             }
         }
     }, 1000);
@@ -696,23 +696,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
                 let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-                /*if (serviceWorker && installServiceWorker) {
-                    const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync();
-                    if (!isServiceWorkerProxyActive) {
-                        const isUnregistered = await serviceWorker.unregisterAsync();
-                        console.log("isUnregistered")
-                        console.log(isUnregistered)
-                        if(isUnregistered){
-                            serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-                        }
-                        const extrasQueries = extras != null ? {...extras}: {};
-                        extrasQueries.callbackPath = url;
-                        extrasQueries.state = state;
-                        const queryString = buildQueries(extrasQueries);
-                        window.location.href = `${redirectUri}/service-worker-install${queryString}`;
-                        //return;
-                    }
-                }*/
                 let storage;
                 if (serviceWorker) {
                     serviceWorker.startKeepAliveServiceWorker();
@@ -949,7 +932,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         
         const localsilentLoginAsync= async () => {
             try {
-                const silent_token_response = await this.silentLoginAsync();
+                const loginParams = getLoginParams(this.configurationName, configuration.redirect_uri);
+                const silent_token_response = await this.silentLoginAsync(loginParams.extras, loginParams.state);
                 if (silent_token_response) {
                     return silent_token_response.tokens;
                 }
@@ -1043,7 +1027,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 } else if (isLogin == null) {
                     try {
                         this.publishEvent(eventNames.syncTokensAsync_begin, {});
-                        const silent_token_response = await this.silentLoginAsync({prompt: "none"});
+                        const loginParams = getLoginParams(this.configurationName, configuration.redirect_uri);
+                        const silent_token_response = await this.silentLoginAsync({...loginParams.extras,prompt: "none"}, loginParams.state);
                         if (silent_token_response && silent_token_response.tokens) {
                             this.tokens = await setTokensAsync(serviceWorker, silent_token_response.tokens);
                             this.publishEvent(eventNames.syncTokensAsync_end, {});
