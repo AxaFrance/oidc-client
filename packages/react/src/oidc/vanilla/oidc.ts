@@ -216,9 +216,9 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
                 oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
             }
         } else{
-            await oidc.syncTokensAsync();
-            if(oidc.timeoutId) {
-                oidc.timeoutId = autoRenewTokens(oidc, refreshToken, expiresAt);
+            const tokens = await oidc.syncTokensAsync();
+            if(tokens && oidc.timeoutId) {
+                oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, expiresAt);
             }
         }
     }, 1000);
@@ -230,7 +230,6 @@ const getLoginSessionKey = (configurationName:string, redirectUri:string) => {
 const getLoginParams = (configurationName, redirectUri) => {
     return JSON.parse(sessionStorage[getLoginSessionKey(configurationName, redirectUri)]);
 }
-
 
 const userInfoAsync = async (oidc) => {
     if(oidc.userInfo != null){
@@ -280,7 +279,10 @@ const setTokensAsync = async (serviceWorker, tokens) =>{
         accessTokenPayload = extractAccessTokenPayload(tokens);
     }
     const _idTokenPayload = idTokenPayload(tokens.idToken);
-    const expiresAt =  (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
+
+    const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
+    const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
+    const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
     return {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
 }
 
@@ -526,7 +528,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                         self.publishEvent(eventNames.silentLoginAsync_error, result);
                                         iframe.remove();
                                         isResolved = true;
-                                        reject(result);
+                                        reject(new Error("oidc"));
                                     }
                                 }
                             }
@@ -535,10 +537,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const silentSigninTimeout = configuration.silent_login_timeout ?? 12000
                     setTimeout(() => {
                         if (!isResolved) {
-                            self.publishEvent(eventNames.silentLoginAsync_error, "timeout");
+                            self.publishEvent(eventNames.silentLoginAsync_error, {reason: "timeout"});
                             iframe.remove();
                             isResolved = true;
-                            reject("timeout");
+                            reject(new Error("timeout"));
                         }
                     }, silentSigninTimeout);
                 } catch (e) {
@@ -981,7 +983,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             };
             
             let index = 0;
-            while (index <=2) {
+            while (index <=4) {
                 try {
                     this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
                     if(index > 1) {
@@ -1009,55 +1011,75 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     syncTokensAsyncPromise=null;
     async syncTokensAsync() {
-        // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
-        const configuration = this.configuration;
-        if(!this.tokens){
-            return;
+        
+        const localSyncTokensAsync = async () => {
+            // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
+            const configuration = this.configuration;
+            if (!this.tokens) {
+                return null;
+            }
+
+            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
+            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+            if (serviceWorker) {
+                const {isLogin} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
+                if (isLogin == false) {
+                    this.publishEvent(eventNames.logout_from_another_tab, {});
+                    await this.destroyAsync();
+                    return null;
+                } else if (isLogin == null) {
+                    try {
+                        this.publishEvent(eventNames.syncTokensAsync_begin, {});
+                        const silent_token_response = await this.silentLoginAsync({prompt: "none"});
+                        if (silent_token_response && silent_token_response.tokens) {
+                            this.tokens = await setTokensAsync(serviceWorker, silent_token_response.tokens);
+                            this.publishEvent(eventNames.syncTokensAsync_end, {});
+                            return this.tokens;
+                        } else {
+                            this.publishEvent(eventNames.syncTokensAsync_error, {message: "no token found in result"});
+                            if (this.timeoutId) {
+                                timer.clearTimeout(this.timeoutId);
+                                this.timeoutId = null;
+                            }
+                            this.publishEvent(eventNames.syncTokensAsync_end, {});
+                            return null;
+                        }
+                    } catch (exceptionSilent) {
+                        console.error(exceptionSilent);
+                        this.publishEvent(eventNames.syncTokensAsync_error, exceptionSilent);
+                        if (this.timeoutId) {
+                            timer.clearTimeout(this.timeoutId);
+                            this.timeoutId = null;
+                        }
+                        this.publishEvent(eventNames.syncTokensAsync_end, {});
+                        return null;
+                    }
+
+                }
+            } else {
+                const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
+                const {tokens} = await session.initAsync();
+                if (!tokens) {
+                    this.publishEvent(eventNames.logout_from_another_tab, {});
+                    await this.destroyAsync();
+                    return null;
+                }
+            }
+            return this.tokens;
+        }
+        
+        if(this.syncTokensAsyncPromise){
+            return this.syncTokensAsyncPromise;
         }
 
-        const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-        if (serviceWorker) {
-            const { isLogin } = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
-            if(isLogin == false){
-                this.publishEvent(eventNames.logout_from_another_tab, {});
-                await this.destroyAsync();
-            }
-            else if (isLogin == null){
-                try {
-                    this.publishEvent(eventNames.syncTokensAsync_begin, {});
-                    this.syncTokensAsyncPromise = this.silentLoginAsync({prompt:"none"});
-                    const silent_token_response = await this.syncTokensAsyncPromise;
-                    if (silent_token_response && silent_token_response.tokens) {
-                        this.tokens = await setTokensAsync(serviceWorker, silent_token_response.tokens);
-                    } else{
-                        this.publishEvent(eventNames.syncTokensAsync_error, {message:"no token found in result"});
-                        if(this.timeoutId){
-                            timer.clearTimeout(this.timeoutId);
-                            this.timeoutId=null;
-                        }
-                        return;
-                    }
-                } catch (exceptionSilent) {
-                    console.error(exceptionSilent);
-                    this.publishEvent(eventNames.syncTokensAsync_error, exceptionSilent);
-                    if(this.timeoutId){
-                        timer.clearTimeout(this.timeoutId);
-                        this.timeoutId=null;
-                    }
-                    return;
-                }
+        this.syncTokensAsyncPromise = localSyncTokensAsync().then(result =>{
+            if(this.syncTokensAsyncPromise){
                 this.syncTokensAsyncPromise = null;
-                this.publishEvent(eventNames.syncTokensAsync_end, {});
             }
-        } else {
-            const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
-            const {tokens} = await session.initAsync();
-            if(!tokens){
-                this.publishEvent(eventNames.logout_from_another_tab, {});
-                await this.destroyAsync();
-            }
-        }
+            return result;
+        });
+        
+        return this.syncTokensAsyncPromise
     }
 
 
