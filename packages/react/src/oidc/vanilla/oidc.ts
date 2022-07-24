@@ -464,6 +464,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             await sleepAsync(1000);
             this.publishEvent(eventNames.silentLoginAsync, {message:"wait because document is hidden"});
         }
+
+        let numberTryOnline = 6;
+        while (!navigator.onLine && numberTryOnline > 0) {
+            await sleepAsync(1000);
+            numberTryOnline--;
+            this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
+        }
             
         try {
             this.publishEvent(eventNames.silentLoginAsync_begin, {});
@@ -528,7 +535,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                         self.publishEvent(eventNames.silentLoginAsync_error, result);
                                         iframe.remove();
                                         isResolved = true;
-                                        reject(new Error("oidc"));
+                                        reject(new Error("oidc_"+result.error));
                                     }
                                 }
                             }
@@ -990,6 +997,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         while (document.hidden) {
                             await sleepAsync(1000);
                             this.publishEvent(eventNames.refreshTokensAsync, {message: "wait because document is hidden"});
+                        }
+                        let numberTryOnline = 6;
+                        while (!navigator.onLine && numberTryOnline > 0) {
+                            await sleepAsync(1000);
+                            numberTryOnline--;
+                            this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
                         }
                     }
                     const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
