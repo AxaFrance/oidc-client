@@ -38,7 +38,8 @@ export const configurationIdentityServer = {
     ...,
     authority_time_cache_wellknowurl_in_second: 60* 60, // Time to cache in second of openid wellknowurl, default is 1 hour
     monitor_session:true, // Add OpenId monitor session, default is true (more information https://openid.net/specs/openid-connect-session-1_0.html)
-    onLogoutFromAnotherTab: Function // Optional, can be set to override the default behavior, this function is triggered when user is logout from another tab
+    onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user with the same subject is logged out from another tab when session_monitor is active
+    onLogoutFromSameTab: Function // Optional, can be set to override the default behavior, this function is triggered when user is logged out from same tab when session_monitor is active
 };
 
 ```

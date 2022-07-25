@@ -290,6 +290,7 @@ const eventNames = {
     service_worker_not_supported_by_browser: "service_worker_not_supported_by_browser",
     token_aquired: "token_aquired",
     logout_from_another_tab: "logout_from_another_tab",
+    logout_from_same_tab: "logout_from_same_tab",
     token_renewed: "token_renewed",
     token_timer: "token_timer",
     loginAsync_begin:"loginAsync_begin",
@@ -765,7 +766,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             console.debug("SessionMonitor._callback: Different subject signed into OP:", iFrameIdTokenPayload.sub);
                         }
                     }).catch((e) => {
-                        this.publishEvent(eventNames.logout_from_another_tab, {});
+                        this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor"});
                         this.destroyAsync();
                     });
                 };
@@ -1021,7 +1022,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             if (serviceWorker) {
                 const {isLogin} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
                 if (isLogin == false) {
-                    this.publishEvent(eventNames.logout_from_another_tab, {});
+                    this.publishEvent(eventNames.logout_from_another_tab, {"message": "service worker syncTokensAsync"});
                     await this.destroyAsync();
                     return null;
                 } else if (isLogin == null) {
@@ -1052,13 +1053,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         this.publishEvent(eventNames.syncTokensAsync_end, {});
                         return null;
                     }
-
                 }
             } else {
                 const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
                 const {tokens} = await session.initAsync();
                 if (!tokens) {
-                    this.publishEvent(eventNames.logout_from_another_tab, {});
+                    this.publishEvent(eventNames.logout_from_another_tab, {"message": "session syncTokensAsync"});
                     await this.destroyAsync();
                     return null;
                 }
@@ -1112,7 +1112,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          this.tokens = null;
          this.userInfo = null;
          this.events = [];
-         
+     }
+     
+     async logoutSameTabAsync(sub){
+         // @ts-ignore
+         if(this.configuration.monitor_session && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
+             this.publishEvent(eventNames.logout_from_same_tab, {"message": sub});
+             await this.destroyAsync();
+         }
      }
      
     async logoutAsync(callbackPathOrUrl: string | undefined = undefined, extras: StringMap = null) {
@@ -1131,7 +1138,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 		const url = isUri ? callbackPathOrUrl : window.location.origin + path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
-        await this.destroyAsync();  
+        // @ts-ignore
+        const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
+        await this.destroyAsync();
+        for (const [key, oidc] of Object.entries(oidcDatabase)) {
+            if(oidc !== this) {
+                // @ts-ignore
+                await oidc.logoutSameTabAsync(sub);
+            }
+        }
+        
         if(oidcServerConfiguration.endSessionEndpoint) {
             let extraQueryString = "";
             if(extras){
