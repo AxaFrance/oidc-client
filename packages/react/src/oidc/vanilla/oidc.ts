@@ -765,9 +765,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         else {
                             console.debug("SessionMonitor._callback: Different subject signed into OP:", iFrameIdTokenPayload.sub);
                         }
-                    }).catch((e) => {
-                        this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor"});
-                        this.destroyAsync();
+                    }).catch(async (e) => {
+                        for (const [key, oidc] of Object.entries(oidcDatabase)) {
+                            //if(oidc !== this) {
+                                // @ts-ignore
+                               await oidc.logoutOtherTabAsync(idTokenPayload.sub);
+                            //}
+                        }
+                        //await this.destroyAsync();
+                        //this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor"});
+                        
                     });
                 };
 
@@ -1111,7 +1118,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          }
          this.tokens = null;
          this.userInfo = null;
-         this.events = [];
+        // this.events = [];
      }
      
      async logoutSameTabAsync(sub){
@@ -1121,6 +1128,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
              await this.destroyAsync();
          }
      }
+
+    async logoutOtherTabAsync(sub){
+        // @ts-ignore
+        
+        if(this.configuration.monitor_session && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
+            await this.destroyAsync();
+            console.log("logoutOtherTabAsync(sub)" +this.configurationName);
+            this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor", "sub": sub});
+        }
+    }
      
     async logoutAsync(callbackPathOrUrl: string | undefined = undefined, extras: StringMap = null) {
         const configuration = this.configuration;
