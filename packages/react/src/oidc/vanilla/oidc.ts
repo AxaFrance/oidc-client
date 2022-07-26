@@ -52,17 +52,24 @@ const performTokenRequestAsync= async (url, details, extras) => {
         const currentTimeUnixSecond = new Date().getTime() /1000;
         tokens.issued_at = currentTimeUnixSecond;
     }
+
+    const data = {
+        accessToken: tokens.access_token,
+        expiresIn: tokens.expires_in,
+        idToken: tokens.id_token,
+        refreshToken: tokens.refresh_token,
+        scope: tokens.scope,
+        tokenType: tokens.token_type,
+        issuedAt: tokens.issued_at
+    };
+    
+    if(tokens.accessTokenPayload !== undefined){
+       // @ts-ignore
+        data.accessTokenPayload = tokens.accessTokenPayload; 
+    }
     
     return { success : true,
-        data : {
-            accessToken: tokens.access_token,
-            expiresIn: tokens.expires_in,
-            idToken: tokens.id_token,
-            refreshToken: tokens.refresh_token,
-            scope: tokens.scope,
-            tokenType: tokens.token_type,
-            issuedAt: tokens.issued_at
-        }
+        data 
     };
 }
 
@@ -266,14 +273,14 @@ const userInfoAsync = async (oidc) => {
 
 const setTokensAsync = async (serviceWorker, tokens) =>{
     let accessTokenPayload;
-    if(tokens == null){
+    /*if(tokens == null){
         if(serviceWorker){
             await serviceWorker.clearAsync();
         }
         return null;
-    }
-    if(serviceWorker){
-        accessTokenPayload = await serviceWorker.getAccessTokenPayloadAsync();
+    }*/
+    if(tokens.accessTokenPayload !== undefined) {
+        accessTokenPayload = tokens.accessTokenPayload;//await serviceWorker.getAccessTokenPayloadAsync();
     }
     else {
         accessTokenPayload = extractAccessTokenPayload(tokens);

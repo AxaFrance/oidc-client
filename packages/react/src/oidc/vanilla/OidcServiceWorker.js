@@ -57,7 +57,9 @@ function hideTokens(currentDatabaseElement) {
             const secureTokens = {
                 ...tokens,
                 access_token: ACCESS_TOKEN +"_" + configurationName,
+                accessTokenPayload : extractAccessTokenPayload(tokens.access_token)
             };
+
             if(tokens.refresh_token){
                 secureTokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
             }
