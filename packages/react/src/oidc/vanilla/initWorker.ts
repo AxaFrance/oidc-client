@@ -1,4 +1,5 @@
 ﻿import timer from "./timer"
+import {parseOriginalTokens} from "./parseTokens";
 
 function get_browser() {
     let ua = navigator.userAgent, tem,
@@ -127,7 +128,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { tokens : result.tokens, isLogin: result.isLogin};
+        return { tokens : parseOriginalTokens(result.tokens), isLogin: result.isLogin};
     }
     
     const startKeepAliveServiceWorker = () => {

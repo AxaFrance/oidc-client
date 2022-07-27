@@ -19,7 +19,7 @@ import timer from './timer';
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
-
+import {parseOriginalTokens, setTokens} from "./parseTokens";
 const performTokenRequestAsync= async (url, details, extras) => {
     
     for (let [key, value] of Object.entries(extras)) {
@@ -47,29 +47,9 @@ const performTokenRequestAsync= async (url, details, extras) => {
         return {success:false, status: response.status}
     }
     const tokens = await response.json();
-
-    if(!tokens.issued_at) {
-        const currentTimeUnixSecond = new Date().getTime() /1000;
-        tokens.issued_at = currentTimeUnixSecond;
-    }
-
-    const data = {
-        accessToken: tokens.access_token,
-        expiresIn: tokens.expires_in,
-        idToken: tokens.id_token,
-        refreshToken: tokens.refresh_token,
-        scope: tokens.scope,
-        tokenType: tokens.token_type,
-        issuedAt: tokens.issued_at
-    };
-    
-    if(tokens.accessTokenPayload !== undefined){
-       // @ts-ignore
-        data.accessTokenPayload = tokens.accessTokenPayload; 
-    }
     
     return { success : true,
-        data 
+        data: parseOriginalTokens(tokens)
     };
 }
 
@@ -115,36 +95,6 @@ export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceC
     
 }
 
-const idTokenPayload = (token) => {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-
-    return JSON.parse(jsonPayload);
-}
-
-const countLetter = (str, find)=> {
-    return (str.split(find)).length - 1;
-}
-
-const extractAccessTokenPayload = tokens => {
-    if(tokens.accessTokenPayload)
-    {
-        return tokens.accessTokenPayload;
-    }
-    const accessToken = tokens.accessToken;
-    try{
-        if (!accessToken || countLetter(accessToken,'.') != 2) {
-            return null;
-        }
-        return JSON.parse(atob(accessToken.split('.')[1]));
-    } catch (e) {
-        console.warn(e);
-    }
-    return null;
-};
 
 export interface StringMap {
     [key: string]: string;
@@ -207,7 +157,7 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
         if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
-            oidc.tokens= setTokens(tokens);
+            oidc.tokens= tokens;
             if(!oidc.serviceWorker){
                 await oidc.session.setTokens(oidc.tokens);
             }
@@ -222,6 +172,9 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
         } else{
             const tokens = await oidc.syncTokensAsync();
             oidc.tokens = tokens;
+            if(!oidc.serviceWorker){
+                await oidc.session.setTokens(oidc.tokens);
+            }
             if(!oidc.tokens){
                 await oidc.destroyAsync();
                 return;
@@ -271,28 +224,6 @@ const userInfoAsync = async (oidc) => {
    const userInfo = await fetchUserInfo(accessToken);
    oidc.userInfo= userInfo;
    return userInfo;
-}
-
-const setTokens = (tokens) =>{
-    let accessTokenPayload;
-    /*if(tokens == null){
-        if(serviceWorker){
-            await serviceWorker.clearAsync();
-        }
-        return null;
-    }*/
-    if(tokens.accessTokenPayload !== undefined) {
-        accessTokenPayload = tokens.accessTokenPayload;//await serviceWorker.getAccessTokenPayloadAsync();
-    }
-    else {
-        accessTokenPayload = extractAccessTokenPayload(tokens);
-    }
-    const _idTokenPayload = idTokenPayload(tokens.idToken);
-
-    const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
-    const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
-    const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
-    return {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
 }
 
 const eventNames = {
@@ -610,16 +541,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     if (tokens) {
                         serviceWorker.startKeepAliveServiceWorker();
                         // @ts-ignore
-                        const reformattedToken = {
-                            accessToken : tokens.access_token,
-                            refreshToken : tokens.refresh_token,
-                            expiresIn: tokens.expires_in,
-                            idToken: tokens.id_token,
-                            scope: tokens.scope,
-                            tokenType: tokens.token_type,
-                            issuedAt: tokens.issued_at
-                        }
-                        this.tokens = setTokens(reformattedToken);
+                        this.tokens = tokens;
                         this.serviceWorker = serviceWorker;
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt);
@@ -980,18 +902,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     extras[key] = value;
                 }
             }
-            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-
-            const details = {
-                client_id: clientId,
-                redirect_uri: redirectUri,
-                grant_type: GRANT_TYPE_REFRESH_TOKEN,
-                refresh_token: refreshToken,
-            };
             
             let index = 0;
             while (index <=4) {
                 try {
+                    const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
                     this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
                     if(index > 1) {
                         while (document.hidden) {
@@ -1005,17 +920,23 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
                         }
                     }
-                    const { status } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
+                    
+                    const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
                     switch (status) {
                         case "NOT_CONNECTED":
                             return null;
                         case "LOGOUT_FROM_ANOTHER_TAB":
                             this.publishEvent(eventNames.logout_from_another_tab, {"message": "session syncTokensAsync"});
-                            //await this.destroyAsync();
                             return null;
                         case "REQUIRE_SYNC_TOKENS":
                             return localsilentLoginAsync();
                         default:
+                            const details = {
+                                client_id: clientId,
+                                redirect_uri: redirectUri,
+                                grant_type: GRANT_TYPE_REFRESH_TOKEN,
+                                refresh_token: tokens.refreshToken,
+                            };
                             const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
                             if (tokenResponse.success) {
                                 this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
@@ -1037,23 +958,25 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         return null;
      }
 
-    async syncTokensInfoAsync(configuration, configurationName, tokens)  {
+    async syncTokensInfoAsync(configuration, configurationName, currentTokens)  {
         // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
         //const configuration = this.configuration;
-        if (!tokens) {
+        if (!currentTokens) {
             return { tokens : null, status: "NOT_CONNECTED"};
         }
 
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
         if (serviceWorker) {
-            const {isLogin} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
+            const {isLogin, tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
             if (isLogin == false) {
                 //this.publishEvent(eventNames.logout_from_another_tab, {"message": "service worker syncTokensAsync"});
                 //await this.destroyAsync();
                 return { tokens : null, status: "LOGOUT_FROM_ANOTHER_TAB"};
             } else if (isLogin == null) {
-                return { tokens : null, status: "REQUIRE_SYNC_TOKENS", serviceWorker};
+                return { tokens : null, status: "REQUIRE_SYNC_TOKENS"};
+            } else if(tokens.issuedAt !== currentTokens.issuedAt){
+                return { tokens : tokens, status: "TOKEN_UPDATED_BY_ANOTHER_TAB"};
             }
         } else {
             const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
@@ -1062,9 +985,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 //this.publishEvent(eventNames.logout_from_another_tab, {"message": "session syncTokensAsync"});
                 //await this.destroyAsync();
                 return { tokens : null, status: "LOGOUT_FROM_ANOTHER_TAB"};
+            } else if(tokens.issuedAt !== currentTokens.issuedAt){
+                return { tokens : tokens, status: "TOKEN_UPDATED_BY_ANOTHER_TAB"};
             }
         }
-        return { tokens, status: "OK"};
+        return { tokens:currentTokens, status: "OK"};
     }
 
     syncTokensAsyncPromise=null;
@@ -1072,8 +997,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         
         const localSyncTokensAsync = async () => {
             const configuration = this.configuration;
-            const tokens = this.tokens;
-            const { status } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
+            const currentTokens = this.tokens;
+            const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, currentTokens);
             switch (status) {
                 case "NOT_CONNECTED":
                     return null;
@@ -1115,7 +1040,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     return tokens;
             }
             // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
-
         }
         
         if(this.syncTokensAsyncPromise){
