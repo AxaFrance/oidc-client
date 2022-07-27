@@ -301,6 +301,7 @@ addEventListener('message', event => {
             } else{
                 currentLoginCallbackConfigurationName = null;
             }
+            
             if(!currentDatabase.tokens){
                 port.postMessage({
                     tokens:null,
@@ -322,10 +323,11 @@ addEventListener('message', event => {
             }
             return;
 
-        case "getAccessTokenPayload":
+        /*case "getAccessTokenPayload":
             const accessTokenPayload = extractAccessTokenPayload(currentDatabase.tokens.access_token);
             port.postMessage({configurationName, accessTokenPayload});
-            return;
+            return;*/
+            
         case "setSessionState":
             currentDatabase.sessionState = data.data.sessionState;
             port.postMessage({configurationName});

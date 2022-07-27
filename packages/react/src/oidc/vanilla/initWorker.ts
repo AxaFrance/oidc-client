@@ -107,7 +107,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return await registration.unregister();
     }
 
-    const getAccessTokenPayloadAsync=async () => {
+   /* const getAccessTokenPayloadAsync=async () => {
         const result = await sendMessageAsync(registration)({
             type: "getAccessTokenPayload",
             data: null,
@@ -115,7 +115,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         });
         // @ts-ignore
         return result.accessTokenPayload;
-    }
+    }*/
 
     const clearAsync=() =>{
         return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
@@ -152,7 +152,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         loadItemsAsync, 
         clearAsync, 
         initAsync, 
-        getAccessTokenPayloadAsync,
+       // getAccessTokenPayloadAsync,
         startKeepAliveServiceWorker,
         isServiceWorkerProxyActiveAsync,
         setSessionStateAsync,

@@ -23,7 +23,7 @@ const SilentLogin: ComponentType<any> = (({configurationName }) => {
     
     useEffect(() => {
         if(!oidc.tokens){
-            oidc.loginAsync(null, extras, true, queryParams.state, true, queryParams.scope);
+            oidc.loginAsync(null, extras,  queryParams.state, true, queryParams.scope);
         }
         return () => {
         }
