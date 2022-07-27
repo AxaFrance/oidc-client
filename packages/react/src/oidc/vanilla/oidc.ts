@@ -950,16 +950,15 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const localsilentLoginAsync= async () => {
             try {
                 const loginParams = getLoginParams(this.configurationName, configuration.redirect_uri);
-                const silent_token_response = await this.silentLoginAsync(loginParams.extras, loginParams.state);
+                const silent_token_response = await this.silentLoginAsync({
+                    ...loginParams.extras,
+                    prompt: "none"
+                }, loginParams.state);
                 if (silent_token_response) {
                     return silent_token_response.tokens;
                 }
             } catch (exceptionSilent) {
                 console.error(exceptionSilent);
-            }
-            if(this.timeoutId){
-                timer.clearTimeout(this.timeoutId);
-                this.timeoutId=null;
             }
             this.publishEvent(eventNames.refreshTokensAsync_error, {message: "refresh token and silent refresh failed"});
             return null;
@@ -1006,13 +1005,28 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
                         }
                     }
-                    const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
-                    if (tokenResponse.success) {
-                        this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
-                        return tokenResponse.data;
-                    } else {
-                        this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "bad request" , tokenResponse: tokenResponse});
-                        return await localsilentLoginAsync();
+                    const { status } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
+                    switch (status) {
+                        case "NOT_CONNECTED":
+                            return null;
+                        case "LOGOUT_FROM_ANOTHER_TAB":
+                            this.publishEvent(eventNames.logout_from_another_tab, {"message": "session syncTokensAsync"});
+                            //await this.destroyAsync();
+                            return null;
+                        case "REQUIRE_SYNC_TOKENS":
+                            return localsilentLoginAsync();
+                        default:
+                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
+                            if (tokenResponse.success) {
+                                this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
+                                return tokenResponse.data;
+                            } else {
+                                this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
+                                    message: "bad request",
+                                    tokenResponse: tokenResponse
+                                });
+                                return await localsilentLoginAsync();
+                            }
                     }
                 } catch (exception) {
                     console.error(exception);
@@ -1020,7 +1034,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
                 index++;
             }
-        
+        return null;
      }
 
     async syncTokensInfoAsync(configuration, configurationName, tokens)  {
@@ -1071,7 +1085,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     try {
                         this.publishEvent(eventNames.syncTokensAsync_begin, {});
                         const loginParams = getLoginParams(this.configurationName, configuration.redirect_uri);
-                        const silent_token_response = await this.silentLoginAsync({...loginParams.extras,prompt: "none"}, loginParams.state);
+                        const silent_token_response = await this.silentLoginAsync({...loginParams.extras, prompt: "none"}, loginParams.state);
                         if (silent_token_response && silent_token_response.tokens) {
                             const newTokens = await setTokens(silent_token_response.tokens);
                             this.publishEvent(eventNames.syncTokensAsync_end, {});
@@ -1099,7 +1113,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }
                 default:
                     return tokens;
-                    
             }
             // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
 
