@@ -19,7 +19,7 @@ import timer from './timer';
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
-import {parseOriginalTokens, setTokens} from "./parseTokens";
+import {parseOriginalTokens, setTokens, computeTimeLeft} from "./parseTokens";
 const performTokenRequestAsync= async (url, details, extras) => {
     
     for (let [key, value] of Object.entries(extras)) {
@@ -150,12 +150,12 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
 }
 
 const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
-    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
+    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second;
     return timer.setTimeout(async () => {
-        const currentTimeUnixSecond = new Date().getTime() /1000;
-        const timeInfo = { timeLeft: Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond) - currentTimeUnixSecond))};
+        const timeLeft = computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond, expiresAt);
+        const timeInfo = { timeLeft };
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
-        if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
+        if(timeLeft <= 0) {
             const tokens = await oidc.refreshTokensAsync(refreshToken);
             oidc.tokens= tokens;
             if(!oidc.serviceWorker){
@@ -323,7 +323,11 @@ export class Oidc {
             silent_login_uri = `${configuration.silent_redirect_uri.replace("-callback", "").replace("callback", "")}-login`; 
         }
         
-        this.configuration = {...configuration, silent_login_uri, monitor_session: configuration.monitor_session ?? true };
+        this.configuration = {...configuration, 
+            silent_login_uri, 
+            monitor_session: configuration.monitor_session ?? true,
+            refresh_time_before_tokens_expiration_in_second : configuration.refresh_time_before_tokens_expiration_in_second ?? 60
+        };
         this.configurationName= configurationName;
       this.tokens = null
       this.userInfo = null;
@@ -400,17 +404,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     async silentLoginAsync(extras:StringMap=null, state:string=null, scope:string=null) {
         if (!this.configuration.silent_redirect_uri || !this.configuration.silent_login_uri) {
             return Promise.resolve(null);
-        }
-        while (document.hidden) {
-            await sleepAsync(1000);
-            this.publishEvent(eventNames.silentLoginAsync, {message:"wait because document is hidden"});
-        }
-
-        let numberTryOnline = 6;
-        while (!navigator.onLine && numberTryOnline > 0) {
-            await sleepAsync(1000);
-            numberTryOnline--;
-            this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
         }
             
         try {
@@ -867,7 +860,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
 
-    async refreshTokensAsync(refreshToken) {
+    async refreshTokensAsync(refreshToken, index=0) {
         
         const localsilentLoginAsync= async () => {
             try {
@@ -903,15 +896,15 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
             }
             
-            let index = 0;
-            while (index <=4) {
+            if (index <=4) {
                 try {
                     const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
                     this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
                     if(index > 1) {
-                        while (document.hidden) {
+                        if (document.hidden) {
                             await sleepAsync(1000);
                             this.publishEvent(eventNames.refreshTokensAsync, {message: "wait because document is hidden"});
+                            return refreshToken(refreshToken, index+1);
                         }
                         let numberTryOnline = 6;
                         while (!navigator.onLine && numberTryOnline > 0) {
@@ -925,6 +918,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     switch (status) {
                         case "NOT_CONNECTED":
                             return null;
+                        case "TOKENS_VALID":
+                        case "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID":
+                            return tokens;
                         case "LOGOUT_FROM_ANOTHER_TAB":
                             this.publishEvent(eventNames.logout_from_another_tab, {"message": "session syncTokensAsync"});
                             return null;
@@ -970,30 +966,31 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (serviceWorker) {
             const {isLogin, tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
             if (isLogin == false) {
-                //this.publishEvent(eventNames.logout_from_another_tab, {"message": "service worker syncTokensAsync"});
-                //await this.destroyAsync();
                 return { tokens : null, status: "LOGOUT_FROM_ANOTHER_TAB"};
             } else if (isLogin == null) {
                 return { tokens : null, status: "REQUIRE_SYNC_TOKENS"};
-            } else if(tokens.issuedAt !== currentTokens.issuedAt){
-                return { tokens : tokens, status: "TOKEN_UPDATED_BY_ANOTHER_TAB"};
+            } else if(tokens.issuedAt !== currentTokens.issuedAt) {
+                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
+                return { tokens : tokens, status: timeLeft => 0 ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID"};
             }
         } else {
             const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
             const {tokens} = await session.initAsync();
             if (!tokens) {
-                //this.publishEvent(eventNames.logout_from_another_tab, {"message": "session syncTokensAsync"});
-                //await this.destroyAsync();
                 return { tokens : null, status: "LOGOUT_FROM_ANOTHER_TAB"};
             } else if(tokens.issuedAt !== currentTokens.issuedAt){
-                return { tokens : tokens, status: "TOKEN_UPDATED_BY_ANOTHER_TAB"};
+                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
+                return { tokens : tokens, status: timeLeft => 0 ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID"};
             }
         }
-        return { tokens:currentTokens, status: "OK"};
+
+        const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
+        
+        return { tokens:currentTokens, status: timeLeft => 0 ? "TOKENS_VALID" : "TOKENS_INVALID"};
     }
 
     syncTokensAsyncPromise=null;
-    async syncTokensAsync(isRefreshToken:boolean=false) {
+    async syncTokensAsync() {
         
         const localSyncTokensAsync = async () => {
             const configuration = this.configuration;
@@ -1004,9 +1001,22 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     return null;
                 case "LOGOUT_FROM_ANOTHER_TAB":
                     this.publishEvent(eventNames.logout_from_another_tab, {"message": "session syncTokensAsync"});
-                    //await this.destroyAsync();
                     return null;
                 case "REQUIRE_SYNC_TOKENS":
+
+                    if (document.hidden) {
+                        await sleepAsync(1000);
+                        this.publishEvent(eventNames.silentLoginAsync, {message:"wait because document is hidden"});
+                        return localSyncTokensAsync();
+                    }
+
+                    let numberTryOnline = 6;
+                    while (!navigator.onLine && numberTryOnline > 0) {
+                        await sleepAsync(1000);
+                        numberTryOnline--;
+                        this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
+                    }
+                    
                     try {
                         this.publishEvent(eventNames.syncTokensAsync_begin, {});
                         const loginParams = getLoginParams(this.configurationName, configuration.redirect_uri);
@@ -1017,22 +1027,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             return newTokens;
                         } else {
                             this.publishEvent(eventNames.syncTokensAsync_error, {message: "no token found in result"});
-                            /*if (this.timeoutId) {
-                                timer.clearTimeout(this.timeoutId);
-                                this.timeoutId = null;
-                            }*/
-                            //await this.destroyAsync();
                             this.publishEvent(eventNames.syncTokensAsync_end, {});
                             return null;
                         }
                     } catch (exceptionSilent) {
                         console.error(exceptionSilent);
-                        this.publishEvent(eventNames.syncTokensAsync_error, exceptionSilent);
-                        /*if (this.timeoutId) {
-                            timer.clearTimeout(this.timeoutId);
-                            this.timeoutId = null;
-                        }*/
-                        //await this.destroyAsync();
+                        this.publishEvent(eventNames.syncTokensAsync_error, exceptionSilent.message);
                         this.publishEvent(eventNames.syncTokensAsync_end, {});
                         return null;
                     }

@@ -80,3 +80,8 @@ export const parseOriginalTokens= (tokens) =>{
 
     return setTokens(data);
 }
+
+export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt)=>{
+    const currentTimeUnixSecond = new Date().getTime() /1000;
+    return Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond) - currentTimeUnixSecond));
+}
