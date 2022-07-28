@@ -163,6 +163,7 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
             }
             if(!oidc.tokens){
                 await oidc.destroyAsync();
+                oidc.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token` });
                 return;                
             }
             oidc.publishEvent(Oidc.eventNames.token_renewed, {});
@@ -176,6 +177,7 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
                 await oidc.session.setTokens(oidc.tokens);
             }
             if(!oidc.tokens){
+                oidc.publishEvent(eventNames.refreshTokensAsync_error, {message: `sync` });
                 await oidc.destroyAsync();
                 return;
             }
@@ -326,7 +328,8 @@ export class Oidc {
         this.configuration = {...configuration, 
             silent_login_uri, 
             monitor_session: configuration.monitor_session ?? true,
-            refresh_time_before_tokens_expiration_in_second : configuration.refresh_time_before_tokens_expiration_in_second ?? 60
+            refresh_time_before_tokens_expiration_in_second : configuration.refresh_time_before_tokens_expiration_in_second ?? 60,
+            silent_login_timeout: configuration.silent_login_timeout ?? 12000,
         };
         this.configurationName= configurationName;
       this.tokens = null
@@ -475,7 +478,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             }
                         }
                     };
-                    const silentSigninTimeout = configuration.silent_login_timeout ?? 12000
+                    const silentSigninTimeout = configuration.silent_login_timeout;
                     setTimeout(() => {
                         if (!isResolved) {
                             self.publishEvent(eventNames.silentLoginAsync_error, {reason: "timeout"});
@@ -904,7 +907,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         if (document.hidden) {
                             await sleepAsync(1000);
                             this.publishEvent(eventNames.refreshTokensAsync, {message: "wait because document is hidden"});
-                            return refreshToken(refreshToken, index+1);
+                            return refreshToken(refreshToken, index);
                         }
                         let numberTryOnline = 6;
                         while (!navigator.onLine && numberTryOnline > 0) {
@@ -949,8 +952,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 } catch (exception) {
                     console.error(exception);
                     this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exception" ,exception: exception.message});
+                    return refreshToken(refreshToken, index+1);
                 }
-                index++;
+                
             }
         return null;
      }
