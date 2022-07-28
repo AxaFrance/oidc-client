@@ -915,6 +915,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }
                     
                     const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
+                    this.publishEvent(eventNames.refreshTokensAsync, {message: `status ${status}` });
                     switch (status) {
                         case "NOT_CONNECTED":
                             return null;
@@ -970,8 +971,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             } else if (isLogin == null) {
                 return { tokens : null, status: "REQUIRE_SYNC_TOKENS"};
             } else if(tokens.issuedAt !== currentTokens.issuedAt) {
-                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
-                return { tokens : tokens, status: timeLeft => 0 ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID"};
+                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
+                const status = (timeLeft > 0) ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID";
+                return { tokens : tokens, status };
             }
         } else {
             const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
@@ -979,14 +981,15 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             if (!tokens) {
                 return { tokens : null, status: "LOGOUT_FROM_ANOTHER_TAB"};
             } else if(tokens.issuedAt !== currentTokens.issuedAt){
-                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
-                return { tokens : tokens, status: timeLeft => 0 ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID"};
+                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
+                const status = (timeLeft > 0) ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID";
+                return { tokens : tokens, status };
             }
         }
 
         const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
-        
-        return { tokens:currentTokens, status: timeLeft => 0 ? "TOKENS_VALID" : "TOKENS_INVALID"};
+        const status = (timeLeft > 0) ? "TOKENS_VALID" : "TOKENS_INVALID";
+        return { tokens:currentTokens, status};
     }
 
     syncTokensAsyncPromise=null;
