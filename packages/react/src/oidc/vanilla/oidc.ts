@@ -19,7 +19,7 @@ import timer from './timer';
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
-import {parseOriginalTokens, setTokens, computeTimeLeft} from "./parseTokens";
+import {parseOriginalTokens, setTokens, computeTimeLeft, isTokensValid} from "./parseTokens";
 const performTokenRequestAsync= async (url, details, extras) => {
     
     for (let [key, value] of Object.entries(extras)) {
@@ -202,8 +202,9 @@ const userInfoAsync = async (oidc) => {
     if(!oidc.tokens){
         return null;
     }
-    if(oidc.syncTokensAsyncPromise){
-        await oidc.syncTokensAsyncPromise;
+    // We wait and of the synchronisation before making a request
+    while (oidc.tokens && !isTokensValid(oidc.tokens)){
+        await sleepAsync(200);
     }
     const accessToken = oidc.tokens.accessToken;
 

@@ -89,3 +89,10 @@ export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expir
     const currentTimeUnixSecond = new Date().getTime() /1000;
     return Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond) - currentTimeUnixSecond));
 }
+
+export const isTokensValid= (tokens) =>{
+    if(!tokens){
+        return false;
+    }
+    return computeTimeLeft(0, tokens.expiresAt) > 0;
+}

@@ -1,5 +1,7 @@
 import React from 'react';
 import Oidc from "./vanilla/oidc";
+import {isTokensValid} from "./vanilla/parseTokens";
+import {sleepAsync} from "./vanilla/initWorker";
 
 export type Fetch = typeof window.fetch;
 export interface ComponentWithOidcFetchProps {
@@ -22,9 +24,9 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc |
   const oidc = getOidcWithConfigurationName();
   
   // We wait and of the synchronisation before making a request
-  /*if(oidc.syncTokensAsyncPromise){
-    await oidc.syncTokensAsyncPromise;
-  }*/
+    while (oidc.tokens && !isTokensValid(oidc.tokens)){
+      await sleepAsync(200);
+    }
 
   // @ts-ignore
   const accessToken = oidc.tokens ? oidc.tokens.accessToken : null;
