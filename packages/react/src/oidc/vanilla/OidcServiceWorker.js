@@ -28,7 +28,7 @@ const countLetter = (str, find)=> {
     return (str.split(find)).length - 1;
 }
 
-function extractAccessTokenPayload(accessToken) {
+const extractTokenPayload=(accessToken)=> {
     try{
         if (!accessToken) {
             return null;
@@ -44,6 +44,18 @@ function extractAccessTokenPayload(accessToken) {
     return null;
 }
 
+export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt)=>{
+    const currentTimeUnixSecond = new Date().getTime() /1000;
+    return Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond) - currentTimeUnixSecond));
+}
+
+export const isTokensValid= (tokens) =>{
+    if(!tokens){
+        return false;
+    }
+    return computeTimeLeft(0, tokens.expiresAt) > 0;
+}
+
 function hideTokens(currentDatabaseElement) {
     const configurationName = currentDatabaseElement.configurationName;
     return (response) => {
@@ -54,15 +66,27 @@ function hideTokens(currentDatabaseElement) {
             }
             currentDatabaseElement.tokens = tokens;
             currentDatabaseElement.isLogin = true;
+            const accessTokenPayload = extractTokenPayload(tokens.access_token);
             const secureTokens = {
                 ...tokens,
                 access_token: ACCESS_TOKEN +"_" + configurationName,
-                accessTokenPayload : extractAccessTokenPayload(tokens.access_token)
+                accessTokenPayload : accessTokenPayload
             };
 
+            let _idTokenPayload = null; 
+            if(tokens.id_token) {
+                _idTokenPayload = extractTokenPayload(tokens.id_token);
+                secureTokens.idTokenPayload = _idTokenPayload;
+            }
             if(tokens.refresh_token){
                 secureTokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
             }
+
+            const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
+            const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
+            const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
+            secureTokens.expireAt = expiresAt;
+            
             
             const body = JSON.stringify(secureTokens)
             return new Response(body, response);
@@ -159,6 +183,10 @@ const handleFetch = async (event) => {
 
     const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(database, originalRequest.url);
     if(currentDatabaseForRequestAccessToken && currentDatabaseForRequestAccessToken.tokens) {
+
+        while (currentDatabaseForRequestAccessToken.tokens && !isTokensValid(currentDatabaseForRequestAccessToken.tokens)){
+            await sleep(200);
+        } 
         const newRequest = new Request(originalRequest, {
             headers: {
                 ...serializeHeaders(originalRequest.headers),

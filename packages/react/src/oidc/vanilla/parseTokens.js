@@ -19,7 +19,7 @@ const extractAccessTokenPayload = tokens => {
     }
     const accessToken = tokens.accessToken;
     try{
-        if (!accessToken || countLetter(accessToken,'.') != 2) {
+        if (!accessToken || countLetter(accessToken,'.') !== 2) {
             return null;
         }
         return JSON.parse(atob(accessToken.split('.')[1]));
@@ -53,6 +53,7 @@ export const setTokens = (tokens) =>{
     const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
     const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
     const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
+    
     return {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
 }
 
@@ -80,6 +81,11 @@ export const parseOriginalTokens= (tokens) =>{
     if(tokens.accessTokenPayload !== undefined){
         // @ts-ignore
         data.accessTokenPayload = tokens.accessTokenPayload;
+    }
+
+    if(tokens.idTokenPayload !== undefined){
+        // @ts-ignore
+        data.idTokenPayload = tokens.idTokenPayload;
     }
 
     return setTokens(data);

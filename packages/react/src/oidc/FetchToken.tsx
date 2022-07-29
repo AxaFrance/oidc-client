@@ -23,13 +23,14 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc |
   }
   const oidc = getOidcWithConfigurationName();
   
-  // We wait and of the synchronisation before making a request
-    while (oidc.tokens && !isTokensValid(oidc.tokens)){
-      await sleepAsync(200);
-    }
+  
 
   // @ts-ignore
   const accessToken = oidc.tokens ? oidc.tokens.accessToken : null;
+  // We wait  the synchronisation before making a request
+  while (oidc.tokens && accessToken && !isTokensValid(oidc.tokens)){
+    await sleepAsync(200);
+  }
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json');
   }
