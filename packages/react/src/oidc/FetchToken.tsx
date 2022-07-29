@@ -22,9 +22,9 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc |
   const oidc = getOidcWithConfigurationName();
   
   // We wait and of the synchronisation before making a request
-  if(oidc.syncTokensAsyncPromise){
+  /*if(oidc.syncTokensAsyncPromise){
     await oidc.syncTokensAsyncPromise;
-  }
+  }*/
 
   // @ts-ignore
   const accessToken = oidc.tokens ? oidc.tokens.accessToken : null;

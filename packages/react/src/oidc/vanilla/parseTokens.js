@@ -31,6 +31,10 @@ const extractAccessTokenPayload = tokens => {
 
 
 export const setTokens = (tokens) =>{
+    
+    if(!tokens){
+        return null;
+    }
     let accessTokenPayload;
 
     if(!tokens.issuedAt) {
