@@ -44,12 +44,12 @@ const extractTokenPayload=(accessToken)=> {
     return null;
 }
 
-export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt)=>{
+const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt)=>{
     const currentTimeUnixSecond = new Date().getTime() /1000;
     return Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond) - currentTimeUnixSecond));
 }
 
-export const isTokensValid= (tokens) =>{
+const isTokensValid= (tokens) =>{
     if(!tokens){
         return false;
     }
@@ -85,8 +85,8 @@ function hideTokens(currentDatabaseElement) {
             const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
             const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
             const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
-            secureTokens.expireAt = expiresAt;
-            
+            secureTokens.expiresAt = expiresAt;
+            tokens.expiresAt = expiresAt;
             
             const body = JSON.stringify(secureTokens)
             return new Response(body, response);
