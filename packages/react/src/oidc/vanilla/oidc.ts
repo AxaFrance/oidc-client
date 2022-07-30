@@ -465,6 +465,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             const data = e.data;
                             if (data && typeof (data) === "string") {
                                 if (!isResolved) {
+                                    self.publishEvent(eventNames.silentLoginAsync_end, {youhou:"test",data});
                                     if(data.startsWith(key)) {
                                         const result = JSON.parse(e.data.replace(key, ''));
                                         self.publishEvent(eventNames.silentLoginAsync_end, {});
@@ -896,7 +897,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             } catch (exceptionSilent) {
                 if(exceptionSilent && exceptionSilent.message && exceptionSilent.message.startsWith("oidc")){
                     return null;
-                }
+                } 
+                await sleepAsync(1000);
                 throw exceptionSilent;
             }
             return null;
