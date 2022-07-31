@@ -989,10 +989,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
         } else {
             const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
-            const {tokens} = await session.initAsync();
+            const {tokens, status } = await session.initAsync();
             if (!tokens) {
-                return { tokens : null, status: "LOGOUT_FROM_ANOTHER_TAB"};
-            } else if(tokens.issuedAt !== currentTokens.issuedAt){
+                return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB"};
+            } else if (status == "SESSIONS_LOST") {
+                    return { tokens : null, status: "SESSIONS_LOST"};
+                }
+            else if(tokens.issuedAt !== currentTokens.issuedAt){
                 const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
                 const status = (timeLeft > 0) ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID";
                 return { tokens : tokens, status };
