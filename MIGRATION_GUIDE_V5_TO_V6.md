@@ -1,11 +1,11 @@
 ﻿# Migrate from v5 to v6
 
 V6 offer:
-- More efficient silent login 
-- More robust algorithm in order to keep the session alive
-- Add session monitor feature: Monitor session feature allow to logout the same user from all tabs and from all websites where the user is logged to.
-- Authority wellknowurl response can be cached inside sessionStorage
-- Increase security
+- More efficient silent login/signin
+- More robust algorithm in order to keep the service worker session alive
+- Add session monitor feature: Monitor session feature allow to logout the same user from all tabs and from all websites where the user/clientId is logged to.
+- [ServiceWorker] Authority wellknowurl response can be cached inside sessionStorage 
+- [ServiceWorker] Security is increased
 - Does not refresh token when refreshing the page if token is still valid
 
 ```javascript
@@ -43,3 +43,10 @@ export const configurationIdentityServer = {
 };
 
 ```
+
+# What next ? Roadmap on v6
+
+- Now it's time to clean and test well the code
+- fix and add feature to last edge case
+- Clean internal vanilla OIDC interface
+- Document vanilla OIDC library

@@ -48,8 +48,8 @@ const performTokenRequestAsync= async (url, details, extras) => {
         return {success:false, status: response.status}
     }
     const tokens = await response.json();
-    console.log(tokens);
-    return { success : true,
+    return { 
+        success : true,
         data: parseOriginalTokens(tokens)
     };
 }
@@ -70,7 +70,6 @@ const internalFetch = async (url, headers, numberRetry=0) => {
                 throw e;
             }
         } else {
-            
             console.error(e.message);
             throw e; // rethrow other unexpected errors
         }
@@ -461,7 +460,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             const data = e.data;
                             if (data && typeof (data) === "string") {
                                 if (!isResolved) {
-                                    self.publishEvent(eventNames.silentLoginAsync_end, {youhou:"test",data});
                                     if(data.startsWith(key)) {
                                         const result = JSON.parse(e.data.replace(key, ''));
                                         self.publishEvent(eventNames.silentLoginAsync_end, {});
@@ -696,7 +694,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         for (const [key, oidc] of Object.entries(oidcDatabase)) {
                             //if(oidc !== this) {
                                 // @ts-ignore
-                               await oidc.logoutOtherTabAsync(idTokenPayload.sub);
+                               await oidc.logoutOtherTabAsync(this.configuration.client_id, idTokenPayload.sub);
                             //}
                         }
                         //await this.destroyAsync();
@@ -984,7 +982,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB"};
             }else if (status == "SESSIONS_LOST") {
                     return { tokens : null, status: "SESSIONS_LOST"};
-            } else if (!status) {
+            } else if (!status || !tokens) {
                 return { tokens : null, status: "REQUIRE_SYNC_TOKENS"};
             } else if(tokens.issuedAt !== currentTokens.issuedAt) {
                 const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
@@ -1044,19 +1042,18 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         // this.events = [];
      }
      
-     async logoutSameTabAsync(sub){
+     async logoutSameTabAsync(clientId, sub){
          // @ts-ignore
-         if(this.configuration.monitor_session && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
+         if(this.configuration.monitor_session&& this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
              this.publishEvent(eventNames.logout_from_same_tab, {"message": sub});
              await this.destroyAsync("LOGGED_OUT");
          }
      }
 
-    async logoutOtherTabAsync(sub){
+    async logoutOtherTabAsync(clientId, sub){
         // @ts-ignore
-        if(this.configuration.monitor_session && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
+        if(this.configuration.monitor_session && this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
             await this.destroyAsync("LOGGED_OUT");
-            console.log("logoutOtherTabAsync(sub)" +this.configurationName);
             this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor", "sub": sub});
         }
     }
@@ -1083,7 +1080,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         for (const [key, oidc] of Object.entries(oidcDatabase)) {
             if(oidc !== this) {
                 // @ts-ignore
-                await oidc.logoutSameTabAsync(sub);
+                await oidc.logoutSameTabAsync(this.configuration.client_id, sub);
             }
         }
         
