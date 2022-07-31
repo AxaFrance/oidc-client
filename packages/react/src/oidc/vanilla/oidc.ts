@@ -163,7 +163,6 @@ const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
             }
             if(!oidc.tokens){
                 await oidc.destroyAsync(status);
-                oidc.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token` });
                 return;                
             }
             
@@ -894,11 +893,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 console.error(exceptionSilent);
                 this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exceptionSilent" ,exception: exceptionSilent.message});
                 if(exceptionSilent && exceptionSilent.message && exceptionSilent.message.startsWith("oidc")){
+                    this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token silent` });
                     return {tokens:null, status:"SESSION_LOST"};
                 } 
                 await sleepAsync(1000);
                 throw exceptionSilent;
             }
+            this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token silent return` });
             return {tokens:null, status:"SESSION_LOST"};
         }
             
@@ -913,6 +914,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
                     switch (status) {
                         case "SESSION_LOST":
+                            this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token session lost` });
                             return {tokens:null, status:"SESSION_LOST"};
                         case "NOT_CONNECTED":
                             return {tokens:null, status:null};
@@ -962,6 +964,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     return this.synchroniseTokensAsync(refreshToken, index+1);
                 }
             }
+
+        this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token` });
         return {tokens:null, status:"SESSION_LOST"};
      }
 
