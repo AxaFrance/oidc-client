@@ -18,7 +18,7 @@ let database = {
     default: {
         configurationName: "default",
         tokens: null,
-        isLogin:null,
+        status:null,
         items:[],
         oidcServerConfiguration: null
     }
@@ -65,7 +65,7 @@ function hideTokens(currentDatabaseElement) {
                 tokens.issued_at = currentTimeUnixSecond;
             }
             currentDatabaseElement.tokens = tokens;
-            currentDatabaseElement.isLogin = true;
+            currentDatabaseElement.status = "LOGGED_IN";
             const accessTokenPayload = extractTokenPayload(tokens.access_token);
             const secureTokens = {
                 ...tokens,
@@ -297,7 +297,7 @@ addEventListener('message', event => {
             tokens: null,
             items:[],
             oidcServerConfiguration: null,
-            isLogin:null,
+            status:null,
             configurationName: configurationName,
         };
         currentDatabase = database[configurationName];
@@ -312,7 +312,7 @@ addEventListener('message', event => {
         case "clear":
             currentDatabase.tokens = null;
             currentDatabase.items = null;
-            currentDatabase.isLogin = false;
+            currentDatabase.status = data.data.status;
             port.postMessage({configurationName});
             return;
         case "init":
@@ -333,7 +333,7 @@ addEventListener('message', event => {
             if(!currentDatabase.tokens){
                 port.postMessage({
                     tokens:null,
-                    isLogin: currentDatabase.isLogin,
+                    status: currentDatabase.status,
                     configurationName});
             } else {
                 const tokens = {
@@ -345,16 +345,11 @@ addEventListener('message', event => {
                 }
                 port.postMessage({
                     tokens,
-                    isLogin: currentDatabase.isLogin,
+                    status: currentDatabase.status,
                     configurationName
                 });
             }
             return;
-
-        /*case "getAccessTokenPayload":
-            const accessTokenPayload = extractAccessTokenPayload(currentDatabase.tokens.access_token);
-            port.postMessage({configurationName, accessTokenPayload});
-            return;*/
             
         case "setSessionState":
             currentDatabase.sessionState = data.data.sessionState;

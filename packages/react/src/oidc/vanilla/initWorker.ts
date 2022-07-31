@@ -107,19 +107,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const unregisterAsync = async () => {
         return await registration.unregister();
     }
-
-   /* const getAccessTokenPayloadAsync=async () => {
-        const result = await sendMessageAsync(registration)({
-            type: "getAccessTokenPayload",
-            data: null,
-            configurationName
-        });
-        // @ts-ignore
-        return result.accessTokenPayload;
-    }*/
-
-    const clearAsync=() =>{
-        return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
+    
+    const clearAsync=(status) =>{
+        return sendMessageAsync(registration)({type: "clear", data: {status}, configurationName});
     }
     const initAsync= async (oidcServerConfiguration, where) => {
         const result = await sendMessageAsync(registration)({
@@ -128,7 +118,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { tokens : parseOriginalTokens(result.tokens), isLogin: result.isLogin};
+        return { tokens : parseOriginalTokens(result.tokens), status: result.status};
     }
     
     const startKeepAliveServiceWorker = () => {

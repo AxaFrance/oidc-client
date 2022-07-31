@@ -9,22 +9,21 @@
         return Promise.resolve(JSON.parse(storage[`oidc_items.${configurationName}:${redirectUri}`]));
     }
 
-    const clearAsync=() =>{
-        storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens:null});
+    const clearAsync=(status) =>{
+        storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens:null, status});
         return Promise.resolve();
     }
 
     const initAsync=async () => {
         if(!storage[`oidc.${configurationName}:${redirectUri}`]){
-            storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens:null});
-            return {tokens:null};
+            storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens:null, status:null});
+            return {tokens:null, status:null};
         }
-        return Promise.resolve({ tokens : JSON.parse(storage[`oidc.${configurationName}:${redirectUri}`]).tokens });
+        const data = JSON.parse(storage[`oidc.${configurationName}:${redirectUri}`]);
+        return Promise.resolve({ tokens : data.tokens, status: data.status });
     }
 
     const setTokens = (tokens) => {
-        //console.log("setTokens");
-        //console.log(tokens);
         storage[`oidc.${configurationName}:${redirectUri}`] = JSON.stringify({tokens});
     }
 
