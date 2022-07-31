@@ -1,7 +1,7 @@
 export const configurationIdentityServer = {
     client_id: 'interactive.public.short',
     redirect_uri: window.location.origin+'/authentication/callback',
-    silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
+    //silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
     //silent_login_uri: window.location.origin+'/authentication/silent-login',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
@@ -9,9 +9,9 @@ export const configurationIdentityServer = {
     //refresh_time_before_tokens_expiration_in_second: 280,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false, 
-    //storage: localStorage,
+    //storage: sessionStorage,
     //silent_login_timeout: 3333000
-    monitor_session:false,
+    monitor_session:true,
   };
 
 export const configurationIdentityServerWithHash = {
