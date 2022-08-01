@@ -31,7 +31,7 @@ It use AppAuthJS behind the scene because it very lightweight and created by ope
 - **Simple** :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
-- **No cookies problem** : You can disable silent signin (that internally use an iframe)
+- **No cookies problem** : You can disable silent signin (that internally use an iframe). For your information, your OIDC server should be in the same domain of your website in order to be able to send OIDC server cookies from your website via an internal IFRAME, else, you may encounter COOKIES problem.
 - **Multiple Authentication** :
   - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
@@ -161,6 +161,7 @@ const propTypes = {
       userinfo_endpoint: PropTypes.string,
       end_session_endpoint: PropTypes.string,
       revocation_endpoint: PropTypes.string,
+      check_session_iframe: PropTypes.string
     }),
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
@@ -533,6 +534,7 @@ const configuration = {
     userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
     end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
     revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
+    check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession'
   },
 };
 

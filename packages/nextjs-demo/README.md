@@ -16,11 +16,19 @@ import { OidcProvider } from '@axa-fr/react-oidc';
 import { useRouter } from 'next/router'
 
 const configuration = {
-  client_id: 'interactive.public.short',
-  redirect_uri: 'http://localhost:3001/#authentication/callback',
-  silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
-  scope: 'openid profile email api offline_access', 
-  authority: 'https://demo.duendesoftware.com',
+    client_id: 'interactive.public.short',
+    redirect_uri: 'http://localhost:3001/#authentication/callback',
+    silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
+    scope: 'openid profile email api offline_access',
+    authority: 'https://demo.duendesoftware.com',
+    authority_configuration: {
+        authorization_endpoint: 'https://demo.duendesoftware.com/connect/authorize',
+        token_endpoint: 'https://demo.duendesoftware.com/connect/token',
+        userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
+        end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
+        revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
+        check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession'
+    },
 };
 
 const onEvent=(configurationName, eventName, data )=>{

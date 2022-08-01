@@ -39,6 +39,7 @@ export const configurationIdentityServerWithoutDiscovery = {
         userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
         end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
         revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
+        check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession'
     },
     refresh_time_before_tokens_expiration_in_second: 70,
     service_worker_relative_url:'/OidcServiceWorker.js',
