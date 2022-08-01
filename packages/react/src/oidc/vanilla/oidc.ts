@@ -10,50 +10,91 @@ import {
     RedirectRequestHandler,
     TokenRequest
 } from '@openid/appauth';
-import {NoHashQueryStringUtils, HashQueryStringUtils} from './noHashQueryStringUtils';
+import {HashQueryStringUtils, NoHashQueryStringUtils} from './noHashQueryStringUtils';
 import {initWorkerAsync, sleepAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
 import timer from './timer';
 
-const isInIframe = () => {
-    try {
-        return window.self !== window.top;
-    } catch (e) {
-        return true;
-    }
-}
+import {CheckSessionIFrame} from "./checkSessionIFrame"
+import {getParseQueryStringFromLocation} from "./route-utils";
+import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
+import {computeTimeLeft, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
 
-const idTokenPayload = (token) => {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-
-    return JSON.parse(jsonPayload);
-}
-
-const countLetter = (str, find)=> {
-    return (str.split(find)).length - 1;
-}
-
-const extractAccessTokenPayload = tokens => {
-    if(tokens.accessTokenPayload)
-    {
-        return tokens.accessTokenPayload;
-    }
-    const accessToken = tokens.accessToken;
-    try{
-        if (!accessToken || countLetter(accessToken,'.') != 2) {
-            return null;
+const performTokenRequestAsync= async (url, details, extras) => {
+    
+    for (let [key, value] of Object.entries(extras)) {
+        if (details[key] === undefined) {
+            details[key] = value;
         }
-        return JSON.parse(atob(accessToken.split('.')[1]));
-    } catch (e) {
-        console.warn(e);
     }
-    return null;
-};
+
+    let formBody = [];
+    for (const property in details) {
+        const encodedKey = encodeURIComponent(property);
+        const encodedValue = encodeURIComponent(details[property]);
+        formBody.push(`${encodedKey}=${encodedValue}`);
+    }
+    const formBodyString = formBody.join("&");
+
+    const response = await internalFetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+        body: formBodyString,
+    });
+    if(response.status !== 200){
+        return {success:false, status: response.status}
+    }
+    const tokens = await response.json();
+    return { 
+        success : true,
+        data: parseOriginalTokens(tokens)
+    };
+}
+
+const internalFetch = async (url, headers, numberRetry=0) => {
+    let response;
+    try {
+        let controller = new AbortController();
+        setTimeout(() => controller.abort(), 10000);
+        response = await fetch(url, {...headers, signal: controller.signal});
+    } catch (e) {
+        if (e.message === 'AbortError'
+            || e.message === 'Network request failed') {
+            if(numberRetry <=1) {
+                return await internalFetch(url, headers, numberRetry + 1);
+            } 
+            else {
+                throw e;
+            }
+        } else {
+            console.error(e.message);
+            throw e; // rethrow other unexpected errors
+        }
+    }
+    return response;
+}
+
+export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
+    check_session_iframe?: string;
+}
+
+export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceConfiguration{
+    private check_session_iframe: string;
+    
+    constructor(request: any) {
+        super(request);
+        this.authorizationEndpoint = request.authorization_endpoint;
+        this.tokenEndpoint = request.token_endpoint;
+        this.revocationEndpoint = request.revocation_endpoint;
+        this.userInfoEndpoint = request.userinfo_endpoint;
+        this.check_session_iframe = request.check_session_iframe;
+    }
+    
+}
+
 
 export interface StringMap {
     [key: string]: string;
@@ -70,15 +111,18 @@ export interface AuthorityConfiguration {
     revocation_endpoint: string;
     end_session_endpoint?: string;
     userinfo_endpoint?: string;
+    check_session_iframe?:string;
 }
 
  export type OidcConfiguration = {
      client_id: string,
      redirect_uri: string,
      silent_redirect_uri?:string,
-     silent_signin_timeout?:number,
+     silent_login_uri?:string,
+     silent_login_timeout?:number,
      scope: string,
      authority: string,
+     authority_time_cache_wellknowurl_in_second?: number,
      authority_configuration?: AuthorityConfiguration,
      refresh_time_before_tokens_expiration_in_second?: number,
      token_request_timeout?: number,
@@ -87,6 +131,7 @@ export interface AuthorityConfiguration {
      extras?:StringMap
      token_request_extras?:StringMap,
      storage?: Storage
+     monitor_session?: boolean
 };
 
 const oidcDatabase = {};
@@ -99,47 +144,51 @@ const oidcFactory = (configuration: OidcConfiguration, name="default") => {
 }
 
 const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
-    const response = await oidc.loginCallbackAsync();
-    const tokens = response.tokens
-    oidc.tokens = await setTokensAsync(oidc.serviceWorker, tokens);
-    if(!oidc.serviceWorker){
-        await oidc.session.setTokens(oidc.tokens);
-    }
-    oidc.publishEvent(Oidc.eventNames.token_aquired, oidc.tokens);
-    oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt)
-    return { state:response.state, callbackPath : response.callbackPath };
+    const { parsedTokens, state, callbackPath } = await oidc.loginCallbackAsync();
+    oidc.timeoutId = autoRenewTokens(oidc, parsedTokens.refreshToken, parsedTokens.expiresAt)
+    return { state, callbackPath };
 }
 
 const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
-    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second ?? 60;
+    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second;
     return timer.setTimeout(async () => {
-        const currentTimeUnixSecond = new Date().getTime() /1000;
-        const timeInfo = { timeLeft: Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond)- currentTimeUnixSecond))};
+        const timeLeft = computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond, expiresAt);
+        const timeInfo = { timeLeft };
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
-        if(currentTimeUnixSecond > (expiresAt - refreshTimeBeforeTokensExpirationInSecond)) {
-            const tokens = await oidc.refreshTokensAsync(refreshToken);
-            oidc.tokens= await setTokensAsync(oidc.serviceWorker, tokens);
+            const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken);
+            oidc.tokens= tokens;
             if(!oidc.serviceWorker){
                 await oidc.session.setTokens(oidc.tokens);
             }
             if(!oidc.tokens){
+                await oidc.destroyAsync(status);
                 return;                
             }
-            oidc.publishEvent(Oidc.eventNames.token_renewed, oidc.tokens);
+            
             if(oidc.timeoutId) {
                 oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
             }
-        } else{
-            await oidc.syncTokensAsync();
-            if(oidc.timeoutId) {
-                oidc.timeoutId = autoRenewTokens(oidc, refreshToken, expiresAt);
-            }
-        }
+
     }, 1000);
 }
 
-export const getLoginParams = (configurationName) => {
-    return JSON.parse(sessionStorage[`oidc_login.${configurationName}`]);
+const getLoginSessionKey = (configurationName:string, redirectUri:string) => {
+    return `oidc_login.${configurationName}:${redirectUri}`;
+}
+
+const setLoginParams = (configurationName:string, redirectUri:string, data) =>{
+    const sessionKey = getLoginSessionKey(configurationName, redirectUri);
+    getLoginParamsCache = data
+    sessionStorage[sessionKey] = JSON.stringify(data);
+}
+
+let getLoginParamsCache = null;
+const getLoginParams = (configurationName, redirectUri) => {
+    const dataString = sessionStorage[getLoginSessionKey(configurationName, redirectUri)];
+    if(!getLoginParamsCache){
+        getLoginParamsCache = JSON.parse(dataString);
+    }
+    return getLoginParamsCache;
 }
 
 const userInfoAsync = async (oidc) => {
@@ -149,17 +198,22 @@ const userInfoAsync = async (oidc) => {
     if(!oidc.tokens){
         return null;
     }
-    if(oidc.syncTokensAsyncPromise){
-        await oidc.syncTokensAsyncPromise;
-    }
     const accessToken = oidc.tokens.accessToken;
-
+    if(!accessToken){
+        return null;
+    }
+    // We wait the synchronisation before making a request
+    while (oidc.tokens && !isTokensValid(oidc.tokens)){
+        await sleepAsync(200);
+    }
+    
     const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
    const url = oidcServerConfiguration.userInfoEndpoint;
    const fetchUserInfo = async (accessToken) => {
        const res = await fetch(url, {
            headers: {
-               authorization: `Bearer ${accessToken}`
+               authorization: `Bearer ${accessToken}`,
+               credentials: 'include'
            }
        });
 
@@ -174,27 +228,11 @@ const userInfoAsync = async (oidc) => {
    return userInfo;
 }
 
-const setTokensAsync = async (serviceWorker, tokens) =>{
-    let accessTokenPayload;
-    if(tokens == null){
-        if(serviceWorker){
-            await serviceWorker.clearAsync();
-        }
-        return null;
-    }
-    if(serviceWorker){
-        accessTokenPayload = await serviceWorker.getAccessTokenPayloadAsync();
-    }
-    else {
-        accessTokenPayload = extractAccessTokenPayload(tokens);
-    }
-    const expiresAt =  tokens.issuedAt + tokens.expiresIn;
-    return {...tokens, idTokenPayload: idTokenPayload(tokens.idToken), accessTokenPayload, expiresAt};
-}
-
 const eventNames = {
     service_worker_not_supported_by_browser: "service_worker_not_supported_by_browser",
     token_aquired: "token_aquired",
+    logout_from_another_tab: "logout_from_another_tab",
+    logout_from_same_tab: "logout_from_same_tab",
     token_renewed: "token_renewed",
     token_timer: "token_timer",
     loginAsync_begin:"loginAsync_begin",
@@ -203,26 +241,72 @@ const eventNames = {
     loginCallbackAsync_end:"loginCallbackAsync_end",
     loginCallbackAsync_error:"loginCallbackAsync_error",
     refreshTokensAsync_begin: "refreshTokensAsync_begin",
+    refreshTokensAsync: "refreshTokensAsync",
     refreshTokensAsync_end: "refreshTokensAsync_end",
     refreshTokensAsync_error: "refreshTokensAsync_error",
-    refreshTokensAsync_silent_begin: "refreshTokensAsync_silent_begin",
-    refreshTokensAsync_silent_end: "refreshTokensAsync_silent_end",
     refreshTokensAsync_silent_error: "refreshTokensAsync_silent_error",
     tryKeepExistingSessionAsync_begin: "tryKeepExistingSessionAsync_begin",
     tryKeepExistingSessionAsync_end: "tryKeepExistingSessionAsync_end",
     tryKeepExistingSessionAsync_error: "tryKeepExistingSessionAsync_error",
-    silentSigninAsync_begin: "silentSigninAsync_begin",
-    silentSigninAsync: "silentSigninAsync",
-    silentSigninAsync_end: "silentSigninAsync_end",
-    silentSigninAsync_error: "silentSigninAsync_error", 
+    silentLoginAsync_begin: "silentLoginAsync_begin",
+    silentLoginAsync: "silentLoginAsync",
+    silentLoginAsync_end: "silentLoginAsync_end",
+    silentLoginAsync_error: "silentLoginAsync_error", 
     syncTokensAsync_begin: "syncTokensAsync_begin",
     syncTokensAsync_end: "syncTokensAsync_end",
     syncTokensAsync_error: "syncTokensAsync_error"
-
 }
 
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
+}
+
+const oneHourSecond = 60 * 60;
+let fetchFromIssuerCache = null;
+const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage= window.sessionStorage):
+    Promise<OidcAuthorizationServiceConfiguration> => {
+    const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
+    
+    const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
+    if(!fetchFromIssuerCache && storage) {
+        const cacheJson = storage.getItem(localStorageKey);
+        if(cacheJson){
+            fetchFromIssuerCache = JSON.parse(cacheJson);
+        }
+    }
+    const oneHourMinisecond = 1000 * timeCacheSecond;
+    // @ts-ignore
+    if(fetchFromIssuerCache && (fetchFromIssuerCache.timestamp + oneHourMinisecond) > Date.now()){
+        return new OidcAuthorizationServiceConfiguration(fetchFromIssuerCache.result);
+    }
+    const response = await fetch(fullUrl);
+
+    if (response.status != 200) {
+        return null;
+    }
+    
+    const result = await response.json();
+    
+    const timestamp = Date.now();
+    fetchFromIssuerCache = {result, timestamp};
+    if(storage) {
+        storage.setItem(localStorageKey, JSON.stringify({result, timestamp}));
+    }
+    return new OidcAuthorizationServiceConfiguration(result);
+}
+
+const buildQueries = (extras:StringMap) => {
+    let queries = '';
+    if(extras != null){
+        for (let [key, value] of Object.entries(extras)) {
+            if (queries === ""){
+                queries = `?${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+            } else {
+                queries+= `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+            }
+        }
+    }
+    return queries;
 }
 
 export class Oidc {
@@ -234,8 +318,19 @@ export class Oidc {
     private serviceWorker?: any;
     private configurationName: string;
     private session?: any;
+    private checkSessionIFrame: CheckSessionIFrame;
     constructor(configuration:OidcConfiguration, configurationName="default") {
-      this.configuration = configuration
+        let silent_login_uri = configuration.silent_login_uri;
+        if(configuration.silent_redirect_uri && !configuration.silent_login_uri){
+            silent_login_uri = `${configuration.silent_redirect_uri.replace("-callback", "").replace("callback", "")}-login`; 
+        }
+        
+        this.configuration = {...configuration, 
+            silent_login_uri, 
+            monitor_session: configuration.monitor_session ?? true,
+            refresh_time_before_tokens_expiration_in_second : configuration.refresh_time_before_tokens_expiration_in_second ?? 60,
+            silent_login_timeout: configuration.silent_login_timeout ?? 12000,
+        };
         this.configurationName= configurationName;
       this.tokens = null
       this.userInfo = null;
@@ -243,14 +338,18 @@ export class Oidc {
       this.timeoutId = null;
       this.serviceWorker = null;
       this.session = null;
-      this.refreshTokensAsync.bind(this);
+      this.synchroniseTokensAsync.bind(this);
       this.loginCallbackWithAutoTokensRenewAsync.bind(this);
       this.initAsync.bind(this);
       this.loginCallbackAsync.bind(this);
+      this._loginCallbackAsync.bind(this);
       this.subscriveEvents.bind(this);
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
+      this.logoutAsync.bind(this);
+      
+      this.initAsync(this.configuration.authority, this.configuration.authority_configuration);
     }
 
     subscriveEvents(func){
@@ -282,27 +381,69 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
     static eventNames = eventNames;
     
-    silentSigninCallbackFromIFrame(){
-        if (this.configuration.silent_redirect_uri) {
-            window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify(this.tokens)}`, window.location.origin);
+    _silentLoginCallbackFromIFrame(){
+        if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
+            const queryParams = getParseQueryStringFromLocation(window.location.href);
+            window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({tokens:this.tokens, sessionState:queryParams.session_state})}`, window.location.origin);
         }
     }
-    async silentSigninAsync() {
-        if (!this.configuration.silent_redirect_uri) {
-            return Promise.resolve(null);
+    _silentLoginErrorCallbackFromIFrame() {
+        if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
+            const queryParams = getParseQueryStringFromLocation(window.location.href);
+            window.top.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({error: queryParams.error})}`, window.location.origin);
         }
-        while (document.hidden) {
-            await sleepAsync(1000);
-            this.publishEvent(eventNames.silentSigninAsync, {message:"wait because document is hidden"});
+    }
+    
+    async silentLoginCallBackAsync() {
+        try {
+            await this.loginCallbackAsync(true);
+            this._silentLoginCallbackFromIFrame();
+        } catch (error) {
+            console.error(error)
+            this._silentLoginErrorCallbackFromIFrame();
+        }
+    }
+    
+    async silentLoginAsync(extras:StringMap=null, state:string=null, scope:string=null) {
+        if (!this.configuration.silent_redirect_uri || !this.configuration.silent_login_uri) {
+            return Promise.resolve(null);
         }
             
         try {
-            this.publishEvent(eventNames.silentSigninAsync_begin, {});
+            this.publishEvent(eventNames.silentLoginAsync_begin, {});
             const configuration = this.configuration
-            const link = configuration.silent_redirect_uri;
+            let queries = "";
+            
+            if(state){
+                if(extras == null){
+                    extras = {};
+                }
+                extras.state = state;
+            }
+            
+            if(scope){
+                if(extras == null){
+                    extras = {};
+                }
+                extras.scope = scope;
+            }
+            
+            if(extras != null){
+                for (let [key, value] of Object.entries(extras)) {
+                    if (queries === ""){
+                      queries = `?${encodeURIComponent(key)}=${encodeURIComponent(value)}`;  
+                    } else {
+                        queries+= `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+                    }
+                }
+            }
+            const link = configuration.silent_login_uri  + queries;
+            const idx = link.indexOf("/", link.indexOf("//") + 2);
+            const iFrameOrigin = link.substr(0, idx);
             const iframe = document.createElement('iframe');
             iframe.width = "0px";
             iframe.height = "0px";
+            
             iframe.id = `${this.configurationName}_oidc_iframe`;
             iframe.setAttribute("src", link);
             document.body.appendChild(iframe);
@@ -311,52 +452,67 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 try {
                     let isResolved = false;
                     window.onmessage = function (e) {
-                        const key = `${self.configurationName}_oidc_tokens:`;
-                        if (e.data && typeof (e.data) === "string" && e.data.startsWith(key)) {
-                            if (!isResolved) {
-                                const result = JSON.parse(e.data.replace(key, ''));
-                                self.publishEvent(eventNames.silentSigninAsync_end, result);
-                                iframe.remove();
-                                isResolved = true;
-                                resolve(result);
+                        if (e.origin === iFrameOrigin &&
+                            e.source === iframe.contentWindow
+                        ) {
+                            const key = `${self.configurationName}_oidc_tokens:`;
+                            const key_error = `${self.configurationName}_oidc_error:`;
+                            const data = e.data;
+                            if (data && typeof (data) === "string") {
+                                if (!isResolved) {
+                                    if(data.startsWith(key)) {
+                                        const result = JSON.parse(e.data.replace(key, ''));
+                                        self.publishEvent(eventNames.silentLoginAsync_end, {});
+                                        iframe.remove();
+                                        isResolved = true;
+                                        resolve(result);
+                                    }
+                                    else if(data.startsWith(key_error)) {
+                                        const result = JSON.parse(e.data.replace(key_error, ''));
+                                        self.publishEvent(eventNames.silentLoginAsync_error, result);
+                                        iframe.remove();
+                                        isResolved = true;
+                                        reject(new Error("oidc_"+result.error));
+                                    }
+                                }
                             }
                         }
                     };
-                    const silentSigninTimeout = configuration.silent_signin_timeout ? configuration.silent_signin_timeout : 12000
+                    const silentSigninTimeout = configuration.silent_login_timeout;
                     setTimeout(() => {
                         if (!isResolved) {
-                            self.publishEvent(eventNames.silentSigninAsync_error, "timeout");
+                            self.publishEvent(eventNames.silentLoginAsync_error, {reason: "timeout"});
                             iframe.remove();
                             isResolved = true;
-                            reject("timeout");
+                            reject(new Error("timeout"));
                         }
                     }, silentSigninTimeout);
                 } catch (e) {
                     iframe.remove();
-                    self.publishEvent(eventNames.silentSigninAsync_error, e);
+                    self.publishEvent(eventNames.silentLoginAsync_error, e);
                     reject(e);
                 }
             });
         } catch (e) {
-            this.publishEvent(eventNames.silentSigninAsync_error, e);
+            this.publishEvent(eventNames.silentLoginAsync_error, e);
             throw e;
         }
     }
-    initAsyncPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
         if (authorityConfiguration != null) {
-            return new AuthorizationServiceConfiguration( {
+            return new OidcAuthorizationServiceConfiguration( {
                 authorization_endpoint: authorityConfiguration.authorization_endpoint,
                 end_session_endpoint: authorityConfiguration.end_session_endpoint,
                 revocation_endpoint: authorityConfiguration.revocation_endpoint,
                 token_endpoint: authorityConfiguration.token_endpoint,
-                userinfo_endpoint: authorityConfiguration.userinfo_endpoint});
+                userinfo_endpoint: authorityConfiguration.userinfo_endpoint,
+                check_session_iframe:authorityConfiguration.check_session_iframe,
+            });
         }
-        if(this.initAsyncPromise){
-            return this.initAsyncPromise;
-        }
-        this.initAsyncPromise = await AuthorizationServiceConfiguration.fetchFromIssuer(authority, new FetchRequestor());
-        return this.initAsyncPromise;
+
+        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+        const storage = serviceWorker ? window.localStorage : null;
+        return await fetchFromIssuer(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage);
     }
 
     tryKeepExistingSessionPromise = null;
@@ -379,12 +535,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "tryKeepExistingSessionAsync");
                     if (tokens) {
                         serviceWorker.startKeepAliveServiceWorker();
-                        const updatedTokens = await this.refreshTokensAsync(tokens.refresh_token, true);
                         // @ts-ignore
-                        this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
+                        this.tokens = tokens;
                         this.serviceWorker = serviceWorker;
                         // @ts-ignore
-                        this.timeoutId = autoRenewTokens(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                        this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt);
+                        const sessionState = await serviceWorker.getSessionStateAsync();
+                        // @ts-ignore
+                        await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
                             message: "tokens inside ServiceWorker are valid"
@@ -401,16 +559,18 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             message: "service worker is not supported by this browser"
                         });
                     }
-                    const session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
+                    const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
                     const {tokens} = await session.initAsync();
                     if (tokens) {
-                        const updatedTokens = await this.refreshTokensAsync(tokens.refreshToken, true);
                         // @ts-ignore
-                        this.tokens = await setTokensAsync(serviceWorker, updatedTokens);
-                        session.setTokens(this.tokens);
+                        this.tokens = setTokens(tokens);
+                        //session.setTokens(this.tokens);
                         this.session = session;
                         // @ts-ignore
-                        this.timeoutId = autoRenewTokens(this, updatedTokens.refreshToken, this.tokens.expiresAt);
+                        this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt);
+                        const sessionState = session.getSessionState();
+                        // @ts-ignore
+                        await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                             success: true,
                             message: `tokens inside storage are valid`
@@ -424,6 +584,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 });
                 return false;
             } catch (exception) {
+                console.error(exception);
                 if (serviceWorker) {
                     await serviceWorker.clearAsync();
                 }
@@ -439,109 +600,160 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         });
     }
 
-    async loginAsync(callbackPath:string=undefined, extras:StringMap=null, installServiceWorker=true, state:string=undefined) {
-        try {
-            const location = window.location;
-            const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
-            this.publishEvent(eventNames.loginAsync_begin, {});
-            const configuration = this.configuration
-            // Security we cannot loggin from Iframe
-            if (!configuration.silent_redirect_uri && isInIframe()) {
-                throw new Error("Login from iframe is forbidden");
-            }
-            sessionStorage[`oidc_login.${this.configurationName}`] = JSON.stringify({callbackPath:url,extras,state});
-            
-            let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-            const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-            if(serviceWorker && installServiceWorker) {
-                const isServiceWorkerProxyActive = await serviceWorker.isServiceWorkerProxyActiveAsync();
-                if(!isServiceWorkerProxyActive) {
-                    window.location.href = `${configuration.redirect_uri}/service-worker-install`;
-                    return;
-                }
-            }
-            let storage;
-            if(serviceWorker) {
-                serviceWorker.startKeepAliveServiceWorker();
-                await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
-                storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
-                await storage.setItem("dummy",{});
-            } else {
-                const session = initSession(this.configurationName);
-                storage = new MemoryStorageBackend(session.saveItemsAsync, {});
-            }
-            
-            // @ts-ignore
-            const queryStringUtil = configuration.redirect_uri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
-            const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
-                    const authRequest = new AuthorizationRequest({
-                        client_id: configuration.client_id,
-                        redirect_uri: configuration.redirect_uri,
-                        scope: configuration.scope,
-                        response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
-                        state,
-                        extras: extras ?? configuration.extras
-                    });
-                    authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
-        } catch(exception) {
-            this.publishEvent(eventNames.loginAsync_error, exception);
-            throw exception;
+    loginPromise: Promise<any>=null;
+    async loginAsync(callbackPath:string=undefined, extras:StringMap=null, state:string=undefined, isSilentSignin:boolean=false, scope:string=undefined) {
+        if(this.loginPromise !== null){
+            return this.loginPromise;
         }
-    }
+        
+        const loginLocalAsync=async () => {
+            try {
+                const location = window.location;
+                const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
+                this.publishEvent(eventNames.loginAsync_begin, {});
+                const configuration = this.configuration;
 
-    syncTokensAsyncPromise=null;
-    async syncTokensAsync() {
-        // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
-        const configuration = this.configuration;
-        if(!this.tokens){
-            return;
+                const redirectUri = isSilentSignin ? configuration.silent_redirect_uri : configuration.redirect_uri;
+                if (!scope) {
+                    scope = configuration.scope;
+                }
+
+                setLoginParams(this.configurationName, redirectUri, {callbackPath: url, extras, state});
+                
+                let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
+                let storage;
+                if (serviceWorker) {
+                    serviceWorker.startKeepAliveServiceWorker();
+                    await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                    storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
+                    await storage.setItem("dummy", {});
+                } else {
+                    const session = initSession(this.configurationName, redirectUri);
+                    storage = new MemoryStorageBackend(session.saveItemsAsync, {});
+                }
+
+                const extraFinal = extras ?? configuration.extras ?? {};
+
+                // @ts-ignore
+                const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
+                const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
+                const authRequest = new AuthorizationRequest({
+                    client_id: configuration.client_id,
+                    redirect_uri: redirectUri,
+                    scope,
+                    response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+                    state,
+                    extras: extraFinal
+                });
+                authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
+            } catch (exception) {
+                this.publishEvent(eventNames.loginAsync_error, exception);
+                throw exception;
+            }
         }
-       
-        const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-        if (serviceWorker) {
-            const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
-            if(!tokens){
-                try {
-                    this.publishEvent(eventNames.syncTokensAsync_begin, {});
-                    this.syncTokensAsyncPromise = this.silentSigninAsync();
-                    const silent_token_response = await this.syncTokensAsyncPromise;
-                    console.log("silent_token_response")
-                    console.log(silent_token_response)
-                    if (silent_token_response) {
-                        this.tokens = await setTokensAsync(serviceWorker, silent_token_response);
-                    } else{
-                        this.publishEvent(eventNames.syncTokensAsync_error, null);
-                        if(this.timeoutId){
-                           timer.clearTimeout(this.timeoutId);
-                           this.timeoutId=null;
-                        }
+        this.loginPromise = loginLocalAsync();
+        return this.loginPromise.then(result =>{
+            this.loginPromise = null;
+            return result;
+        });
+    }
+    
+    async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin=false){
+        return new Promise((resolve:Function, reject) => {
+            if (this.configuration.silent_login_uri && this.configuration.silent_redirect_uri && this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
+                const checkSessionCallback = () => {
+                    this.checkSessionIFrame.stop();
+                    
+                    if(this.tokens === null){
                         return;
                     }
-                } catch (exceptionSilent) {
-                    console.error(exceptionSilent);
-                    this.publishEvent(eventNames.syncTokensAsync_error, exceptionSilent);
-                    if(this.timeoutId){
-                        timer.clearTimeout(this.timeoutId);
-                        this.timeoutId=null;
-                    }
-                    return;
-                }
-                this.syncTokensAsyncPromise = null;
-                this.publishEvent(eventNames.syncTokensAsync_end, {});
+                    // @ts-ignore
+                    const idToken = this.tokens.idToken;
+                    // @ts-ignore
+                    const idTokenPayload = this.tokens.idTokenPayload;
+                    this.silentLoginAsync({
+                        prompt: "none",
+                        id_token_hint: idToken,
+                        scope: "openid"
+                    }).then((silentSigninResponse) => {
+                        const iFrameIdTokenPayload = silentSigninResponse.tokens.idTokenPayload;
+                        if (idTokenPayload.sub === iFrameIdTokenPayload.sub) {
+                            const sessionState = silentSigninResponse.sessionState;
+                            this.checkSessionIFrame.start(silentSigninResponse.sessionState);
+                            if (idTokenPayload.sid === iFrameIdTokenPayload.sid) {
+                                console.debug("SessionMonitor._callback: Same sub still logged in at OP, restarting check session iframe; session_state:", sessionState);
+                            } else {
+                                console.debug("SessionMonitor._callback: Same sub still logged in at OP, session state has changed, restarting check session iframe; session_state:", sessionState);
+                            }
+                        }
+                        else {
+                            console.debug("SessionMonitor._callback: Different subject signed into OP:", iFrameIdTokenPayload.sub);
+                        }
+                    }).catch(async (e) => {
+                        for (const [key, oidc] of Object.entries(oidcDatabase)) {
+                            //if(oidc !== this) {
+                                // @ts-ignore
+                               await oidc.logoutOtherTabAsync(this.configuration.client_id, idTokenPayload.sub);
+                            //}
+                        }
+                        //await this.destroyAsync();
+                        //this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor"});
+                        
+                    });
+                };
+
+                this.checkSessionIFrame = new CheckSessionIFrame(checkSessionCallback, clientId, checkSessionIFrameUri);
+                this.checkSessionIFrame.load().then(() => {
+                    this.checkSessionIFrame.start(sessionState);
+                    resolve();
+                }).catch((e) =>{
+                    reject(e);
+                });
+            } else {
+                resolve();
             }
-        }
+        });
     }
 
-    async loginCallbackAsync(){
+    loginCallbackPromise : Promise<any>=null
+    async loginCallbackAsync(isSilenSignin:boolean=false){
+        if(this.loginCallbackPromise !== null){
+            return this.loginCallbackPromise;
+        }
+        
+        const loginCallbackLocalAsync= async( ) =>{
+            const response = await this._loginCallbackAsync(isSilenSignin);
+            // @ts-ignore
+            const tokens = response.tokens;
+            const parsedTokens = setTokens(tokens);
+            this.tokens = parsedTokens;
+            if(!this.serviceWorker){
+                await this.session.setTokens(parsedTokens);
+            }
+            this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
+            // @ts-ignore
+            return  { parsedTokens, state:response.state, callbackPath : response.callbackPath};
+        }
+        
+        this.loginCallbackPromise = loginCallbackLocalAsync();
+        return this.loginCallbackPromise.then(result =>{
+            this.loginCallbackPromise = null;
+            return result;
+        })
+    }
+    
+    async _loginCallbackAsync(isSilentSignin:boolean=false){
         try {
             this.publishEvent(eventNames.loginCallbackAsync_begin, {});
             const configuration = this.configuration;
             const clientId = configuration.client_id;
-            const redirectURL = configuration.redirect_uri;
+            const redirectUri = isSilentSignin ? configuration.silent_redirect_uri : configuration.redirect_uri;
             const authority =  configuration.authority;
             const tokenRequestTimeout =  configuration.token_request_timeout;
             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
+            const queryParams = getParseQueryStringFromLocation(window.location.href);
+            const sessionState =  queryParams.session_state;
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
             if(serviceWorker){
@@ -555,17 +767,19 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     throw new Error("Service Worker storage disapear");
                 }
                 await storage.removeItem("dummy");
+                await serviceWorker.setSessionStateAsync(sessionState);
             }else{
                 
-                this.session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
-                const session = initSession(this.configurationName);
+                this.session = initSession(this.configurationName, redirectUri, configuration.storage ?? sessionStorage);
+                const session = initSession(this.configurationName, redirectUri);
+                session.setSessionState(sessionState);
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
             }
             return new Promise((resolve, reject) => {
                 // @ts-ignore
                 let queryStringUtil = new NoHashQueryStringUtils();
-                if(configuration.redirect_uri.includes("#")) {
+                if(redirectUri.includes("#")) {
                     const splithash = window.location.href.split("#");
                     if (splithash.length === 2 && splithash[1].includes("?")) {
                         queryStringUtil = new HashQueryStringUtils();
@@ -599,29 +813,38 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
                     const tokenRequest = new TokenRequest({
                         client_id: clientId,
-                        redirect_uri: redirectURL,
+                        redirect_uri: redirectUri,
                         grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
                         code: response.code,
                         refresh_token: undefined,
                         extras,
                     });
 
-                    let timeoutId = setTimeout(function(){
+                    let timeoutId = setTimeout(()=>{
                         reject("performTokenRequest timeout");
                         timeoutId=null;
                     }, tokenRequestTimeout ?? 12000);
                     try {
                         const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-                        tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then((tokenResponse)=>{
-                            if(timeoutId) {
-                                const loginParams = getLoginParams(this.configurationName);
+                        tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then(async (tokenResponse) => {
+                            if (timeoutId) {
                                 clearTimeout(timeoutId);
-                                this.timeoutId=null;
-                                this.publishEvent(eventNames.loginCallbackAsync_end, {});
-                                resolve({
-                                    tokens: tokenResponse,
-                                    state: request.state,
-                                    callbackPath: loginParams.callbackPath,
+                                this.timeoutId = null;
+                                const loginParams = getLoginParams(this.configurationName, redirectUri);
+
+                                if (serviceWorker) {
+                                    const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
+                                    tokenResponse = tokens;
+                                }
+
+                                // @ts-ignore
+                                this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() => {
+                                    this.publishEvent(eventNames.loginCallbackAsync_end, {});
+                                    resolve({
+                                        tokens: tokenResponse,
+                                        state: request.state,
+                                        callbackPath: loginParams.callbackPath,
+                                    });
                                 });
                             }
                         });
@@ -642,67 +865,155 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             this.publishEvent(eventNames.loginCallbackAsync_error, exception);
             throw exception;
         }
-
     }
 
-    async refreshTokensAsync(refreshToken, silentEvent = false) {
-        const localSilentSigninAsync= async (exception=null) => {
+    async synchroniseTokensAsync(refreshToken, index=0) {
+        
+            if (document.hidden) {
+                await sleepAsync(1000);
+                this.publishEvent(eventNames.refreshTokensAsync, {message: "wait because document is hidden"});
+                return await this.synchroniseTokensAsync(refreshToken, index);
+            }
+            let numberTryOnline = 6;
+            while (!navigator.onLine && numberTryOnline > 0) {
+                await sleepAsync(1000);
+                numberTryOnline--;
+                this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
+            }
+
+        const configuration = this.configuration;
+        const localsilentLoginAsync= async () => {
             try {
-                const silent_token_response = await this.silentSigninAsync();
+                const loginParams = getLoginParams(this.configurationName, configuration.redirect_uri);
+                const silent_token_response = await this.silentLoginAsync({
+                    ...loginParams.extras,
+                    prompt: "none"
+                }, loginParams.state);
                 if (silent_token_response) {
-                    return silent_token_response;
+                    this.publishEvent(Oidc.eventNames.token_renewed, {});
+                    return {tokens:silent_token_response.tokens, status:"LOGGED"};
                 }
             } catch (exceptionSilent) {
                 console.error(exceptionSilent);
+                this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exceptionSilent" ,exception: exceptionSilent.message});
+                if(exceptionSilent && exceptionSilent.message && exceptionSilent.message.startsWith("oidc")){
+                    this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token silent` });
+                    return {tokens:null, status:"SESSION_LOST"};
+                } 
+                await sleepAsync(1000);
+                throw exceptionSilent;
             }
-            if(this.timeoutId){
-                timer.clearTimeout(this.timeoutId);
-                this.timeoutId=null;
-            }
-            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_error : eventNames.refreshTokensAsync_error, exception);
-            return null;
+            this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token silent return` });
+            return {tokens:null, status:"SESSION_LOST"};
         }
-
-        try{
-            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_begin : eventNames.refreshTokensAsync_begin, {})
-            const configuration = this.configuration;
-            const clientId = configuration.client_id;
-            const redirectUri = configuration.redirect_uri;
-            const authority =  configuration.authority;
             
-            if(!refreshToken)
-            {
-                return await localSilentSigninAsync();
-            }
-            const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-
-            let extras = undefined;
-            if(configuration.token_request_extras) {
-                extras = {}
-                for (let [key, value] of Object.entries(configuration.token_request_extras)) {
-                    extras[key] = value;
+            if (index <=4) {
+                try {
+                    
+                    if(!refreshToken)
+                    {
+                        this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
+                        return await localsilentLoginAsync();
+                    }
+                    const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
+                    switch (status) {
+                        case "SESSION_LOST":
+                            this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token session lost` });
+                            return {tokens:null, status:"SESSION_LOST"};
+                        case "NOT_CONNECTED":
+                            return {tokens:null, status:null};
+                        case "TOKENS_VALID":
+                        case "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID":
+                            return {tokens, status:"LOGGED_IN"};
+                        case "LOGOUT_FROM_ANOTHER_TAB":
+                            this.publishEvent(eventNames.logout_from_another_tab, {"status": "session syncTokensAsync"});
+                            return {tokens:null, status:"LOGGED_OUT"};
+                        case "REQUIRE_SYNC_TOKENS":
+                            this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, status, tryNumber: index});
+                            return await localsilentLoginAsync();
+                        default:
+                            this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, status, tryNumber: index});
+                            const clientId = configuration.client_id;
+                            const redirectUri = configuration.redirect_uri;
+                            const authority =  configuration.authority;
+                            let extras = {};
+                            if(configuration.token_request_extras) {
+                                for (let [key, value] of Object.entries(configuration.token_request_extras)) {
+                                    extras[key] = value;
+                                }
+                            }
+                            const details = {
+                                client_id: clientId,
+                                redirect_uri: redirectUri,
+                                grant_type: GRANT_TYPE_REFRESH_TOKEN,
+                                refresh_token: tokens.refreshToken,
+                            };
+                            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
+                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
+                            if (tokenResponse.success) {
+                                this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
+                                this.publishEvent(Oidc.eventNames.token_renewed, {});
+                                return {tokens: tokenResponse.data, status:"LOGGED_IN"};
+                            } else {
+                                this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
+                                    message: "bad request",
+                                    tokenResponse: tokenResponse
+                                });
+                                return await this.synchroniseTokensAsync(null, index+1);
+                            }
+                    }
+                } catch (exception) {
+                    console.error(exception);
+                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exception" ,exception: exception.message});
+                    return this.synchroniseTokensAsync(refreshToken, index+1);
                 }
             }
-            
-            // use the token response to make a request for an access token
-            const request = new TokenRequest({
-                client_id: clientId,
-                redirect_uri: redirectUri,
-                grant_type: GRANT_TYPE_REFRESH_TOKEN,
-                code: undefined,
-                refresh_token: refreshToken,
-                extras
-                });
-            
-            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-            const token_response = await tokenHandler.performTokenRequest(oidcServerConfiguration, request);
-            this.publishEvent(silentEvent ? eventNames.refreshTokensAsync_silent_end :eventNames.refreshTokensAsync_end,  {message:"success"});
-            return token_response;
-        } catch(exception) {
-            console.error(exception);
-            return await localSilentSigninAsync(exception);
-        }
+
+        this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token` });
+        return {tokens:null, status:"SESSION_LOST"};
      }
+
+    async syncTokensInfoAsync(configuration, configurationName, currentTokens)  {
+        // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
+        //const configuration = this.configuration;
+        if (!currentTokens) {
+            return { tokens : null, status: "NOT_CONNECTED"};
+        }
+
+        const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
+        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
+        if (serviceWorker) {
+            const {status, tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
+            if (status == "LOGGED_OUT") {
+                return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB"};
+            }else if (status == "SESSIONS_LOST") {
+                    return { tokens : null, status: "SESSIONS_LOST"};
+            } else if (!status || !tokens) {
+                return { tokens : null, status: "REQUIRE_SYNC_TOKENS"};
+            } else if(tokens.issuedAt !== currentTokens.issuedAt) {
+                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
+                const status = (timeLeft > 0) ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID";
+                return { tokens : tokens, status };
+            }
+        } else {
+            const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
+            const {tokens, status } = await session.initAsync();
+            if (!tokens) {
+                return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB"};
+            } else if (status == "SESSIONS_LOST") {
+                    return { tokens : null, status: "SESSIONS_LOST"};
+                }
+            else if(tokens.issuedAt !== currentTokens.issuedAt){
+                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
+                const status = (timeLeft > 0) ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID";
+                return { tokens : tokens, status };
+            }
+        }
+
+        const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
+        const status = (timeLeft > 0) ? "TOKENS_VALID" : "TOKENS_INVALID";
+        return { tokens:currentTokens, status};
+    }
 
     loginCallbackWithAutoTokensRenewPromise:Promise<loginCallbackResult> = null;
      loginCallbackWithAutoTokensRenewAsync():Promise<loginCallbackResult>{
@@ -720,19 +1031,38 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          return userInfoAsync(this);
      }
      
-     async destroyAsync() {
+     async destroyAsync(status) {
+         timer.clearTimeout(this.timeoutId);
+         this.timeoutId=null;
+         if(this.checkSessionIFrame){
+             this.checkSessionIFrame.stop();
+         }
         if(this.serviceWorker){
-            await this.serviceWorker.clearAsync();
+            await this.serviceWorker.clearAsync(status);
         }
          if(this.session){
-             await this.session.clearAsync();
+             await this.session.clearAsync(status);
          }
          this.tokens = null;
          this.userInfo = null;
-         this.events = [];
-         timer.clearTimeout(this.timeoutId);
-         this.timeoutId=null;
+        // this.events = [];
      }
+     
+     async logoutSameTabAsync(clientId, sub){
+         // @ts-ignore
+         if(this.configuration.monitor_session&& this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
+             this.publishEvent(eventNames.logout_from_same_tab, {"message": sub});
+             await this.destroyAsync("LOGGED_OUT");
+         }
+     }
+
+    async logoutOtherTabAsync(clientId, sub){
+        // @ts-ignore
+        if(this.configuration.monitor_session && this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
+            await this.destroyAsync("LOGGED_OUT");
+            this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor", "sub": sub});
+        }
+    }
      
     async logoutAsync(callbackPathOrUrl: string | undefined = undefined, extras: StringMap = null) {
         const configuration = this.configuration;
@@ -750,7 +1080,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 		const url = isUri ? callbackPathOrUrl : window.location.origin + path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
-        await this.destroyAsync();  
+        // @ts-ignore
+        const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
+        await this.destroyAsync("LOGGED_OUT");
+        for (const [key, oidc] of Object.entries(oidcDatabase)) {
+            if(oidc !== this) {
+                // @ts-ignore
+                await oidc.logoutSameTabAsync(this.configuration.client_id, sub);
+            }
+        }
+        
         if(oidcServerConfiguration.endSessionEndpoint) {
             let extraQueryString = "";
             if(extras){

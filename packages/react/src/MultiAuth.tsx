@@ -30,8 +30,9 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                         <br/>For example, config_1 can have other sensitive scope, config_2 does not ask for the "offline_access" so it does not retrieve the most sensitive token "refresh_token" for very sensitive operation, it retrive only access_token valid for a small amout of time.</p>
                     <select value={configurationName} onChange={handleConfigurationChange} >
                         <option value="config_classic">config_classic</option>
-                        <option value="config_without_refresh_token">config_without_refresh_token</option>
-                        <option value="google">google</option>
+                        <option value="config_without_silent_login">config_without_silent_login</option>
+                        <option value="config_without_refresh_token_silent_login">config_without_refresh_token_silent_login</option>
+                        <option value="config_google">google</option>
                         <option value="config_with_hash">config_with_hash</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
@@ -57,11 +58,16 @@ export const MultiAuthContainer = () => {
             silent_redirect_uri,
             scope: 'openid profile email api offline_access'
         },
-        config_without_refresh_token: {...configurationIdentityServer,
+        config_without_silent_login: {...configurationIdentityServer,
+            redirect_uri:callBack,
+            silent_redirect_uri: "",
+            scope: 'openid profile email api offline_access'
+        },
+        config_without_refresh_token_silent_login: {...configurationIdentityServer,
             redirect_uri:callBack,
             silent_redirect_uri: "",
             scope: 'openid profile email api'},
-        google: { ...configurationGoogle },
+        config_google: { ...configurationGoogle },
         config_with_hash: { ...configurationIdentityServerWithHash}
     }
     const handleConfigurationChange = (event) => {

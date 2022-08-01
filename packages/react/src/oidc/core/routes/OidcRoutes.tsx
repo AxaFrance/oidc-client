@@ -1,9 +1,9 @@
 import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
-import { getPath } from './route-utils';
+import { getPath } from '../../vanilla/route-utils';
 import CallbackComponent from '../default-component/Callback.component';
 import SilentCallbackComponent from "../default-component/SilentCallback.component";
-import ServiceWorkerInstall from "../default-component/ServiceWorkerInstall.component";
 import { CustomHistory } from "./withRouter";
+import SilentLoginComponent from "../default-component/SilentLogin.component";
 
 const defaultProps: Partial<OidcRoutesProps> = {
 
@@ -16,15 +16,16 @@ type OidcRoutesProps = {
   configurationName:string;
   redirect_uri: string;
   silent_redirect_uri?: string;
+  silent_login_uri?:string;
   withCustomHistory?: () => CustomHistory;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   callbackErrorComponent,
   callbackSuccessComponent,
-                                                              authenticatingComponent,  
                                                               redirect_uri,
                                                               silent_redirect_uri,
+                                                              silent_login_uri,
   children, configurationName,
   withCustomHistory=null,
 }) => {
@@ -48,11 +49,15 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
     }
   }
 
+  if(silent_login_uri){
+    if(path === getPath(silent_login_uri)){
+      return <SilentLoginComponent configurationName={configurationName} />
+    }
+  }
+  
   switch (path) {
     case callbackPath:
       return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} withCustomHistory={withCustomHistory} />;
-    case callbackPath +"/service-worker-install" :
-      return <ServiceWorkerInstall callBackError={callbackErrorComponent} authenticating={authenticatingComponent} configurationName={configurationName} />;  
     default:
       return <>{children}</>;
   }

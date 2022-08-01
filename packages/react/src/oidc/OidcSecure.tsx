@@ -14,11 +14,11 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, ca
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
-            oidc.loginAsync(callbackPath, extras, true, state);
+            oidc.loginAsync(callbackPath, extras, state);
         }
         return () => {
         }
-    }, [configurationName, callbackPath, extras])
+    }, [configurationName, callbackPath, extras, state])
 
     if(!oidc.tokens){
       return null;

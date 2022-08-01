@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc",
-  "version": "5.14.2",
+  "version": "6.0.0-beta17",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -11,7 +11,7 @@
   },
   "files": [
     "dist",
-    "src",
+    "src/oidc",
     "README.md",
     "tsconfig.json",
     "package.json",

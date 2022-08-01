@@ -42,7 +42,7 @@ These libraries is used to manage client authentication.
 - **Simple** :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
-- **No cookies problem** : You can disable silent signin (that internally use an iframe)
+- **No cookies problem** : You can disable silent signin (that internally use an iframe). For your information, your OIDC server should be in the same domain of your website in order to be able to send OIDC server cookies from your website via an internal IFRAME, else, you may encounter COOKIES problem.
 - **Multiple Authentication** :
   - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
@@ -123,10 +123,14 @@ render(<App />, document.getElementById('root'));
 
 ```javascript
 // OidcTrustedDomains.js
-// Add here trusted domains, access tokens will be send
+
+// Add bellow trusted domains, access tokens will automatically injected to be send to
+// trusted domain can also be a path like https://www.myapi.com/users, 
+// then all subroute like https://www.myapi.com/useers/1 will be authorized to send access_token to.
+
+// Domains used by OIDC server must be also declared here
 const trustedDomains = {
-    default:["http://localhost:4200"],
-    auth0:[]
+  default:["https://demo.duendesoftware.com", "https://www.myapi.com/users"]
 };
 ```
 
@@ -245,6 +249,7 @@ In this version you can use a ServiceWorker that will hide the refresh_token and
 - For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATION_GUIDE_V3_TO_V4.md)
 - For migrating from v3 to v5 checkout our [`migration guide v3 to v5`](./MIGRATION_GUIDE_V3_TO_V5.md)
 - For migrating from v4 to v5 checkout our [`migration guide v4 to v5`](./MIGRATION_GUIDE_V4_TO_V5.md)
+- For migrating from v5 to v6 checkout our [`migration guide v5 to v6`](./MIGRATION_GUIDE_V5_TO_V6.md)
 
 ## Contribute
 

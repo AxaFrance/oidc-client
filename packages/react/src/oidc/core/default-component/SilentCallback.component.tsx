@@ -1,32 +1,22 @@
 import React, {useEffect, ComponentType} from 'react';
-import Oidc, {getLoginParams} from "../../vanilla/oidc";
-import {OidcSecure} from "../../OidcSecure";
+import Oidc from "../../vanilla/oidc";
 
-const CallBack = ({configurationName}) =>{
-    const getOidc =  Oidc.get;
+const CallbackManager: ComponentType<any> = ({configurationName }) => {
+
     useEffect(() => {
         let isMounted = true;
         const playCallbackAsync = async () => {
-            if(isMounted) {
-                const oidc = getOidc(configurationName);
-                oidc.silentSigninCallbackFromIFrame();
-            }
+            const getOidc =  Oidc.get;
+            const oidc = getOidc(configurationName);
+            oidc.silentLoginCallBackAsync();
         };
         playCallbackAsync();
-
         return () => {
             isMounted = false;
         };
     },[]);
-    
-    return <></>;
-}
 
-const CallbackManager: ComponentType<any> = ({configurationName }) => {
-    const loginParams = getLoginParams(configurationName);
-    return <OidcSecure configurationName={configurationName} state={loginParams.state} extras={loginParams.extras}>
-        <CallBack configurationName={configurationName}/>
-    </OidcSecure>;
+    return <></>;
 };
 
 export default CallbackManager;

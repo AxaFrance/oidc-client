@@ -31,7 +31,7 @@ It use AppAuthJS behind the scene because it very lightweight and created by ope
 - **Simple** :
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
-- **No cookies problem** : You can disable silent signin (that internally use an iframe)
+- **No cookies problem** : You can disable silent signin (that internally use an iframe). For your information, your OIDC server should be in the same domain of your website in order to be able to send OIDC server cookies from your website via an internal IFRAME, else, you may encounter COOKIES problem.
 - **Multiple Authentication** :
   - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
@@ -71,10 +71,16 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 
 ```javascript
 // OidcTrustedDomains.js
-// Add here trusted domains, access tokens will be send to
+
+// Add bellow trusted domains, access tokens will automatically injected to be send to
+// trusted domain can also be a path like https://www.myapi.com/users, 
+// then all subroute like https://www.myapi.com/useers/1 will be authorized to send access_token to.
+
+// Domains used by OIDC server must be also declared here
 const trustedDomains = {
-    default:["http://localhost:4200"]
+  default:["https://demo.duendesoftware.com", "https://www.myapi.com/users"]
 };
+
 ```
 
 # Run The Demo
@@ -144,7 +150,8 @@ const propTypes = {
     client_id: PropTypes.string.isRequired, // oidc client id
     redirect_uri: PropTypes.string.isRequired, // oidc redirect url
     silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
-    silent_signin_timeout: PropTypes.number, // Optional default is 12000 milliseconds
+    silent_login_uri: PropTypes.string, // Optional, route that trigger the signin
+    silent_login_timeout: PropTypes.number, // Optional default is 12000 milliseconds
     scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
     authority: PropTypes.string.isRequired,
     storage: Storage, // Default sessionStorage, you can set localStorage but it is less secure to XSS attacks
@@ -154,12 +161,17 @@ const propTypes = {
       userinfo_endpoint: PropTypes.string,
       end_session_endpoint: PropTypes.string,
       revocation_endpoint: PropTypes.string,
+      check_session_iframe: PropTypes.string
     }),
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
     extras: StringMap|undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
     withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState()) 
+    authority_time_cache_wellknowurl_in_second: 60* 60, // Time to cache in second of openid wellknowurl, default is 1 hour
+    monitor_session:true, // Add OpenId monitor session, default is true (more information https://openid.net/specs/openid-connect-session-1_0.html)
+    onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user with the same subject is logged out from another tab when session_monitor is active
+    onLogoutFromSameTab: Function // Optional, can be set to override the default behavior, this function is triggered when user is logged out from same tab when session_monitor is active
   }).isRequired
 };
 ```
@@ -513,15 +525,16 @@ import { useRouter } from 'next/router'
 const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: 'http://localhost:3001/#authentication/callback',
-  silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
+  silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-login that use cookies between OIDC server and client javascript to restore the session
   scope: 'openid profile email api offline_access',
-  authority: 'https://demo.identityserver.io',
+  authority: 'https://demo.duendesoftware.com',
   authority_configuration: {
     authorization_endpoint: 'https://demo.duendesoftware.com/connect/authorize',
     token_endpoint: 'https://demo.duendesoftware.com/connect/token',
     userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
     end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
     revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
+    check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession'
   },
 };
 
@@ -564,7 +577,7 @@ React oidc work also with hash router.
 export const configurationIdentityServerWithHash = {
 client_id: 'interactive.public.short',
 redirect_uri: window.location.origin+'#authentication-callback',
-silent_redirect_uri: window.location.origin+'#authentication-silent-callback',
+silent_redirect_uri: window.location.origin+'#authentication-silent-callback', 
 scope: 'openid profile email api offline_access',
 authority: 'https://demo.duendesoftware.com',
 refresh_time_before_tokens_expiration_in_second: 70,

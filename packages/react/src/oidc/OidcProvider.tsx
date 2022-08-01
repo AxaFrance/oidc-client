@@ -23,6 +23,8 @@ export type OidcProviderProps = {
     configuration?: OidcConfiguration;
     children: any;
     onSessionLost?: Function,
+    onLogoutFromAnotherTab?:Function,
+    onLogoutFromSameTab?:Function,
     withCustomHistory?: () => CustomHistory,
     onEvent?:Function
 };
@@ -81,6 +83,8 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              authenticatingErrorComponent = AuthenticatingError,
                                                                              sessionLostComponent=SessionLost,
                                                                              onSessionLost=null,
+                                                                             onLogoutFromAnotherTab=null,
+                                                                             onLogoutFromSameTab=null,
                                                                              withCustomHistory=null,
                                                                              onEvent=null,
                                                                          }) => {
@@ -115,6 +119,20 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                 }
                 setEvent({name, data});
             }
+            else if(name === Oidc.eventNames.logout_from_another_tab){
+                if(onLogoutFromAnotherTab != null){
+                    onLogoutFromAnotherTab();
+                    return;
+                }
+                setEvent({name, data});
+            }
+            else if(name === Oidc.eventNames.logout_from_same_tab){
+                if(onLogoutFromSameTab != null){
+                    onLogoutFromSameTab();
+                    return;
+                }
+                //setEvent({name, data});
+            }
             else if (name == Oidc.eventNames.loginAsync_begin
                 || name == Oidc.eventNames.loginCallbackAsync_end
                 || name == Oidc.eventNames.loginAsync_error
@@ -143,7 +161,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
     const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
     const isLoading = (loading || (currentConfigurationName != configurationName ));
-    
+    const oidc = getOidc(configurationName);
     let eventName = event.name;
     switch(eventName){
         case Oidc.eventNames.service_worker_not_supported_by_browser:
@@ -161,14 +179,16 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
             </Switch>;
         case Oidc.eventNames.refreshTokensAsync_error:
         case Oidc.eventNames.syncTokensAsync_error:
+        case Oidc.eventNames.logout_from_another_tab:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <SessionLostComponent configurationName={configurationName} /> 
             </Switch>;
         default:
             return (
                 <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
-                      <OidcRoutes redirect_uri={configuration.redirect_uri}
-                                  silent_redirect_uri={configuration.silent_redirect_uri}
+                      <OidcRoutes redirect_uri={oidc.configuration.redirect_uri}
+                                  silent_redirect_uri={oidc.configuration.silent_redirect_uri}
+                                  silent_login_uri={oidc.configuration.silent_login_uri}
                                   callbackSuccessComponent={callbackSuccessComponent} 
                                   callbackErrorComponent={authenticatingErrorComponent}
                                   authenticatingComponent={authenticatingComponent}

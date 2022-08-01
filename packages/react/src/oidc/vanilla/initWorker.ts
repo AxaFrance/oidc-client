@@ -1,4 +1,5 @@
 ﻿import timer from "./timer"
+import {parseOriginalTokens} from "./parseTokens";
 
 function get_browser() {
     let ua = navigator.userAgent, tem,
@@ -102,19 +103,13 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const loadItemsAsync=() =>{
         return sendMessageAsync(registration)({type: "loadItems", data: null, configurationName});
     }
-
-    const getAccessTokenPayloadAsync=async () => {
-        const result = await sendMessageAsync(registration)({
-            type: "getAccessTokenPayload",
-            data: null,
-            configurationName
-        });
-        // @ts-ignore
-        return result.accessTokenPayload;
+    
+    const unregisterAsync = async () => {
+        return await registration.unregister();
     }
-
-    const clearAsync=() =>{
-        return sendMessageAsync(registration)({type: "clear", data: null, configurationName});
+    
+    const clearAsync=(status) =>{
+        return sendMessageAsync(registration)({type: "clear", data: {status}, configurationName});
     }
     const initAsync= async (oidcServerConfiguration, where) => {
         const result = await sendMessageAsync(registration)({
@@ -123,7 +118,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { tokens : result.tokens};
+        return { tokens : parseOriginalTokens(result.tokens), status: result.status};
     }
     
     const startKeepAliveServiceWorker = () => {
@@ -133,13 +128,26 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         }
     }
 
+    const setSessionStateAsync = (sessionState) => {
+        return sendMessageAsync(registration)({type: "setSessionState", data: {sessionState}, configurationName});
+    }
+
+    const getSessionStateAsync= async () => {
+        const result = await sendMessageAsync(registration)({type: "getSessionState", data: null, configurationName});
+        // @ts-ignore
+        return result.sessionState;
+    }
+
     return { 
         saveItemsAsync, 
         loadItemsAsync, 
         clearAsync, 
         initAsync, 
-        getAccessTokenPayloadAsync,
+       // getAccessTokenPayloadAsync,
         startKeepAliveServiceWorker,
-        isServiceWorkerProxyActiveAsync
+        isServiceWorkerProxyActiveAsync,
+        setSessionStateAsync,
+        getSessionStateAsync,
+        unregisterAsync,
     };
 }

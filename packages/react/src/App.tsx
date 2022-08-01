@@ -9,10 +9,17 @@ import { MultiAuthContainer } from "./MultiAuth";
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
+
+const getRandomInt = (max) => {
+  return Math.floor(Math.random() * max);
+}
+
+
 function reducer(state, action) {
   switch (action.type) {
     case 'event':
-      return [{...action.data, date:Date.now()}, ...state]
+      const id = getRandomInt(9999999999999).toString();
+      return [{...action.data, id, date:Date.now()}, ...state]
     default:
       throw new Error();
   }
@@ -23,7 +30,7 @@ function App() {
   const [events, dispatch] = useReducer(reducer, []);
 
   const onEvent=(configurationName, eventName, data )=>{
-    console.log(`oidc:${configurationName}:${eventName}`, data);
+   // console.log(`oidc:${configurationName}:${eventName}`, data);
     dispatch({type: 'event', data: {name: `oidc:${configurationName}:${eventName}`, data}})
   }
   return (<>
@@ -84,7 +91,7 @@ function App() {
               {events.map(e => {
                 const date = new Date(e.date);
                 const dateFormated = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-                return <p>{dateFormated} {e.name}: { JSON.stringify(e.data)}</p>
+                return <p key={e.id}>{dateFormated} {e.name}: { JSON.stringify(e.data)}</p>
               })}
             </div>
           </div>
