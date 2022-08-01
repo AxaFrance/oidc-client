@@ -43,8 +43,6 @@
     "react-dom": "x"
   },
   "devDependencies": {
-    "react": "x",
-    "react-dom": "x",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "13.1.1",
     "@testing-library/user-event": "14.1.1",
@@ -54,6 +52,8 @@
     "cross-env": "^7.0.3",
     "cypress": "^9.5.0",
     "msw": "0.39.2",
+    "react": "x",
+    "react-dom": "x",
     "react-router-dom": "6.3.0",
     "react-scripts": "5.0.1",
     "typescript": "4.6.3"
