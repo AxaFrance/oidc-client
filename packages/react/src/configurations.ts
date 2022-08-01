@@ -6,7 +6,7 @@ export const configurationIdentityServer = {
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
     //authority_time_cache_wellknowurl_in_second: 60* 60,
-    //refresh_time_before_tokens_expiration_in_second: 280,
+    refresh_time_before_tokens_expiration_in_second: 10,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false, 
     //storage: sessionStorage,
@@ -18,10 +18,10 @@ export const configurationIdentityServerWithHash = {
     client_id: 'interactive.public.short',
     redirect_uri: window.location.origin+'/multi-auth/authentification#authentication-callback',
     silent_redirect_uri: window.location.origin+'/multi-auth/authentification#authentication-silent-callback',
-    //silent_login_uri: window.location.origin+'#authentication-silent-login',
+    silent_login_uri: window.location.origin+'#authentication-silent-login',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
-    refresh_time_before_tokens_expiration_in_second: 70,
+    refresh_time_before_tokens_expiration_in_second: 10,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false,
 };
@@ -30,7 +30,7 @@ export const configurationIdentityServerWithoutDiscovery = {
     client_id: 'interactive.public.short',
     redirect_uri: window.location.origin+'/authentication/callback',
     silent_redirect_uri: window.location.origin+'/authentication/silent-callback',
-    //silent_login_uri: window.location.origin+'/authentication/silent_login',
+    silent_login_uri: window.location.origin+'/authentication/silent_login',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
     authority_configuration: {
@@ -41,7 +41,7 @@ export const configurationIdentityServerWithoutDiscovery = {
         revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
         check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession'
     },
-    refresh_time_before_tokens_expiration_in_second: 70,
+    refresh_time_before_tokens_expiration_in_second: 10,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false,
 };
@@ -51,7 +51,7 @@ export const configurationAuth0 = {
     redirect_uri: window.location.origin+'/callback',
     scope: 'openid profile email api offline_access',
     authority: 'https://kdhttps.auth0.com',
-    refresh_time_before_tokens_expiration_in_second: 70,
+    refresh_time_before_tokens_expiration_in_second: 10,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false,
 };
@@ -60,7 +60,7 @@ export const configurationGoogle = {
     client_id: '908893276222-f2drloh56ll0g99md38lv2k810d0nk0p.apps.googleusercontent.com',
     redirect_uri: `${window.location.origin}/multi-auth/callback-google`,
     silent_redirect_uri: window.location.origin+'/multi-auth/silent-callback-google',
-    //silent_login_uri: window.location.origin+'/multi-auth/silent-login-google',
+    silent_login_uri: window.location.origin+'/multi-auth/silent-login-google',
     scope: 'openid profile email',
     authority: 'https://accounts.google.com/',
     service_worker_relative_url:'/OidcServiceWorker.js',

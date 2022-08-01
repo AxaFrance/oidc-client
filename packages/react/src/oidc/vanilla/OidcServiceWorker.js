@@ -64,31 +64,33 @@ function hideTokens(currentDatabaseElement) {
                 const currentTimeUnixSecond = new Date().getTime() /1000;
                 tokens.issued_at = currentTimeUnixSecond;
             }
-            currentDatabaseElement.tokens = tokens;
-            currentDatabaseElement.status = "LOGGED_IN";
+
             const accessTokenPayload = extractTokenPayload(tokens.access_token);
             const secureTokens = {
                 ...tokens,
                 access_token: ACCESS_TOKEN +"_" + configurationName,
                 accessTokenPayload : accessTokenPayload
             };
+            tokens.accessTokenPayload = accessTokenPayload;
 
             let _idTokenPayload = null; 
             if(tokens.id_token) {
                 _idTokenPayload = extractTokenPayload(tokens.id_token);
                 secureTokens.idTokenPayload = _idTokenPayload;
+                tokens.idTokenPayload = _idTokenPayload;
             }
             if(tokens.refresh_token){
                 secureTokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
             }
 
-            const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
+            const idTokenExpiresAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
             const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
-            const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
+            const expiresAt = idTokenExpiresAt < accessTokenExpiresAt ? idTokenExpiresAt : accessTokenExpiresAt;
             secureTokens.expiresAt = expiresAt;
+            const body = JSON.stringify(secureTokens);
             tokens.expiresAt = expiresAt;
-            
-            const body = JSON.stringify(secureTokens)
+            currentDatabaseElement.tokens = tokens;
+            currentDatabaseElement.status = "LOGGED_IN";
             return new Response(body, response);
         });
     };
@@ -205,7 +207,8 @@ const handleFetch = async (event) => {
     const numberDatabase = currentDatabases.length;
     if(numberDatabase > 0) {
         const maPromesse = new Promise((resolve, reject) => {
-            const response = originalRequest.clone().text().then(actualBody => {
+            const clonedRequest = originalRequest.clone();
+            const response = clonedRequest.text().then(actualBody => {
                 if(actualBody.includes(REFRESH_TOKEN)) {
                     let newBody = actualBody;
                     for(let i= 0;i<numberDatabase;i++){
@@ -218,34 +221,34 @@ const handleFetch = async (event) => {
                         }
                     }
                     
-                    return fetch(originalRequest, {
+                    return fetch(clonedRequest, {
                         body: newBody,
-                        method: originalRequest.method,
+                        method: clonedRequest.method,
                         headers: {
                             ...serializeHeaders(originalRequest.headers),
                         },
-                        mode: originalRequest.mode,
-                        cache: originalRequest.cache,
-                        redirect: originalRequest.redirect,
-                        referrer: originalRequest.referrer,
-                        credentials: originalRequest.credentials,
-                        integrity: originalRequest.integrity
+                        mode: clonedRequest.mode,
+                        cache: clonedRequest.cache,
+                        redirect: clonedRequest.redirect,
+                        referrer: clonedRequest.referrer,
+                        credentials: clonedRequest.credentials,
+                        integrity: clonedRequest.integrity
                     }).then(hideTokens(currentDatabase));
                 } else if(actualBody.includes("code_verifier=") && currentLoginCallbackConfigurationName){
                     currentDatabase = database[currentLoginCallbackConfigurationName];
                     currentLoginCallbackConfigurationName=null;
-                    return fetch(originalRequest,{
+                    return fetch(clonedRequest,{
                         body: actualBody,
-                        method: originalRequest.method,
+                        method: clonedRequest.method,
                         headers: {
                             ...serializeHeaders(originalRequest.headers),
                         },
-                        mode: originalRequest.mode,
-                        cache: originalRequest.cache,
-                        redirect: originalRequest.redirect,
-                        referrer: originalRequest.referrer,
-                        credentials: originalRequest.credentials,
-                        integrity: originalRequest.integrity
+                        mode: clonedRequest.mode,
+                        cache: clonedRequest.cache,
+                        redirect: clonedRequest.redirect,
+                        referrer: clonedRequest.referrer,
+                        credentials: clonedRequest.credentials,
+                        integrity: clonedRequest.integrity
                     }).then(hideTokens(currentDatabase));
                 }
             });

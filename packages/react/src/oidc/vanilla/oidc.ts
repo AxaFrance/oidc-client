@@ -826,13 +826,19 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }, tokenRequestTimeout ?? 12000);
                     try {
                         const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-                        tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then((tokenResponse)=>{
-                            if(timeoutId) {
+                        tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then(async (tokenResponse) => {
+                            if (timeoutId) {
                                 clearTimeout(timeoutId);
-                                this.timeoutId=null;
+                                this.timeoutId = null;
                                 const loginParams = getLoginParams(this.configurationName, redirectUri);
+
+                                if (serviceWorker) {
+                                    const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
+                                    tokenResponse = tokens;
+                                }
+
                                 // @ts-ignore
-                                this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() =>{
+                                this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() => {
                                     this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                     resolve({
                                         tokens: tokenResponse,
