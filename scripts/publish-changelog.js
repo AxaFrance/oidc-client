@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const VERSION = require('../packages/context/package.json').version;
+const VERSION = require('../packages/react/package.json').version;
 
 try {
   const execSync = require('child_process').execSync;

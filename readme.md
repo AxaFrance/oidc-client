@@ -68,26 +68,17 @@ Work perfectly well with :
 ## Getting Started
 
 ### Getting Started React using create-react-app
+
 ```sh
-npm install @axa-fr/react-oidc copyfiles --save
+npm install @axa-fr/react-oidc --save
+
+# If you have a "public" folder, the 2 files will be created :
+# ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
+# ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
 
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
-
-Add a copy task in order to install and stay up to date an Oidc Service Worker.
-The only file you should edit is "OidcTrustedDomains.js" which will never be erased with the configuration bellow.
-
-```sh
-#package.json
-{
-    "scripts": {
-        "copy": "copyfiles -f ./node_modules/@axa-fr/react-oidc/dist/OidcServiceWorker.js ./public && copyfiles -f -s ./node_modules/@axa-fr/react-oidc/dist/OidcTrustedDomains.js ./public",
-        "start:server": "react-scripts start",
-        "build:server": "npm run copy && react-scripts build",
-        "prepare": "npm run copy"
-    }
-}
-```
+The only file you should edit is "OidcTrustedDomains.js".
 
 ```javascript
 import React from 'react';

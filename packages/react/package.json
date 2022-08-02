@@ -11,6 +11,7 @@
   },
   "files": [
     "dist",
+    "bin",
     "src/oidc",
     "README.md",
     "tsconfig.json",
@@ -33,7 +34,8 @@
     "test": "react-scripts test --coverage",
     "eject": "react-scripts eject",
     "clean": "rimraf dist",
-    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist"
+    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist",
+    "postinstall": "node ./bin/copy.js"
   },
   "dependencies": {
     "@openid/appauth": "1.3.1"
