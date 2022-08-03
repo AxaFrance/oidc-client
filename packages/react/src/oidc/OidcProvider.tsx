@@ -175,7 +175,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
         case Oidc.eventNames.loginAsync_error:
         case Oidc.eventNames.loginCallbackAsync_error:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
-                <AuthenticatingErrorComponent configurationName={configurationName} />;
+                <AuthenticatingErrorComponent configurationName={configurationName} />
             </Switch>;
         case Oidc.eventNames.refreshTokensAsync_error:
         case Oidc.eventNames.syncTokensAsync_error:
