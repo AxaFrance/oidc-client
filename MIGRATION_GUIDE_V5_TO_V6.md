@@ -1,4 +1,6 @@
 ﻿# Migrate from v5 to v6
+ 
+[Youtube demo of V6 and explanation of breacking changes.](https://youtu.be/ReywDegsX-s)
 
 V6 offer:
 - Better browser multiple tab management
