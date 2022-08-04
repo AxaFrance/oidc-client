@@ -68,13 +68,12 @@ export const MultiAuthContainer = () => {
             silent_redirect_uri: "",
             scope: 'openid profile email api'},
         config_google: { ...configurationGoogle },
-        config_with_hash: { ...configurationIdentityServerWithHash}
+        config_with_hash: { ...configurationIdentityServerWithHash }
     }
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
         sessionStorage.configurationName = configurationName;
         setConfigurationName(configurationName);
-
     }
 
     const onSessionLost = ()=>{

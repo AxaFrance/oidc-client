@@ -11,7 +11,7 @@ export const configurationIdentityServer = {
     service_worker_only: false, 
     //storage: sessionStorage,
     //silent_login_timeout: 3333000
-    monitor_session:true,
+    monitor_session: true,
   };
 
 export const configurationIdentityServerWithHash = {
@@ -59,7 +59,6 @@ export const configurationAuth0 = {
 export const configurationGoogle = {
     client_id: '908893276222-f2drloh56ll0g99md38lv2k810d0nk0p.apps.googleusercontent.com',
     redirect_uri: `${window.location.origin}/multi-auth/callback-google`,
-    silent_redirect_uri: window.location.origin+'/multi-auth/silent-callback-google',
     silent_login_uri: window.location.origin+'/multi-auth/silent-login-google',
     scope: 'openid profile email',
     authority: 'https://accounts.google.com/',

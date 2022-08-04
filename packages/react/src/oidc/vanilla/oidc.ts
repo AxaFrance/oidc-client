@@ -262,22 +262,22 @@ const getRandomInt = (max) => {
 }
 
 const oneHourSecond = 60 * 60;
-let fetchFromIssuerCache = null;
+let fetchFromIssuerCache = {};
 const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage= window.sessionStorage):
     Promise<OidcAuthorizationServiceConfiguration> => {
     const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
     
     const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
-    if(!fetchFromIssuerCache && storage) {
+    if(!fetchFromIssuerCache[localStorageKey] && storage) {
         const cacheJson = storage.getItem(localStorageKey);
         if(cacheJson){
-            fetchFromIssuerCache = JSON.parse(cacheJson);
+            fetchFromIssuerCache[localStorageKey] = JSON.parse(cacheJson);
         }
     }
     const oneHourMinisecond = 1000 * timeCacheSecond;
     // @ts-ignore
-    if(fetchFromIssuerCache && (fetchFromIssuerCache.timestamp + oneHourMinisecond) > Date.now()){
-        return new OidcAuthorizationServiceConfiguration(fetchFromIssuerCache.result);
+    if(fetchFromIssuerCache[localStorageKey] && (fetchFromIssuerCache[localStorageKey].timestamp + oneHourMinisecond) > Date.now()){
+        return new OidcAuthorizationServiceConfiguration(fetchFromIssuerCache[localStorageKey].result);
     }
     const response = await fetch(fullUrl);
 
