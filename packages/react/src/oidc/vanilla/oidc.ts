@@ -910,11 +910,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             if (index <=4) {
                 try {
                     
-                    if(!refreshToken)
-                    {
-                        this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
-                        return await localsilentLoginAsync();
-                    }
                     const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens);
                     switch (status) {
                         case "SESSION_LOST":
@@ -932,6 +927,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, status, tryNumber: index});
                             return await localsilentLoginAsync();
                         default:
+                            if(!refreshToken)
+                            {
+                                this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
+                                return await localsilentLoginAsync();
+                            }
                             this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, status, tryNumber: index});
                             const clientId = configuration.client_id;
                             const redirectUri = configuration.redirect_uri;
