@@ -84,7 +84,7 @@ function hideTokens(currentDatabaseElement) {
             }
 
             const idTokenExpiresAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
-            const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
+            const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issued_at + tokens.expires_in;
             const expiresAt = idTokenExpiresAt < accessTokenExpiresAt ? idTokenExpiresAt : accessTokenExpiresAt;
             secureTokens.expiresAt = expiresAt;
             const body = JSON.stringify(secureTokens);
