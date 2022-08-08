@@ -11,7 +11,7 @@ import {
     TokenRequest
 } from '@openid/appauth';
 import {HashQueryStringUtils, NoHashQueryStringUtils} from './noHashQueryStringUtils';
-import {initWorkerAsync, sleepAsync} from './initWorker'
+import {initWorkerAsync, sleepAsync, getOperatingSystem} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
 import timer from './timer';
@@ -623,7 +623,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
                 let storage;
-                if (serviceWorker) {
+                // iOS kill Service Worker when domain we leave domain
+                if (serviceWorker && getOperatingSystem().os !== "iOS") {
                     serviceWorker.startKeepAliveServiceWorker();
                     await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                     storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
@@ -692,14 +693,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         }
                     }).catch(async (e) => {
                         for (const [key, oidc] of Object.entries(oidcDatabase)) {
-                            //if(oidc !== this) {
                                 // @ts-ignore
                                await oidc.logoutOtherTabAsync(this.configuration.client_id, idTokenPayload.sub);
-                            //}
                         }
-                        //await this.destroyAsync();
-                        //this.publishEvent(eventNames.logout_from_another_tab, {message : "SessionMonitor"});
-                        
                     });
                 };
 
@@ -760,13 +756,20 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 serviceWorker.startKeepAliveServiceWorker();
                 this.serviceWorker = serviceWorker;
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
-                const items = await serviceWorker.loadItemsAsync();
-                storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
-                const dummy =await storage.getItem("dummy");
-                if(!dummy){
-                    throw new Error("Service Worker storage disapear");
+                // iOS kill Service Worker when domain we leave domain
+                if(getOperatingSystem().os !== "iOS") {
+                    const items = await serviceWorker.loadItemsAsync();
+                    storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
+                    const dummy = await storage.getItem("dummy");
+                    if (!dummy) {
+                        throw new Error("Service Worker storage disapear");
+                    }
+                    await storage.removeItem("dummy");
+                } else{
+                    const session = initSession(this.configurationName, redirectUri);
+                    const items = await session.loadItemsAsync();
+                    storage = new MemoryStorageBackend(session.saveItemsAsync, items);
                 }
-                await storage.removeItem("dummy");
                 await serviceWorker.setSessionStateAsync(sessionState);
             }else{
                 
