@@ -45,14 +45,14 @@ export const getOperatingSystem = () => {
         }
     }
 
-    let osVersion = unknown;
+    //let osVersion = unknown;
 
     if (/Windows/.test(os)) {
-        osVersion = /Windows (.*)/.exec(os)[1];
+        //osVersion = /Windows (.*)/.exec(os)[1];
         os = 'Windows';
     }
 
-    switch (os) {
+    /*switch (os) {
         case 'Mac OS':
         case 'Mac OS X':
         case 'Android':
@@ -63,10 +63,10 @@ export const getOperatingSystem = () => {
             const osVersionArray = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
             osVersion = osVersionArray[1] + '.' + osVersionArray[2] + '.' + (parseInt(osVersionArray[3]) | 0);
             break;
-    }
+    }*/
     return {
         os: os,
-        osVersion: osVersion
+       // osVersion: osVersion
     }
 }
 
