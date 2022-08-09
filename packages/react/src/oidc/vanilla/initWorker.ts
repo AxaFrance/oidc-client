@@ -3,7 +3,7 @@ import {parseOriginalTokens} from "./parseTokens";
 
 
 export const getOperatingSystem = () => {
-    const nVer = navigator.appVersion;
+    //const nVer = navigator.appVersion;
     const nAgt = navigator.userAgent;
     const unknown = '-';
     // system
@@ -141,6 +141,12 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return null;
     }
     const {name, version} = getBrowser();
+    const os = getOperatingSystem();
+    
+    if(os.os === "iOS" || os.os === "Mac OS"){
+        return null;
+    }
+    
     if(name == "chrome" && parseInt(version)<90){
         return null;
     }

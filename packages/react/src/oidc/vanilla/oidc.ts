@@ -11,7 +11,7 @@ import {
     TokenRequest
 } from '@openid/appauth';
 import {HashQueryStringUtils, NoHashQueryStringUtils} from './noHashQueryStringUtils';
-import {initWorkerAsync, sleepAsync, getOperatingSystem} from './initWorker'
+import {initWorkerAsync, sleepAsync} from './initWorker'
 import {MemoryStorageBackend} from "./memoryStorageBackend";
 import {initSession} from "./initSession";
 import timer from './timer';
@@ -626,7 +626,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
                 let storage;
                 // iOS kill Service Worker when domain we leave domain
-                if (serviceWorker && getOperatingSystem().os !== "iOS") {
+                if (serviceWorker/* && getOperatingSystem().os !== "iOS"*/) {
                     serviceWorker.startKeepAliveServiceWorker();
                     await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                     storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
@@ -759,7 +759,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 this.serviceWorker = serviceWorker;
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
                 // iOS kill Service Worker when domain we leave domain
-                if(getOperatingSystem().os !== "iOS") {
+                //if(getOperatingSystem().os !== "iOS") {
                     const items = await serviceWorker.loadItemsAsync();
                     storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
                     const dummy = await storage.getItem("dummy");
@@ -767,11 +767,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         throw new Error("Service Worker storage disapear");
                     }
                     await storage.removeItem("dummy");
-                } else{
+                /*} else{
                     const session = initSession(this.configurationName, redirectUri);
                     const items = await session.loadItemsAsync();
                     storage = new MemoryStorageBackend(session.saveItemsAsync, items);
-                }
+                }*/
                 await serviceWorker.setSessionStateAsync(sessionState);
             }else{
                 
