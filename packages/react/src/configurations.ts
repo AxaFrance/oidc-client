@@ -11,7 +11,7 @@ export const configurationIdentityServer = {
     service_worker_only: false, 
     //storage: sessionStorage,
     //silent_login_timeout: 3333000
-    monitor_session: true,
+    monitor_session: false,
   };
 
 export const configurationIdentityServerWithHash = {
