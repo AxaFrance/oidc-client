@@ -268,10 +268,12 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
     
     const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
-    if(!fetchFromIssuerCache[localStorageKey] && storage) {
-        const cacheJson = storage.getItem(localStorageKey);
-        if(cacheJson){
-            fetchFromIssuerCache[localStorageKey] = JSON.parse(cacheJson);
+    if(!fetchFromIssuerCache[localStorageKey]) {
+        if(storage) {
+            const cacheJson = storage.getItem(localStorageKey);
+            if (cacheJson) {
+                fetchFromIssuerCache[localStorageKey] = JSON.parse(cacheJson);
+            }
         }
     }
     const oneHourMinisecond = 1000 * timeCacheSecond;
@@ -288,7 +290,7 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     const result = await response.json();
     
     const timestamp = Date.now();
-    fetchFromIssuerCache = {result, timestamp};
+    fetchFromIssuerCache[localStorageKey] = {result, timestamp};
     if(storage) {
         storage.setItem(localStorageKey, JSON.stringify({result, timestamp}));
     }
