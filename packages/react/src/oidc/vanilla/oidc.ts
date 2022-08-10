@@ -213,7 +213,7 @@ const userInfoAsync = async (oidc) => {
        const res = await fetch(url, {
            headers: {
                authorization: `Bearer ${accessToken}`,
-               credentials: 'include'
+               // credentials: 'include'
            }
        });
 
@@ -500,21 +500,32 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             throw e;
         }
     }
+    initPromise = null;
     async initAsync(authority:string, authorityConfiguration:AuthorityConfiguration) {
-        if (authorityConfiguration != null) {
-            return new OidcAuthorizationServiceConfiguration( {
-                authorization_endpoint: authorityConfiguration.authorization_endpoint,
-                end_session_endpoint: authorityConfiguration.end_session_endpoint,
-                revocation_endpoint: authorityConfiguration.revocation_endpoint,
-                token_endpoint: authorityConfiguration.token_endpoint,
-                userinfo_endpoint: authorityConfiguration.userinfo_endpoint,
-                check_session_iframe:authorityConfiguration.check_session_iframe,
-            });
+        if(this.initPromise !== null){
+            return this.initPromise;
         }
+        const localFuncAsync = async () => {
+            if (authorityConfiguration != null) {
+                return new OidcAuthorizationServiceConfiguration({
+                    authorization_endpoint: authorityConfiguration.authorization_endpoint,
+                    end_session_endpoint: authorityConfiguration.end_session_endpoint,
+                    revocation_endpoint: authorityConfiguration.revocation_endpoint,
+                    token_endpoint: authorityConfiguration.token_endpoint,
+                    userinfo_endpoint: authorityConfiguration.userinfo_endpoint,
+                    check_session_iframe: authorityConfiguration.check_session_iframe,
+                });
+            }
 
-        const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
-        const storage = serviceWorker ? window.localStorage : null;
-        return await fetchFromIssuer(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage);
+            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+            const storage = serviceWorker ? window.localStorage : null;
+            return await fetchFromIssuer(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage);
+        }
+        this.initPromise = localFuncAsync();
+        return this.initPromise.then((result) =>{
+            this.initPromise = null;
+            return result;
+        })
     }
 
     tryKeepExistingSessionPromise = null;
@@ -1028,9 +1039,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
              return result;
          })
      }
-     
+
+    userInfoPromise:Promise<any> = null;
      userInfoAsync(){
-         return userInfoAsync(this);
+         if(this.userInfoPromise !== null){
+             return this.userInfoPromise;
+         }
+         this.userInfoPromise = userInfoAsync(this);
+         return this.userInfoPromise.then(result =>{
+             this.userInfoPromise = null;
+             return result;
+         })
      }
      
      async destroyAsync(status) {
