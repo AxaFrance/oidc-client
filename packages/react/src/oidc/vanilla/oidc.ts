@@ -42,6 +42,7 @@ const performTokenRequestAsync= async (url, details, extras) => {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
+        //mode: 'cors',
         body: formBodyString,
     });
     if(response.status !== 200){

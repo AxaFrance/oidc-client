@@ -259,14 +259,14 @@ const handleFetch = async (event) => {
                     resolve(r);
                 } else{
                     console.log("success undefined");
-                    reject(new Error("Response is undefined inside a success"));
+                    //reject(new Error("Response is undefined inside a success"));
                 }
             }).catch(err => {
                 if(err !== undefined) {
                     reject(err);
                 } else{
                     console.log("error undefined");
-                    reject(new Error("Response is undefined inside a error"));
+                    //reject(new Error("Response is undefined inside a error"));
                 }
             });
         });

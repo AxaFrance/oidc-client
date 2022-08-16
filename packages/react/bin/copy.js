@@ -17,7 +17,7 @@ const applyCopy=(input) => {
             const trustedDomainsFilename = "OidcTrustedDomains.js";
             const trustedDomainsDestinationPath = path.join(destinationPath, `${trustedDomainsFilename}`);
             if(!fs.existsSync(trustedDomainsDestinationPath)){
-                fs.copyFileSync(path.join(__dirname, "..", "dist", "trustedDomainsFilename"), trustedDomainsDestinationPath);
+                fs.copyFileSync(path.join(__dirname, "..", "dist", trustedDomainsFilename), trustedDomainsDestinationPath);
                 console.log(`File copied successfully at ${trustedDomainsDestinationPath}`);
             }
         }
