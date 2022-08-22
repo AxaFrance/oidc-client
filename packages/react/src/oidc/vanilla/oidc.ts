@@ -936,7 +936,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         case "NOT_CONNECTED":
                             return {tokens:null, status:null};
                         case "TOKENS_VALID":
+                            return {tokens, status:"LOGGED_IN"};
                         case "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID":
+                            this.publishEvent(Oidc.eventNames.token_renewed, {});
                             return {tokens, status:"LOGGED_IN"};
                         case "LOGOUT_FROM_ANOTHER_TAB":
                             this.publishEvent(eventNames.logout_from_another_tab, {"status": "session syncTokensAsync"});
