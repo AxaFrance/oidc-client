@@ -330,7 +330,7 @@ export class Oidc {
         
         this.configuration = {...configuration, 
             silent_login_uri, 
-            monitor_session: configuration.monitor_session ?? true,
+            monitor_session: configuration.monitor_session ?? false,
             refresh_time_before_tokens_expiration_in_second : configuration.refresh_time_before_tokens_expiration_in_second ?? 60,
             silent_login_timeout: configuration.silent_login_timeout ?? 12000,
         };
