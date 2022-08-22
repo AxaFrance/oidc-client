@@ -1086,7 +1086,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
      
-    async logoutAsync(callbackPathOrUrl: string | undefined = undefined, extras: StringMap = null) {
+    async logoutAsync(callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) {
         const configuration = this.configuration;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         if(callbackPathOrUrl && (typeof callbackPathOrUrl !== 'string'))
@@ -1113,13 +1113,27 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
         
         if(oidcServerConfiguration.endSessionEndpoint) {
-            let extraQueryString = "";
-            if(extras){
-                for (let [key, value] of Object.entries(extras)) {
-                    extraQueryString +=`&${key}=${encodeURIComponent(value)}`;
+            if(!extras){
+                extras= {
+                    id_token_hint: idToken
+                };
+                if(callbackPathOrUrl !== null){
+                    extras["post_logout_redirect_uri"] = url;
                 }
             }
-            window.location.href = `${oidcServerConfiguration.endSessionEndpoint}?post_logout_redirect_uri=${encodeURIComponent(url)}&id_token_hint=${idToken}${extraQueryString}`;
+            let queryString = "";
+            if(extras){
+                for (let [key, value] of Object.entries(extras)) {
+                    if(queryString === "")
+                    {
+                        queryString += "?";
+                    } else{
+                        queryString += "&";
+                    }
+                    queryString +=`${key}=${encodeURIComponent(value)}`;
+                }
+            }
+            window.location.href = `${oidcServerConfiguration.endSessionEndpoint}${queryString}`;
         }
         else{
             window.location.reload();

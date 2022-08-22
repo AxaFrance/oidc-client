@@ -14,7 +14,8 @@ export const Home = () => {
                     {!isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button></p>}
                     {!isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => login('/profile', null, "youhou")}>Login with state</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('/profile')}>logout /profile</button></p>}
-                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('')}>logout</button></p>}
+                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button></p>}
+                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout(null)}>logout whithout callbackredirect</button></p>}
                 </div>
             </div>
         </div>
