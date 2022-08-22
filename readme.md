@@ -125,6 +125,38 @@ const trustedDomains = {
 };
 ```
 
+How to consume
+
+"useOidc" returns all props from the Hook :
+
+```javascript
+import React from 'react';
+import {useOidc} from "./oidc";
+
+export const Home = () => {
+
+    const { login, logout, isAuthenticated} = useOidc();
+    
+    return (
+        <div className="container-fluid mt-3">
+            <div className="card">
+                <div className="card-body">
+                    <h5 className="card-title">Welcome !!!</h5>
+                    <p className="card-text">React Demo Application protected by OpenId Connect</p>
+                    {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
+                    {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
+                </div>
+            </div>
+        </div>
+    )
+};
+
+```
+The Hook method exposes :
+- isAuthenticated : if the user is logged in or not
+- logout: logout function (return a promise)
+- login: login function 'return a promise'
+
 "OidcSecure" component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
 
 ```javascript

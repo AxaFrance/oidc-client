@@ -3,7 +3,7 @@ import {useOidc} from "./oidc";
 
 export const Home = () => {
 
-    const { login, logout, isAuthenticated} = useOidc();
+    const { login, logout, renewTokens, isAuthenticated} = useOidc();
 
     return (
         <div className="container-fluid mt-3">
@@ -16,6 +16,7 @@ export const Home = () => {
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('/profile')}>logout /profile</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout(null)}>logout whithout callbackredirect</button></p>}
+                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => renewTokens()}>renew tokens</button></p>}
                 </div>
             </div>
         </div>

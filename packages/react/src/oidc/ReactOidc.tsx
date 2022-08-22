@@ -39,8 +39,10 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
     const logout = (callbackPath: string | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).logoutAsync(callbackPath, extras);
     };
-
-    return { login, logout, isAuthenticated };
+    const renewTokens = () => {
+        return getOidc(configurationName).renewTokensAsync();
+    };
+    return { login, logout, renewTokens, isAuthenticated };
 }
 
 const accessTokenInitialState = {accessToken:null, accessTokenPayload:null};

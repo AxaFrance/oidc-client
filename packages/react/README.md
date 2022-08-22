@@ -175,7 +175,7 @@ import {useOidc} from "./oidc";
 
 export const Home = () => {
 
-    const { login, logout, isAuthenticated} = useOidc();
+    const { login, logout, renewTokens, isAuthenticated} = useOidc();
     
     return (
         <div className="container-fluid mt-3">
@@ -185,6 +185,7 @@ export const Home = () => {
                     <p className="card-text">React Demo Application protected by OpenId Connect</p>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
+                    {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => renewTokens()}>renewTokens</button>}
                 </div>
             </div>
         </div>
@@ -196,6 +197,7 @@ The Hook method exposes :
 - isAuthenticated : if the user is logged in or not
 - logout: logout function (return a promise)
 - login: login function 'return a promise'
+- renewTokens: renew tokens function 'return a promise'
 
 ## How to secure a component
 
