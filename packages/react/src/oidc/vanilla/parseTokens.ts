@@ -61,6 +61,7 @@ export const setTokens = (tokens) =>{
 }
 
 
+
 export const parseOriginalTokens= (tokens) =>{
     if(!tokens){
         return null;
@@ -104,4 +105,13 @@ export const isTokensValid= (tokens) =>{
         return false;
     }
     return computeTimeLeft(0, tokens.expiresAt) > 0;
+}
+
+// https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation (excluding rules #1, #4, #5, #7, #8, #12, and #13 which did not apply).
+// https://github.com/openid/AppAuth-JS/issues/65
+export const isTokensOidcValid =(tokens, nonce) =>{
+    if(tokens.idTokenPayload && tokens.idTokenPayload.nonce !== nonce){
+        return false;
+    }
+    return true;
 }

@@ -19,7 +19,7 @@ import timer from './timer';
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
-import {computeTimeLeft, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
+import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
 
 const performTokenRequestAsync= async (url, details, extras) => {
     
@@ -636,6 +636,15 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     scope = configuration.scope;
                 }
 
+                const randomString = function(length) {
+                    let text = "";
+                    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    for(let i = 0; i < length; i++) {
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    return text;
+                }
+
                 setLoginParams(this.configurationName, redirectUri, {callbackPath: url, extras, state});
                 
                 let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
@@ -646,13 +655,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
                     storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
                     await storage.setItem("dummy", {});
+                    
                 } else {
                     const session = initSession(this.configurationName, redirectUri);
                     storage = new MemoryStorageBackend(session.saveItemsAsync, {});
                 }
+                const generatedNonce = randomString(12)
+                await storage.setItem("nonce", {"nonce":generatedNonce});
 
                 const extraFinal = extras ?? configuration.extras ?? {};
-
+                
+                extraFinal["nonce"] = generatedNonce;
                 // @ts-ignore
                 const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
                 const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
@@ -787,13 +800,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 await storage.removeItem("dummy");
                 await serviceWorker.setSessionStateAsync(sessionState);
             }else{
-                
                 this.session = initSession(this.configurationName, redirectUri, configuration.storage ?? sessionStorage);
                 const session = initSession(this.configurationName, redirectUri);
                 session.setSessionState(sessionState);
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
             }
+
+            
             return new Promise((resolve, reject) => {
                 // @ts-ignore
                 let queryStringUtil = new NoHashQueryStringUtils();
@@ -853,6 +867,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 if (serviceWorker) {
                                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
                                     tokenResponse = tokens;
+                                }
+                                const nonceData = await storage.getItem("nonce");
+                                if(!isTokensOidcValid(tokenResponse, nonceData.nonce)){
+                                    throw new Error("Tokens are not OpenID valid");
                                 }
 
                                 // @ts-ignore

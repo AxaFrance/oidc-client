@@ -20,6 +20,7 @@ let database = {
         tokens: null,
         status:null,
         items:[],
+        nonce: null,
         oidcServerConfiguration: null
     }
 };
@@ -54,6 +55,15 @@ const isTokensValid= (tokens) =>{
         return false;
     }
     return computeTimeLeft(0, tokens.expiresAt) > 0;
+}
+
+// https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation (excluding rules #1, #4, #5, #7, #8, #12, and #13 which did not apply).
+// https://github.com/openid/AppAuth-JS/issues/65
+const isTokensOidcValid =(tokens, nonce) =>{
+    if(tokens.idTokenPayload && tokens.idTokenPayload.nonce !== nonce){
+        return false;
+    }
+    return true;
 }
 
 function hideTokens(currentDatabaseElement) {
@@ -92,6 +102,10 @@ function hideTokens(currentDatabaseElement) {
             secureTokens.expiresAt = expiresAt;
             const body = JSON.stringify(secureTokens);
             tokens.expiresAt = expiresAt;
+
+            if(!isTokensOidcValid(tokens, currentDatabaseElement.nonce.nonce)){
+                throw Error("Tokens are not OpenID valid");
+            }
             currentDatabaseElement.tokens = tokens;
             currentDatabaseElement.status = "LOGGED_IN";
             return new Response(body, response);
@@ -365,6 +379,9 @@ addEventListener('message', event => {
             port.postMessage({configurationName, sessionState});
             return;
         default:
+            if(data.data.nonce){
+                currentDatabase.nonce = data.data.nonce;
+            }
             currentDatabase.items = data.data;
             port.postMessage({configurationName});
             return;
