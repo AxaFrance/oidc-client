@@ -1,5 +1,5 @@
 import React, {useReducer} from 'react';
-import {BrowserRouter, Route, Link, Routes} from 'react-router-dom';
+import {BrowserRouter, Route, NavLink, Routes} from 'react-router-dom';
 import { Home } from "./Home";
 import { Profile, SecureProfile } from "./Profile";
 import { configurationAuth0, configurationIdentityServer, configurationIdentityServerWithoutDiscovery } from './configurations';
@@ -45,25 +45,25 @@ function App() {
           <div style={show ? { display: "block" } : { display: 'none' }} className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav">
               <li className="nav-item">
-                <Link className="nav-link" to="/">Home</Link>
+                <NavLink className="nav-link" to="/">Home</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/profile">Profile</Link>
+                <NavLink className="nav-link" to="/profile">Profile</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/profile-secure-component">Secure Profile Component</Link>
+                <NavLink className="nav-link" to="/profile-secure-component">Secure Profile Component</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/profile-secure-hoc">Secure Profile Hoc</Link>
+                <NavLink className="nav-link" to="/profile-secure-hoc">Secure Profile Hoc</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/user-fetch-secure-hoc">Secure User Fetch Hoc</Link>
+                <NavLink className="nav-link" to="/user-fetch-secure-hoc">Secure User Fetch Hoc</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/user-fetch-secure-hook">Secure User Fetch Hook</Link>
+                <NavLink className="nav-link" to="/user-fetch-secure-hook">Secure User Fetch Hook</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/multi-auth">Multi Auth</Link>
+                <NavLink className="nav-link" to="/multi-auth">Multi Auth</NavLink>
               </li>
             </ul>
           </div>
