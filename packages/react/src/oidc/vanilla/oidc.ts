@@ -665,12 +665,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const session = initSession(this.configurationName, redirectUri);
                     storage = new MemoryStorageBackend(session.saveItemsAsync, {});
                 }
-                const generatedNonce = randomString(12)
-                await storage.setItem("nonce", {"nonce":generatedNonce});
+               
 
                 const extraFinal = extras ?? configuration.extras ?? {};
                 
-                extraFinal["nonce"] = generatedNonce;
+                if(!extraFinal.nonce) {
+                    extraFinal["nonce"] = randomString(12);
+                }
+                await storage.setItem("nonce", {"nonce":extraFinal.nonce});
                 // @ts-ignore
                 const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
                 const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
@@ -875,7 +877,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 }
                                 const nonceData = await storage.getItem("nonce");
                                 if(!isTokensOidcValid(tokenResponse, nonceData.nonce, oidcServerConfiguration)){
-                                    throw new Error("Tokens are not OpenID valid");
+                                    const exception = new Error("Tokens are not OpenID valid");
+                                    if(timeoutId) {
+                                        clearTimeout(timeoutId);
+                                        this.timeoutId=null;
+                                        this.publishEvent(eventNames.loginCallbackAsync_error, exception);
+                                        console.error(exception);
+                                        reject(exception);
+                                    }
                                 }
 
                                 // @ts-ignore
