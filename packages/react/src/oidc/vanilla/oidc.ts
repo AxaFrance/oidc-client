@@ -1003,6 +1003,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
                             const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
                             if (tokenResponse.success) {
+                                if(!isTokensOidcValid(tokenResponse.data, null, oidcServerConfiguration)){
+                                    this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
+                                    return {tokens:null, status:"SESSION_LOST"};
+                                }
                                 this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
                                 this.publishEvent(Oidc.eventNames.token_renewed, {});
                                 return {tokens: tokenResponse.data, status:"LOGGED_IN"};
