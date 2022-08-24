@@ -80,10 +80,12 @@ const internalFetch = async (url, headers, numberRetry=0) => {
 
 export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
     check_session_iframe?: string;
+    issuer:string;
 }
 
 export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceConfiguration{
     private check_session_iframe: string;
+    private issuer: string;
     
     constructor(request: any) {
         super(request);
@@ -92,6 +94,7 @@ export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceC
         this.revocationEndpoint = request.revocation_endpoint;
         this.userInfoEndpoint = request.userinfo_endpoint;
         this.check_session_iframe = request.check_session_iframe;
+        this.issuer = request.issuer;
     }
     
 }
@@ -113,6 +116,7 @@ export interface AuthorityConfiguration {
     end_session_endpoint?: string;
     userinfo_endpoint?: string;
     check_session_iframe?:string;
+    issuer:string;
 }
 
  export type OidcConfiguration = {
@@ -519,6 +523,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     token_endpoint: authorityConfiguration.token_endpoint,
                     userinfo_endpoint: authorityConfiguration.userinfo_endpoint,
                     check_session_iframe: authorityConfiguration.check_session_iframe,
+                    issuer: authorityConfiguration.issuer,
                 });
             }
 
@@ -869,7 +874,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                     tokenResponse = tokens;
                                 }
                                 const nonceData = await storage.getItem("nonce");
-                                if(!isTokensOidcValid(tokenResponse, nonceData.nonce)){
+                                if(!isTokensOidcValid(tokenResponse, nonceData.nonce, oidcServerConfiguration)){
                                     throw new Error("Tokens are not OpenID valid");
                                 }
 
