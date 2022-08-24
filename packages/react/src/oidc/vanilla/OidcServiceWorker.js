@@ -112,9 +112,9 @@ function hideTokens(currentDatabaseElement) {
             if(tokens.id_token) {
                 _idTokenPayload = extractTokenPayload(tokens.id_token);
                 tokens.idTokenPayload = {..._idTokenPayload};
-                if(_idTokenPayload.nonce){
+                /*if(_idTokenPayload.nonce){
                     _idTokenPayload.nonce = NONCE + "_" + configurationName;
-                }
+                }*/
                 secureTokens.idTokenPayload = _idTokenPayload;
             }
             if(tokens.refresh_token){
