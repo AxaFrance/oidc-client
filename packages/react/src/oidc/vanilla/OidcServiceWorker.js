@@ -20,6 +20,7 @@ let database = {
         tokens: null,
         status:null,
         items:[],
+        nonce: null,
         oidcServerConfiguration: null
     }
 };
@@ -56,6 +57,37 @@ const isTokensValid= (tokens) =>{
     return computeTimeLeft(0, tokens.expiresAt) > 0;
 }
 
+// https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation (excluding rules #1, #4, #5, #7, #8, #12, and #13 which did not apply).
+// https://github.com/openid/AppAuth-JS/issues/65
+const isTokensOidcValid =(tokens, nonce, oidcServerConfiguration) =>{
+    if(tokens.idTokenPayload) {
+        const idTokenPayload = tokens.idTokenPayload;
+        // 2: The Issuer Identifier for the OpenID Provider (which is typically obtained during Discovery) MUST exactly match the value of the iss (issuer) Claim.
+        if(oidcServerConfiguration.issuer !==  idTokenPayload.iss){
+            return false;
+        }
+        // 3: The Client MUST validate that the aud (audience) Claim contains its client_id value registered at the Issuer identified by the iss (issuer) Claim as an audience. The aud (audience) Claim MAY contain an array with more than one element. The ID Token MUST be rejected if the ID Token does not list the Client as a valid audience, or if it contains additional audiences not trusted by the Client.
+
+        // 6: If the ID Token is received via direct communication between the Client and the Token Endpoint (which it is in this flow), the TLS server validation MAY be used to validate the issuer in place of checking the token signature. The Client MUST validate the signature of all other ID Tokens according to JWS [JWS] using the algorithm specified in the JWT alg Header Parameter. The Client MUST use the keys provided by the Issuer.
+
+        // 9: The current time MUST be before the time represented by the exp Claim.
+        const currentTimeUnixSecond = new Date().getTime() /1000;
+        if(idTokenPayload.exp && idTokenPayload.exp < currentTimeUnixSecond) {
+            return false;
+        }
+        // 10: The iat Claim can be used to reject tokens that were issued too far away from the current time, limiting the amount of time that nonces need to be stored to prevent attacks. The acceptable range is Client specific.
+        const timeInSevenDays = 60 * 60 * 24 * 7;
+        if(idTokenPayload.iat && (idTokenPayload.iat + timeInSevenDays) < currentTimeUnixSecond) {
+            return false;
+        }
+        // 11: If a nonce value was sent in the Authentication Request, a nonce Claim MUST be present and its value checked to verify that it is the same value as the one that was sent in the Authentication Request. The Client SHOULD check the nonce value for replay attacks. The precise method for detecting replay attacks is Client specific.
+        if (idTokenPayload.nonce && idTokenPayload.nonce !== nonce) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function hideTokens(currentDatabaseElement) {
     const configurationName = currentDatabaseElement.configurationName;
     return (response) => {
@@ -79,8 +111,12 @@ function hideTokens(currentDatabaseElement) {
             let _idTokenPayload = null;
             if(tokens.id_token) {
                 _idTokenPayload = extractTokenPayload(tokens.id_token);
+                tokens.idTokenPayload = {..._idTokenPayload};
+                if(_idTokenPayload.nonce) {
+                    const keyNonce = NONCE_TOKEN + '_'+ currentDatabaseElement.configurationName;
+                    _idTokenPayload.nonce = keyNonce;
+                }
                 secureTokens.idTokenPayload = _idTokenPayload;
-                tokens.idTokenPayload = _idTokenPayload;
             }
             if(tokens.refresh_token){
                 secureTokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
@@ -92,6 +128,10 @@ function hideTokens(currentDatabaseElement) {
             secureTokens.expiresAt = expiresAt;
             const body = JSON.stringify(secureTokens);
             tokens.expiresAt = expiresAt;
+
+            if(!isTokensOidcValid(tokens, currentDatabaseElement.nonce.nonce, currentDatabaseElement.oidcServerConfiguration)){
+                throw Error("Tokens are not OpenID valid");
+            }
             currentDatabaseElement.tokens = tokens;
             currentDatabaseElement.status = "LOGGED_IN";
             return new Response(body, response);
@@ -138,7 +178,7 @@ const getCurrentDatabaseDomain = (database, url) => {
             }
         }
 
-        if(hasToSendToken){
+        if(hasToSendToken) {
             if(!currentDatabase.tokens) {
                 return null;
             }
@@ -159,6 +199,7 @@ const serializeHeaders = (headers) => {
 
 const REFRESH_TOKEN = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
+const NONCE_TOKEN = 'NONCE_SECURED_BY_OIDC_SERVICE_WORKER';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -215,11 +256,14 @@ const handleFetch = async (event) => {
                     let newBody = actualBody;
                     for(let i= 0;i<numberDatabase;i++){
                         const currentDb = currentDatabases[i];
-                        const key = REFRESH_TOKEN + '_'+ currentDb.configurationName;
-                        if(currentDb && currentDb.tokens != null && actualBody.includes(key)) {
-                            newBody = newBody.replace(key, encodeURIComponent(currentDb.tokens.refresh_token));
-                            currentDatabase = currentDb;
-                            break;
+
+                        if(currentDb && currentDb.tokens != null) {
+                            const keyRefreshToken = REFRESH_TOKEN + '_'+ currentDb.configurationName;
+                            if(actualBody.includes(keyRefreshToken)) {
+                                newBody = newBody.replace(keyRefreshToken, encodeURIComponent(currentDb.tokens.refresh_token));
+                                currentDatabase = currentDb;
+                                break;
+                            }
                         }
                     }
 
@@ -327,6 +371,8 @@ addEventListener('message', event => {
             checkDomain(domains, tokenEndpoint);
             const userInfoEndpoint = oidcServerConfiguration.userInfoEndpoint;
             checkDomain(domains, userInfoEndpoint);
+            const issuer = oidcServerConfiguration.issuer;
+            checkDomain(domains, issuer);
             currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
             const where = data.data.where;
             if(where === "loginCallbackAsync" || where === "tryKeepExistingSessionAsync") {
@@ -348,6 +394,9 @@ addEventListener('message', event => {
                 if(tokens.refresh_token){
                     tokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
                 }
+                if(tokens.idTokenPayload && tokens.idTokenPayload.nonce){
+                    tokens.idTokenPayload.nonce =  NONCE_TOKEN + "_" + configurationName;
+                }
                 port.postMessage({
                     tokens,
                     status: currentDatabase.status,
@@ -364,8 +413,12 @@ addEventListener('message', event => {
             const sessionState = currentDatabase.sessionState;
             port.postMessage({configurationName, sessionState});
             return;
+        case "setNonce":
+            currentDatabase.nonce = data.data.nonce;
+            port.postMessage({configurationName});
+            return;
         default:
-            currentDatabase.items = data.data;
+            currentDatabase.items = { ...data.data };
             port.postMessage({configurationName});
             return;
     }

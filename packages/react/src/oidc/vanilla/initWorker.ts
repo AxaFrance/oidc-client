@@ -138,6 +138,16 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return result.sessionState;
     }
 
+    const setNonceAsync = (nonce) => {
+        return sendMessageAsync(registration)({type: "setNonce", data: {nonce}, configurationName});
+    }
+    const NONCE_TOKEN = 'NONCE_SECURED_BY_OIDC_SERVICE_WORKER';
+    const getNonceAsync= async () => {
+        // @ts-ignore
+        const keyNonce = NONCE_TOKEN + '_'+ configurationName;
+        return {nonce:keyNonce};
+    }
+
     return { 
         saveItemsAsync, 
         loadItemsAsync, 
@@ -148,6 +158,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         isServiceWorkerProxyActiveAsync,
         setSessionStateAsync,
         getSessionStateAsync,
+        setNonceAsync,
+        getNonceAsync,
         unregisterAsync,
     };
 }

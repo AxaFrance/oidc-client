@@ -19,7 +19,7 @@ import timer from './timer';
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
-import {computeTimeLeft, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
+import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
 
 const performTokenRequestAsync= async (url, details, extras) => {
     
@@ -80,10 +80,12 @@ const internalFetch = async (url, headers, numberRetry=0) => {
 
 export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
     check_session_iframe?: string;
+    issuer:string;
 }
 
 export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceConfiguration{
     private check_session_iframe: string;
+    private issuer: string;
     
     constructor(request: any) {
         super(request);
@@ -92,6 +94,7 @@ export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceC
         this.revocationEndpoint = request.revocation_endpoint;
         this.userInfoEndpoint = request.userinfo_endpoint;
         this.check_session_iframe = request.check_session_iframe;
+        this.issuer = request.issuer;
     }
     
 }
@@ -113,6 +116,7 @@ export interface AuthorityConfiguration {
     end_session_endpoint?: string;
     userinfo_endpoint?: string;
     check_session_iframe?:string;
+    issuer:string;
 }
 
  export type OidcConfiguration = {
@@ -519,6 +523,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     token_endpoint: authorityConfiguration.token_endpoint,
                     userinfo_endpoint: authorityConfiguration.userinfo_endpoint,
                     check_session_iframe: authorityConfiguration.check_session_iframe,
+                    issuer: authorityConfiguration.issuer,
                 });
             }
 
@@ -636,23 +641,38 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     scope = configuration.scope;
                 }
 
+                const randomString = function(length) {
+                    let text = "";
+                    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    for(let i = 0; i < length; i++) {
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    return text;
+                }
+
                 setLoginParams(this.configurationName, redirectUri, {callbackPath: url, extras, state});
-                
+                const extraFinal = extras ?? configuration.extras ?? {};
+                if(!extraFinal.nonce) {
+                    extraFinal["nonce"] = randomString(12);
+                }
+                const nonce = {"nonce":extraFinal.nonce};
                 let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
                 let storage;
                 if (serviceWorker) {
                     serviceWorker.startKeepAliveServiceWorker();
                     await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                    await serviceWorker.setNonceAsync(nonce);
                     storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
                     await storage.setItem("dummy", {});
+                    
                 } else {
                     const session = initSession(this.configurationName, redirectUri);
+                    await session.setNonceAsync(nonce);
                     storage = new MemoryStorageBackend(session.saveItemsAsync, {});
                 }
-
-                const extraFinal = extras ?? configuration.extras ?? {};
-
+                
+                
                 // @ts-ignore
                 const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
                 const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
@@ -774,6 +794,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const sessionState =  queryParams.session_state;
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
+            let nonceData = null;
             if(serviceWorker){
                 serviceWorker.startKeepAliveServiceWorker();
                 this.serviceWorker = serviceWorker;
@@ -786,14 +807,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
                 await storage.removeItem("dummy");
                 await serviceWorker.setSessionStateAsync(sessionState);
+                nonceData = await serviceWorker.getNonceAsync();
             }else{
-                
                 this.session = initSession(this.configurationName, redirectUri, configuration.storage ?? sessionStorage);
                 const session = initSession(this.configurationName, redirectUri);
                 session.setSessionState(sessionState);
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
+                nonceData = await session.getNonceAsync();
             }
+
             return new Promise((resolve, reject) => {
                 // @ts-ignore
                 let queryStringUtil = new NoHashQueryStringUtils();
@@ -853,6 +876,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 if (serviceWorker) {
                                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
                                     tokenResponse = tokens;
+                                };
+                                if(!isTokensOidcValid(tokenResponse, nonceData.nonce, oidcServerConfiguration)){
+                                    const exception = new Error("Tokens are not OpenID valid");
+                                    if(timeoutId) {
+                                        clearTimeout(timeoutId);
+                                        this.timeoutId=null;
+                                        this.publishEvent(eventNames.loginCallbackAsync_error, exception);
+                                        console.error(exception);
+                                        reject(exception);
+                                    }
                                 }
 
                                 // @ts-ignore
@@ -971,6 +1004,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
                             const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
                             if (tokenResponse.success) {
+                                if(!isTokensOidcValid(tokenResponse.data, null, oidcServerConfiguration)){
+                                    this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
+                                    return {tokens:null, status:"SESSION_LOST"};
+                                }
                                 this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
                                 this.publishEvent(Oidc.eventNames.token_renewed, {});
                                 return {tokens: tokenResponse.data, status:"LOGGED_IN"};
