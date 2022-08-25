@@ -47,7 +47,6 @@
     }
 
     const getTokens = () => {
-       
         if(!storage[`oidc.${configurationName}:${redirectUri}`]){
             return null;
         }
