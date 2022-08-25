@@ -36,13 +36,13 @@
     }
 
     const setNonceAsync = (nonce) => {
-        storage[`oidc.nonce.${configurationName}:${redirectUri}`] = nonce.nonce;
+        localStorage[`oidc.nonce.${configurationName}:${redirectUri}`] = nonce.nonce;
     }
 
     const getNonceAsync= async () => {
         // @ts-ignore
-        const result =  {nonce: storage[`oidc.nonce.${configurationName}:${redirectUri}`]};
-        storage[`oidc.nonce.${configurationName}:${redirectUri}`] = "";
+        const result =  {nonce: localStorage[`oidc.nonce.${configurationName}:${redirectUri}`]};
+        localStorage[`oidc.nonce.${configurationName}:${redirectUri}`] = "";
         return result;
     }
 
