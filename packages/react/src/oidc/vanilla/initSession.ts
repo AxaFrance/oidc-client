@@ -35,6 +35,17 @@
         return storage[`oidc.session_state.${configurationName}:${redirectUri}`];
     }
 
+    const setNonceAsync = (nonce) => {
+        storage[`oidc.nonce.${configurationName}:${redirectUri}`] = nonce.nonce;
+    }
+
+    const getNonceAsync= async () => {
+        // @ts-ignore
+        const result =  {nonce: storage[`oidc.nonce.${configurationName}:${redirectUri}`]};
+        storage[`oidc.nonce.${configurationName}:${redirectUri}`] = "";
+        return result;
+    }
+
     const getTokens = () => {
        
         if(!storage[`oidc.${configurationName}:${redirectUri}`]){
@@ -43,5 +54,16 @@
         return JSON.stringify({ tokens : JSON.parse(storage[`oidc.${configurationName}:${redirectUri}`]).tokens });
     }
 
-    return { saveItemsAsync, loadItemsAsync, clearAsync, initAsync, setTokens, getTokens, setSessionState, getSessionState };
+    return {
+        saveItemsAsync, 
+        loadItemsAsync, 
+        clearAsync, 
+        initAsync, 
+        setTokens, 
+        getTokens, 
+        setSessionState, 
+        getSessionState,
+        setNonceAsync,
+        getNonceAsync
+    };
 }

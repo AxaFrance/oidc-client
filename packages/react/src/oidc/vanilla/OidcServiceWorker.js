@@ -112,15 +112,16 @@ function hideTokens(currentDatabaseElement) {
             if(tokens.id_token) {
                 _idTokenPayload = extractTokenPayload(tokens.id_token);
                 tokens.idTokenPayload = {..._idTokenPayload};
-                /*if(_idTokenPayload.nonce){
-                    _idTokenPayload.nonce = NONCE + "_" + configurationName;
-                }*/
+                if(_idTokenPayload.nonce) {
+                    const keyNonce = NONCE_TOKEN + '_'+ currentDatabaseElement.configurationName;
+                    _idTokenPayload.nonce = keyNonce;
+                }
                 secureTokens.idTokenPayload = _idTokenPayload;
             }
             if(tokens.refresh_token){
                 secureTokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
             }
-            
+
             const idTokenExpiresAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
             const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issued_at + tokens.expires_in;
             const expiresAt = idTokenExpiresAt < accessTokenExpiresAt ? idTokenExpiresAt : accessTokenExpiresAt;
@@ -198,7 +199,7 @@ const serializeHeaders = (headers) => {
 
 const REFRESH_TOKEN = 'REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
-const NONCE = 'NONCE_SECURED_BY_OIDC_SERVICE_WORKER';
+const NONCE_TOKEN = 'NONCE_SECURED_BY_OIDC_SERVICE_WORKER';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -393,6 +394,9 @@ addEventListener('message', event => {
                 if(tokens.refresh_token){
                     tokens.refresh_token = REFRESH_TOKEN + "_" + configurationName;
                 }
+                if(tokens.idTokenPayload && tokens.idTokenPayload.nonce){
+                    tokens.idTokenPayload.nonce =  NONCE_TOKEN + "_" + configurationName;
+                }
                 port.postMessage({
                     tokens,
                     status: currentDatabase.status,
@@ -409,11 +413,12 @@ addEventListener('message', event => {
             const sessionState = currentDatabase.sessionState;
             port.postMessage({configurationName, sessionState});
             return;
+        case "setNonce":
+            currentDatabase.nonce = data.data.nonce;
+            port.postMessage({configurationName});
+            return;
         default:
-            if(data.data.nonce){
-                currentDatabase.nonce = data.data.nonce;
-            }
-            currentDatabase.items = data.data;
+            currentDatabase.items = { ...data.data };
             port.postMessage({configurationName});
             return;
     }

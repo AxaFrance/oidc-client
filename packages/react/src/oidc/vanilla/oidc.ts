@@ -651,28 +651,28 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
 
                 setLoginParams(this.configurationName, redirectUri, {callbackPath: url, extras, state});
-                
+                const extraFinal = extras ?? configuration.extras ?? {};
+                if(!extraFinal.nonce) {
+                    extraFinal["nonce"] = randomString(12);
+                }
+                const nonce = {"nonce":extraFinal.nonce};
                 let serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
                 let storage;
                 if (serviceWorker) {
                     serviceWorker.startKeepAliveServiceWorker();
                     await serviceWorker.initAsync(oidcServerConfiguration, "loginAsync");
+                    await serviceWorker.setNonceAsync(nonce);
                     storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
                     await storage.setItem("dummy", {});
                     
                 } else {
                     const session = initSession(this.configurationName, redirectUri);
+                    await session.setNonceAsync(nonce);
                     storage = new MemoryStorageBackend(session.saveItemsAsync, {});
                 }
-               
-
-                const extraFinal = extras ?? configuration.extras ?? {};
                 
-                if(!extraFinal.nonce) {
-                    extraFinal["nonce"] = randomString(12);
-                }
-                await storage.setItem("nonce", {"nonce":extraFinal.nonce});
+                
                 // @ts-ignore
                 const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
                 const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
@@ -794,6 +794,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const sessionState =  queryParams.session_state;
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
             let storage = null;
+            let nonceData = null;
             if(serviceWorker){
                 serviceWorker.startKeepAliveServiceWorker();
                 this.serviceWorker = serviceWorker;
@@ -806,15 +807,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
                 await storage.removeItem("dummy");
                 await serviceWorker.setSessionStateAsync(sessionState);
+                nonceData = await serviceWorker.getNonceAsync();
             }else{
                 this.session = initSession(this.configurationName, redirectUri, configuration.storage ?? sessionStorage);
                 const session = initSession(this.configurationName, redirectUri);
                 session.setSessionState(sessionState);
                 const items = await session.loadItemsAsync();
                 storage = new MemoryStorageBackend(session.saveItemsAsync, items);
+                nonceData = await session.getNonceAsync();
             }
 
-            
             return new Promise((resolve, reject) => {
                 // @ts-ignore
                 let queryStringUtil = new NoHashQueryStringUtils();
@@ -874,8 +876,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 if (serviceWorker) {
                                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
                                     tokenResponse = tokens;
-                                }
-                                const nonceData = await storage.getItem("nonce");
+                                };
                                 if(!isTokensOidcValid(tokenResponse, nonceData.nonce, oidcServerConfiguration)){
                                     const exception = new Error("Tokens are not OpenID valid");
                                     if(timeoutId) {

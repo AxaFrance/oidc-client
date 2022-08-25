@@ -51,7 +51,7 @@ export const setTokens = (tokens) =>{
     else {
         accessTokenPayload = extractAccessTokenPayload(tokens);
     }
-    const _idTokenPayload = idTokenPayload(tokens.idToken);
+    const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : idTokenPayload(tokens.idToken);
 
     const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
     const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
