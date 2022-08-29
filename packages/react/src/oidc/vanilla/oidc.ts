@@ -154,8 +154,8 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
     return { state, callbackPath };
 }
 
-async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh =false) {
-    const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh);
+async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh =false, extras:StringMap=null) {
+    const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras);
     oidc.tokens = tokens;
     const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
     if (!serviceWorker) {
@@ -169,7 +169,7 @@ async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh =f
     }
 
     if (oidc.timeoutId) {
-        oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt);
+        oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, extras);
     }
 }
 
@@ -946,7 +946,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
 
-    async synchroniseTokensAsync(refreshToken, index=0, forceRefresh =false) {
+    async synchroniseTokensAsync(refreshToken, index=0, forceRefresh =false, extras:StringMap=null) {
         
             if (document.hidden) {
                 await sleepAsync(1000);
@@ -959,13 +959,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 numberTryOnline--;
                 this.publishEvent(eventNames.refreshTokensAsync, {message: `wait because navigator is offline try ${numberTryOnline}` });
             }
-
+        if(!extras){
+            extras = {}
+        }
         const configuration = this.configuration;
         const localsilentLoginAsync= async () => {
             try {
                 const loginParams = getLoginParams(this.configurationName, configuration.redirect_uri);
+                
                 const silent_token_response = await this.silentLoginAsync({
                     ...loginParams.extras,
+                    ...extras,
                     prompt: "none"
                 }, loginParams.state);
                 if (silent_token_response) {
@@ -988,7 +992,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             
             if (index <=4) {
                 try {
-                    
                     const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens, forceRefresh);
                     switch (status) {
                         case "SESSION_LOST":
@@ -1017,12 +1020,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             const clientId = configuration.client_id;
                             const redirectUri = configuration.redirect_uri;
                             const authority =  configuration.authority;
-                            let extras = {};
-                            if(configuration.token_request_extras) {
-                                for (let [key, value] of Object.entries(configuration.token_request_extras)) {
-                                    extras[key] = value;
-                                }
-                            }
+                            const tokenExtras = configuration.token_request_extras ? configuration.token_request_extras : {};
+                            let finalExtras = {...tokenExtras, ...extras};
+                            
                             const details = {
                                 client_id: clientId,
                                 redirect_uri: redirectUri,
@@ -1030,7 +1030,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 refresh_token: tokens.refreshToken,
                             };
                             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, extras)
+                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras)
                             if (tokenResponse.success) {
                                 if(!isTokensOidcValid(tokenResponse.data, null, oidcServerConfiguration)){
                                     this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
@@ -1127,13 +1127,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          })
      }
      
-     async renewTokensAsync (){
+     async renewTokensAsync (extras:StringMap=null){
          if(!this.timeoutId){
              return;
          }
          timer.clearTimeout(this.timeoutId);
          // @ts-ignore
-         await renewTokensAndStartTimerAsync(this, this.tokens.refreshToken, true);
+         await renewTokensAndStartTimerAsync(this, this.tokens.refreshToken, true, extras);
      }
      
      async destroyAsync(status) {
