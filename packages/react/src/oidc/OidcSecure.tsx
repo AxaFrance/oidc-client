@@ -9,16 +9,16 @@ export type OidcSecureProps = {
     state?: string|undefined;
 };
 
-export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, extras=null, configurationName="default", state=undefined}) => {
+export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, extras=null, configurationName="default"}) => {
     const getOidc =  Oidc.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
-            oidc.loginAsync(callbackPath, extras, state);
+            oidc.loginAsync(callbackPath, extras);
         }
         return () => {
         }
-    }, [configurationName, callbackPath, extras, state])
+    }, [configurationName, callbackPath, extras])
 
     if(!oidc.tokens){
       return null;

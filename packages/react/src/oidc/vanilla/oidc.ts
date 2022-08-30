@@ -173,13 +173,13 @@ async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh =f
     }
 }
 
-const autoRenewTokens = (oidc, refreshToken, expiresAt) => {
+const autoRenewTokens = (oidc, refreshToken, expiresAt, extras:StringMap=null) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second;
     return timer.setTimeout(async () => {
         const timeLeft = computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond, expiresAt);
         const timeInfo = { timeLeft };
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
-        await renewTokensAndStartTimerAsync(oidc, refreshToken);
+        await renewTokensAndStartTimerAsync(oidc, refreshToken, false, extras);
     }, 1000);
 }
 
@@ -627,7 +627,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     loginPromise: Promise<any>=null;
-    async loginAsync(callbackPath:string=undefined, extras:StringMap=null, state:string=undefined, isSilentSignin:boolean=false, scope:string=undefined, silentLoginOnly = false) {
+    async loginAsync(callbackPath:string=undefined, extras:StringMap=null, isSilentSignin:boolean=false, scope:string=undefined, silentLoginOnly = false) {
         if(this.loginPromise !== null){
             return this.loginPromise;
         }
@@ -638,6 +638,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
                
                 const configuration = this.configuration;
+            let state = undefined;
+            if(extras && "state" in extras){
+                state = extras["state"];
+                delete extras["state"];
+            }
+           
 
                 if(silentLoginOnly){
                     try {
@@ -651,7 +657,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             this.tokens = silentResult.tokens;
                             this.publishEvent(eventNames.token_aquired, {});
                             // @ts-ignore
-                            this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt);
+                            this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt, extras);
                             return {};
                         }
                     }catch (e) {

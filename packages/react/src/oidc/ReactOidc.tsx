@@ -33,8 +33,8 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
         };
     }, [configurationName]);
 
-    const login = (callbackPath:string | undefined = undefined, extras:StringMap=null, state: string|undefined=undefined, silentLoginOnly = false) => {
-        return getOidc(configurationName).loginAsync(callbackPath, extras, state, false, undefined, silentLoginOnly);
+    const login = (callbackPath:string | undefined = undefined, extras:StringMap=null, silentLoginOnly = false) => {
+        return getOidc(configurationName).loginAsync(callbackPath, extras, false, undefined, silentLoginOnly);
     };
     const logout = (callbackPath: string | null | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).logoutAsync(callbackPath, extras);

@@ -38,7 +38,7 @@ const MultiAuth = ( {configurationName, handleConfigurationChange }) => {
                         <option value="config_with_hash">config_with_hash</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
-                    {!isAuthenticated && isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, undefined, null, true)}>Silent Login</button>}
+                    {!isAuthenticated && isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, undefined, true)}>Silent Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
                 </div>
             </div>
