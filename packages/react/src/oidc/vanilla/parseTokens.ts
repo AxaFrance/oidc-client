@@ -58,6 +58,7 @@ export const setTokens = (tokens, oldTokens=null) =>{
     const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
     
     const newTokens = {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
+    // When refresh_token is not rotated we reuse ald refresh_token
     if(oldTokens != null && "refreshToken" in oldTokens && !("refreshToken" in tokens)){
         const refreshToken = oldTokens.refreshToken
         return {...newTokens, refreshToken};

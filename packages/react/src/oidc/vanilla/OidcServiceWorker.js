@@ -133,6 +133,7 @@ function hideTokens(currentDatabaseElement) {
                 throw Error("Tokens are not OpenID valid");
             }
             
+            // When refresh_token is not rotated we reuse ald refresh_token
             if(currentDatabaseElement.tokens != null && "refresh_token" in currentDatabaseElement.tokens && !("refresh_token" in tokens)){
                 const refreshToken = currentDatabaseElement.tokens.refresh_token;
                 currentDatabaseElement.tokens = {...tokens, refresh_token : refreshToken};
