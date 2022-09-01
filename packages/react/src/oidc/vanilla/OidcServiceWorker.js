@@ -126,14 +126,22 @@ function hideTokens(currentDatabaseElement) {
             const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issued_at + tokens.expires_in;
             const expiresAt = idTokenExpiresAt < accessTokenExpiresAt ? idTokenExpiresAt : accessTokenExpiresAt;
             secureTokens.expiresAt = expiresAt;
-            const body = JSON.stringify(secureTokens);
+           
             tokens.expiresAt = expiresAt;
 
             if(!isTokensOidcValid(tokens, currentDatabaseElement.nonce.nonce, currentDatabaseElement.oidcServerConfiguration)){
                 throw Error("Tokens are not OpenID valid");
             }
-            currentDatabaseElement.tokens = tokens;
+            
+            if(currentDatabaseElement.tokens != null && "refresh_token" in currentDatabaseElement.tokens && !("refresh_token" in tokens)){
+                const refreshToken = currentDatabaseElement.tokens.refresh_token;
+                currentDatabaseElement.tokens = {...tokens, refresh_token : refreshToken};
+            } else{
+                currentDatabaseElement.tokens = tokens;    
+            }
+            
             currentDatabaseElement.status = "LOGGED_IN";
+            const body = JSON.stringify(secureTokens);
             return new Response(body, response);
         });
     };

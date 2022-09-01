@@ -33,7 +33,7 @@ const extractAccessTokenPayload = tokens => {
 };
 
 
-export const setTokens = (tokens) =>{
+export const setTokens = (tokens, oldTokens=null) =>{
     
     if(!tokens){
         return null;
@@ -57,12 +57,18 @@ export const setTokens = (tokens) =>{
     const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
     const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
     
-    return {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
+    const newTokens = {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
+    if(oldTokens != null && "refreshToken" in oldTokens && !("refreshToken" in tokens)){
+        const refreshToken = oldTokens.refreshToken
+        return {...newTokens, refreshToken};
+    } 
+    
+    return newTokens;
 }
 
 
 
-export const parseOriginalTokens= (tokens) =>{
+export const parseOriginalTokens= (tokens, oldTokens) =>{
     if(!tokens){
         return null;
     }
@@ -75,11 +81,15 @@ export const parseOriginalTokens= (tokens) =>{
         accessToken: tokens.access_token,
         expiresIn: tokens.expires_in,
         idToken: tokens.id_token,
-        refreshToken: tokens.refresh_token,
         scope: tokens.scope,
         tokenType: tokens.token_type,
         issuedAt: tokens.issued_at
     };
+
+    if("refresh_token" in tokens) {
+        // @ts-ignore
+        data.refreshToken= tokens.refresh_token;
+    }
 
 
     if(tokens.accessTokenPayload !== undefined){
@@ -92,7 +102,7 @@ export const parseOriginalTokens= (tokens) =>{
         data.idTokenPayload = tokens.idTokenPayload;
     }
 
-    return setTokens(data);
+    return setTokens(data, oldTokens);
 }
 
 export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt)=>{

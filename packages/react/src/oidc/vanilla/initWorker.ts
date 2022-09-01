@@ -118,7 +118,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             configurationName
         });
         // @ts-ignore
-        return { tokens : parseOriginalTokens(result.tokens), status: result.status};
+        return { tokens : parseOriginalTokens(result.tokens, null), status: result.status};
     }
     
     const startKeepAliveServiceWorker = () => {
