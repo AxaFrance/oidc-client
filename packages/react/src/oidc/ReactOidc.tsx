@@ -21,7 +21,7 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
         const oidc = getOidc(configurationName);
         setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
-            if(name === Oidc.eventNames.logout_from_another_tab || name === Oidc.eventNames.logout_from_same_tab){
+            if(name === Oidc.eventNames.logout_from_another_tab || name === Oidc.eventNames.logout_from_same_tab || name === Oidc.eventNames.token_aquired){
                 if(isMounted) {
                     setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
                 }
@@ -33,14 +33,14 @@ export const useOidc =(configurationName=defaultConfigurationName) =>{
         };
     }, [configurationName]);
 
-    const login = (callbackPath:string | undefined = undefined, extras:StringMap=null, state: string|undefined=undefined) => {
-        return getOidc(configurationName).loginAsync(callbackPath, extras, state);
+    const login = (callbackPath:string | undefined = undefined, extras:StringMap=null, silentLoginOnly = false) => {
+        return getOidc(configurationName).loginAsync(callbackPath, extras, false, undefined, silentLoginOnly);
     };
     const logout = (callbackPath: string | null | undefined = undefined, extras:StringMap=null) => {
         return getOidc(configurationName).logoutAsync(callbackPath, extras);
     };
-    const renewTokens = () => {
-        return getOidc(configurationName).renewTokensAsync();
+    const renewTokens = (extras:StringMap=null) => {
+        return getOidc(configurationName).renewTokensAsync(extras);
     };
     return { login, logout, renewTokens, isAuthenticated };
 }
