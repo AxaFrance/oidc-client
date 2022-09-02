@@ -18,7 +18,7 @@ export const configurationIdentityServerWithHash = {
     client_id: 'interactive.public.short',
     redirect_uri: window.location.origin+'/multi-auth/authentification#authentication-callback',
     silent_redirect_uri: window.location.origin+'/multi-auth/authentification#authentication-silent-callback',
-    silent_login_uri: window.location.origin+'#authentication-silent-login',
+    silent_login_uri: window.location.origin+'/multi-auth/authentification#authentication-silent-login',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
     refresh_time_before_tokens_expiration_in_second: 10,

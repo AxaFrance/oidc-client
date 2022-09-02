@@ -589,7 +589,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const {tokens} = await session.initAsync();
                     if (tokens) {
                         // @ts-ignore
-                        this.tokens = setTokens(tokens, null);
+                        this.tokens = setTokens(tokens);
                         //session.setTokens(this.tokens);
                         //this.session = session;
                         // @ts-ignore
@@ -1036,7 +1036,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 refresh_token: tokens.refreshToken,
                             };
                             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens))
+                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras)
                             if (tokenResponse.success) {
                                 if(!isTokensOidcValid(tokenResponse.data, null, oidcServerConfiguration)){
                                     this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
