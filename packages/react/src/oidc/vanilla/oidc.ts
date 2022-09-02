@@ -158,7 +158,7 @@ async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh =f
     oidc.tokens = tokens;
     const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
     if (!serviceWorker) {
-        const session = initSession(this.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage);
+        const session = initSession(oidc.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage);
         await session.setTokens(oidc.tokens);
     }
     
