@@ -21,7 +21,7 @@ import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
 import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
 
-const performTokenRequestAsync= async (url, details, extras) => {
+const performTokenRequestAsync= async (url, details, extras, oldTokens) => {
     
     for (let [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
@@ -51,7 +51,7 @@ const performTokenRequestAsync= async (url, details, extras) => {
     const tokens = await response.json();
     return { 
         success : true,
-        data: parseOriginalTokens(tokens)
+        data: parseOriginalTokens(tokens, oldTokens)
     };
 }
 
@@ -589,7 +589,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const {tokens} = await session.initAsync();
                     if (tokens) {
                         // @ts-ignore
-                        this.tokens = setTokens(tokens);
+                        this.tokens = setTokens(tokens, null);
                         //session.setTokens(this.tokens);
                         //this.session = session;
                         // @ts-ignore
@@ -1036,7 +1036,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 refresh_token: tokens.refreshToken,
                             };
                             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras)
+                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens))
                             if (tokenResponse.success) {
                                 if(!isTokensOidcValid(tokenResponse.data, null, oidcServerConfiguration)){
                                     this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
