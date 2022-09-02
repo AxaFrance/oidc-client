@@ -42,7 +42,6 @@ const performTokenRequestAsync= async (url, details, extras, oldTokens) => {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
-        //mode: 'cors',
         body: formBodyString,
     });
     if(response.status !== 200){
@@ -224,7 +223,6 @@ const userInfoAsync = async (oidc) => {
        const res = await fetch(url, {
            headers: {
                authorization: `Bearer ${accessToken}`,
-               // credentials: 'include'
            }
        });
 
@@ -328,9 +326,7 @@ export class Oidc {
     public tokens: null;
     public events: Array<any>;
     private timeoutId: NodeJS.Timeout;
-    //private serviceWorker?: any;
     private configurationName: string;
-    //private session?: any;
     private checkSessionIFrame: CheckSessionIFrame;
     constructor(configuration:OidcConfiguration, configurationName="default") {
         let silent_login_uri = configuration.silent_login_uri;
@@ -349,8 +345,6 @@ export class Oidc {
       this.userInfo = null;
       this.events = [];
       this.timeoutId = null;
-      //this.serviceWorker = null;
-      //this.session = null;
       this.synchroniseTokensAsync.bind(this);
       this.loginCallbackWithAutoTokensRenewAsync.bind(this);
       this.initAsync.bind(this);
@@ -563,7 +557,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         serviceWorker.startKeepAliveServiceWorker();
                         // @ts-ignore
                         this.tokens = tokens;
-                        //this.serviceWorker = serviceWorker;
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt);
                         const sessionState = await serviceWorker.getSessionStateAsync();
@@ -590,8 +583,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     if (tokens) {
                         // @ts-ignore
                         this.tokens = setTokens(tokens);
-                        //session.setTokens(this.tokens);
-                        //this.session = session;
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt);
                         const sessionState = session.getSessionState();
@@ -831,7 +822,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             let nonceData = null;
             if(serviceWorker){
                 serviceWorker.startKeepAliveServiceWorker();
-                //const serviceWorker = serviceWorker;
                 await serviceWorker.initAsync(oidcServerConfiguration, "loginCallbackAsync");
                 const items = await serviceWorker.loadItemsAsync();
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
@@ -843,7 +833,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 await serviceWorker.setSessionStateAsync(sessionState);
                 nonceData = await serviceWorker.getNonceAsync();
             }else{
-                //this.session = initSession(this.configurationName, redirectUri, configuration.storage ?? sessionStorage);
                 const session = initSession(this.configurationName, redirectUri);
                 session.setSessionState(sessionState);
                 const items = await session.loadItemsAsync();
