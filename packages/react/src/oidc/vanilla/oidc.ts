@@ -1036,7 +1036,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 refresh_token: tokens.refreshToken,
                             };
                             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras)
+                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens);
                             if (tokenResponse.success) {
                                 if(!isTokensOidcValid(tokenResponse.data, null, oidcServerConfiguration)){
                                     this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
