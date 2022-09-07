@@ -899,7 +899,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 if (serviceWorker) {
                                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
                                     tokenResponse = tokens;
-                                };
+                                }
                                 if(!isTokensOidcValid(tokenResponse, nonceData.nonce, oidcServerConfiguration)){
                                     const exception = new Error("Tokens are not OpenID valid");
                                     if(timeoutId) {
@@ -987,7 +987,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             
             if (index <=4) {
                 try {
-                    const { status, tokens } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens, forceRefresh);
+                    const { status, tokens, nonce } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens, forceRefresh);
                     switch (status) {
                         case "SESSION_LOST":
                             this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token session lost` });
@@ -1027,7 +1027,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
                             const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens);
                             if (tokenResponse.success) {
-                                if(!isTokensOidcValid(tokenResponse.data, null, oidcServerConfiguration)){
+                                if(!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)){
                                     this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
                                     return {tokens:null, status:"SESSION_LOST"};
                                 }
@@ -1056,46 +1056,51 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     async syncTokensInfoAsync(configuration, configurationName, currentTokens, forceRefresh =false)  {
         // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
         //const configuration = this.configuration;
+        const nullNonce = { nonce:null };
         if (!currentTokens) {
-            return { tokens : null, status: "NOT_CONNECTED"};
+            return { tokens : null, status: "NOT_CONNECTED", nonce: nullNonce};
         }
-
+        let nonce = nullNonce;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
         if (serviceWorker) {
             const {status, tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
             if (status == "LOGGED_OUT") {
-                return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB"};
+                return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB", nonce: nullNonce};
             }else if (status == "SESSIONS_LOST") {
-                    return { tokens : null, status: "SESSIONS_LOST"};
+                    return { tokens : null, status: "SESSIONS_LOST", nonce: nullNonce};
             } else if (!status || !tokens) {
-                return { tokens : null, status: "REQUIRE_SYNC_TOKENS"};
+                return { tokens : null, status: "REQUIRE_SYNC_TOKENS", nonce: nullNonce};
             } else if(tokens.issuedAt !== currentTokens.issuedAt) {
                 const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
                 const status = (timeLeft > 0) ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID";
-                return { tokens : tokens, status };
+                const nonce = await serviceWorker.getNonceAsync();
+                return { tokens : tokens, status, nonce};
             }
+            nonce = await serviceWorker.getNonceAsync();
         } else {
             const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
-            const {tokens, status } = await session.initAsync();
+            const { tokens, status } = await session.initAsync();
             if (!tokens) {
-                return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB"};
+                return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB", nonce: nullNonce};
             } else if (status == "SESSIONS_LOST") {
-                    return { tokens : null, status: "SESSIONS_LOST"};
+                    return { tokens : null, status: "SESSIONS_LOST", nonce: nullNonce};
                 }
             else if(tokens.issuedAt !== currentTokens.issuedAt){
                 const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
                 const status = (timeLeft > 0) ? "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID" : "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID";
-                return { tokens : tokens, status };
+                const nonce = await session.getNonceAsync();
+                return { tokens : tokens, status , nonce };
             }
+            nonce = await session.getNonceAsync();
         }
 
         const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
         const status = (timeLeft > 0) ? "TOKENS_VALID" : "TOKENS_INVALID";
         if(forceRefresh){
-            return { tokens:currentTokens, status:"FORCE_REFRESH"};
+            return { tokens:currentTokens, status:"FORCE_REFRESH", nonce};
         }
-        return { tokens:currentTokens, status};
+        return { tokens:currentTokens, status, nonce};
     }
 
     loginCallbackWithAutoTokensRenewPromise:Promise<loginCallbackResult> = null;

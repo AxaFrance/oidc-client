@@ -42,7 +42,6 @@
     const getNonceAsync= async () => {
         // @ts-ignore
         const result =  {nonce: localStorage[`oidc.nonce.${configurationName}:${redirectUri}`]};
-        localStorage[`oidc.nonce.${configurationName}:${redirectUri}`] = "";
         return result;
     }
 
