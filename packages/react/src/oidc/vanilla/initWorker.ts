@@ -68,7 +68,7 @@ const sendMessageAsync = (registration) => (data) =>{
 
 export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
     
-    if(!navigator || !navigator.serviceWorker||!serviceWorkerRelativeUrl){
+    if(typeof window === "undefined" || typeof navigator === "undefined" || !navigator.serviceWorker||!serviceWorkerRelativeUrl){
         return null;
     }
     const {name, version} = get_browser();
