@@ -136,6 +136,7 @@ export interface AuthorityConfiguration {
      token_request_extras?:StringMap,
      storage?: Storage
      monitor_session?: boolean
+     use_cookies_for_tokens?: string
 };
 
 const oidcDatabase = {};
@@ -158,7 +159,7 @@ async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh =f
     oidc.tokens = tokens;
     const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
     if (!serviceWorker) {
-        const session = initSession(oidc.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage);
+        const session = initSession(oidc.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage, oidc.configuration.use_cookies_for_tokens);
         await session.setTokens(oidc.tokens);
     }
     
@@ -578,7 +579,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             message: "service worker is not supported by this browser"
                         });
                     }
-                    const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
+                    const session = initSession(this.configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage, configuration.use_cookies_for_tokens);
                     const {tokens} = await session.initAsync();
                     if (tokens) {
                         // @ts-ignore
@@ -790,7 +791,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const oidc = this;
             const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
             if (!serviceWorker) {
-                const session = initSession(this.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage);
+                const session = initSession(this.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage, oidc.configuration.use_cookies_for_tokens);
                 await session.setTokens(parsedTokens);
             }
             
@@ -1079,7 +1080,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
             nonce = await serviceWorker.getNonceAsync();
         } else {
-            const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage);
+            const session = initSession(configurationName, configuration.redirect_uri, configuration.storage ?? sessionStorage, configuration.use_cookies_for_tokens);
             const { tokens, status } = await session.initAsync();
             if (!tokens) {
                 return {tokens: null, status: "LOGOUT_FROM_ANOTHER_TAB", nonce: nullNonce};
@@ -1145,7 +1146,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          const oidc = this;
          const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
          if (!serviceWorker) {
-             const session = initSession(this.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage);
+             const session = initSession(this.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage, oidc.configuration.use_cookies_for_tokens);
              await session.clearAsync(status);
          } else{
              await serviceWorker.clearAsync(status);
