@@ -56,16 +56,15 @@ export const initSession = (configurationName, redirectUri, storage =sessionStor
           return Promise.resolve();
         }
       
-        if (cookiePath) {
-          cookieHelper.set(`${cookiePath}.accessToken`, {tokens:null, status});
+  
+        cookieHelper.set(`${cookiePath}.accessToken`, {tokens:null, status});
 
-          // needed to make logout work
-          cookieHelper.erase(`${cookiePath}.accessToken`);
-          cookieHelper.erase(`${cookiePath}.idToken`);
-          cookieHelper.erase(`${cookiePath}.refreshToken`);
-          cookieHelper.erase(`rest`);
-          return Promise.resolve();
-        }
+        // needed to make logout work
+        cookieHelper.erase(`${cookiePath}.accessToken`);
+        cookieHelper.erase(`${cookiePath}.idToken`);
+        cookieHelper.erase(`${cookiePath}.refreshToken`);
+        cookieHelper.erase(`rest`);
+        return Promise.resolve();
     }
   
 
@@ -115,24 +114,24 @@ export const initSession = (configurationName, redirectUri, storage =sessionStor
           expiresAt,
           idTokenPayload,
           issuedAt,
-          tokenType
-
+          tokenType,
+          scope,
         }: {
           [key: string]: string | number | any
         } = {...tokens };
 
-        if (accessToken) cookieHelper.set(`${cookiePath}.accessToken`, tokens.accessToken, false);
-        if (idToken) cookieHelper.set(`${cookiePath}.idToken`, tokens.idToken, false);
-        if (refreshToken) cookieHelper.set(`${cookiePath}.refreshToken`, tokens.refreshToken, false);
+        if (accessToken) cookieHelper.set(`${cookiePath}.accessToken`, accessToken, false);
+        if (idToken) cookieHelper.set(`${cookiePath}.idToken`, idToken, false);
+        if (refreshToken) cookieHelper.set(`${cookiePath}.refreshToken`, refreshToken, false);
         
         cookieHelper.set('rest', {
-          accessTokenPayload: accessTokenPayload,
-          expiresIn: expiresIn,
-          expiresAt: expiresAt,
-          idTokenPayload: idTokenPayload,
-          issuedAt: issuedAt,
-          scope: issuedAt,
-          tokenType: tokenType,
+          accessTokenPayload,
+          expiresIn,
+          expiresAt,
+          idTokenPayload,
+          issuedAt,
+          scope,
+          tokenType,
         });
     }
 
