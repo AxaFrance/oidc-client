@@ -4,7 +4,7 @@
     "lib": ["ES2015", "DOM"],
     "outDir": "dist",
     "jsx": "react",
-    "module": "ESNext",
+    "module": "CommonJS",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
