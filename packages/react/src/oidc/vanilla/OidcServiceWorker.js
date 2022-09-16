@@ -2,6 +2,8 @@
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
+const acceptAnyDomainToken = "*";
+
 const keepAliveJsonFilename = "OidcKeepAliveServiceWorker.json";
 const handleInstall = (event) => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
@@ -182,11 +184,15 @@ const getCurrentDatabaseDomain = (database, url) => {
         ] : [...trustedDomains[key]];
 
         let hasToSendToken = false;
-        for(let i=0;i<domainsToSendTokens.length;i++) {
-            const domain = domainsToSendTokens[i];
-            if (url.startsWith(domain)) {
-                hasToSendToken = true;
-                break;
+        if (domainsToSendTokens.find((f) => f === acceptAnyDomainToken)) {
+            hasToSendToken= true;
+        } else {
+            for (let i = 0; i < domainsToSendTokens.length; i++) {
+                const domain = domainsToSendTokens[i];
+                if (url.startsWith(domain)) {
+                    hasToSendToken = true;
+                    break;
+                }
             }
         }
 
@@ -335,15 +341,14 @@ self.addEventListener('activate', handleActivate);
 self.addEventListener('fetch', handleFetch);
 
 
-const checkDomain =(domains, tokenEndpoint) => {
-
-    if(!tokenEndpoint){
+const checkDomain = (domains, endpoint) => {
+    if(!endpoint){
         return;
     }
 
-    const domain = domains.find(domain => tokenEndpoint.startsWith(domain));
+    const domain = domains.find(domain => endpoint.startsWith(domain));
     if(!domain){
-        throw new Error("Domain " + tokenEndpoint+ " is not trusted, please add domain in TrustedDomains.js");
+        throw new Error("Domain " + endpoint + " is not trusted, please add domain in TrustedDomains.js");
     }
 }
 
@@ -378,13 +383,12 @@ addEventListener('message', event => {
             return;
         case "init":
             const oidcServerConfiguration = data.data.oidcServerConfiguration;
-            const tokenEndpoint = oidcServerConfiguration.tokenEndpoint;
             const domains = trustedDomains[configurationName];
-            checkDomain(domains, tokenEndpoint);
-            const userInfoEndpoint = oidcServerConfiguration.userInfoEndpoint;
-            checkDomain(domains, userInfoEndpoint);
-            const issuer = oidcServerConfiguration.issuer;
-            checkDomain(domains, issuer);
+            if (!domains.find(f => f === acceptAnyDomainToken)) {
+                checkDomain(domains, oidcServerConfiguration.tokenEndpoint);
+                checkDomain(domains, oidcServerConfiguration.userInfoEndpoint);
+                checkDomain(domains, oidcServerConfiguration.issuer);
+            }
             currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
             const where = data.data.where;
             if(where === "loginCallbackAsync" || where === "tryKeepExistingSessionAsync") {
