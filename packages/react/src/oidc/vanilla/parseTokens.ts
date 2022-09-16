@@ -1,36 +1,28 @@
-﻿const idTokenPayload = (token) => {
-    if(!token){
-        return null;
-    }
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+﻿
 
-    return JSON.parse(jsonPayload);
+const b64DecodeUnicode = (str) =>
+    decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+const parseJwt = (token) => JSON.parse(b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')));
+
+const extractTokenPayload = (token) => {
+    try{
+        if (!token) {
+            return null;
+        }
+        if(countLetter(token,'.') === 2) {
+            return parseJwt(token);
+        } else {
+            return null;
+        }
+    } catch (e) {
+        console.warn(e);
+    }
+    return null;
 }
 
 const countLetter = (str, find)=> {
     return (str.split(find)).length - 1;
 }
-
-const extractAccessTokenPayload = tokens => {
-    if(tokens.accessTokenPayload)
-    {
-        return tokens.accessTokenPayload;
-    }
-    const accessToken = tokens.accessToken;
-    try{
-        if (!accessToken || countLetter(accessToken,'.') !== 2) {
-            return null;
-        }
-        return JSON.parse(atob(accessToken.split('.')[1]));
-    } catch (e) {
-        console.warn(e);
-    }
-    return null;
-};
 
 
 export const setTokens = (tokens, oldTokens=null) =>{
@@ -49,9 +41,9 @@ export const setTokens = (tokens, oldTokens=null) =>{
         accessTokenPayload = tokens.accessTokenPayload;
     }
     else {
-        accessTokenPayload = extractAccessTokenPayload(tokens);
+        accessTokenPayload = extractTokenPayload(tokens);
     }
-    const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : idTokenPayload(tokens.idToken);
+    const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : extractTokenPayload(tokens.idToken);
 
     const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
     const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;

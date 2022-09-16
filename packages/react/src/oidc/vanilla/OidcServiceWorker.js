@@ -29,13 +29,16 @@ const countLetter = (str, find)=> {
     return (str.split(find)).length - 1;
 }
 
-const extractTokenPayload=(accessToken)=> {
+const b64DecodeUnicode = (str) =>
+    decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+const parseJwt = (token) => JSON.parse(b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')));
+const extractTokenPayload=(token)=> {
     try{
-        if (!accessToken) {
+        if (!token) {
             return null;
         }
-        if(countLetter(accessToken,'.') === 2) {
-            return JSON.parse(atob(accessToken.split('.')[1]));
+        if(countLetter(token,'.') === 2) {
+            return parseJwt(token);
         } else {
             return null;
         }
