@@ -92,10 +92,10 @@ import Routes from './Router';
 // "access_token" will be provided automaticaly to the urls and domains configured inside "OidcTrustedDomains.js"
 const configuration = {
   client_id: 'interactive.public.short',
-  redirect_uri: 'http://localhost:4200/authentication/callback',
-  silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
+  redirect_uri: window.location.origin + '/authentication/callback',
+  silent_redirect_uri: window.location.origin + '/authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
   scope: 'openid profile email api offline_access',
-  authority: 'https://demo.identityserver.io',
+  authority: 'https://demo.duendesoftware.com',
   service_worker_relative_url:'/OidcServiceWorker.js',
   service_worker_only:true,
 };
