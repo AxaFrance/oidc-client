@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc",
-  "version": "6.6.1",
+  "version": "6.6.2-alpha0",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -13,6 +13,7 @@
   "files": [
     "dist",
     "bin",
+    "src",
     "README.md",
     "package.json",
     "package-lock.json"
