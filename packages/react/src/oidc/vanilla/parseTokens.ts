@@ -41,7 +41,7 @@ export const setTokens = (tokens, oldTokens=null) =>{
         accessTokenPayload = tokens.accessTokenPayload;
     }
     else {
-        accessTokenPayload = extractTokenPayload(tokens);
+        accessTokenPayload = extractTokenPayload(tokens.accessToken);
     }
     const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : extractTokenPayload(tokens.idToken);
 
