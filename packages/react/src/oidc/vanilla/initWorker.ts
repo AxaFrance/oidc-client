@@ -38,7 +38,8 @@ export const sleepAsync = (milliseconds) => {
 }
 
 const keepAlive = () => {
-    fetch('/OidcKeepAliveServiceWorker.json');
+    const promise =fetch('/OidcKeepAliveServiceWorker.json');
+    promise.catch(error => {});
     sleepAsync(230*1000).then(keepAlive);
 }
 
@@ -49,7 +50,7 @@ const isServiceWorkerProxyActiveAsync = () => {
         }})
         .then((response) => {
             return response.statusText === 'oidc-service-worker';
-        });
+        }).catch(error => {});
 };
 
 const sendMessageAsync = (registration) => (data) =>{
