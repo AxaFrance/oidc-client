@@ -38,18 +38,23 @@ export const sleepAsync = (milliseconds) => {
 }
 
 const keepAlive = () => {
-    fetch('/OidcKeepAliveServiceWorker.json');
-    sleepAsync(230*1000).then(keepAlive);
+    try {
+        const promise = fetch('/OidcKeepAliveServiceWorker.json');
+        promise.catch(error => {console.log(error)});
+        sleepAsync(230 * 1000).then(keepAlive);
+    } catch (error){console.log(error)}
 }
 
 const isServiceWorkerProxyActiveAsync = () => {
-    return fetch('/OidcKeepAliveServiceWorker.json', {
-        headers: {
-            'oidc-vanilla': "true"
-        }})
-        .then((response) => {
-            return response.statusText === 'oidc-service-worker';
-        });
+    try {
+        return fetch('/OidcKeepAliveServiceWorker.json', {
+            headers: {
+                'oidc-vanilla': "true"
+            }})
+            .then((response) => {
+                return response.statusText === 'oidc-service-worker';
+            }).catch(error => {console.log(error)});
+    } catch (error){console.log(error)}
 };
 
 const sendMessageAsync = (registration) => (data) =>{

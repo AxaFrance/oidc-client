@@ -106,10 +106,10 @@ import Routes from './Router';
 // You need to give inside your code the "access_token" when using fetch
 const configuration = {
   client_id: 'interactive.public.short',
-  redirect_uri: 'http://localhost:4200/authentication/callback',
-  silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
+  redirect_uri: window.location.origin + '/authentication/callback',
+  silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
   scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
-  authority: 'https://demo.identityserver.io',
+  authority: 'https://demo.duendesoftware.com',
   service_worker_relative_url:'/OidcServiceWorker.js',
   service_worker_only:false,
 };
