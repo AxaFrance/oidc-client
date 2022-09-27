@@ -12,7 +12,7 @@ export interface ComponentWithOidcFetchProps {
 const defaultConfigurationName = "default";
 
 const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc | null) => async (...params: Parameters<Fetch>) => {
-  const [url, options] = params;
+  const [url, options, ...rest] = params;
   const optionTmp = options ? { ...options} : { method: "GET" };
   
   let headers = new Headers();
@@ -39,7 +39,7 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc |
     }
   }
   const newOptions = { ...optionTmp, headers };
-  return await fetch(url, newOptions);
+  return await fetch(url, newOptions, ...rest);
 };
 
 export const withOidcFetch = (fetch: Fetch = null, configurationName = defaultConfigurationName) => (
