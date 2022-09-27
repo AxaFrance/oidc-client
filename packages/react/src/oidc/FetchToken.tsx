@@ -4,18 +4,18 @@ import {isTokensValid} from "./vanilla/parseTokens";
 import {sleepAsync} from "./vanilla/initWorker";
 
 export type Fetch = typeof window.fetch;
+
 export interface ComponentWithOidcFetchProps {
   fetch?: Fetch;
 }
+
 const defaultConfigurationName = "default";
 
-const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc | null) => async (
-    url: RequestInfo,
-    options: RequestInit = { method: 'GET' }
-) => {
+const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc | null) => async (...params: Parameters<Fetch>) => {
+  const [url, options] = params;
+  const optionTmp = options ? { ...options} : { method: "GET" };
+  
   let headers = new Headers();
-  const optionTmp = { ...options };
-
   if (optionTmp.headers) {
     headers = !(optionTmp.headers instanceof Headers)
         ? new Headers(optionTmp.headers)
@@ -23,11 +23,9 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc |
   }
   const oidc = getOidcWithConfigurationName();
   
-  
-
   // @ts-ignore
   const accessToken = oidc.tokens ? oidc.tokens.accessToken : null;
-  // We wait  the synchronisation before making a request
+  // We wait the synchronisation before making a request
   while (oidc.tokens && accessToken && !isTokensValid(oidc.tokens)){
     await sleepAsync(200);
   }
@@ -44,7 +42,7 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc |
   return await fetch(url, newOptions);
 };
 
-export const withOidcFetch = (fetch:Fetch=null, configurationName=defaultConfigurationName) => (
+export const withOidcFetch = (fetch: Fetch = null, configurationName = defaultConfigurationName) => (
     WrappedComponent
   ) => (props: ComponentWithOidcFetchProps) => {
     const {fetch:newFetch} = useOidcFetch(fetch || props.fetch, configurationName)
@@ -52,10 +50,10 @@ export const withOidcFetch = (fetch:Fetch=null, configurationName=defaultConfigu
   };
 
 
-export const useOidcFetch =(fetch:Fetch=null, configurationName=defaultConfigurationName) =>{
+export const useOidcFetch =(fetch: Fetch = null, configurationName = defaultConfigurationName) =>{
   const previousFetch = fetch || window.fetch;
-  const getOidc =  Oidc.get;
-  const getOidcWithConfigurationName = () => { return getOidc(configurationName); };
+  const getOidc = Oidc.get;
+  const getOidcWithConfigurationName = () => getOidc(configurationName);
   const newFetch = fetchWithToken(previousFetch, getOidcWithConfigurationName);
-  return { fetch:newFetch };
+  return { fetch: newFetch };
 }
