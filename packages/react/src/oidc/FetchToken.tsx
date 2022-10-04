@@ -1,7 +1,5 @@
 import React from 'react';
-import Oidc from "./vanilla/oidc";
-import {isTokensValid} from "./vanilla/parseTokens";
-import {sleepAsync} from "./vanilla/initWorker";
+import {VanillaOidc} from './vanilla/vanillaOidc'
 
 export type Fetch = typeof window.fetch;
 export interface ComponentWithOidcFetchProps {
@@ -9,7 +7,7 @@ export interface ComponentWithOidcFetchProps {
 }
 const defaultConfigurationName = "default";
 
-const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc | null) => async (
+const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => VanillaOidc | null) => async (
     url: RequestInfo,
     options: RequestInit = { method: 'GET' }
 ) => {
@@ -23,14 +21,9 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Oidc |
   }
   const oidc = getOidcWithConfigurationName();
   
-  
-
   // @ts-ignore
-  const accessToken = oidc.tokens ? oidc.tokens.accessToken : null;
-  // We wait  the synchronisation before making a request
-  while (oidc.tokens && accessToken && !isTokensValid(oidc.tokens)){
-    await sleepAsync(200);
-  }
+  const getValidToken = await oidc.getValidTokenAsync();
+  const accessToken = getValidToken.tokens.accessToken;
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json');
   }
@@ -51,10 +44,9 @@ export const withOidcFetch = (fetch:Fetch=null, configurationName=defaultConfigu
     return <WrappedComponent {...props} fetch={newFetch} />;
   };
 
-
 export const useOidcFetch =(fetch:Fetch=null, configurationName=defaultConfigurationName) =>{
   const previousFetch = fetch || window.fetch;
-  const getOidc =  Oidc.get;
+  const getOidc =  VanillaOidc.get;
   const getOidcWithConfigurationName = () => { return getOidc(configurationName); };
   const newFetch = fetchWithToken(previousFetch, getOidcWithConfigurationName);
   return { fetch:newFetch };

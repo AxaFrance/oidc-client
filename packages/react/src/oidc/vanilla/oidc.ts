@@ -19,7 +19,7 @@ import timer from './timer';
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
-import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
+import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens, Tokens} from "./parseTokens";
 
 const performTokenRequestAsync= async (url, details, extras, oldTokens) => {
     
@@ -306,24 +306,10 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     return new OidcAuthorizationServiceConfiguration(result);
 }
 
-const buildQueries = (extras:StringMap) => {
-    let queries = '';
-    if(extras != null){
-        for (let [key, value] of Object.entries(extras)) {
-            if (queries === ""){
-                queries = `?${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-            } else {
-                queries+= `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-            }
-        }
-    }
-    return queries;
-}
-
 export class Oidc {
     public configuration: OidcConfiguration;
     public userInfo: null;
-    public tokens: null;
+    public tokens?: Tokens;
     public events: Array<any>;
     private timeoutId: NodeJS.Timeout;
     private configurationName: string;
@@ -402,7 +388,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
     
-    async silentLoginCallBackAsync() {
+    async silentLoginCallbackAsync() {
         try {
             await this.loginCallbackAsync(true);
             this._silentLoginCallbackFromIFrame();
@@ -784,9 +770,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const loginCallbackLocalAsync= async( ) =>{
             const response = await this._loginCallbackAsync(isSilenSignin);
             // @ts-ignore
-            const tokens = response.tokens;
-            const parsedTokens = setTokens(tokens);
-            this.tokens = parsedTokens;
+            const parsedTokens = response.tokens;
+            // @ts-ignore
+            this.tokens = response.tokens;
             const oidc = this;
             const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
             if (!serviceWorker) {
@@ -891,16 +877,19 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     try {
                         const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
                         tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then(async (tokenResponse) => {
+                            
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
                                 this.timeoutId = null;
                                 const loginParams = getLoginParams(this.configurationName, redirectUri);
-
+                                let formattedTokens = null;
                                 if (serviceWorker) {
                                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
-                                    tokenResponse = tokens;
+                                    formattedTokens = tokens;
+                                } else{
+                                    formattedTokens = setTokens(tokenResponse);
                                 }
-                                if(!isTokensOidcValid(tokenResponse, nonceData.nonce, oidcServerConfiguration)){
+                                if(!isTokensOidcValid(formattedTokens, nonceData.nonce, oidcServerConfiguration)){
                                     const exception = new Error("Tokens are not OpenID valid");
                                     if(timeoutId) {
                                         clearTimeout(timeoutId);
@@ -915,7 +904,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() => {
                                     this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                     resolve({
-                                        tokens: tokenResponse,
+                                        tokens: formattedTokens,
                                         state: request.state,
                                         callbackPath: loginParams.callbackPath,
                                     });

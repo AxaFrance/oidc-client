@@ -1,12 +1,12 @@
 import React, {useEffect, ComponentType} from 'react';
-import Oidc from "../../vanilla/oidc";
+import {VanillaOidc} from "../../vanilla/vanillaOidc";
 import {getParseQueryStringFromLocation} from "../../vanilla/route-utils";
 
 
 const SilentLogin: ComponentType<any> = (({configurationName }) => {
     const queryParams = getParseQueryStringFromLocation(window.location.href);
 
-    const getOidc =  Oidc.get;
+    const getOidc =  VanillaOidc.get;
     const oidc = getOidc(configurationName);
     
     let extras = null;  

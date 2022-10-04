@@ -1,7 +1,8 @@
 import React, {ComponentType, FC, PropsWithChildren, useEffect, useState} from 'react';
-import Oidc, {OidcConfiguration} from './vanilla/oidc';
+import {OidcConfiguration} from './vanilla/oidc';
+import {VanillaOidc} from './vanilla/vanillaOidc';
 import OidcRoutes from './core/routes/OidcRoutes';
-import {Authenticating, AuthenticateError, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
+import {Authenticating, SessionLost, Loading, CallBackSuccess} from './core/default-component/index';
 import ServiceWorkerNotSupported from "./core/default-component/ServiceWorkerNotSupported.component";
 import AuthenticatingError from "./core/default-component/AuthenticateError.component";
 import { CustomHistory } from "./core/routes/withRouter";
@@ -37,7 +38,7 @@ export type OidcSessionProps = {
 
 const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({loadingComponent, children, configurationName}) =>{
     const [loading, setLoading] = useState(true);
-    const getOidc =  Oidc.get;
+    const getOidc =  VanillaOidc.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         let isMounted = true;
@@ -51,7 +52,7 @@ const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({loadingComponent
         return () => {
             isMounted = false;
         }
-    }, [oidc, configurationName]);
+    }, [configurationName]);
     const LoadingComponent = loadingComponent;
     return (
         <>
@@ -89,7 +90,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
                                                                              onEvent=null,
                                                                          }) => {
     const getOidc =(configurationName="default") => {
-        return Oidc.getOrCreate(configuration, configurationName);
+        return VanillaOidc.getOrCreate(configuration, configurationName);
     }
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(defaultEventState);
@@ -112,34 +113,34 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
     useEffect(() => {
         const oidc = getOidc(configurationName);
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
-            if(name == Oidc.eventNames.refreshTokensAsync_error || name == Oidc.eventNames.syncTokensAsync_error){
+            if(name == VanillaOidc.eventNames.refreshTokensAsync_error || name == VanillaOidc.eventNames.syncTokensAsync_error){
                 if(onSessionLost != null){
                     onSessionLost();
                     return;
                 }
                 setEvent({name, data});
             }
-            else if(name === Oidc.eventNames.logout_from_another_tab){
+            else if(name === VanillaOidc.eventNames.logout_from_another_tab){
                 if(onLogoutFromAnotherTab != null){
                     onLogoutFromAnotherTab();
                     return;
                 }
                 setEvent({name, data});
             }
-            else if(name === Oidc.eventNames.logout_from_same_tab){
+            else if(name === VanillaOidc.eventNames.logout_from_same_tab){
                 if(onLogoutFromSameTab != null){
                     onLogoutFromSameTab();
                     return;
                 }
                 //setEvent({name, data});
             }
-            else if (name == Oidc.eventNames.loginAsync_begin
-                || name == Oidc.eventNames.loginCallbackAsync_end
-                || name == Oidc.eventNames.loginAsync_error
-                || name == Oidc.eventNames.loginCallbackAsync_error
+            else if (name == VanillaOidc.eventNames.loginAsync_begin
+                || name == VanillaOidc.eventNames.loginCallbackAsync_end
+                || name == VanillaOidc.eventNames.loginAsync_error
+                || name == VanillaOidc.eventNames.loginCallbackAsync_error
             ) {
                 setEvent({name, data});
-            } else if (name == Oidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
+            } else if (name == VanillaOidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
                 setEvent({name, data});
             }
         });
@@ -164,22 +165,22 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>>  = ({ child
     const oidc = getOidc(configurationName);
     let eventName = event.name;
     switch(eventName){
-        case Oidc.eventNames.service_worker_not_supported_by_browser:
+        case VanillaOidc.eventNames.service_worker_not_supported_by_browser:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <ServiceWorkerNotSupportedComponent configurationName={configurationName} />
             </Switch>;
-        case Oidc.eventNames.loginAsync_begin:
+        case VanillaOidc.eventNames.loginAsync_begin:
             return  <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <AuthenticatingComponent configurationName={configurationName} />
             </Switch>;
-        case Oidc.eventNames.loginAsync_error:
-        case Oidc.eventNames.loginCallbackAsync_error:
+        case VanillaOidc.eventNames.loginAsync_error:
+        case VanillaOidc.eventNames.loginCallbackAsync_error:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <AuthenticatingErrorComponent configurationName={configurationName} />
             </Switch>;
-        case Oidc.eventNames.refreshTokensAsync_error:
-        case Oidc.eventNames.syncTokensAsync_error:
-        case Oidc.eventNames.logout_from_another_tab:
+        case VanillaOidc.eventNames.refreshTokensAsync_error:
+        case VanillaOidc.eventNames.syncTokensAsync_error:
+        case VanillaOidc.eventNames.logout_from_another_tab:
             return <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <SessionLostComponent configurationName={configurationName} /> 
             </Switch>;
