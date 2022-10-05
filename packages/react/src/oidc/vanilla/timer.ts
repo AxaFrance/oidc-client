@@ -32,9 +32,9 @@
             };
 
             function onMessage(port, event) {
-                var method = event.data[0];
-                var id = event.data[1];
-                var option = event.data[2];
+                const method = event.data[0];
+                const id = event.data[1];
+                const option = event.data[2];
 
                 if (methods[method]) {
                     methods[method](port, id, option);

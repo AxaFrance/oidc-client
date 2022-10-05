@@ -1,16 +1,16 @@
 import React, {useEffect, PropsWithChildren, FC} from 'react';
 
-import Oidc, {StringMap} from "./vanilla/oidc";
+import {StringMap} from "./vanilla/oidc";
+import {VanillaOidc} from "./vanilla/vanillaOidc";
 
 export type OidcSecureProps = {
     callbackPath?:string;
     extras?:StringMap
     configurationName?: string;
-    state?: string|undefined;
 };
 
 export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({children, callbackPath=null, extras=null, configurationName="default"}) => {
-    const getOidc =  Oidc.get;
+    const getOidc =  VanillaOidc.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if(!oidc.tokens){
@@ -30,8 +30,7 @@ export const withOidcSecure = (
   WrappedComponent: FC<PropsWithChildren<OidcSecureProps>>, 
   callbackPath=null,
   extras=null, 
-  configurationName="default", 
-  state: string|undefined=undefined
+  configurationName="default"
 ) => (props) => {
-  return <OidcSecure state={state} callbackPath={callbackPath} extras={extras} configurationName={configurationName}><WrappedComponent {...props} /></OidcSecure>;
+  return <OidcSecure callbackPath={callbackPath} extras={extras} configurationName={configurationName}><WrappedComponent {...props} /></OidcSecure>;
 };
