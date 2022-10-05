@@ -78,7 +78,9 @@ export const useOidcAccessToken =(configurationName=defaultConfigurationName) =>
             if(name == VanillaOidc.eventNames.token_renewed
                 || name == VanillaOidc.eventNames.token_aquired 
                 || name === VanillaOidc.eventNames.logout_from_another_tab
-                || name === VanillaOidc.eventNames.logout_from_same_tab){
+                || name === VanillaOidc.eventNames.logout_from_same_tab
+                || name == VanillaOidc.eventNames.refreshTokensAsync_error
+                || name == VanillaOidc.eventNames.syncTokensAsync_error){
                 if(isMounted) {
                     const tokens = oidc.tokens;
                     setAccessToken(tokens != null  ? {accessToken :tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload } : accessTokenInitialState);
@@ -124,7 +126,10 @@ export const useOidcIdToken =(configurationName= defaultConfigurationName) =>{
         const newSubscriptionId = oidc.subscriveEvents((name, data) => {
             if(name == VanillaOidc.eventNames.token_renewed
                 || name == VanillaOidc.eventNames.token_aquired
-                || name === VanillaOidc.eventNames.logout_from_another_tab){
+                || name === VanillaOidc.eventNames.logout_from_another_tab
+                || name === VanillaOidc.eventNames.logout_from_same_tab
+                || name == VanillaOidc.eventNames.refreshTokensAsync_error 
+                || name == VanillaOidc.eventNames.syncTokensAsync_error){
                 if(isMounted) {
                     const tokens = oidc.tokens;
                     setIDToken(tokens != null  ? {idToken: tokens.idToken, idTokenPayload:tokens.idTokenPayload} : idTokenInitialState);
