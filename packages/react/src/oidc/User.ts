@@ -14,7 +14,7 @@ export type OidcUser = {
 }
 
 export interface OidcUserInfo {
-    sub?: string;
+    sub: string;
     name?: string;
     given_name?: string;
     family_name?: string;
