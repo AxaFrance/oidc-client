@@ -21,8 +21,44 @@ import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
 import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens, Tokens} from "./parseTokens";
 
+const TOKEN_TYPE ={
+    refresh_token:"refresh_token",
+    access_token:"access_token"
+}
+
+const performRevocationRequestAsync= async (url, token, token_type='refresh_token') => {
+    const details = {
+        token:token,
+        token_type_hint:token_type,
+        client_id:"interactive.public.short"
+    }
+
+    let formBody = [];
+    for (const property in details) {
+        const encodedKey = encodeURIComponent(property);
+        const encodedValue = encodeURIComponent(details[property]);
+        formBody.push(`${encodedKey}=${encodedValue}`);
+    }
+    const formBodyString = formBody.join("&");
+
+    const response = await internalFetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+        body: formBodyString,
+    });
+    if(response.status !== 200){
+        return {success:false, status: response.status}
+    }
+    const result = await response.json();
+    console.log(result);
+    return {
+        success : true
+    };
+}
+
 const performTokenRequestAsync= async (url, details, extras, oldTokens) => {
-    
     for (let [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
@@ -1180,6 +1216,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 		const url = isUri ? callbackPathOrUrl : window.location.origin + path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
+
+        const revocation_endpoint = "https://demo.duendesoftware.com/connect/revocation";
+        await performRevocationRequestAsync(revocation_endpoint, this.tokens.refreshToken);
         // @ts-ignore
         const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
         await this.destroyAsync("LOGGED_OUT");
@@ -1189,6 +1228,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 await oidc.logoutSameTabAsync(this.configuration.client_id, sub);
             }
         }
+
         
         if(oidcServerConfiguration.endSessionEndpoint) {
             if(!extras){
