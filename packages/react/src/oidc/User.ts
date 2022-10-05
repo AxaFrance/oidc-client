@@ -8,8 +8,8 @@ export enum OidcUserStatus {
     LoadingError = 'Error loading user'
 }
 
-export type OidcUser = {
-    user: OidcUserInfo,
+export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
+    user: T,
     status: OidcUserStatus
 }
 
@@ -45,8 +45,8 @@ export interface OidcAddressClaim {
     country?: string;
 }
 
-export const useOidcUser = (configurationName="default") => {
-    const [oidcUser, setOidcUser] = useState<OidcUser>({user: null, status: OidcUserStatus.Unauthenticated});
+export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName="default") => {
+    const [oidcUser, setOidcUser] = useState<OidcUser<T>>({user: null, status: OidcUserStatus.Unauthenticated});
 
     const oidc = Oidc.get(configurationName);
     useEffect(() => {
