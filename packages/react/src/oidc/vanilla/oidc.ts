@@ -26,11 +26,11 @@ const TOKEN_TYPE ={
     access_token:"access_token"
 }
 
-const performRevocationRequestAsync= async (url, token, token_type='refresh_token') => {
+const performRevocationRequestAsync= async (url, token, token_type=TOKEN_TYPE.refresh_token, client_id) => {
     const details = {
         token:token,
         token_type_hint:token_type,
-        client_id:"interactive.public.short"
+        client_id: client_id
     }
 
     let formBody = [];
@@ -49,10 +49,8 @@ const performRevocationRequestAsync= async (url, token, token_type='refresh_toke
         body: formBodyString,
     });
     if(response.status !== 200){
-        return {success:false, status: response.status}
+        return { success:false };
     }
-    const result = await response.json();
-    console.log(result);
     return {
         success : true
     };
@@ -1216,9 +1214,21 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 		const url = isUri ? callbackPathOrUrl : window.location.origin + path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
-
-        const revocation_endpoint = "https://demo.duendesoftware.com/connect/revocation";
-        await performRevocationRequestAsync(revocation_endpoint, this.tokens.refreshToken);
+        const revocationEndpoint = oidcServerConfiguration.revocationEndpoint;
+        if(revocationEndpoint) {
+            const promises = [];
+            if(this.tokens.accessToken){
+                const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.accessToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+                promises.push(revokeAccessTokenPromise);
+            }
+            if(this.tokens.refreshToken) {
+                const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+                promises.push(revokeRefreshTokenPromise);
+            }
+            if(promises.length > 0){
+                await Promise.all(promises);
+            }
+        }
         // @ts-ignore
         const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
         await this.destroyAsync("LOGGED_OUT");
