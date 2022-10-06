@@ -1231,7 +1231,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
             }
         }catch(exception){
-            console.error(exception);
+            console.warn(exception);
         }
         // @ts-ignore
         const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
