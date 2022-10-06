@@ -1214,20 +1214,24 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 		const url = isUri ? callbackPathOrUrl : window.location.origin + path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : "";
-        const revocationEndpoint = oidcServerConfiguration.revocationEndpoint;
-        if(revocationEndpoint) {
-            const promises = [];
-            if(this.tokens.accessToken){
-                const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.accessToken, TOKEN_TYPE.refresh_token, configuration.client_id);
-                promises.push(revokeAccessTokenPromise);
+        try {
+            const revocationEndpoint = oidcServerConfiguration.revocationEndpoint;
+            if (revocationEndpoint) {
+                const promises = [];
+                if (this.tokens.accessToken) {
+                    const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.accessToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+                    promises.push(revokeAccessTokenPromise);
+                }
+                if (this.tokens.refreshToken) {
+                    const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+                    promises.push(revokeRefreshTokenPromise);
+                }
+                if (promises.length > 0) {
+                    await Promise.all(promises);
+                }
             }
-            if(this.tokens.refreshToken) {
-                const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
-                promises.push(revokeRefreshTokenPromise);
-            }
-            if(promises.length > 0){
-                await Promise.all(promises);
-            }
+        }catch(exception){
+            console.error(exception);
         }
         // @ts-ignore
         const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
