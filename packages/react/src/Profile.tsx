@@ -1,10 +1,14 @@
 import React from 'react';
 
 import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser, OidcUserStatus} from "./oidc";
+import { OidcUserInfo } from './oidc/User';
 
+interface OidcUserRoleInfo extends OidcUserInfo{
+    role?: string[]
+}
 
 const DisplayUserInfo = () => {
-    const{ oidcUser, oidcUserLoadingState } = useOidcUser();
+    const{ oidcUser, oidcUserLoadingState } = useOidcUser<OidcUserRoleInfo>();
 
     switch (oidcUserLoadingState){
         case OidcUserStatus.Loading:
