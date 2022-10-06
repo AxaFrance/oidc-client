@@ -24,8 +24,17 @@ const countLetter = (str, find)=> {
     return (str.split(find)).length - 1;
 }
 
+export type Tokens = {
+    refreshToken: string,
+    idTokenPayload:any,
+    idToken:string,
+    accessTokenPayload:any,
+    accessToken:string,
+    expiresAt: number,
+    issuedAt: number
+};
 
-export const setTokens = (tokens, oldTokens=null) =>{
+export const setTokens = (tokens, oldTokens=null):Tokens =>{
     
     if(!tokens){
         return null;
@@ -45,9 +54,9 @@ export const setTokens = (tokens, oldTokens=null) =>{
     }
     const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : extractTokenPayload(tokens.idToken);
 
-    const idTokenExipreAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
+    const idTokenExpireAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
     const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
-    const expiresAt = idTokenExipreAt < accessTokenExpiresAt ? idTokenExipreAt : accessTokenExpiresAt;
+    const expiresAt = idTokenExpireAt < accessTokenExpiresAt ? idTokenExpireAt : accessTokenExpiresAt;
     
     const newTokens = {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
     // When refresh_token is not rotated we reuse ald refresh_token

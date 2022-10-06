@@ -19,7 +19,7 @@ import timer from './timer';
 import {CheckSessionIFrame} from "./checkSessionIFrame"
 import {getParseQueryStringFromLocation} from "./route-utils";
 import {AuthorizationServiceConfigurationJson} from "@openid/appauth/src/authorization_service_configuration";
-import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens} from "./parseTokens";
+import {computeTimeLeft, isTokensOidcValid, isTokensValid, parseOriginalTokens, setTokens, Tokens} from "./parseTokens";
 
 const performTokenRequestAsync= async (url, details, extras, oldTokens) => {
     
@@ -77,6 +77,15 @@ const internalFetch = async (url, headers, numberRetry=0) => {
     return response;
 }
 
+const randomString = function(length) {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for(let i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
 export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
     check_session_iframe?: string;
     issuer:string;
@@ -103,10 +112,6 @@ export interface StringMap {
     [key: string]: string;
 }
 
-export interface loginCallbackResult {
-    state: string,
-    callbackPath: string,
-}
 
 export interface AuthorityConfiguration {
     authorization_endpoint: string;
@@ -146,16 +151,25 @@ const oidcFactory = (configuration: OidcConfiguration, name="default") => {
     oidcDatabase[name] = new Oidc(configuration, name)
     return oidcDatabase[name];
 }
+export type LoginCallback = {
+    callbackPath:string
+}
 
-const loginCallbackWithAutoTokensRenewAsync = async (oidc) => {
-    const { parsedTokens, state, callbackPath } = await oidc.loginCallbackAsync();
+export type InternalLoginCallback = {
+    callbackPath:string
+    parsedTokens:Tokens,
+}
+
+const loginCallbackWithAutoTokensRenewAsync = async (oidc) : Promise<LoginCallback> => {
+    const { parsedTokens, callbackPath } = await oidc.loginCallbackAsync();
     oidc.timeoutId = autoRenewTokens(oidc, parsedTokens.refreshToken, parsedTokens.expiresAt)
-    return { state, callbackPath };
+    return { callbackPath };
 }
 
 async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh =false, extras:StringMap=null) {
-    const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras);
-    oidc.tokens = tokens;
+    const updateTokens = (tokens) => oidc.tokens = tokens;
+    const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras, updateTokens);
+    
     const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
     if (!serviceWorker) {
         const session = initSession(oidc.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage);
@@ -306,24 +320,10 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     return new OidcAuthorizationServiceConfiguration(result);
 }
 
-const buildQueries = (extras:StringMap) => {
-    let queries = '';
-    if(extras != null){
-        for (let [key, value] of Object.entries(extras)) {
-            if (queries === ""){
-                queries = `?${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-            } else {
-                queries+= `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-            }
-        }
-    }
-    return queries;
-}
-
 export class Oidc {
     public configuration: OidcConfiguration;
     public userInfo: null;
-    public tokens: null;
+    public tokens?: Tokens;
     public events: Array<any>;
     private timeoutId: NodeJS.Timeout;
     private configurationName: string;
@@ -360,13 +360,13 @@ export class Oidc {
       this.initAsync(this.configuration.authority, this.configuration.authority_configuration);
     }
 
-    subscriveEvents(func){
+    subscriveEvents(func):string{
         const id = getRandomInt(9999999999999).toString();
         this.events.push({id, func});
         return id;
     }
 
-    removeEventSubscription(id){
+    removeEventSubscription(id) :void{
        const newEvents = this.events.filter(e =>  e.id !== id);
        this.events = newEvents;
     }
@@ -402,7 +402,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
     
-    async silentLoginCallBackAsync() {
+    async silentLoginCallbackAsync() {
         try {
             await this.loginCallbackAsync(true);
             this._silentLoginCallbackFromIFrame();
@@ -536,11 +536,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     tryKeepExistingSessionPromise = null;
-    async tryKeepExistingSessionAsync() {
+    async tryKeepExistingSessionAsync() :Promise<boolean> {
         if(this.tryKeepExistingSessionPromise !== null){
             return this.tryKeepExistingSessionPromise;
         }
-        
         const funcAsync  =async () => {
             let serviceWorker
             if (this.tokens != null) {
@@ -617,25 +616,20 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         });
     }
 
-    loginPromise: Promise<any>=null;
+    loginPromise: Promise<void>=null;
     async loginAsync(callbackPath:string=undefined, extras:StringMap=null, isSilentSignin:boolean=false, scope:string=undefined, silentLoginOnly = false) {
         if(this.loginPromise !== null){
             return this.loginPromise;
         }
-        
         const loginLocalAsync=async () => {
-            
                 const location = window.location;
                 const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
-               
                 const configuration = this.configuration;
             let state = undefined;
             if(extras && "state" in extras){
                 state = extras["state"];
                 delete extras["state"];
             }
-           
-
                 if(silentLoginOnly){
                     try {
                         const extraFinal = extras ?? configuration.extras ?? {};
@@ -662,15 +656,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     scope = configuration.scope;
                 }
 
-                const randomString = function(length) {
-                    let text = "";
-                    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                    for(let i = 0; i < length; i++) {
-                        text += possible.charAt(Math.floor(Math.random() * possible.length));
-                    }
-                    return text;
-                }
-
                 setLoginParams(this.configurationName, redirectUri, {callbackPath: url, extras, state});
                 const extraFinal = extras ?? configuration.extras ?? {};
                 if(!extraFinal.nonce) {
@@ -692,7 +677,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     await session.setNonceAsync(nonce);
                     storage = new MemoryStorageBackend(session.saveItemsAsync, {});
                 }
-                
                 
                 // @ts-ignore
                 const queryStringUtil = redirectUri.includes("#") ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
@@ -781,24 +765,22 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return this.loginCallbackPromise;
         }
         
-        const loginCallbackLocalAsync= async( ) =>{
+        const loginCallbackLocalAsync= async():Promise<InternalLoginCallback> =>{
             const response = await this._loginCallbackAsync(isSilenSignin);
             // @ts-ignore
-            const tokens = response.tokens;
-            const parsedTokens = setTokens(tokens);
-            this.tokens = parsedTokens;
+            const parsedTokens = response.tokens;
+            // @ts-ignore
+            this.tokens = response.tokens;
             const oidc = this;
             const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
             if (!serviceWorker) {
                 const session = initSession(this.configurationName, oidc.configuration.redirect_uri, oidc.configuration.storage);
                 await session.setTokens(parsedTokens);
             }
-            
             this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
             // @ts-ignore
             return  { parsedTokens, state:response.state, callbackPath : response.callbackPath};
         }
-        
         this.loginCallbackPromise = loginCallbackLocalAsync();
         return this.loginCallbackPromise.then(result =>{
             this.loginCallbackPromise = null;
@@ -891,16 +873,19 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     try {
                         const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
                         tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then(async (tokenResponse) => {
+                            
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
                                 this.timeoutId = null;
                                 const loginParams = getLoginParams(this.configurationName, redirectUri);
-
+                                let formattedTokens = null;
                                 if (serviceWorker) {
                                     const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, "syncTokensAsync");
-                                    tokenResponse = tokens;
+                                    formattedTokens = tokens;
+                                } else{
+                                    formattedTokens = setTokens(tokenResponse);
                                 }
-                                if(!isTokensOidcValid(tokenResponse, nonceData.nonce, oidcServerConfiguration)){
+                                if(!isTokensOidcValid(formattedTokens, nonceData.nonce, oidcServerConfiguration)){
                                     const exception = new Error("Tokens are not OpenID valid");
                                     if(timeoutId) {
                                         clearTimeout(timeoutId);
@@ -915,7 +900,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() => {
                                     this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                     resolve({
-                                        tokens: tokenResponse,
+                                        tokens: formattedTokens,
                                         state: request.state,
                                         callbackPath: loginParams.callbackPath,
                                     });
@@ -941,12 +926,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
 
-    async synchroniseTokensAsync(refreshToken, index=0, forceRefresh =false, extras:StringMap=null) {
-        
+    async synchroniseTokensAsync(refreshToken, index=0, forceRefresh =false, extras:StringMap=null, updateTokens) {
             if (document.hidden) {
                 await sleepAsync(1000);
                 this.publishEvent(eventNames.refreshTokensAsync, {message: "wait because document is hidden"});
-                return await this.synchroniseTokensAsync(refreshToken, index, forceRefresh);
+                return await this.synchroniseTokensAsync(refreshToken, index, forceRefresh, extras, updateTokens);
             }
             let numberTryOnline = 6;
             while (!navigator.onLine && numberTryOnline > 0) {
@@ -968,6 +952,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     prompt: "none"
                 }, loginParams.state);
                 if (silent_token_response) {
+                    updateTokens(silent_token_response.tokens);
                     this.publishEvent(Oidc.eventNames.token_renewed, {});
                     return {tokens:silent_token_response.tokens, status:"LOGGED"};
                 }
@@ -975,12 +960,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 console.error(exceptionSilent);
                 this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exceptionSilent" ,exception: exceptionSilent.message});
                 if(exceptionSilent && exceptionSilent.message && exceptionSilent.message.startsWith("oidc")){
+                    updateTokens(null);
                     this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token silent` });
                     return {tokens:null, status:"SESSION_LOST"};
                 } 
                 await sleepAsync(1000);
                 throw exceptionSilent;
             }
+            updateTokens(null);
             this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token silent return` });
             return {tokens:null, status:"SESSION_LOST"};
         }
@@ -990,16 +977,21 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const { status, tokens, nonce } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens, forceRefresh);
                     switch (status) {
                         case "SESSION_LOST":
+                            updateTokens(null);
                             this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token session lost` });
                             return {tokens:null, status:"SESSION_LOST"};
                         case "NOT_CONNECTED":
+                            updateTokens(null);
                             return {tokens:null, status:null};
                         case "TOKENS_VALID":
+                            updateTokens(tokens);
                             return {tokens, status:"LOGGED_IN"};
                         case "TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID":
+                            updateTokens(tokens);
                             this.publishEvent(Oidc.eventNames.token_renewed, {});
                             return {tokens, status:"LOGGED_IN"};
                         case "LOGOUT_FROM_ANOTHER_TAB":
+                            updateTokens(null);
                             this.publishEvent(eventNames.logout_from_another_tab, {"status": "session syncTokensAsync"});
                             return {tokens:null, status:"LOGGED_OUT"};
                         case "REQUIRE_SYNC_TOKENS":
@@ -1008,7 +1000,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         default:
                             if(!refreshToken)
                             {
-                                this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, tryNumber: index});
                                 return await localsilentLoginAsync();
                             }
                             this.publishEvent(eventNames.refreshTokensAsync_begin, {refreshToken:refreshToken, status, tryNumber: index});
@@ -1028,9 +1019,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens);
                             if (tokenResponse.success) {
                                 if(!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)){
+                                    updateTokens(null);
                                     this.publishEvent(eventNames.refreshTokensAsync_error, {message: `refresh token return not valid tokens` });
                                     return {tokens:null, status:"SESSION_LOST"};
                                 }
+                                updateTokens(tokenResponse.data);
                                 this.publishEvent(eventNames.refreshTokensAsync_end, {success: tokenResponse.success});
                                 this.publishEvent(Oidc.eventNames.token_renewed, {});
                                 return {tokens: tokenResponse.data, status:"LOGGED_IN"};
@@ -1039,13 +1032,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                     message: "bad request",
                                     tokenResponse: tokenResponse
                                 });
-                                return await this.synchroniseTokensAsync(null, index+1, forceRefresh);
+                                return await this.synchroniseTokensAsync(null, index+1, forceRefresh, extras, updateTokens);
                             }
                     }
                 } catch (exception) {
                     console.error(exception);
                     this.publishEvent(eventNames.refreshTokensAsync_silent_error, {message: "exception" ,exception: exception.message});
-                    return this.synchroniseTokensAsync(refreshToken, index+1, forceRefresh);
+                    return this.synchroniseTokensAsync(refreshToken, index+1, forceRefresh, extras, updateTokens);
                 }
             }
 
@@ -1103,8 +1096,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         return { tokens:currentTokens, status, nonce};
     }
 
-    loginCallbackWithAutoTokensRenewPromise:Promise<loginCallbackResult> = null;
-     loginCallbackWithAutoTokensRenewAsync():Promise<loginCallbackResult>{
+    loginCallbackWithAutoTokensRenewPromise:Promise<LoginCallback> = null;
+     loginCallbackWithAutoTokensRenewAsync():Promise<LoginCallback>{
          if(this.loginCallbackWithAutoTokensRenewPromise !== null){
              return this.loginCallbackWithAutoTokensRenewPromise;
          }

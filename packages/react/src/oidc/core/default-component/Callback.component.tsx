@@ -1,6 +1,6 @@
 import React, {useEffect, useState, ComponentType} from 'react';
 import AuthenticatingError from "./AuthenticateError.component";
-import Oidc from "../../vanilla/oidc";
+import {VanillaOidc} from "../../vanilla/vanillaOidc";
 import {getCustomHistory} from "../routes/withRouter";
 
 export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-callback">
@@ -16,9 +16,9 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
-      const getOidc =  Oidc.get;
+      const getOidc =  VanillaOidc.get;
       try {
-        const {callbackPath} = await getOidc(configurationName).loginCallbackWithAutoTokensRenewAsync();
+        const {callbackPath} = await getOidc(configurationName).loginCallbackAsync();
         const history = (withCustomHistory)? withCustomHistory(): getCustomHistory();
         history.replaceState(callbackPath || "/")
       } catch (error) {

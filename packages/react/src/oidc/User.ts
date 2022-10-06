@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState} from "react";
-import Oidc from "./vanilla/oidc";
+import {VanillaOidc} from "./vanilla/vanillaOidc";
 
 export enum OidcUserStatus {
     Unauthenticated= 'Unauthenticated',
@@ -48,10 +48,9 @@ export interface OidcAddressClaim {
 export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName="default") => {
     const [oidcUser, setOidcUser] = useState<OidcUser<T>>({user: null, status: OidcUserStatus.Unauthenticated});
 
-    const oidc = Oidc.get(configurationName);
+    const oidc = VanillaOidc.get(configurationName);
     useEffect(() => {
         let isMounted = true;
-
         if(oidc && oidc.tokens) {
             setOidcUser({...oidcUser, status: OidcUserStatus.Loading});
             oidc.userInfoAsync()
@@ -62,7 +61,6 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
                 })
                 .catch(() => setOidcUser({...oidcUser, status: OidcUserStatus.LoadingError}));
         }
-
         return  () => { isMounted = false };
     }, []);
 

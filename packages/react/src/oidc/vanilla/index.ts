@@ -1,1 +1,1 @@
-﻿export { Oidc } from './oidc';
+﻿export { VanillaOidc } from './vanillaOidc';

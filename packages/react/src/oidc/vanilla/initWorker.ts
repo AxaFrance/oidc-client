@@ -45,6 +45,11 @@ const keepAlive = () => {
     } catch (error){console.log(error)}
 }
 
+/*window.addEventListener('error', (event) => {
+    var textContent = `${event.type}: ${event.message}\n`;
+    console.log(textContent)
+});*/
+
 const isServiceWorkerProxyActiveAsync = () => {
     try {
         return fetch('/OidcKeepAliveServiceWorker.json', {
