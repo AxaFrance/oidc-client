@@ -1219,7 +1219,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             if (revocationEndpoint) {
                 const promises = [];
                 if (this.tokens.accessToken) {
-                    const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.accessToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+                    const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.accessToken, TOKEN_TYPE.access_token, configuration.client_id);
                     promises.push(revokeAccessTokenPromise);
                 }
                 if (this.tokens.refreshToken) {
