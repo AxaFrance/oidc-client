@@ -1,4 +1,6 @@
-﻿
+﻿import {sleepAsync} from "./initWorker";
+import Oidc from "./oidc";
+
 
 const b64DecodeUnicode = (str) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
@@ -117,6 +119,31 @@ export const isTokensValid= (tokens) =>{
         return false;
     }
     return computeTimeLeft(0, tokens.expiresAt) > 0;
+}
+
+
+export type ValidToken = {
+    isTokensValid: Boolean,
+    tokens: Tokens,
+    numberWaited: Number
+}
+
+export interface OidcToken{
+    tokens?: Tokens;
+}
+
+export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWait = 50): Promise<ValidToken> => {
+    let numberWaitTemp = numberWait;
+    while (!isTokensValid(oidc.tokens) && numberWaitTemp > 0) {
+        await sleepAsync(200);
+        numberWaitTemp = numberWaitTemp - 1;
+    }
+    const isValid = isTokensValid(oidc.tokens);
+    return {
+        isTokensValid: isValid,
+        tokens: oidc.tokens,
+        numberWaited: numberWaitTemp - numberWait
+    };
 }
 
 // https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation (excluding rules #1, #4, #5, #7, #8, #12, and #13 which did not apply).

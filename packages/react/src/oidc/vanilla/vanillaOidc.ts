@@ -1,13 +1,8 @@
 ﻿import {LoginCallback, Oidc, OidcConfiguration, StringMap} from "./oidc";
-import {isTokensValid} from "./parseTokens";
+import {getValidTokenAsync, isTokensValid, ValidToken} from "./parseTokens";
 import {sleepAsync} from "./initWorker";
 import {Tokens} from "./parseTokens";
 
-type ValidToken = {
-    isTokensValid: Boolean,
-    tokens: Tokens,
-    numberWaited: Number
-}
 
 export class VanillaOidc {
     private _oidc: Oidc;
@@ -55,18 +50,7 @@ export class VanillaOidc {
         return this._oidc.configuration;
     }
     async getValidTokenAsync(waitMs=200, numberWait=50 ): Promise<ValidToken> {
-        const oidc = this._oidc;
-        let numberWaitTemp = numberWait;
-        while (oidc.tokens && !isTokensValid(oidc.tokens) && numberWaitTemp > 0) {
-            await sleepAsync(200);
-            numberWaitTemp=numberWaitTemp-1;
-        }
-        const isValid = !isTokensValid(oidc.tokens);
-        return { 
-            isTokensValid: isValid, 
-            tokens: oidc.tokens,
-            numberWaited: numberWaitTemp - numberWait
-        };
+        return getValidTokenAsync(this._oidc, waitMs, numberWait);
     }
     async userInfoAsync():Promise<any>{
         return this._oidc.userInfoAsync();
