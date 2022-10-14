@@ -45,11 +45,6 @@ const keepAlive = () => {
     } catch (error){console.log(error)}
 }
 
-/*window.addEventListener('error', (event) => {
-    var textContent = `${event.type}: ${event.message}\n`;
-    console.log(textContent)
-});*/
-
 const isServiceWorkerProxyActiveAsync = () => {
     try {
         return fetch('/OidcKeepAliveServiceWorker.json', {
@@ -121,10 +116,10 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const clearAsync=(status) =>{
         return sendMessageAsync(registration)({type: "clear", data: {status}, configurationName});
     }
-    const initAsync= async (oidcServerConfiguration, where) => {
+    const initAsync= async (oidcServerConfiguration, where, oidcConfiguration) => {
         const result = await sendMessageAsync(registration)({
             type: "init",
-            data: {oidcServerConfiguration, where},
+            data: {oidcServerConfiguration, where, oidcConfiguration},
             configurationName
         });
         // @ts-ignore
@@ -163,7 +158,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         loadItemsAsync, 
         clearAsync, 
         initAsync, 
-       // getAccessTokenPayloadAsync,
         startKeepAliveServiceWorker,
         isServiceWorkerProxyActiveAsync,
         setSessionStateAsync,

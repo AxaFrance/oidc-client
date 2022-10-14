@@ -100,6 +100,12 @@ const isTokensOidcValid =(tokens, nonce, oidcServerConfiguration) =>{
     return true;
 }
 
+const TokenRenewMode = {
+    access_token_or_id_token_invalid: "access_token_or_id_token_invalid",
+    access_token_invalid:"access_token_invalid",
+    id_token_invalid: "id_token_invalid"
+}
+
 function hideTokens(currentDatabaseElement) {
     const configurationName = currentDatabaseElement.configurationName;
     return (response) => {
@@ -136,7 +142,16 @@ function hideTokens(currentDatabaseElement) {
 
             const idTokenExpiresAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
             const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issued_at + tokens.expires_in;
-            const expiresAt = idTokenExpiresAt < accessTokenExpiresAt ? idTokenExpiresAt : accessTokenExpiresAt;
+
+            let expiresAt;
+            const tokenRenewMode = currentDatabaseElement.oidcConfiguration.token_renew_mode;
+            if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
+                expiresAt = accessTokenExpiresAt;
+            } else if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
+                expiresAt = idTokenExpiresAt;
+            } else {
+                expiresAt = idTokenExpiresAt < accessTokenExpiresAt ? idTokenExpiresAt : accessTokenExpiresAt;
+            }
             secureTokens.expiresAt = expiresAt;
 
             tokens.expiresAt = expiresAt;
@@ -390,6 +405,7 @@ addEventListener('message', event => {
             tokens: null,
             items:[],
             oidcServerConfiguration: null,
+            oidcConfiguration:null,
             status:null,
             configurationName: configurationName,
         };
@@ -411,7 +427,7 @@ addEventListener('message', event => {
             return;
         case "init":
             const oidcServerConfiguration = data.data.oidcServerConfiguration;
-            const domains = trustedDomains[configurationName];
+                        const domains = trustedDomains[configurationName];
             if (!domains.find(f => f === acceptAnyDomainToken)) {
                 checkDomain(domains, oidcServerConfiguration.tokenEndpoint);
                 checkDomain(domains, oidcServerConfiguration.revocationEndpoint);
@@ -419,6 +435,7 @@ addEventListener('message', event => {
                 checkDomain(domains, oidcServerConfiguration.issuer);
             }
             currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
+            currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
             const where = data.data.where;
             if(where === "loginCallbackAsync" || where === "tryKeepExistingSessionAsync") {
                 currentLoginCallbackConfigurationName = configurationName;

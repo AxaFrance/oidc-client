@@ -65,6 +65,39 @@ Work perfectly well with :
 - [keycloak](https://www.keycloak.org/)
 - all oidc compatible providers
 
+<p align="center">
+    <img src="./docs/img/react-oidc-secure.PNG"
+     alt="@axa-fr/react-oidc is one of the securest way to Authenticate."
+      />
+  <br>
+  @axa-fr/react-oidc is one of the securest way to Authenticate. 
+</p>
+
+<p align="center">
+    <img src="./docs/img/react-oidc-lifetime.PNG"
+     alt="Service Worker lifetime drawback. "
+      />
+  <br>
+  Service Worker lifetime drawback. 
+</p>
+
+<p align="center">
+    <img src="./docs/img/react-oidc-silent.PNG"
+     alt="Silent-Signing constraints. "
+      />
+  <br>
+  Silent-Signing constraints. 
+</p>
+
+<p align="center">
+    <img src="./docs/img/react-oidc-cost.PNG"
+     alt="@axa-fr/react-oidc is the simpliest and cheapest."
+      />
+  <br>
+  @axa-fr/react-oidc is the simpliest and cheapest. 
+</p>
+
+
 ## Getting Started
 
 ### Getting Started React using create-react-app

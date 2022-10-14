@@ -1,3 +1,5 @@
+import {TokenRenewMode} from "./oidc";
+
 export const configurationIdentityServer = {
     client_id: 'interactive.public.short',
     redirect_uri: window.location.origin + '/authentication/callback',
@@ -12,6 +14,7 @@ export const configurationIdentityServer = {
     //storage: sessionStorage,
     //silent_login_timeout: 3333000
     //monitor_session: true,
+    token_renew_mode : TokenRenewMode.access_token_invalid
   };
 
 export const configurationIdentityServerWithHash = {

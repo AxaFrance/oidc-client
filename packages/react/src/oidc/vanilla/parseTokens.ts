@@ -1,5 +1,4 @@
 ﻿import {sleepAsync} from "./initWorker";
-import Oidc from "./oidc";
 
 
 const b64DecodeUnicode = (str) =>
@@ -36,7 +35,19 @@ export type Tokens = {
     issuedAt: number
 };
 
-export const setTokens = (tokens, oldTokens=null):Tokens =>{
+export type TokenRenewModeType = {
+    access_token_or_id_token_invalid: string,
+    access_token_invalid:string,
+    id_token_invalid: string
+}
+
+export const TokenRenewMode = {
+    access_token_or_id_token_invalid: "access_token_or_id_token_invalid",
+    access_token_invalid:"access_token_invalid",
+    id_token_invalid: "id_token_invalid"
+}
+
+export const setTokens = (tokens, oldTokens=null, tokenRenewMode: string):Tokens =>{
     
     if(!tokens){
         return null;
@@ -58,7 +69,16 @@ export const setTokens = (tokens, oldTokens=null):Tokens =>{
 
     const idTokenExpireAt =(_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp: Number.MAX_VALUE;
     const accessTokenExpiresAt =  (accessTokenPayload && accessTokenPayload.exp)? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
-    const expiresAt = idTokenExpireAt < accessTokenExpiresAt ? idTokenExpireAt : accessTokenExpiresAt;
+
+    let expiresAt; 
+   
+    if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
+        expiresAt = accessTokenExpiresAt;
+    } else  if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
+        expiresAt = idTokenExpireAt;
+    } else {
+        expiresAt = idTokenExpireAt < accessTokenExpiresAt ? idTokenExpireAt : accessTokenExpiresAt;
+    }    
     
     const newTokens = {...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt};
     // When refresh_token is not rotated we reuse ald refresh_token
@@ -72,7 +92,7 @@ export const setTokens = (tokens, oldTokens=null):Tokens =>{
 
 
 
-export const parseOriginalTokens= (tokens, oldTokens) =>{
+export const parseOriginalTokens= (tokens, oldTokens, tokenRenewMode: string ) =>{
     if(!tokens){
         return null;
     }
@@ -94,8 +114,7 @@ export const parseOriginalTokens= (tokens, oldTokens) =>{
         // @ts-ignore
         data.refreshToken= tokens.refresh_token;
     }
-
-
+    
     if(tokens.accessTokenPayload !== undefined){
         // @ts-ignore
         data.accessTokenPayload = tokens.accessTokenPayload;
@@ -106,7 +125,7 @@ export const parseOriginalTokens= (tokens, oldTokens) =>{
         data.idTokenPayload = tokens.idTokenPayload;
     }
 
-    return setTokens(data, oldTokens);
+    return setTokens(data, oldTokens, tokenRenewMode);
 }
 
 export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt)=>{
