@@ -619,7 +619,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const {tokens} = await session.initAsync();
                     if (tokens) {
                         // @ts-ignore
-                        this.tokens = setTokens(tokens);
+                        this.tokens = setTokens(tokens, null, configuration.token_renew_mode);
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt);
                         const sessionState = session.getSessionState();

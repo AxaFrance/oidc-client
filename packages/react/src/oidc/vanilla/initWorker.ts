@@ -1,5 +1,6 @@
 ﻿import timer from "./timer"
 import {parseOriginalTokens} from "./parseTokens";
+import {OidcConfiguration} from "./oidc";
 
 function get_browser() {
     let ua = navigator.userAgent, tem,
@@ -116,14 +117,14 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const clearAsync=(status) =>{
         return sendMessageAsync(registration)({type: "clear", data: {status}, configurationName});
     }
-    const initAsync= async (oidcServerConfiguration, where, oidcConfiguration) => {
+    const initAsync= async (oidcServerConfiguration, where, oidcConfiguration:OidcConfiguration) => {
         const result = await sendMessageAsync(registration)({
             type: "init",
             data: {oidcServerConfiguration, where, oidcConfiguration},
             configurationName
         });
         // @ts-ignore
-        return { tokens : parseOriginalTokens(result.tokens, null), status: result.status};
+        return { tokens : parseOriginalTokens(result.tokens, null, oidcConfiguration.token_renew_mode), status: result.status};
     }
     
     const startKeepAliveServiceWorker = () => {
