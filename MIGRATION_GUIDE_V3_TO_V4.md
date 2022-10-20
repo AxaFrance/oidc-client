@@ -77,7 +77,7 @@ const propTypes = {
 const propTypes = {
   loadingComponent: PropTypes.elementType, // you can inject your own loading component
   sessionLostComponent: PropTypes.elementType, // you can inject your own session lost component
-  authenticating: PropTypes.elementType, // you can inject your own authenticationg component
+  authenticatingComponent: PropTypes.elementType, // you can inject your own authenticating component
   callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
   callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
   serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
@@ -108,10 +108,10 @@ const  { isEnabled, login, logout, oidcUser, events } = useReactOidc();
 // new v4 
 import { useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc-context';
 
-const { login, logout, isLogged} = useOidc(); // login and logout return a Promise
-const{ oidcUser, isOidcUserLoading, isLogged } = useOidcUser(); // Return user_info endpoint data
-const{ accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a jwk
-const{ idToken, idTokenPayload } = useOidcIdToken(); // contain IDToken metadata
+const { login, logout, isAuthenticated } = useOidc(); // login and logout return a Promise
+const { oidcUser, isOidcUserLoading, isLogged } = useOidcUser(); // Return user_info endpoint data
+const { accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a jwk
+const { idToken, idTokenPayload } = useOidcIdToken(); // contain IDToken metadata
  
  ```
 ```javascript
