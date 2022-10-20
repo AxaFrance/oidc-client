@@ -77,7 +77,7 @@ const propTypes = {
 const propTypes = {
   loadingComponent: PropTypes.elementType, // you can inject your own loading component
   sessionLostComponent: PropTypes.elementType, // you can inject your own session lost component
-  authenticating: PropTypes.elementType, // you can inject your own authenticationg component
+  authenticatingComponent: PropTypes.elementType, // you can inject your own authenticating component
   callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
   callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
   serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
