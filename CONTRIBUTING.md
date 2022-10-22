@@ -6,11 +6,11 @@ To get started with the repository:
 
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd react-oidc/packages/context
+cd react-oidc/packages/react
 npm install
 npm start
-# You are ready to contribute !
 ```
+You are now ready to contribute!
 
 ## Pull Request
 
