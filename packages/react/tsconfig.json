@@ -3,6 +3,7 @@
     "target": "ES2015",
     "lib": ["ES2015", "DOM"],
     "outDir": "dist",
+    "baseUrl": "./",
     "jsx": "react-jsx",
     "module": "CommonJS",
     "declaration": true,
