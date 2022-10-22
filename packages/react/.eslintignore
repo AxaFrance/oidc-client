@@ -9,3 +9,7 @@ dist
 **/*.stories.tsx
 ./src/setupTests.ts
 setupTests.js
+.eslintrc.js
+config
+jest.config.js
+App.specold.tsx
