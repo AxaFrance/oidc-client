@@ -1,7 +1,9 @@
-﻿# Migrate from v3 to v5
+﻿# Migrating from v3 to v5
 
-V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
+V4 was a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
 In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
+
+V5 is a smaller refactor on v4, with some breaking changes in the names of props.
 
 - Packages
   - [`@axa-fr/react-oidc-context`](./packages/context#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context)
@@ -9,12 +11,12 @@ In the v4 we have chosen to remove a lot the surface API in order to simplify us
   - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4 : use react-oidc-context which works with redux and in fact does not use any react context**
   - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4**
-  - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
+  - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![NPM version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
 
-Migration PullRequest sample : https://github.com/samuel-gomez/react-starter-toolkit/pull/36
-
+Migration PullRequest [sample](https://github.com/samuel-gomez/react-starter-toolkit/pull/36)
 
 Main provider component have been renamed
+
 ```javascript
 import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 
@@ -23,22 +25,23 @@ import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
 </AuthenticationProvider>
 
-// in v5 become
+// in v5 becomes
 
 import { OidcProvider } from '@axa-fr/react-oidc-context';
 
-//loggerLevel : Logger property has been removed in v4
+// loggerLevel : Logger property has been removed in v4
 <OidcProvider configuration={oidcConfiguration}>
 </OidcProvider>
 ```
 
 Provider properties have changed, you need to keep only required properties for v4 else it won't work.
+
 ```javascript
 // old v3 
 const propTypes = {
   notAuthenticated: PropTypes.elementType, // react component displayed during authentication
   notAuthorized: PropTypes.elementType, // react component displayed in case user is not Authorised
-  authenticating: PropTypes.elementType, // react component displayed when about to redirect user to be authenticated
+  authenticatingComponent: PropTypes.elementType, // react component displayed when about to redirect user to be authenticated
   callbackComponentOverride: PropTypes.elementType, // react component displayed when user is connected
   sessionLostComponent: PropTypes.elementType, // react component displayed when user loose authentication session
   configuration: PropTypes.shape({
@@ -62,6 +65,8 @@ const propTypes = {
       introspection_endpoint: PropTypes.string,
     }),
   }).isRequired,
+  customEvents={{...}}, //event hooks for onUserLoaded, onUserUnloaded, onSilentRenewError, onUserSessionChanged.  DEPRECATED in v4+
+  acr_values: PropTypes.string, //custom acr_values. See 'extras' now.
   isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
   loggerLevel: PropTypes.number,
   logger: PropTypes.shape({
@@ -77,7 +82,7 @@ const propTypes = {
 const propTypes = {
   loadingComponent: PropTypes.elementType, // you can inject your own loading component
   sessionLostComponent: PropTypes.elementType, // you can inject your own session lost component
-  authenticating: PropTypes.elementType, // you can inject your own authenticationg component
+  authenticatingComponent: PropTypes.elementType, // you can inject your own authenticating component
   callbackSuccessComponent: PropTypes.elementType, // you can inject your own call back success component
   callbackErrorComponent: PropTypes.elementType, // you can inject your own call back error component
   serviceWorkerNotSupportedComponent: PropTypes.elementType, // you can inject your page that explain your require a more modern browser
@@ -90,13 +95,12 @@ const propTypes = {
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
-    extras: StringMap|undefined // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
-  }).isRequired
+    extras: StringMap|undefined // ex: {'prompt': 'consent', 'access_type': 'offline', 'acr_values'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
+  }).isRequired,
 };
 ```
 
-
-Manage Oidc actions and informations
+Manage Oidc actions and information
 
 ```javascript
 
@@ -109,11 +113,11 @@ const  { isEnabled, login, logout, oidcUser, events } = useReactOidc();
 import { useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc-context';
 
 const { login, logout, isAuthenticated} = useOidc(); // login and logout return a Promise
-const{ oidcUser, oidcUserLoadingState } = useOidcUser(); // Return user_info endpoint data
-const{ accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a jwk
-const{ idToken, idTokenPayload } = useOidcIdToken(); // contain IDToken metadata
- 
- ```
+const { oidcUser, oidcUserLoadingState } = useOidcUser(); // Return user_info endpoint data
+const { accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a JWK
+const { idToken, idTokenPayload } = useOidcIdToken(); // contain IDToken metadata
+```
+
 ```javascript
 
 // old v3 
@@ -122,10 +126,8 @@ import { withFetchRedirectionOn401,
          withFetchRedirectionOn403,
          withAuthentication } from '@axa-fr/react-oidc-context-fetch';
 
-
 // new v5
 import { withOidcFetch } from '@axa-fr/react-oidc-context';
-
 
 // withFetchRedirectionOn401 : removed, you have to implement your own 401 management
 // withFetchSilentAuthenticateAndRetryOn401 : removed, not necessary in v4 token are in auto refresh mode only
@@ -134,7 +136,6 @@ import { withOidcFetch } from '@axa-fr/react-oidc-context';
 
 // withFetchToken in v3 have been rename to withOidcFetch and set inside  '@axa-fr/react-oidc-context' package
 withOidcFetch(</MyComponent/>)
-
  
 ```
 
@@ -155,7 +156,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 }
 ```
 
-Then edit OidcTrustedDomains.js in "public" folder for your need
+Then edit `OidcTrustedDomains.js` in "public" folder for your need
 
 ```javascript
 // OidcTrustedDomains.js
@@ -165,9 +166,4 @@ const trustedDomains = {
 };
 ```
 
-
-In case v5 does not implement all features that you are using or this migration guide enought complete.
-
-Please make issues or PullRequest in order to help to complete it !
-
-
+In case v5 does not implement all the features that you are using or this migration guide enough complete, please make issues or PullRequest in order to help to complete it!

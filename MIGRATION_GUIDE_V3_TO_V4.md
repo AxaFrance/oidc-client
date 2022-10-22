@@ -1,4 +1,4 @@
-﻿# Migrate from v3 to v4
+﻿# Migrating from v3 to v4
 
 V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
 In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
@@ -9,12 +9,12 @@ In the v4 we have chosen to remove a lot the surface API in order to simplify us
   - [`@axa-fr/react-oidc-context-fetch`](./packages/context-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-context-fetch) **Deprecated in v4**
   - [`@axa-fr/react-oidc-redux`](./packages/redux#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux) **Deprecated in v4 : use react-oidc-context which works with redux and in fact does not use any react context**
   - [`@axa-fr/react-oidc-redux-fetch`](./packages/redux-fetch#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-redux-fetch) **Deprecated in v4**
-  - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
+  - [`@axa-fr/react-oidc-fetch-observable`](./packages/fetch-observable#readme.md) [![NPM version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc-fetch-observable) **Deprecated in v4**
 
-Migration PullRequest sample : https://github.com/samuel-gomez/react-starter-toolkit/pull/36
-
+Migration PullRequest [sample](https://github.com/samuel-gomez/react-starter-toolkit/pull/36)
 
 Main provider component have been renamed
+
 ```javascript
 import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 
@@ -23,16 +23,17 @@ import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 <AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
 </AuthenticationProvider>
 
-// in v4 become
+// in v4 becomes
 
 import { OidcProvider } from '@axa-fr/react-oidc-context';
 
-//loggerLevel : Logger property has been removed in v4
+// loggerLevel : Logger property has been removed in v4
 <OidcProvider configuration={oidcConfiguration}>
 </OidcProvider>
 ```
 
 Provider properties have changed, you need to keep only required properties for v4 else it won't work.
+
 ```javascript
 // old v3 
 const propTypes = {
@@ -62,6 +63,7 @@ const propTypes = {
       introspection_endpoint: PropTypes.string,
     }),
   }).isRequired,
+  customEvents={{...}}, //event hooks for onUserLoaded, onUserUnloaded, onSilentRenewError, onUserSessionChanged.  DEPRECATED in v4+
   isEnabled: PropTypes.bool, // enable/disable the protections and trigger of authentication (useful during development).
   loggerLevel: PropTypes.number,
   logger: PropTypes.shape({
@@ -95,8 +97,7 @@ const propTypes = {
 };
 ```
 
-
-Manage Oidc actions and informations
+Manage Oidc actions and information
 
 ```javascript
 
@@ -109,11 +110,12 @@ const  { isEnabled, login, logout, oidcUser, events } = useReactOidc();
 import { useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc-context';
 
 const { login, logout, isAuthenticated } = useOidc(); // login and logout return a Promise
-const { oidcUser, isOidcUserLoading, isLogged } = useOidcUser(); // Return user_info endpoint data
-const { accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a jwk
+const { oidcUser, isOidcUserLoading } = useOidcUser(); // Return user_info endpoint data
+const { accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a JWK
 const { idToken, idTokenPayload } = useOidcIdToken(); // contain IDToken metadata
  
- ```
+```
+
 ```javascript
 
 // old v3 
@@ -122,10 +124,8 @@ import { withFetchRedirectionOn401,
          withFetchRedirectionOn403,
          withAuthentication } from '@axa-fr/react-oidc-context-fetch';
 
-
 // new v4
 import { withOidcFetch } from '@axa-fr/react-oidc-context';
-
 
 // withFetchRedirectionOn401 : removed, you have to implement your own 401 management
 // withFetchSilentAuthenticateAndRetryOn401 : removed, not necessary in v4 token are in auto refresh mode only
@@ -135,7 +135,6 @@ import { withOidcFetch } from '@axa-fr/react-oidc-context';
 // withFetchToken in v3 have been rename to withOidcFetch and set inside  '@axa-fr/react-oidc-context' package
 withOidcFetch(</MyComponent/>)
 
- 
 ```
 
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
@@ -155,7 +154,7 @@ The only file you should edit is "OidcTrustedDomains.js" which will never be era
 }
 ```
 
-Then edit OidcTrustedDomains.js in "public" folder for your need
+Then edit `OidcTrustedDomains.js` in "public" folder for your need
 
 ```javascript
 // OidcTrustedDomains.js
@@ -165,9 +164,4 @@ const trustedDomains = {
 };
 ```
 
-
-In case v4 does not implement all features that you are using or this migration guide enought complete.
-
-Please make issues or PullRequest in order to help to complete it !
-
-
+In case v4 does not implement all the features that you are using or this migration guide enough complete, please make issues or PullRequest in order to help to complete it!
