@@ -1,35 +1,35 @@
-import React, {useEffect, ComponentType} from 'react';
-import {VanillaOidc} from "../../vanilla/vanillaOidc";
-import {getParseQueryStringFromLocation} from "../../vanilla/route-utils";
+import { ComponentType, useEffect } from 'react';
 
+import { getParseQueryStringFromLocation } from '../../vanilla/route-utils';
+import { VanillaOidc } from '../../vanilla/vanillaOidc';
 
-const SilentLogin: ComponentType<any> = (({configurationName }) => {
+const SilentLogin: ComponentType<any> = ({ configurationName }) => {
     const queryParams = getParseQueryStringFromLocation(window.location.href);
 
-    const getOidc =  VanillaOidc.get;
+    const getOidc = VanillaOidc.get;
     const oidc = getOidc(configurationName);
-    
-    let extras = null;  
 
-    for (let [key, value] of Object.entries(queryParams)) {
-        if(key === "state" || key == "scope"){
+    let extras = null;
+
+    for (const [key, value] of Object.entries(queryParams)) {
+        if (key === 'state' || key === 'scope') {
             continue;
         }
-        if(extras === null){
+        if (extras === null) {
             extras = {};
         }
         extras[key] = value;
     }
-    
+
     useEffect(() => {
-        if(!oidc.tokens){
-            oidc.loginAsync(null, extras,  true, queryParams.scope);
+        if (!oidc.tokens) {
+            oidc.loginAsync(null, extras, true, queryParams.scope);
         }
         return () => {
-        }
+        };
     }, []);
-    
+
     return <></>;
-});
+};
 
 export default SilentLogin;

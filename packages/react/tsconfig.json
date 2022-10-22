@@ -35,5 +35,5 @@
     "**/*.stories.tsx",
     "./src/setupTests.ts"
   ],
-  "files": ["./src/oidc/index.ts"]
+  "files": ["src/oidc/index.ts"]
 }

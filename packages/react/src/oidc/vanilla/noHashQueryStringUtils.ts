@@ -1,4 +1,4 @@
-import {BasicQueryStringUtils} from '@openid/appauth';
+import { BasicQueryStringUtils } from '@openid/appauth';
 
 export class NoHashQueryStringUtils extends BasicQueryStringUtils {
     parse(input, useHash) {
@@ -6,27 +6,27 @@ export class NoHashQueryStringUtils extends BasicQueryStringUtils {
     }
 }
 
-const keys = ["code", "session_state", "state"]
+const keys = ['code', 'session_state', 'state'];
 
 export class HashQueryStringUtils extends BasicQueryStringUtils {
     parse(input, useHash) {
-        const output =  super.parse(input, true /* use hash */);
-        
+        const output = super.parse(input, true /* use hash */);
+
         // Fix AppAuthJs behavior
         let propertyToDelelete = null;
         Object.entries(output).map(([key, value]) => {
             keys.forEach(k => {
-                if(key.endsWith(`?${k}`)){
-                    output[k]= value;
+                if (key.endsWith(`?${k}`)) {
+                    output[k] = value;
                     propertyToDelelete = key;
                 }
-            })
+            });
         });
-        
-        if(propertyToDelelete){
+
+        if (propertyToDelelete) {
             delete output[propertyToDelelete];
         }
-        
+
         return output;
     }
 }

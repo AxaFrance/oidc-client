@@ -1,4 +1,4 @@
-﻿export class MemoryStorageBackend {
+export class MemoryStorageBackend {
     public items: any;
     private saveItemsAsync: Function;
 

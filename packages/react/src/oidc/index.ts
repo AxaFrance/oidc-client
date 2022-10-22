@@ -1,6 +1,6 @@
-﻿export { withOidcSecure, OidcSecure } from "./OidcSecure";
-export { useOidcUser, OidcUserStatus} from "./User";
-export { useOidc, useOidcAccessToken, useOidcIdToken } from "./ReactOidc";
-export { withOidcFetch, useOidcFetch } from "./FetchToken";
-export { OidcProvider } from "./OidcProvider";
-export {TokenRenewMode } from "./vanilla/parseTokens";
+export { useOidcFetch, withOidcFetch } from './FetchToken';
+export { OidcProvider } from './OidcProvider';
+export { OidcSecure, withOidcSecure } from './OidcSecure';
+export { useOidc, useOidcAccessToken, useOidcIdToken } from './ReactOidc';
+export { OidcUserStatus, useOidcUser } from './User';
+export { TokenRenewMode } from './vanilla/parseTokens';

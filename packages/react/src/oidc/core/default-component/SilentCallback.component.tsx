@@ -1,12 +1,12 @@
-import React, {useEffect, ComponentType} from 'react';
-import {VanillaOidc} from "../../vanilla/vanillaOidc"
+import React, { ComponentType, useEffect } from 'react';
 
-const CallbackManager: ComponentType<any> = ({configurationName }) => {
+import { VanillaOidc } from '../../vanilla/vanillaOidc';
 
+const CallbackManager: ComponentType<any> = ({ configurationName }) => {
     useEffect(() => {
         let isMounted = true;
         const playCallbackAsync = async () => {
-            const getOidc =  VanillaOidc.get;
+            const getOidc = VanillaOidc.get;
             const oidc = getOidc(configurationName);
             oidc.silentLoginCallbackAsync();
         };
@@ -14,7 +14,7 @@ const CallbackManager: ComponentType<any> = ({configurationName }) => {
         return () => {
             isMounted = false;
         };
-    },[]);
+    }, []);
 
     return <></>;
 };

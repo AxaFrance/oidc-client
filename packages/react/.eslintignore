@@ -1,0 +1,11 @@
+build
+bin
+node_modules
+dist
+**/*.spec.ts
+**/*.spec.tsx
+**/*.test.ts
+**/*.test.tsx
+**/*.stories.tsx
+./src/setupTests.ts
+setupTests.js
