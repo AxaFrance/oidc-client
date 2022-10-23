@@ -110,6 +110,7 @@ module.exports = {
   
       'react/prop-types': 'off',
       'react/jsx-wrap-multilines': 'error',
+      'react/react-in-jsx-scope': 'off',
       'react/display-name': 'off',
       // https://github.com/facebook/react/tree/master/packages/eslint-plugin-react-hooks
       'react-hooks/rules-of-hooks': 'error',

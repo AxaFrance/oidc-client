@@ -7,8 +7,8 @@ export class VanillaOidc {
         this._oidc = oidc;
     }
 
-    subscriveEvents(func:Function):string {
-        return this._oidc.subscriveEvents(func);
+    subscribeEvents(func:Function):string {
+        return this._oidc.subscribeEvents(func);
     }
 
     removeEventSubscription(id:string):void {

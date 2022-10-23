@@ -1,7 +1,7 @@
-import { BasicQueryStringUtils } from '@openid/appauth';
+import { BasicQueryStringUtils, LocationLike } from '@openid/appauth';
 
 export class NoHashQueryStringUtils extends BasicQueryStringUtils {
-    parse(input, useHash) {
+    parse(input: LocationLike, _useHash: boolean) {
         return super.parse(input, false /* never use hash */);
     }
 }
@@ -9,7 +9,7 @@ export class NoHashQueryStringUtils extends BasicQueryStringUtils {
 const keys = ['code', 'session_state', 'state'];
 
 export class HashQueryStringUtils extends BasicQueryStringUtils {
-    parse(input, useHash) {
+    parse(input: LocationLike, _useHash: boolean) {
         const output = super.parse(input, true /* use hash */);
 
         // Fix AppAuthJs behavior

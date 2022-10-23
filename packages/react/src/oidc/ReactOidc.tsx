@@ -5,7 +5,11 @@ import { VanillaOidc } from './vanilla/vanillaOidc';
 
 const defaultConfigurationName = 'default';
 
-const defaultIsAuthenticated = (getOidc, configurationName) => {
+type GetOidcFn = {
+    (configurationName?: string): any;
+}
+
+const defaultIsAuthenticated = (getOidc: GetOidcFn, configurationName: string) => {
     let isAuthenticated = false;
     const oidc = getOidc(configurationName);
     if (oidc) {
@@ -22,7 +26,8 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
         setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
-        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
             if (name === VanillaOidc.eventNames.logout_from_another_tab || name === VanillaOidc.eventNames.logout_from_same_tab || name === VanillaOidc.eventNames.token_aquired) {
                 if (isMounted) {
                     setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
@@ -33,6 +38,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
             isMounted = false;
             oidc.removeEventSubscription(newSubscriptionId);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configurationName]);
 
     const login = (callbackPath:string | undefined = undefined, extras:StringMap = null, silentLoginOnly = false) => {
@@ -49,7 +55,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
 
 const accessTokenInitialState = { accessToken: null, accessTokenPayload: null };
 
-const initTokens = (configurationName) => {
+const initTokens = (configurationName: string) => {
     const getOidc = VanillaOidc.get;
     const oidc = getOidc(configurationName);
     if (oidc.tokens) {
@@ -75,7 +81,8 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
             const tokens = oidc.tokens;
             setAccessToken({ accessToken: tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload });
         }
-        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
             if (name === VanillaOidc.eventNames.token_renewed ||
                 name === VanillaOidc.eventNames.token_aquired ||
                 name === VanillaOidc.eventNames.logout_from_another_tab ||
@@ -92,13 +99,14 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
             isMounted = false;
             oidc.removeEventSubscription(newSubscriptionId);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configurationName]);
     return state;
 };
 
 const idTokenInitialState = { idToken: null, idTokenPayload: null };
 
-const initIdToken = (configurationName) => {
+const initIdToken = (configurationName: string) => {
     const getOidc = VanillaOidc.get;
     const oidc = getOidc(configurationName);
     if (oidc.tokens) {
@@ -124,7 +132,8 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
             const tokens = oidc.tokens;
             setIDToken({ idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload });
         }
-        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
             if (name === VanillaOidc.eventNames.token_renewed ||
                 name === VanillaOidc.eventNames.token_aquired ||
                 name === VanillaOidc.eventNames.logout_from_another_tab ||
@@ -141,6 +150,7 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
             isMounted = false;
             oidc.removeEventSubscription(newSubscriptionId);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configurationName]);
     return state;
 };

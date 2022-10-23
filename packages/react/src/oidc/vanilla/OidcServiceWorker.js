@@ -1,3 +1,4 @@
+/* global trustedDomains */
 this.importScripts('OidcTrustedDomains.js');
 
 const id = Math.round(new Date().getTime() / 1000).toString();
@@ -177,6 +178,7 @@ function hideTokens(currentDatabaseElement) {
 
 const getCurrentDatabasesTokenEndpoint = (database, url) => {
     const databases = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [key, value] of Object.entries(database)) {
         if (value) {
             if (value.oidcServerConfiguration != null && url.startsWith(value.oidcServerConfiguration.tokenEndpoint)) {
@@ -427,6 +429,7 @@ addEventListener('message', event => {
             port.postMessage({ configurationName });
             return;
         case 'init':
+            {
             const oidcServerConfiguration = data.data.oidcServerConfiguration;
                         const domains = trustedDomains[configurationName];
             if (!domains.find(f => f === acceptAnyDomainToken)) {
@@ -468,15 +471,18 @@ addEventListener('message', event => {
                 });
             }
             return;
+        }
 
         case 'setSessionState':
             currentDatabase.sessionState = data.data.sessionState;
             port.postMessage({ configurationName });
             return;
         case 'getSessionState':
-            const sessionState = currentDatabase.sessionState;
-            port.postMessage({ configurationName, sessionState });
-            return;
+            {
+                const sessionState = currentDatabase.sessionState;
+                port.postMessage({ configurationName, sessionState });
+                return;
+            }
         case 'setNonce':
             currentDatabase.nonce = data.data.nonce;
             port.postMessage({ configurationName });

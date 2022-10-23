@@ -2,6 +2,7 @@ module.exports = {
     extends: ['./config/defaultEslintConfig'], 
     parserOptions: {
       project: './tsconfig.json',
+      tsconfigRootDir: __dirname,
     },
     rules: {
       '@typescript-eslint/naming-convention': [

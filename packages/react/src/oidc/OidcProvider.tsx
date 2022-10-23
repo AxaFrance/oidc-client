@@ -9,7 +9,7 @@ import { OidcConfiguration } from './vanilla/oidc';
 import { VanillaOidc } from './vanilla/vanillaOidc';
 
 export type oidcContext = {
-    getOidc: Function;
+    (name?: string): VanillaOidc;
 };
 
 const defaultEventState = { name: '', data: null };
@@ -94,13 +94,14 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
     const getOidc = (configurationName = 'default') => {
         return VanillaOidc.getOrCreate(configuration, configurationName);
     };
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(defaultEventState);
     const [currentConfigurationName, setConfigurationName] = useState('default');
 
     useEffect(() => {
         const oidc = getOidc(configurationName);
-        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
+        const newSubscriptionId = oidc.subscribeEvents((name, data) => {
             if (onEvent) {
                 onEvent(configurationName, name, data);
             }
@@ -113,8 +114,8 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
 
     useEffect(() => {
         const oidc = getOidc(configurationName);
-        const newSubscriptionId = oidc.subscriveEvents((name, data) => {
-            if (name === VanillaOidc.eventNames.refreshTokensAsync_error || name == VanillaOidc.eventNames.syncTokensAsync_error) {
+        const newSubscriptionId = oidc.subscribeEvents((name, data) => {
+            if (name === VanillaOidc.eventNames.refreshTokensAsync_error || name === VanillaOidc.eventNames.syncTokensAsync_error) {
                 if (onSessionLost != null) {
                     onSessionLost();
                     return;
@@ -131,9 +132,9 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
                     onLogoutFromSameTab();
                 }
                 // setEvent({name, data});
-            } else if (name == VanillaOidc.eventNames.loginAsync_begin ||
+            } else if (name === VanillaOidc.eventNames.loginAsync_begin ||
                 name === VanillaOidc.eventNames.loginCallbackAsync_end ||
-                name == VanillaOidc.eventNames.loginAsync_error ||
+                name === VanillaOidc.eventNames.loginAsync_error ||
                 name === VanillaOidc.eventNames.loginCallbackAsync_error
             ) {
                 setEvent({ name, data });
@@ -149,6 +150,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
             previousOidc.removeEventSubscription(newSubscriptionId);
             setEvent(defaultEventState);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configuration, configurationName]);
 
     const SessionLostComponent = sessionLostComponent;
@@ -157,7 +159,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
     const ServiceWorkerNotSupportedComponent = serviceWorkerNotSupportedComponent;
     const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
-    const isLoading = (loading || (currentConfigurationName != configurationName));
+    const isLoading = (loading || (currentConfigurationName !== configurationName));
     const oidc = getOidc(configurationName);
     const eventName = event.name;
     switch (eventName) {

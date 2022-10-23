@@ -23,7 +23,6 @@ import {
     isTokensValid,
     parseOriginalTokens,
     setTokens, TokenRenewMode,
-    TokenRenewModeType,
     Tokens,
 } from './parseTokens';
 import { getParseQueryStringFromLocation } from './route-utils';
@@ -206,7 +205,7 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) : Promise<LoginCallba
 };
 
 async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh = false, extras:StringMap = null) {
-    const updateTokens = (tokens) => oidc.tokens = tokens;
+    const updateTokens = (tokens) => { oidc.tokens = tokens; };
     const { tokens, status } = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras, updateTokens);
 
     const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
@@ -279,7 +278,7 @@ const userInfoAsync = async (oidc) => {
            },
        });
 
-       if (res.status != 200) {
+       if (res.status !== 200) {
            return null;
        }
 
@@ -345,7 +344,7 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
     }
     const response = await fetch(fullUrl);
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
         return null;
     }
 
@@ -390,7 +389,7 @@ export class Oidc {
       this.initAsync.bind(this);
       this.loginCallbackAsync.bind(this);
       this._loginCallbackAsync.bind(this);
-      this.subscriveEvents.bind(this);
+      this.subscribeEvents.bind(this);
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
@@ -399,7 +398,7 @@ export class Oidc {
       this.initAsync(this.configuration.authority, this.configuration.authority_configuration);
     }
 
-    subscriveEvents(func):string {
+    subscribeEvents(func):string {
         const id = getRandomInt(9999999999999).toString();
         this.events.push({ id, func });
         return id;
@@ -421,8 +420,8 @@ export class Oidc {
     }
 
     static get(name = 'default') {
-        const insideBrowser = (typeof process === 'undefined');
-        if (!oidcDatabase.hasOwnProperty(name) && insideBrowser) {
+        const isInsideBrowser = (typeof process === 'undefined');
+        if (!oidcDatabase.hasOwnProperty(name) && isInsideBrowser) {
             throw Error(`Oidc library does seem initialized.
 Please checkout that you are using OIDC hook inside a <OidcProvider configurationName="${name}"></OidcProvider> compoment.`);
         }
@@ -775,7 +774,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         } else {
                             console.debug('SessionMonitor._callback: Different subject signed into OP:', iFrameIdTokenPayload.sub);
                         }
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     }).catch(async (e) => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         for (const [key, oidc] of Object.entries(oidcDatabase)) {
                             // if(oidc !== this) {
                                 // @ts-ignore
@@ -883,7 +884,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         return;
                     }
                     if (!response) {
-                        reject('no response');
+                        reject(new Error('no response'));
                         return;
                     }
 
@@ -908,7 +909,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     });
 
                     let timeoutId = setTimeout(() => {
-                        reject('performTokenRequest timeout');
+                        reject(new Error('performTokenRequest timeout'));
                         timeoutId = null;
                     }, tokenRequestTimeout ?? 12000);
                     try {
@@ -1042,37 +1043,39 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 return await localsilentLoginAsync();
                             }
                             this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
-                            const clientId = configuration.client_id;
-                            const redirectUri = configuration.redirect_uri;
-                            const authority = configuration.authority;
-                            const tokenExtras = configuration.token_request_extras ? configuration.token_request_extras : {};
-                            const finalExtras = { ...tokenExtras, ...extras };
+                            {
+                                const clientId = configuration.client_id;
+                                const redirectUri = configuration.redirect_uri;
+                                const authority = configuration.authority;
+                                const tokenExtras = configuration.token_request_extras ? configuration.token_request_extras : {};
+                                const finalExtras = { ...tokenExtras, ...extras };
 
-                            const details = {
-                                client_id: clientId,
-                                redirect_uri: redirectUri,
-                                grant_type: GRANT_TYPE_REFRESH_TOKEN,
-                                refresh_token: tokens.refreshToken,
-                            };
-                            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-                            const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode);
-                            if (tokenResponse.success) {
-                                if (!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)) {
-                                    updateTokens(null);
-                                    this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token return not valid tokens' });
-                                    return { tokens: null, status: 'SESSION_LOST' };
+                                const details = {
+                                    client_id: clientId,
+                                    redirect_uri: redirectUri,
+                                    grant_type: GRANT_TYPE_REFRESH_TOKEN,
+                                    refresh_token: tokens.refreshToken,
+                                };
+                                const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
+                                const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode);
+                                if (tokenResponse.success) {
+                                    if (!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)) {
+                                        updateTokens(null);
+                                        this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token return not valid tokens' });
+                                        return { tokens: null, status: 'SESSION_LOST' };
+                                    }
+                                    updateTokens(tokenResponse.data);
+                                    this.publishEvent(eventNames.refreshTokensAsync_end, { success: tokenResponse.success });
+                                    this.publishEvent(Oidc.eventNames.token_renewed, {});
+                                    return { tokens: tokenResponse.data, status: 'LOGGED_IN' };
+                                } else {
+                                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
+                                        message: 'bad request',
+                                        tokenResponse,
+                                    });
+                                    return await this.synchroniseTokensAsync(null, index + 1, forceRefresh, extras, updateTokens);
                                 }
-                                updateTokens(tokenResponse.data);
-                                this.publishEvent(eventNames.refreshTokensAsync_end, { success: tokenResponse.success });
-                                this.publishEvent(Oidc.eventNames.token_renewed, {});
-                                return { tokens: tokenResponse.data, status: 'LOGGED_IN' };
-                            } else {
-                                this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
-                                    message: 'bad request',
-                                    tokenResponse,
-                                });
-                                return await this.synchroniseTokensAsync(null, index + 1, forceRefresh, extras, updateTokens);
-                            }
+                        }
                     }
                 } catch (exception) {
                     console.error(exception);
@@ -1097,9 +1100,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
         if (serviceWorker) {
             const { status, tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
-            if (status == 'LOGGED_OUT') {
+            if (status === 'LOGGED_OUT') {
                 return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
-            } else if (status == 'SESSIONS_LOST') {
+            } else if (status === 'SESSIONS_LOST') {
                     return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
             } else if (!status || !tokens) {
                 return { tokens: null, status: 'REQUIRE_SYNC_TOKENS', nonce: nullNonce };
@@ -1115,7 +1118,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const { tokens, status } = await session.initAsync();
             if (!tokens) {
                 return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
-            } else if (status == 'SESSIONS_LOST') {
+            } else if (status === 'SESSIONS_LOST') {
                     return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
                 } else if (tokens.issuedAt !== currentTokens.issuedAt) {
                 const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
@@ -1210,11 +1213,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             console.warn('callbackPathOrUrl path is not a string');
         }
         const path = (callbackPathOrUrl === null || callbackPathOrUrl === undefined) ? location.pathname + (location.search || '') + (location.hash || '') : callbackPathOrUrl;
-		let isUri = false;
+        let isUri = false;
         if (callbackPathOrUrl) {
             isUri = callbackPathOrUrl.includes('https://') || callbackPathOrUrl.includes('http://');
         }
-		const url = isUri ? callbackPathOrUrl : window.location.origin + path;
+        const url = isUri ? callbackPathOrUrl : window.location.origin + path;
         // @ts-ignore
         const idToken = this.tokens ? this.tokens.idToken : '';
         try {
@@ -1239,6 +1242,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         // @ts-ignore
         const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
         await this.destroyAsync('LOGGED_OUT');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (const [key, oidc] of Object.entries(oidcDatabase)) {
             if (oidc !== this) {
                 // @ts-ignore

@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {ComponentType} from "react";
-import {style} from "./style";
+import { ComponentType } from 'react';
 
-const ServiceWorkerNotSupported :  ComponentType<any> = ({configurationName}) => (
+import { style } from './style';
+
+const ServiceWorkerNotSupported : ComponentType<any> = ({ configurationName }) => (
   <div className="oidc-serviceworker" style={style}>
     <div className="oidc-serviceworker__container">
       <h1 className="oidc-serviceworker__title">Unable to authenticate on this browser for {configurationName}</h1>

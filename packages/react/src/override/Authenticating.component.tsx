@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {PropsWithChildren} from "react";
-import {style} from "./style";
+import { PropsWithChildren } from 'react';
 
-const Authenticating :  PropsWithChildren<any> = ({configurationName}) => (
+import { style } from './style';
+
+const Authenticating : PropsWithChildren<any> = ({ configurationName }) => (
       <div className="oidc-authenticating" style={style}>
     <div className="oidc-authenticating__container">
       <h1 className="oidc-authenticating__title">Authentication in progress for {configurationName}</h1>

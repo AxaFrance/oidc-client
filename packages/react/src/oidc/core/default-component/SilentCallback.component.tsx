@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect } from 'react';
+import { ComponentType, useEffect } from 'react';
 
 import { VanillaOidc } from '../../vanilla/vanillaOidc';
 

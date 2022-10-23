@@ -62,14 +62,14 @@ const timer = (function () {
         } catch (error) {
             return null;
         }
-        const insideBrowser = (typeof process === 'undefined');
+        const isInsideBrowser = (typeof process === 'undefined');
         try {
             if (SharedWorker) {
                 worker = new SharedWorker(blobURL);
                return worker.port;
             }
         } catch (error) {
-            if (insideBrowser) {
+            if (isInsideBrowser) {
                 console.warn('SharedWorker not available');
             }
         }
@@ -79,7 +79,7 @@ const timer = (function () {
                 return worker;
             }
         } catch (error) {
-            if (insideBrowser) {
+            if (isInsideBrowser) {
                 console.warn('Worker not available');
             }
         }
