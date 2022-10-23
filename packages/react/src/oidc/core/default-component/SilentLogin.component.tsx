@@ -25,8 +25,6 @@ const SilentLogin: ComponentType<any> = ({ configurationName }) => {
         if (!oidc.tokens) {
             oidc.loginAsync(null, extras, true, queryParams.scope);
         }
-        return () => {
-        };
     }, []);
 
     return <></>;
