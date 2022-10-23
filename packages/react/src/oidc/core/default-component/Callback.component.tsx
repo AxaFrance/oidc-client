@@ -12,7 +12,7 @@ export const CallBackSuccess: ComponentType<any> = () => (<div className="oidc-c
 </div>);
 
 const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, configurationName, withCustomHistory }) => {
-  const [error, setError] = useState(false);
+  const [isError, setIsError] = useState(false);
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
@@ -23,7 +23,7 @@ const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, c
         history.replaceState(callbackPath || '/');
       } catch (error) {
           if (isMounted) {
-            setError(true);
+            setIsError(true);
           }
       }
     };
@@ -36,7 +36,7 @@ const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, c
   const CallbackErrorComponent = callBackError || AuthenticatingError;
   const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
 
-  if (error) {
+  if (isError) {
     return <CallbackErrorComponent configurationName={configurationName} />;
   }
 

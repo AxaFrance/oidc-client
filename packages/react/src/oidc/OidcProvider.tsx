@@ -37,7 +37,7 @@ export type OidcSessionProps = {
 };
 
 const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({ loadingComponent, children, configurationName }) => {
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const getOidc = VanillaOidc.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
@@ -45,18 +45,19 @@ const OidcSession : FC<PropsWithChildren<OidcSessionProps>> = ({ loadingComponen
         if (oidc) {
             oidc.tryKeepExistingSessionAsync().then(() => {
                 if (isMounted) {
-                    setLoading(false);
+                    setIsLoading(false);
                 }
             });
         }
         return () => {
             isMounted = false;
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configurationName]);
     const LoadingComponent = loadingComponent;
     return (
         <>
-            {loading
+            {isLoading
 ? (
                <LoadingComponent configurationName={configurationName}/>
             )
