@@ -1,13 +1,17 @@
 import { LoginCallback, Oidc, OidcConfiguration, StringMap } from './oidc';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens';
 
+export interface EventSubscriber {
+    (name: string, data:any);
+}
+
 export class VanillaOidc {
     private _oidc: Oidc;
     constructor(oidc: Oidc) {
         this._oidc = oidc;
     }
 
-    subscribeEvents(func:Function):string {
+    subscribeEvents(func:EventSubscriber):string {
         return this._oidc.subscribeEvents(func);
     }
 
