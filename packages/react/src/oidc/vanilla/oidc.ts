@@ -497,28 +497,27 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             iframe.id = `${this.configurationName}_oidc_iframe`;
             iframe.setAttribute('src', link);
             document.body.appendChild(iframe);
-            const self = this;
             return new Promise((resolve, reject) => {
                 try {
                     let isResolved = false;
-                    window.onmessage = function (e) {
+                    window.onmessage = (e: MessageEvent<any>) => {
                         if (e.origin === iFrameOrigin &&
                             e.source === iframe.contentWindow
                         ) {
-                            const key = `${self.configurationName}_oidc_tokens:`;
-                            const key_error = `${self.configurationName}_oidc_error:`;
+                            const key = `${this.configurationName}_oidc_tokens:`;
+                            const key_error = `${this.configurationName}_oidc_error:`;
                             const data = e.data;
                             if (data && typeof (data) === 'string') {
                                 if (!isResolved) {
                                     if (data.startsWith(key)) {
                                         const result = JSON.parse(e.data.replace(key, ''));
-                                        self.publishEvent(eventNames.silentLoginAsync_end, {});
+                                        this.publishEvent(eventNames.silentLoginAsync_end, {});
                                         iframe.remove();
                                         isResolved = true;
                                         resolve(result);
                                     } else if (data.startsWith(key_error)) {
                                         const result = JSON.parse(e.data.replace(key_error, ''));
-                                        self.publishEvent(eventNames.silentLoginAsync_error, result);
+                                        this.publishEvent(eventNames.silentLoginAsync_error, result);
                                         iframe.remove();
                                         isResolved = true;
                                         reject(new Error('oidc_' + result.error));
@@ -530,7 +529,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const silentSigninTimeout = configuration.silent_login_timeout;
                     setTimeout(() => {
                         if (!isResolved) {
-                            self.publishEvent(eventNames.silentLoginAsync_error, { reason: 'timeout' });
+                            this.publishEvent(eventNames.silentLoginAsync_error, { reason: 'timeout' });
                             iframe.remove();
                             isResolved = true;
                             reject(new Error('timeout'));
@@ -538,7 +537,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }, silentSigninTimeout);
                 } catch (e) {
                     iframe.remove();
-                    self.publishEvent(eventNames.silentLoginAsync_error, e);
+                    this.publishEvent(eventNames.silentLoginAsync_error, e);
                     reject(e);
                 }
             });
