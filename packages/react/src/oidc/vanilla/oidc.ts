@@ -744,7 +744,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) {
-        return new Promise((resolve:Function, reject) => {
+        return new Promise<void>((resolve, reject): void => {
             if (this.configuration.silent_login_uri && this.configuration.silent_redirect_uri && this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
                 const checkSessionCallback = () => {
                     this.checkSessionIFrame.stop();
@@ -863,7 +863,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
 
             return new Promise((resolve, reject) => {
-                // @ts-ignore
                 let queryStringUtil = new NoHashQueryStringUtils();
                 if (redirectUri.includes('#')) {
                     const splithash = window.location.href.split('#');
@@ -871,7 +870,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         queryStringUtil = new HashQueryStringUtils();
                     }
                 }
-                // @ts-ignore
                 const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
                 const notifier = new AuthorizationNotifier();
                 authorizationHandler.setAuthorizationNotifier(notifier);
@@ -935,7 +933,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                     }
                                 }
 
-                                // @ts-ignore
                                 this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() => {
                                     this.publishEvent(eventNames.loginCallbackAsync_end, {});
                                     resolve({
@@ -1186,7 +1183,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         // this.events = [];
      }
 
-     async logoutSameTabAsync(clientId, sub) {
+     async logoutSameTabAsync(clientId: string, sub: any) {
          // @ts-ignore
          if (this.configuration.monitor_session && this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
              this.publishEvent(eventNames.logout_from_same_tab, { message: sub });
@@ -1194,7 +1191,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          }
      }
 
-    async logoutOtherTabAsync(clientId, sub) {
+    async logoutOtherTabAsync(clientId: string, sub: any) {
         // @ts-ignore
         if (this.configuration.monitor_session && this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
             await this.destroyAsync('LOGGED_OUT');

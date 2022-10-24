@@ -24,11 +24,11 @@ export type OidcProviderProps = {
     configurationName?: string;
     configuration?: OidcConfiguration;
     children: any;
-    onSessionLost?: Function;
-    onLogoutFromAnotherTab?:Function;
-    onLogoutFromSameTab?:Function;
+    onSessionLost?: () => void;
+    onLogoutFromAnotherTab?: () => void;
+    onLogoutFromSameTab?: () => void;
     withCustomHistory?: () => CustomHistory;
-    onEvent?:Function;
+    onEvent?: (configuration: string, name: string, data:any) => void;
 };
 
 export type OidcSessionProps = {
