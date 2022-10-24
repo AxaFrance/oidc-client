@@ -13,7 +13,8 @@
   "files": [
     "dist",
     "bin",
-    "src",
+    "src/oidc",
+    "src/override",
     "README.md",
     "package.json",
     "package-lock.json"
