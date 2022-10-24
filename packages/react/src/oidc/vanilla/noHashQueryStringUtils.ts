@@ -14,7 +14,7 @@ export class HashQueryStringUtils extends BasicQueryStringUtils {
 
         // Fix AppAuthJs behavior
         let propertyToDelelete = null;
-        Object.entries(output).map(([key, value]) => {
+        Object.entries(output).forEach(([key, value]) => {
             keys.forEach(k => {
                 if (key.endsWith(`?${k}`)) {
                     output[k] = value;
