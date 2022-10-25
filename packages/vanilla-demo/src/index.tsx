@@ -9,7 +9,6 @@ export const configuration = {
     refresh_time_before_tokens_expiration_in_second: 40,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false,
-  //  token_renew_mode : TokenRenewMode.access_token_invalid
 };
 
 const href = window.location.href;
@@ -27,7 +26,15 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
     let tokens = vanillaOidc.tokens
 
     if(tokens){
-        document.body.innerHTML = JSON.stringify(tokens);
+
+        // @ts-ignore
+        window.logout = () =>  vanillaOidc.logoutAsync();
+        document.body.innerHTML = `<div>
+            <button onclick="window.logout()">Logout</button>
+            <h1>Authenticated</h1>
+            <p>${JSON.stringify(tokens)}</p>
+        </div>`
+        
     }
     else {
         // @ts-ignore
