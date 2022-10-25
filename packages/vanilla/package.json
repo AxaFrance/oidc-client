@@ -8,6 +8,7 @@
   "description": "OpenID Connect & OAuth authentication using oidc-client wrapped in order to simplify how to use it",
   "files": [
     "dist",
+    "bin",
     "src",
     "README.md",
     "package.json",
