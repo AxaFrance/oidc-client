@@ -30,8 +30,9 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         // @ts-ignore
         window.logout = () =>  vanillaOidc.logoutAsync();
         document.body.innerHTML = `<div>
+            <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.logout()">Logout</button>
-            <h1>Authenticated</h1>
+            <h2>Authenticated</h2>
             <p>${JSON.stringify(tokens)}</p>
         </div>`
         
@@ -40,6 +41,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         // @ts-ignore
         window.login= () =>  vanillaOidc.loginAsync("/");
         document.body.innerHTML = `<div>
+            <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.login()">Login</button>
         </div>`
     }
