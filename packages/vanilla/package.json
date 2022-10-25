@@ -34,7 +34,8 @@
   "scripts": {
     "clean": "rimraf dist && rimraf src",
     "copy": "copyfiles -f ../react/src/oidc/vanilla/*.ts ./src && copyfiles -f ../react/src/oidc/vanilla/*.js ./src",
-    "prepare": "npm run clean && npm run copy && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/OidcServiceWorker.js ./dist && copyfiles -f ./src/OidcTrustedDomains.js ./dist"
+    "prepare": "npm run clean && npm run copy && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/OidcServiceWorker.js ./dist && copyfiles -f ./src/OidcTrustedDomains.js ./dist",
+    "postinstall": "node ./bin/copy.js"
   },
   "license": "MIT",
   "publishConfig": {
