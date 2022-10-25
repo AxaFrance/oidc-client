@@ -4,7 +4,15 @@
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "description": "OpenID Connect & OAuth authentication using oidc-client wrapped in order to simplify how to use it",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json",
+    "package-lock.json"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
