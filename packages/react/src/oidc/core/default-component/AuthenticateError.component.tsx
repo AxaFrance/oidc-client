@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ComponentType} from "react";
+import { ComponentType } from 'react';
 
 const AuthenticatingError: ComponentType<any> = () => (
   <div className="oidc-authenticating">

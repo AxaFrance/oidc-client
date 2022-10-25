@@ -1,5 +1,6 @@
-﻿import { useEffect, useState} from "react";
-import {VanillaOidc} from "./vanilla/vanillaOidc";
+import { useEffect, useState } from 'react';
+
+import { VanillaOidc } from './vanilla/vanillaOidc';
 
 export enum OidcUserStatus {
     Unauthenticated= 'Unauthenticated',
@@ -9,8 +10,8 @@ export enum OidcUserStatus {
 }
 
 export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
-    user: T,
-    status: OidcUserStatus
+    user: T;
+    status: OidcUserStatus;
 }
 
 export interface OidcUserInfo {
@@ -45,24 +46,24 @@ export interface OidcAddressClaim {
     country?: string;
 }
 
-export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName="default") => {
-    const [oidcUser, setOidcUser] = useState<OidcUser<T>>({user: null, status: OidcUserStatus.Unauthenticated});
+export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName = 'default') => {
+    const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: null, status: OidcUserStatus.Unauthenticated });
 
     const oidc = VanillaOidc.get(configurationName);
     useEffect(() => {
         let isMounted = true;
-        if(oidc && oidc.tokens) {
-            setOidcUser({...oidcUser, status: OidcUserStatus.Loading});
+        if (oidc && oidc.tokens) {
+            setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
             oidc.userInfoAsync()
                 .then((info) => {
                     if (isMounted) {
-                        setOidcUser({user: info, status: OidcUserStatus.Loaded});
+                        setOidcUser({ user: info, status: OidcUserStatus.Loaded });
                     }
                 })
-                .catch(() => setOidcUser({...oidcUser, status: OidcUserStatus.LoadingError}));
+                .catch(() => setOidcUser({ ...oidcUser, status: OidcUserStatus.LoadingError }));
         }
-        return  () => { isMounted = false };
+        return () => { isMounted = false; };
     }, []);
 
-    return {oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status}
-}
+    return { oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status };
+};

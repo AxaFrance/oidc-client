@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {ComponentType} from "react";
-import {style} from "./style";
+import { ComponentType } from 'react';
 
-const AuthenticatingError:  ComponentType<any> = ({configurationName}) => (
+import { style } from './style';
+
+const AuthenticatingError: ComponentType<any> = ({ configurationName }) => (
      <div className="oidc-authenticating" style={style}>
         <div className="oidc-authenticating__container">
           <h1 className="oidc-authenticating__title">Error authentication for {configurationName}</h1>

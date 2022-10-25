@@ -1,5 +1,3 @@
-import React from 'react';
-
 const generateKey = () =>
   Math.random()
     .toString(36)
@@ -24,7 +22,7 @@ type InitCustomEventParams<T = any> = {
 // IE Polyfill for CustomEvent
 export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Document) => (
   event: string,
-  params: InitCustomEventParams
+  params: InitCustomEventParams,
 ): CustomEvent => {
   if (typeof windowInternal.CustomEvent === 'function') {
     return new windowInternal.CustomEvent(event, params);
@@ -49,7 +47,7 @@ export type CustomHistory = {
 const getHistory = (
   windowInternal: WindowInternal,
   CreateEventInternal: (event: string, params?: InitCustomEventParams) => CustomEvent,
-  generateKeyInternal: typeof generateKey
+  generateKeyInternal: typeof generateKey,
 ): CustomHistory => {
   return {
     replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {

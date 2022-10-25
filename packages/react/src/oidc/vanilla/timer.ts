@@ -1,4 +1,4 @@
-﻿const timer = (function () {
+const timer = (function () {
     const workerPort = (function () {
         let worker;
         let blobURL;
@@ -28,7 +28,7 @@
                 clearInterval: function (port, id) {
                     clearInterval(innerIdsByOuterIds[id]);
                     innerIdsByOuterIds[id] = null;
-                }
+                },
             };
 
             function onMessage(port, event) {
@@ -57,21 +57,20 @@
         }.toString();
 
         try {
-            const blob = new Blob(['(', workerCode, ')()'], {type: 'application/javascript'});
+            const blob = new Blob(['(', workerCode, ')()'], { type: 'application/javascript' });
             blobURL = URL.createObjectURL(blob);
         } catch (error) {
             return null;
         }
-        const insideBrowser = (typeof process === 'undefined');
+        const isInsideBrowser = (typeof process === 'undefined');
         try {
             if (SharedWorker) {
                 worker = new SharedWorker(blobURL);
                return worker.port;
-            } 
-        } catch (error)
-        {
-            if(insideBrowser) {
-                console.warn("SharedWorker not available");
+            }
+        } catch (error) {
+            if (isInsideBrowser) {
+                console.warn('SharedWorker not available');
             }
         }
         try {
@@ -79,10 +78,9 @@
                 worker = new Worker(blobURL);
                 return worker;
             }
-        } catch (error)
-        {
-            if(insideBrowser) {
-                console.warn("Worker not available");
+        } catch (error) {
+            if (isInsideBrowser) {
+                console.warn('Worker not available');
             }
         }
 
@@ -92,13 +90,13 @@
     if (!workerPort) {
         // In NextJS with SSR (Server Side Rendering) during rending in Node JS, the window object is undefined,
         // the global object is used instead as it is the closest approximation of a browsers window object.
-        const bindContext = (typeof window === 'undefined')? global: window;
+        const bindContext = (typeof window === 'undefined') ? global : window;
 
         return {
             setTimeout: setTimeout.bind(bindContext),
             clearTimeout: clearTimeout.bind(bindContext),
             setInterval: setInterval.bind(bindContext),
-            clearInterval: clearInterval.bind(bindContext)
+            clearInterval: clearInterval.bind(bindContext),
         };
     }
 
@@ -158,7 +156,7 @@
         setTimeout: setTimeoutWorker,
         clearTimeout: clearTimeoutWorker,
         setInterval: setIntervalWorker,
-        clearInterval: clearIntervalWorker
+        clearInterval: clearIntervalWorker,
     };
 }());
 

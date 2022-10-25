@@ -1,16 +1,16 @@
 import React from 'react';
 
-import {OidcSecure, useOidcAccessToken, useOidcIdToken, useOidcUser, OidcUserStatus} from "./oidc";
+import { OidcSecure, OidcUserStatus, useOidcAccessToken, useOidcIdToken, useOidcUser } from './oidc';
 import { OidcUserInfo } from './oidc/User';
 
 interface OidcUserRoleInfo extends OidcUserInfo{
-    role?: string[]
+    role?: string[];
 }
 
 const DisplayUserInfo = () => {
-    const{ oidcUser, oidcUserLoadingState } = useOidcUser<OidcUserRoleInfo>();
+    const { oidcUser, oidcUserLoadingState } = useOidcUser<OidcUserRoleInfo>();
 
-    switch (oidcUserLoadingState){
+    switch (oidcUserLoadingState) {
         case OidcUserStatus.Loading:
             return <p>User Information are loading</p>;
         case OidcUserStatus.Unauthenticated:
@@ -30,7 +30,6 @@ const DisplayUserInfo = () => {
 };
 
 export const Profile = () => {
-
     return (
        <div className="container mt-3">
            <DisplayAccessToken/>
@@ -38,32 +37,31 @@ export const Profile = () => {
            <DisplayUserInfo/>
         </div>
     );
-}
+};
 
 const DisplayAccessToken = () => {
-    const{ accessToken, accessTokenPayload } = useOidcAccessToken();
+    const { accessToken, accessTokenPayload } = useOidcAccessToken();
 
-    if(!accessToken){
-        return <p>you are not authenticated</p>
+    if (!accessToken) {
+        return <p>you are not authenticated</p>;
     }
     return (
         <div className="card text-white bg-info mb-3">
             <div className="card-body">
                 <h5 className="card-title">Access Token</h5>
-                <p style={{color:'red', "backgroundColor": 'white'}}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. "access_token" and "refresh_token" will never be accessible from your client side javascript.</p>
+                <p style={{ color: 'red', backgroundColor: 'white' }}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be accessible from your client side javascript.</p>
                 {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
                 {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
             </div>
         </div>
-    )
+    );
 };
 
+const DisplayIdToken = () => {
+    const { idToken, idTokenPayload } = useOidcIdToken();
 
-const DisplayIdToken =() => {
-    const{ idToken, idTokenPayload } = useOidcIdToken();
-
-    if(!idToken){
-        return <p>you are not authenticated</p>
+    if (!idToken) {
+        return <p>you are not authenticated</p>;
     }
 
     return (
@@ -75,7 +73,6 @@ const DisplayIdToken =() => {
             </div>
         </div>
     );
-}
-
+};
 
 export const SecureProfile = () => <OidcSecure><Profile /></OidcSecure>;

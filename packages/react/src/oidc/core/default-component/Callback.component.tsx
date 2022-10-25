@@ -1,29 +1,29 @@
-import React, {useEffect, useState, ComponentType} from 'react';
-import AuthenticatingError from "./AuthenticateError.component";
-import {VanillaOidc} from "../../vanilla/vanillaOidc";
-import {getCustomHistory} from "../routes/withRouter";
+import React, { ComponentType, useEffect, useState } from 'react';
 
-export const CallBackSuccess: ComponentType<any> = () =>  (<div className="oidc-callback">
+import { VanillaOidc } from '../../vanilla/vanillaOidc';
+import { getCustomHistory } from '../routes/withRouter';
+import AuthenticatingError from './AuthenticateError.component';
+
+export const CallBackSuccess: ComponentType<any> = () => (<div className="oidc-callback">
   <div className="oidc-callback__container">
     <h1 className="oidc-callback__title">Authentication complete</h1>
     <p className="oidc-callback__content">You will be redirected to your application.</p>
   </div>
 </div>);
 
-const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, configurationName, withCustomHistory }) => {
-
-  const [error, setError] = useState(false);
+const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, configurationName, withCustomHistory }) => {
+  const [isError, setIsError] = useState(false);
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
-      const getOidc =  VanillaOidc.get;
+      const getOidc = VanillaOidc.get;
       try {
-        const {callbackPath} = await getOidc(configurationName).loginCallbackAsync();
-        const history = (withCustomHistory)? withCustomHistory(): getCustomHistory();
-        history.replaceState(callbackPath || "/")
+        const { callbackPath } = await getOidc(configurationName).loginCallbackAsync();
+        const history = (withCustomHistory) ? withCustomHistory() : getCustomHistory();
+        history.replaceState(callbackPath || '/');
       } catch (error) {
-          if(isMounted) {
-            setError(true);
+          if (isMounted) {
+            setIsError(true);
           }
       }
     };
@@ -31,15 +31,15 @@ const CallbackManager: ComponentType<any> = ({callBackError, callBackSuccess, co
     return () => {
       isMounted = false;
     };
-  },[]);
+  }, []);
 
   const CallbackErrorComponent = callBackError || AuthenticatingError;
   const CallbackSuccessComponent = callBackSuccess || CallBackSuccess;
 
-  if(error){
-    return <CallbackErrorComponent configurationName={configurationName} />
+  if (isError) {
+    return <CallbackErrorComponent configurationName={configurationName} />;
   }
-  
+
   return <CallbackSuccessComponent configurationName={configurationName} />;
 };
 

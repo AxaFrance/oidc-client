@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
-import {useOidcFetch, withOidcFetch} from "./oidc/FetchToken";
-import {OidcSecure} from "./oidc";
+import { OidcSecure } from './oidc';
+import { useOidcFetch, withOidcFetch } from './oidc/FetchToken';
 
 const DisplayUserInfo = ({ fetch }) => {
     const [oidcUser, setOidcUser] = useState(null);
@@ -9,25 +9,26 @@ const DisplayUserInfo = ({ fetch }) => {
 
     useEffect(() => {
         const fetchUserInfoAsync = async () => {
-            const res = await fetch("https://demo.duendesoftware.com/connect/userinfo");
-            if (res.status != 200) {
+            const res = await fetch('https://demo.duendesoftware.com/connect/userinfo');
+            if (res.status !== 200) {
                 return null;
             }
             return res.json();
         };
         let isMounted = true;
         fetchUserInfoAsync().then((userInfo) => {
-            if(isMounted) {
+            if (isMounted) {
                 setLoading(false);
-                setOidcUser(userInfo)
+                setOidcUser(userInfo);
             }
-        })
-        return  () => {
+        });
+        return () => {
             isMounted = false;
         };
-    },[]);
-    
-    if(isLoading){
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    if (isLoading) {
         return <>Loading</>;
     }
 
@@ -40,14 +41,14 @@ const DisplayUserInfo = ({ fetch }) => {
                 </div>
             </div>
         </div>
-    )
+    );
 };
 
 const UserInfoWithFetchHoc = withOidcFetch(fetch)(DisplayUserInfo);
 
-export const FetchUserHoc= () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure>;
+export const FetchUserHoc = () => <OidcSecure><UserInfoWithFetchHoc/></OidcSecure>;
 
-export const FetchUserHook= () => {
-    const {fetch} = useOidcFetch();
-    return <OidcSecure><DisplayUserInfo fetch={fetch} /></OidcSecure>
-}
+export const FetchUserHook = () => {
+    const { fetch } = useOidcFetch();
+    return <OidcSecure><DisplayUserInfo fetch={fetch} /></OidcSecure>;
+};

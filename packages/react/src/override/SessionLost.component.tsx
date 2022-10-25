@@ -1,11 +1,12 @@
-import React, {ComponentType} from 'react';
-import {style} from "./style"
-import {useOidc} from "../oidc";
+import { ComponentType } from 'react';
 
-export const SessionLost: ComponentType<any> = ({configurationName}) => {
-    const { login} = useOidc(configurationName);
+import { useOidc } from '../oidc';
+import { style } from './style';
 
-    return (<>
+export const SessionLost: ComponentType<any> = ({ configurationName }) => {
+    const { login } = useOidc(configurationName);
+
+    return (
       <div className="oidc-session-lost" style={style}>
         <div className="oidc-session-lost__container">
           <h1 className="oidc-session-lost__title">Session timed out for {configurationName}</h1>
@@ -15,7 +16,7 @@ export const SessionLost: ComponentType<any> = ({configurationName}) => {
             <button type="button" className="btn btn-primary" onClick={() => login(null)}>Login</button>
         </div>
       </div>
-    </>)
+    );
 };
 
 export default SessionLost;

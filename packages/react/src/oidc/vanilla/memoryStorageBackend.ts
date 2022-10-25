@@ -1,6 +1,13 @@
-﻿export class MemoryStorageBackend {
+
+interface SaveItemsFn {
+    (items:any):Promise<any>;
+}
+
+export type ItemName = string | number;
+
+export class MemoryStorageBackend {
     public items: any;
-    private saveItemsAsync: Function;
+    private saveItemsAsync: SaveItemsFn;
 
     constructor(saveItemsAsync, items = {}) {
         this.items = items;
@@ -12,11 +19,11 @@
         this.setItem.bind(this);
     }
 
-    getItem(name) {
+    getItem(name: ItemName) {
         return Promise.resolve(this.items[name]);
     }
 
-    removeItem(name) {
+    removeItem(name: ItemName) {
         delete this.items[name];
         return this.saveItemsAsync(this.items);
     }
@@ -26,7 +33,7 @@
         return this.saveItemsAsync(this.items);
     }
 
-    setItem(name, value) {
+    setItem(name: ItemName, value: any) {
         this.items[name] = value;
         return this.saveItemsAsync(this.items);
     }
