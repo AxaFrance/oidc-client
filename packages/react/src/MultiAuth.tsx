@@ -58,25 +58,25 @@ export const MultiAuthContainer = () => {
     const silent_redirect_uri = window.location.origin + '/multi-auth/authentification/silent-callback2';
     const configurations = {
         config_classic: {
-...configurationIdentityServer,
+            ...configurationIdentityServer,
             redirect_uri: callBack,
             silent_redirect_uri,
             scope: 'openid profile email api offline_access',
         },
         config_without_refresh_token: {
-...configurationIdentityServer,
+            ...configurationIdentityServer,
             redirect_uri: callBack,
             silent_redirect_uri,
             scope: 'openid profile email api',
         },
         config_without_silent_login: {
-...configurationIdentityServer,
+            ...configurationIdentityServer,
             redirect_uri: callBack,
             silent_redirect_uri: '',
             scope: 'openid profile email api offline_access',
         },
         config_without_refresh_token_silent_login: {
-...configurationIdentityServer,
+            ...configurationIdentityServer,
             redirect_uri: callBack,
             silent_redirect_uri: '',
             scope: 'openid profile email api',
