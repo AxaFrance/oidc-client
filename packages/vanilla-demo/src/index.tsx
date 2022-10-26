@@ -2,8 +2,8 @@ import { VanillaOidc } from '@axa-fr/vanilla-oidc'
 
 export const configuration = {
     client_id: 'interactive.public.short',
-    redirect_uri: window.location.origin + '#/authentication/callback',
-    silent_redirect_uri: window.location.origin + '#/authentication/silent-callback',
+    redirect_uri: window.location.origin + '/#/authentication/callback',
+    silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
     scope: 'openid profile email api offline_access',
     authority: 'https://demo.duendesoftware.com',
     refresh_time_before_tokens_expiration_in_second: 40,
@@ -21,6 +21,11 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         vanillaOidc.loginCallbackAsync().then(()=>{
             window.location.href = "/";
         });
+        document.body.innerHTML = `<div>
+            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h2>Loading</h2>
+        </div>`;
+        return
     }
 
     let tokens = vanillaOidc.tokens
