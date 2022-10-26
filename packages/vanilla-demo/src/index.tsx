@@ -38,7 +38,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
-            <p>${JSON.stringify(tokens)}</p>
+            <pre>${JSON.stringify(tokens,null,'\t')}</pre>
         </div>`
         
     }
