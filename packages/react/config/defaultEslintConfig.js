@@ -102,19 +102,16 @@ module.exports = {
       'import/default': 'off',
       'import/named': 'off',
       'import/namespace': 'off',
-
       'import/no-unresolved': 'off',
-  
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
-  
       'react/prop-types': 'off',
       'react/jsx-wrap-multilines': 'error',
       'react/react-in-jsx-scope': 'off',
       'react/display-name': 'off',
       // https://github.com/facebook/react/tree/master/packages/eslint-plugin-react-hooks
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'off',
     },
   
     overrides: [
