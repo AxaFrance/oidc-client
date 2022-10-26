@@ -31,9 +31,9 @@ jobs:
       - name: npm ci
         run: npm ci
         working-directory: ./packages/react
-      - name: npm run build
-        run: npm run build
-        working-directory: ./packages/react
+     # - name: npm run build
+     #   run: npm run build
+    #  working-directory: ./packages/react
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
