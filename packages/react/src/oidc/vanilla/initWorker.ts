@@ -101,8 +101,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return null;
     }
 
-    
-
     const unregisterAsync = async () => {
         return await registration.unregister();
     };
@@ -157,6 +155,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const storage = sessionStorage;
+    
     const saveItemsAsync = (items) => {
         storage[`oidc_items.${configurationName}`] = JSON.stringify(items);
         return Promise.resolve();
