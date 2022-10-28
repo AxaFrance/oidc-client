@@ -101,21 +101,24 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return null;
     }
 
+    
+
+    const unregisterAsync = async () => {
+        return await registration.unregister();
+    };
+    /*
     const saveItemsAsync = (items) => {
-            return sendMessageAsync(registration)({ type: 'saveItems', data: items, configurationName });
+        return sendMessageAsync(registration)({ type: 'saveItems', data: items, configurationName });
     };
 
     const loadItemsAsync = () => {
         return sendMessageAsync(registration)({ type: 'loadItems', data: null, configurationName });
     };
-
-    const unregisterAsync = async () => {
-        return await registration.unregister();
-    };
-
     const clearAsync = (status) => {
         return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
     };
+    
+     */
     const initAsync = async (oidcServerConfiguration, where, oidcConfiguration:OidcConfiguration) => {
         const result = await sendMessageAsync(registration)({
             type: 'init',
@@ -151,6 +154,21 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         // @ts-ignore
         const keyNonce = NONCE_TOKEN + '_' + configurationName;
         return { nonce: keyNonce };
+    };
+
+    const storage = sessionStorage;
+    const saveItemsAsync = (items) => {
+        storage[`oidc_items.${configurationName}`] = JSON.stringify(items);
+        return Promise.resolve();
+    };
+
+    const loadItemsAsync = () => {
+        return Promise.resolve(JSON.parse(storage[`oidc_items.${configurationName}`]));
+    };
+
+    const clearAsync = (status) => {
+        storage[`oidc.${configurationName}`] = JSON.stringify({ tokens: null, status });
+        return Promise.resolve();
     };
 
     return {
