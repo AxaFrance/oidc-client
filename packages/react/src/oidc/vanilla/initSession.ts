@@ -40,8 +40,7 @@ export const initSession = (configurationName, redirectUri, storage = sessionSto
 
     const getNonceAsync = async () => {
         // @ts-ignore
-        const result = { nonce: localStorage[`oidc.nonce.${configurationName}:${redirectUri}`] };
-        return result;
+        return { nonce: localStorage[`oidc.nonce.${configurationName}:${redirectUri}`] };
     };
 
     const getTokens = () => {
