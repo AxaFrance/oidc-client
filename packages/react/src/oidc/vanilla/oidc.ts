@@ -1050,10 +1050,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 return await localsilentLoginAsync();
             default: {
                 try {
+                    this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
                     if (!refreshToken) {
                         return await localsilentLoginAsync();
                     }
-                    this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
 
                     const clientId = configuration.client_id;
                     const redirectUri = configuration.redirect_uri;
@@ -1084,7 +1084,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 message: 'bad request',
                                 tokenResponse,
                             });
-                            return await this.synchroniseTokensAsync(null, nextIndex, forceRefresh, extras, updateTokens);
+                            return await this.synchroniseTokensAsync(refreshToken, nextIndex, forceRefresh, extras, updateTokens);
                         }
                     };
                     const promise = localFunctionAsync();
@@ -1092,7 +1092,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 } catch (exception) {
                     console.error(exception);
                     this.publishEvent(eventNames.refreshTokensAsync_silent_error, { message: 'exception', exception: exception.message });
-                    return this.synchroniseTokensAsync(refreshToken, index + 1, forceRefresh, extras, updateTokens);
+                    return this.synchroniseTokensAsync(refreshToken, nextIndex, forceRefresh, extras, updateTokens);
                 }
             }
         }
