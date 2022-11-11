@@ -1087,7 +1087,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     }
                 };
                 const promise = localFunctionAsync();
-                return await executeWithTimeoutAsync(promise, 30000);
+                try {
+                    return await executeWithTimeoutAsync(promise, 30000);
+                }
+                catch (exception) {
+                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
+                        message: 'timeout error',
+                        exception,
+                    });
+                    return await this.synchroniseTokensAsync(null, nextIndex, forceRefresh, extras, updateTokens);
+                }
             }
         }
      }
