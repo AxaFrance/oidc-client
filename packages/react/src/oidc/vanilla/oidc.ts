@@ -1049,52 +1049,50 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
                 return await localsilentLoginAsync();
             default: {
-                if (!refreshToken) {
-                    return await localsilentLoginAsync();
-                }
-                this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
-
-                const clientId = configuration.client_id;
-                const redirectUri = configuration.redirect_uri;
-                const authority = configuration.authority;
-                const tokenExtras = configuration.token_request_extras ? configuration.token_request_extras : {};
-                const finalExtras = { ...tokenExtras, ...extras };
-                const localFunctionAsync = async () => {
-                    const details = {
-                        client_id: clientId,
-                        redirect_uri: redirectUri,
-                        grant_type: GRANT_TYPE_REFRESH_TOKEN,
-                        refresh_token: tokens.refreshToken,
-                    };
-                    const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-                    const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode);
-                    if (tokenResponse.success) {
-                        if (!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)) {
-                            updateTokens(null);
-                            this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token return not valid tokens' });
-                            return { tokens: null, status: 'SESSION_LOST' };
-                        }
-                        updateTokens(tokenResponse.data);
-                        this.publishEvent(eventNames.refreshTokensAsync_end, { success: tokenResponse.success });
-                        this.publishEvent(Oidc.eventNames.token_renewed, { reason: 'REFRESH_TOKEN' });
-                        return { tokens: tokenResponse.data, status: 'LOGGED_IN' };
-                    } else {
-                        this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
-                            message: 'bad request',
-                            tokenResponse,
-                        });
-                        return await this.synchroniseTokensAsync(null, nextIndex, forceRefresh, extras, updateTokens);
-                    }
-                };
-                const promise = localFunctionAsync();
                 try {
+                    if (!refreshToken) {
+                        return await localsilentLoginAsync();
+                    }
+                    this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
+
+                    const clientId = configuration.client_id;
+                    const redirectUri = configuration.redirect_uri;
+                    const authority = configuration.authority;
+                    const tokenExtras = configuration.token_request_extras ? configuration.token_request_extras : {};
+                    const finalExtras = { ...tokenExtras, ...extras };
+                    const localFunctionAsync = async () => {
+                        const details = {
+                            client_id: clientId,
+                            redirect_uri: redirectUri,
+                            grant_type: GRANT_TYPE_REFRESH_TOKEN,
+                            refresh_token: tokens.refreshToken,
+                        };
+                        const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
+                        const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode);
+                        if (tokenResponse.success) {
+                            if (!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)) {
+                                updateTokens(null);
+                                this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token return not valid tokens' });
+                                return { tokens: null, status: 'SESSION_LOST' };
+                            }
+                            updateTokens(tokenResponse.data);
+                            this.publishEvent(eventNames.refreshTokensAsync_end, { success: tokenResponse.success });
+                            this.publishEvent(Oidc.eventNames.token_renewed, { reason: 'REFRESH_TOKEN' });
+                            return { tokens: tokenResponse.data, status: 'LOGGED_IN' };
+                        } else {
+                            this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
+                                message: 'bad request',
+                                tokenResponse,
+                            });
+                            return await this.synchroniseTokensAsync(null, nextIndex, forceRefresh, extras, updateTokens);
+                        }
+                    };
+                    const promise = localFunctionAsync();
                     return await executeWithTimeoutAsync(promise, 30000);
                 } catch (exception) {
-                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, {
-                        message: 'timeout error',
-                        exception,
-                    });
-                    return await this.synchroniseTokensAsync(null, nextIndex, forceRefresh, extras, updateTokens);
+                    console.error(exception);
+                    this.publishEvent(eventNames.refreshTokensAsync_silent_error, { message: 'exception', exception: exception.message });
+                    return this.synchroniseTokensAsync(refreshToken, index + 1, forceRefresh, extras, updateTokens);
                 }
             }
         }
