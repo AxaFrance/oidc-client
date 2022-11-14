@@ -60,29 +60,6 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/react/package.json
-
-# TO REMOVE IN V6
-          
-#     - name: npm version ${{ steps.tag_version.outputs.new_tag }}
-#       run: npm version ${{ steps.tag_version.outputs.new_tag }}
-#       working-directory: ./packages/context
-
-#     - name: npm install
-#       run: npm install
-#       working-directory: ./packages/context
-
-#     - name: npm prepare
-#       run: npm run prepare
-#       working-directory: ./packages/context
-
-#     - id: publish-react-context
-#       uses: JS-DevTools/npm-publish@v1
-#       if: github.ref == 'refs/heads/master'
-#       with:
-#         token: ${{ secrets.NPM_TOKEN }}
-#         package: ./packages/context/package.json
-
-#END TO REMOVE IN V6
           
       - name: npm version ${{ steps.tag_version.outputs.new_tag }}
         run: npm version ${{ steps.tag_version.outputs.new_tag }}

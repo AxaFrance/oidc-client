@@ -14,13 +14,6 @@ const handleInstall = (event) => {
 const handleActivate = (event) => {
     console.log('[OidcServiceWorker] service worker activated ' + id);
     event.waitUntil(self.clients.claim());
-    /* self.registration.unregister()
-        .then(function() {
-            return self.clients.matchAll();
-        })
-        .then(function(clients) {
-            clients.forEach(client => client.navigate(client.url))
-        }); */
 };
 
 let currentLoginCallbackConfigurationName = null;
@@ -94,7 +87,7 @@ const isTokensOidcValid = (tokens, nonce, oidcServerConfiguration) => {
             return false;
         }
         // 11: If a nonce value was sent in the Authentication Request, a nonce Claim MUST be present and its value checked to verify that it is the same value as the one that was sent in the Authentication Request. The Client SHOULD check the nonce value for replay attacks. The precise method for detecting replay attacks is Client specific.
-        if (idTokenPayload.nonce && idTokenPayload.nonce !== nonce) {
+        if (idTokenPayload.nonce && nonce != null && idTokenPayload.nonce !== nonce) {
             return false;
         }
     }
@@ -131,7 +124,7 @@ function hideTokens(currentDatabaseElement) {
             if (tokens.id_token) {
                 _idTokenPayload = extractTokenPayload(tokens.id_token);
                 tokens.idTokenPayload = { ..._idTokenPayload };
-                if (_idTokenPayload.nonce) {
+                if (_idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
                     const keyNonce = NONCE_TOKEN + '_' + currentDatabaseElement.configurationName;
                     _idTokenPayload.nonce = keyNonce;
                 }
@@ -156,8 +149,8 @@ function hideTokens(currentDatabaseElement) {
             secureTokens.expiresAt = expiresAt;
 
             tokens.expiresAt = expiresAt;
-
-            if (!isTokensOidcValid(tokens, currentDatabaseElement.nonce.nonce, currentDatabaseElement.oidcServerConfiguration)) {
+            const nonce = currentDatabaseElement.nonce ? currentDatabaseElement.nonce.nonce : null;
+            if (!isTokensOidcValid(tokens, nonce, currentDatabaseElement.oidcServerConfiguration)) {
                 throw Error('Tokens are not OpenID valid');
             }
 
@@ -211,10 +204,10 @@ const getCurrentDatabaseDomain = (database, url) => {
         }
 
         const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint
-? [
-            oidcServerConfiguration.userInfoEndpoint, ...trustedDomains[key],
-        ]
-: [...trustedDomains[key]];
+            ? [
+                oidcServerConfiguration.userInfoEndpoint, ...trustedDomains[key],
+            ]
+            : [...trustedDomains[key]];
 
         let hasToSendToken = false;
         if (domainsToSendTokens.find((f) => f === acceptAnyDomainToken)) {
@@ -429,9 +422,9 @@ addEventListener('message', event => {
             port.postMessage({ configurationName });
             return;
         case 'init':
-            {
+        {
             const oidcServerConfiguration = data.data.oidcServerConfiguration;
-                        const domains = trustedDomains[configurationName];
+            const domains = trustedDomains[configurationName];
             if (!domains.find(f => f === acceptAnyDomainToken)) {
                 checkDomain(domains, oidcServerConfiguration.tokenEndpoint);
                 checkDomain(domains, oidcServerConfiguration.revocationEndpoint);
@@ -452,7 +445,7 @@ addEventListener('message', event => {
                     tokens: null,
                     status: currentDatabase.status,
                     configurationName,
-});
+                });
             } else {
                 const tokens = {
                     ...currentDatabase.tokens,
@@ -461,7 +454,7 @@ addEventListener('message', event => {
                 if (tokens.refresh_token) {
                     tokens.refresh_token = REFRESH_TOKEN + '_' + configurationName;
                 }
-                if (tokens.idTokenPayload && tokens.idTokenPayload.nonce) {
+                if (tokens.idTokenPayload && tokens.idTokenPayload.nonce && currentDatabase.nonce != null) {
                     tokens.idTokenPayload.nonce = NONCE_TOKEN + '_' + configurationName;
                 }
                 port.postMessage({
@@ -478,11 +471,11 @@ addEventListener('message', event => {
             port.postMessage({ configurationName });
             return;
         case 'getSessionState':
-            {
-                const sessionState = currentDatabase.sessionState;
-                port.postMessage({ configurationName, sessionState });
-                return;
-            }
+        {
+            const sessionState = currentDatabase.sessionState;
+            port.postMessage({ configurationName, sessionState });
+            return;
+        }
         case 'setNonce':
             currentDatabase.nonce = data.data.nonce;
             port.postMessage({ configurationName });
