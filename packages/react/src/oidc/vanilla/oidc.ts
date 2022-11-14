@@ -50,7 +50,7 @@ const executeWithTimeoutAsync = async (promise, timeout) => {
     });
 };
 
-const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id) => {
+const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id, timeoutMs=10000) => {
     const details = {
         token,
         token_type_hint: token_type,
@@ -71,7 +71,7 @@ const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
         body: formBodyString,
-    });
+    }, timeoutMs);
     if (response.status !== 200) {
         return { success: false };
     }
@@ -80,7 +80,7 @@ const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE
     };
 };
 
-const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRenewMode: string) => {
+const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs=10000) => {
     for (const [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
@@ -101,7 +101,7 @@ const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRe
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
         body: formBodyString,
-    });
+    }, timeoutMs);
     if (response.status !== 200) {
         return { success: false, status: response.status };
     }
@@ -112,17 +112,17 @@ const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRe
     };
 };
 
-const internalFetch = async (url, headers, numberRetry = 0) => {
+const internalFetch = async (url, headers, numberRetry = 0, timeoutMs=10000) => {
     let response;
     try {
         const controller = new AbortController();
-        setTimeout(() => controller.abort(), 10000);
+        setTimeout(() => controller.abort(), timeoutMs);
         response = await fetch(url, { ...headers, signal: controller.signal });
     } catch (e) {
         if (e.message === 'AbortError' ||
             e.message === 'Network request failed') {
             if (numberRetry <= 1) {
-                return await internalFetch(url, headers, numberRetry + 1);
+                return await internalFetch(url, headers, numberRetry + 1, timeoutMs);
             } else {
                 throw e;
             }
@@ -1072,7 +1072,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             refresh_token: tokens.refreshToken,
                         };
                         const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-                        const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode);
+                        const timeoutMs = document.hidden ? 10000 : 30000 * 10;
+                        const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode, timeoutMs);
                         if (tokenResponse.success) {
                             if (!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)) {
                                 updateTokens(null);
@@ -1091,8 +1092,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             return await this.synchroniseTokensAsync(refreshToken, nextIndex, forceRefresh, extras, updateTokens);
                         }
                     };
-                    const promise = localFunctionAsync();
-                    return await executeWithTimeoutAsync(promise, 30000);
+                    //const promise = 
+                    return await localFunctionAsync(); //executeWithTimeoutAsync(promise, 30000);
                 }
             }
         } catch (exception) {
