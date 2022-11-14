@@ -32,7 +32,7 @@ const TOKEN_TYPE = {
     refresh_token: 'refresh_token',
     access_token: 'access_token',
 };
-
+/*
 const executeWithTimeoutAsync = async (promise, timeout) => {
     return new Promise((resolve, reject) => {
         const id = setTimeout(() => {
@@ -48,9 +48,9 @@ const executeWithTimeoutAsync = async (promise, timeout) => {
             reject(err);
         });
     });
-};
+}; */
 
-const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id, timeoutMs=10000) => {
+const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id, timeoutMs = 10000) => {
     const details = {
         token,
         token_type_hint: token_type,
@@ -80,7 +80,7 @@ const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE
     };
 };
 
-const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs=10000) => {
+const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs = 10000) => {
     for (const [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
@@ -112,7 +112,7 @@ const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRe
     };
 };
 
-const internalFetch = async (url, headers, numberRetry = 0, timeoutMs=10000) => {
+const internalFetch = async (url, headers, numberRetry = 0, timeoutMs = 10000) => {
     let response;
     try {
         const controller = new AbortController();
@@ -1092,8 +1092,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             return await this.synchroniseTokensAsync(refreshToken, nextIndex, forceRefresh, extras, updateTokens);
                         }
                     };
-                    //const promise = 
-                    return await localFunctionAsync(); //executeWithTimeoutAsync(promise, 30000);
+                    // const promise =
+                    return await localFunctionAsync(); // executeWithTimeoutAsync(promise, 30000);
                 }
             }
         } catch (exception) {
