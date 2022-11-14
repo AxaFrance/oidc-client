@@ -117,16 +117,13 @@ const keepAlive = () => {
 };
 
 const isServiceWorkerProxyActiveAsync = () => {
-    try {
-        return fetch('/OidcKeepAliveServiceWorker.json', {
-                headers: {
-                    'oidc-vanilla': 'true',
-                },
-            })
-            .then((response) => {
-                return response.statusText === 'oidc-service-worker';
-            }).catch(error => { console.log(error); });
-    } catch (error) { console.log(error); }
+    return fetch('/OidcKeepAliveServiceWorker.json', {
+        headers: {
+            'oidc-vanilla': 'true',
+        },
+    }).then((response) => {
+        return response.statusText === 'oidc-service-worker';
+    }).catch(error => { console.log(error); });
 };
 
 const sendMessageAsync = (registration) => (data) => {
