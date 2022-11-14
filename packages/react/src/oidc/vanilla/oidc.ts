@@ -32,23 +32,6 @@ const TOKEN_TYPE = {
     refresh_token: 'refresh_token',
     access_token: 'access_token',
 };
-/*
-const executeWithTimeoutAsync = async (promise, timeout) => {
-    return new Promise((resolve, reject) => {
-        const id = setTimeout(() => {
-            clearTimeout(id);
-            reject(new Error('Timed out in ' + timeout + 'ms.'));
-        }, timeout);
-
-        promise.then((res) => {
-           clearTimeout(id);
-           resolve(res);
-        }, (err) => {
-            clearTimeout(id);
-            reject(err);
-        });
-    });
-}; */
 
 const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id, timeoutMs = 10000) => {
     const details = {
