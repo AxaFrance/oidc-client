@@ -386,7 +386,7 @@ const checkDomain = (domains, endpoint) => {
 
     const domain = domains.find(domain => endpoint.startsWith(domain));
     if (!domain) {
-        throw new Error(`Domain ${endpoint} is not trusted, please add domain in ${scriptFilename}`);
+        throw new Error('Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename);
     }
 };
 
