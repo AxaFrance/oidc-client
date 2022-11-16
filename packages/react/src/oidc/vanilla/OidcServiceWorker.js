@@ -1,5 +1,5 @@
-/* global trustedDomains */
-this.importScripts('OidcTrustedDomains.js');
+﻿const scriptFilename = 'OidcTrustedDomains.js'; /* global trustedDomains */
+this.importScripts(scriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
@@ -386,7 +386,7 @@ const checkDomain = (domains, endpoint) => {
 
     const domain = domains.find(domain => endpoint.startsWith(domain));
     if (!domain) {
-        throw new Error('Domain ' + endpoint + ' is not trusted, please add domain in TrustedDomains.js');
+        throw new Error(`Domain ${endpoint} is not trusted, please add domain in ${scriptFilename}`);
     }
 };
 
