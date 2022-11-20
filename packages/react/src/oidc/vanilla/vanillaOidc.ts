@@ -44,7 +44,7 @@ export class VanillaOidc {
         return this._oidc.logoutAsync(callbackPathOrUrl, extras);
     }
 
-    silentLoginCallbackAsync():Promise<any> {
+    silentLoginCallbackAsync():Promise<void> {
         return this._oidc.silentLoginCallbackAsync();
     }
 
@@ -68,7 +68,39 @@ export class VanillaOidc {
         return getValidTokenAsync(this._oidc, waitMs, numberWait);
     }
 
-    async userInfoAsync():Promise<any> {
+    async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>():Promise<T> {
         return this._oidc.userInfoAsync();
     }
+}
+
+export interface OidcUserInfo {
+    sub: string;
+    name?: string;
+    given_name?: string;
+    family_name?: string;
+    middle_name?: string;
+    nickname?: string;
+    preferred_username?: string;
+    profile?: string;
+    picture?: string;
+    website?: string;
+    email?: string;
+    email_verified?: boolean;
+    gender?: string;
+    birthdate?: string;
+    zoneinfo?: string;
+    locale?: string;
+    phone_number?: string;
+    phone_number_verified?: boolean;
+    address?: OidcAddressClaim;
+    updated_at?: number;
+}
+
+export interface OidcAddressClaim {
+    formatted?: string;
+    street_address?: string;
+    locality?: string;
+    region?: string;
+    postal_code?: string;
+    country?: string;
 }

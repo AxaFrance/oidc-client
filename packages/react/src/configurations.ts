@@ -11,7 +11,7 @@ export const configurationIdentityServer = {
     refresh_time_before_tokens_expiration_in_second: 40,
     service_worker_relative_url: '/OidcServiceWorker.js',
     service_worker_only: false,
-    // storage: sessionStorage,
+    // storage: localStorage,
     // silent_login_timeout: 3333000
     // monitor_session: true,
     token_renew_mode: TokenRenewMode.access_token_invalid,

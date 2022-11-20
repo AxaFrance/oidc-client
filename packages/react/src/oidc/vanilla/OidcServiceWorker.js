@@ -1,4 +1,4 @@
-﻿const scriptFilename = 'OidcTrustedDomains.js'; /* global trustedDomains */
+const scriptFilename = 'OidcTrustedDomains.js'; /* global trustedDomains */
 this.importScripts(scriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();

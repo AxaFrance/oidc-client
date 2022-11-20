@@ -28,7 +28,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         return
     }
 
-    let tokens = vanillaOidc.tokens
+    let tokens = vanillaOidc.tokens;
 
     if(tokens){
 

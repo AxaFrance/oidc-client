@@ -12,6 +12,7 @@ import {
 } from '@openid/appauth';
 import { AuthorizationServiceConfigurationJson } from '@openid/appauth/src/authorization_service_configuration';
 
+import { getFromCache, setCache } from './cache';
 import { CheckSessionIFrame } from './checkSessionIFrame';
 import { initSession } from './initSession';
 import { initWorkerAsync, sleepAsync } from './initWorker';
@@ -264,12 +265,13 @@ const userInfoAsync = async (oidc) => {
     if (!accessToken) {
         return null;
     }
+
     // We wait the synchronisation before making a request
     while (oidc.tokens && !isTokensValid(oidc.tokens)) {
         await sleepAsync(200);
     }
 
-    const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
+   const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
    const url = oidcServerConfiguration.userInfoEndpoint;
    const fetchUserInfo = async (accessToken) => {
        const res = await fetch(url, {
@@ -323,24 +325,14 @@ const getRandomInt = (max) => {
 };
 
 const oneHourSecond = 60 * 60;
-const fetchFromIssuerCache = {};
 const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage):
     Promise<OidcAuthorizationServiceConfiguration> => {
     const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
 
     const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
-    if (!fetchFromIssuerCache[localStorageKey]) {
-        if (storage) {
-            const cacheJson = storage.getItem(localStorageKey);
-            if (cacheJson) {
-                fetchFromIssuerCache[localStorageKey] = JSON.parse(cacheJson);
-            }
-        }
-    }
-    const oneHourMinisecond = 1000 * timeCacheSecond;
-    // @ts-ignore
-    if (fetchFromIssuerCache[localStorageKey] && (fetchFromIssuerCache[localStorageKey].timestamp + oneHourMinisecond) > Date.now()) {
-        return new OidcAuthorizationServiceConfiguration(fetchFromIssuerCache[localStorageKey].result);
+    const data = getFromCache(localStorageKey, storage, timeCacheSecond);
+    if (data) {
+        return new OidcAuthorizationServiceConfiguration(data);
     }
     const response = await fetch(fullUrl);
 
@@ -350,11 +342,7 @@ const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHou
 
     const result = await response.json();
 
-    const timestamp = Date.now();
-    fetchFromIssuerCache[localStorageKey] = { result, timestamp };
-    if (storage) {
-        storage.setItem(localStorageKey, JSON.stringify({ result, timestamp }));
-    }
+    setCache(localStorageKey, result, storage);
     return new OidcAuthorizationServiceConfiguration(result);
 };
 
