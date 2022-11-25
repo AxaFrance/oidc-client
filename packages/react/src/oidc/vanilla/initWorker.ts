@@ -174,6 +174,21 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return await registration.unregister();
     };
 
+    registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        newWorker.addEventListener('statechange', () => {
+            switch (newWorker.state) {
+                case 'installed':
+                    if (navigator.serviceWorker.controller) {
+                        registration.unregister().then(() => {
+                            window.location.reload();
+                        });
+                    }
+                    break;
+            }
+        });
+    });
+
     const saveItemsAsync = (items) => {
         // iOS kill Service Worker when domain we leave domain
         if (operatingSystem.os === 'iOS') {
