@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 
-import { useOidc } from './oidc';
+import { useOidc, useOidcAccessToken, useOidcIdToken } from './oidc';
 
 export const Home = () => {
     const { login, logout, renewTokens, isAuthenticated } = useOidc();
+
+    // const { oidcUser, oidcUserLoadingState } = useOidcUser();
+    const oidcAccessTokenState = useOidcAccessToken();
+    const { idTokenPayload } = useOidcIdToken();
+    console.warn(idTokenPayload);
+    const decorateToken = useCallback(() => {
+        const { accessToken } = oidcAccessTokenState; // the accessToken here is always the previous one
+
+        console.log(accessToken);
+
+        // use the accessToken to do other stuffs
+    }, [oidcAccessTokenState.accessToken]);
+
+    // sync token on load
+    useEffect(() => {
+            decorateToken();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [oidcAccessTokenState.accessToken]);
 
     return (
         <div className="container-fluid mt-3">
