@@ -216,7 +216,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const initAsync = async (oidcServerConfiguration, where, oidcConfiguration:OidcConfiguration) => {
         const result = await sendMessageAsync(registration)({
             type: 'init',
-            data: { oidcServerConfiguration, where, oidcConfiguration },
+            data: { oidcServerConfiguration, where, oidcConfiguration: { token_renew_mode: oidcConfiguration.token_renew_mode } },
             configurationName,
         });
         // @ts-ignore
