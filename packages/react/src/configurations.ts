@@ -5,7 +5,7 @@ export const configurationIdentityServer = {
     redirect_uri: window.location.origin + '/authentication/callback',
     silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
     // silent_login_uri: window.location.origin+'/authentication/silent-login',
-    scope: 'openid profile email api offline_access',
+    scope: 'offline_access',
     authority: 'https://demo.duendesoftware.com',
     // authority_time_cache_wellknowurl_in_second: 60* 60,
     refresh_time_before_tokens_expiration_in_second: 40,
