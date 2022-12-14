@@ -16,6 +16,6 @@ test.each([['http://example.com/pathname', '/pathname'],
     },
 );
 
-test('wrong uri', () => {
+test('wrong uri format', () => {
     expect(() => getPath("urimybad/toto.com")).toThrowError();
 });
