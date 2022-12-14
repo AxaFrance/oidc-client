@@ -1,8 +1,11 @@
 export const getLocation = (href: string) => {
   const match = href.match(
     // eslint-disable-next-line no-useless-escape
-    /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/,
+    /^([a-z]+?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/,
   );
+  if(!match) {
+      throw new Error('Invalid URL');
+  }
 
   let search = match[6];
   let hash = match[7];
