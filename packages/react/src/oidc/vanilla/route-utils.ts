@@ -3,7 +3,7 @@ export const getLocation = (href: string) => {
     // eslint-disable-next-line no-useless-escape
     /^([a-z]+?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/,
   );
-  if(!match) {
+  if (!match) {
       throw new Error('Invalid URL');
   }
 
