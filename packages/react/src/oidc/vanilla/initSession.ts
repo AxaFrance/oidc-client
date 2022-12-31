@@ -50,6 +50,25 @@ export const initSession = (configurationName, redirectUri, storage = sessionSto
         return JSON.stringify({ tokens: JSON.parse(storage[`oidc.${configurationName}:${redirectUri}`]).tokens });
     };
 
+    const getLoginSessionKey = (configurationName:string, redirectUri:string) => {
+        return `oidc_login.${configurationName}:${redirectUri}`;
+    };
+
+    const setLoginParams = (configurationName:string, redirectUri:string, data) => {
+        const sessionKey = getLoginSessionKey(configurationName, redirectUri);
+        getLoginParamsCache = data;
+        storage[sessionKey] = JSON.stringify(data);
+    };
+
+    let getLoginParamsCache = null;
+    const getLoginParams = (configurationName, redirectUri) => {
+        const dataString = storage[getLoginSessionKey(configurationName, redirectUri)];
+        if (!getLoginParamsCache) {
+            getLoginParamsCache = JSON.parse(dataString);
+        }
+        return getLoginParamsCache;
+    };
+
     return {
         saveItemsAsync,
         loadItemsAsync,
@@ -61,5 +80,7 @@ export const initSession = (configurationName, redirectUri, storage = sessionSto
         getSessionState,
         setNonceAsync,
         getNonceAsync,
+        setLoginParams,
+        getLoginParams,
     };
 };

@@ -261,6 +261,25 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return { nonce: keyNonce };
     };
 
+    const getLoginSessionKey = (configurationName:string, redirectUri:string) => {
+        return `oidc_login.${configurationName}:${redirectUri}`;
+    };
+
+    const setLoginParams = (configurationName:string, redirectUri:string, data) => {
+        const sessionKey = getLoginSessionKey(configurationName, redirectUri);
+        getLoginParamsCache = data;
+        sessionStorage[sessionKey] = JSON.stringify(data);
+    };
+
+    let getLoginParamsCache = null;
+    const getLoginParams = (configurationName, redirectUri) => {
+        const dataString = sessionStorage[getLoginSessionKey(configurationName, redirectUri)];
+        if (!getLoginParamsCache) {
+            getLoginParamsCache = JSON.parse(dataString);
+        }
+        return getLoginParamsCache;
+    };
+
     return {
         saveItemsAsync,
         loadItemsAsync,
@@ -273,5 +292,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         setNonceAsync,
         getNonceAsync,
         unregisterAsync,
+        setLoginParams,
+        getLoginParams,
     };
 };

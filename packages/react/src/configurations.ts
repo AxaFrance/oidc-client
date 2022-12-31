@@ -15,7 +15,24 @@ export const configurationIdentityServer = {
     // silent_login_timeout: 3333000
     // monitor_session: true,
     token_renew_mode: TokenRenewMode.access_token_invalid,
-  };
+};
+
+export const configurationIdentityServer1 = {
+    client_id: 'balosar-blazo',
+    redirect_uri: window.location.origin + '/authentication/callback',
+    silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
+    // silent_login_uri: window.location.origin + '/authentication/silent-login',
+    scope: 'openid offline_access profile email',
+    authority: 'https://localhost:44310',
+    // authority_time_cache_wellknowurl_in_second: 60* 60,
+    refresh_time_before_tokens_expiration_in_second: 40,
+    // service_worker_relative_url: '/OidcServiceWorker.js',
+    service_worker_only: false,
+    // storage: localStorage,
+    // silent_login_timeout: 3333000
+    // monitor_session: true,
+    token_renew_mode: TokenRenewMode.access_token_invalid,
+};
 
 export const configurationIdentityServerWithHash = {
     client_id: 'interactive.public.short',
@@ -57,6 +74,21 @@ export const configurationAuth0 = {
     service_worker_relative_url: '/OidcServiceWorker.js',
     service_worker_only: false,
 };
+/*
+const extras = {
+    "tenantId:token_request:once": "123",
+    "grant_type:token_request:once": "tenant",
+    "prompt:authorize_request:once": "none",
+    "client_secret:token_request:always": "secret",
+    "client_secret:refresh_token_request:always": "secret",
+}
+
+const extras = {
+    "tenantId": { value: "123", "destination": "token_request", "mode": "once" },
+    "grant_type": { value: "tenant", "destination": "token_request", "mode": "once" },
+    "prompt": { value: "none", "destination": "authorize_request", "mode": "once" },
+    "client_secret": { value: "secret", destination: "refresh_token_request_and_token_request", "mode": "always" },
+} */
 
 export const configurationGoogle = {
     client_id: '908893276222-f2drloh56ll0g99md38lv2k810d0nk0p.apps.googleusercontent.com',
