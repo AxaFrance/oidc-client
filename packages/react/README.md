@@ -149,6 +149,7 @@ const propTypes = {
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
+    token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server during token request (more info: https://github.com/openid/AppAuth-JS)
     withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState())
     authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in second of openid wellknowurl, default is 1 hour
     monitor_session: PropTypes.boolean, // Add OpenId monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
