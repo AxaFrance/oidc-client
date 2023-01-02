@@ -72,7 +72,7 @@ const parseQueryString = (queryString:string) => {
     // Convert the array of strings into an object
     for (i = 0, l = queries.length; i < l; i++) {
         temp = queries[i].split('=');
-        params[temp[0]] = temp[1];
+        params[decodeURIComponent(temp[0])] = temp[1];
     }
 
     return params;

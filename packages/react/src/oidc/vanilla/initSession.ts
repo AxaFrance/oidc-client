@@ -54,14 +54,14 @@ export const initSession = (configurationName, redirectUri, storage = sessionSto
         return `oidc_login.${configurationName}:${redirectUri}`;
     };
 
-    const setLoginParams = (configurationName:string, redirectUri:string, data) => {
+    const setLoginParams = (configurationName:string, data) => {
         const sessionKey = getLoginSessionKey(configurationName, redirectUri);
         getLoginParamsCache = data;
         storage[sessionKey] = JSON.stringify(data);
     };
 
     let getLoginParamsCache = null;
-    const getLoginParams = (configurationName, redirectUri) => {
+    const getLoginParams = (configurationName) => {
         const dataString = storage[getLoginSessionKey(configurationName, redirectUri)];
         if (!getLoginParamsCache) {
             getLoginParamsCache = JSON.parse(dataString);

@@ -265,14 +265,14 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return `oidc_login.${configurationName}:${redirectUri}`;
     };
 
-    const setLoginParams = (configurationName:string, redirectUri:string, data) => {
+    const setLoginParams = (configurationName:string, data) => {
         const sessionKey = getLoginSessionKey(configurationName, redirectUri);
         getLoginParamsCache = data;
         sessionStorage[sessionKey] = JSON.stringify(data);
     };
 
     let getLoginParamsCache = null;
-    const getLoginParams = (configurationName, redirectUri) => {
+    const getLoginParams = (configurationName) => {
         const dataString = sessionStorage[getLoginSessionKey(configurationName, redirectUri)];
         if (!getLoginParamsCache) {
             getLoginParamsCache = JSON.parse(dataString);
