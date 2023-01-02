@@ -140,7 +140,7 @@ const sendMessageAsync = (registration) => (data) => {
     });
 };
 
-export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName, redirectUri) => {
+export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
     if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.serviceWorker || !serviceWorkerRelativeUrl) {
         return null;
     }
@@ -192,7 +192,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const saveItemsAsync = (items) => {
         // iOS kill Service Worker when domain we leave domain
         if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName, redirectUri);
+            const session = initSession(configurationName);
             return session.saveItemsAsync(items);
         }
         return sendMessageAsync(registration)({ type: 'saveItems', data: items, configurationName });
@@ -200,7 +200,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const loadItemsAsync = () => {
         // iOS kill Service Worker when domain we leave domain
         if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName, redirectUri);
+            const session = initSession(configurationName);
             return session.loadItemsAsync();
         }
         return sendMessageAsync(registration)({ type: 'loadItems', data: null, configurationName });
@@ -208,7 +208,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const clearAsync = async (status) => {
         // iOS kill Service Worker when domain we leave domain
         if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName, redirectUri);
+            const session = initSession(configurationName);
             await session.clearAsync(status);
         }
         return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
@@ -243,7 +243,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const setNonceAsync = (nonce) => {
         // iOS kill Service Worker when domain we leave domain
         if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName, redirectUri);
+            const session = initSession(configurationName);
             return session.setNonceAsync(nonce);
         }
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
@@ -253,7 +253,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const getNonceAsync = async () => {
         // iOS kill Service Worker when domain we leave domain
         if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName, redirectUri);
+            const session = initSession(configurationName);
             return session.getNonceAsync();
         }
         // @ts-ignore
@@ -261,19 +261,19 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return { nonce: keyNonce };
     };
 
-    const getLoginSessionKey = (configurationName:string, redirectUri:string) => {
-        return `oidc_login.${configurationName}:${redirectUri}`;
+    const getLoginSessionKey = (configurationName:string) => {
+        return `oidc_login.${configurationName}`;
     };
 
     const setLoginParams = (configurationName:string, data) => {
-        const sessionKey = getLoginSessionKey(configurationName, redirectUri);
+        const sessionKey = getLoginSessionKey(configurationName);
         getLoginParamsCache = data;
         sessionStorage[sessionKey] = JSON.stringify(data);
     };
 
     let getLoginParamsCache = null;
     const getLoginParams = (configurationName) => {
-        const dataString = sessionStorage[getLoginSessionKey(configurationName, redirectUri)];
+        const dataString = sessionStorage[getLoginSessionKey(configurationName)];
         if (!getLoginParamsCache) {
             getLoginParamsCache = JSON.parse(dataString);
         }
