@@ -76,11 +76,11 @@ export const configurationAuth0 = {
 };
 /*
 const extras = {
-    "tenantId:token_request:once": "123",
-    "grant_type:token_request:once": "tenant",
-    "prompt:authorize_request:once": "none",
+    "tenantId:token_request": "123",
+    "grant_type:token_request": "tenant",
+    "prompt:authorize_request": "none",
     "client_secret:token_request:always": "secret",
-    "client_secret:refresh_token_request:always": "secret",
+    "client_secret:refresh_token_request": "secret",
 }
 
 const extras = {
