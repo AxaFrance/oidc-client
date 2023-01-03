@@ -577,7 +577,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             console.log('extras', extras);
             if (extras) {
                 for (const key of Object.keys(extras)) {
-                    if (key.endsWith(':authorize_request')) {
+                    if (key.endsWith(':token_request')) {
                         delete extras[key];
                     }
                 }
@@ -786,7 +786,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         }
                         if (getLoginParams && getLoginParams.extras) {
                             for (const [key, value] of Object.entries(getLoginParams.extras)) {
-                                if (key.endsWith(':authorize_request')) {
+                                if (key.endsWith(':token_request')) {
                                     extras[key.replace(':token_request', '')] = value;
                                 }
                             }
