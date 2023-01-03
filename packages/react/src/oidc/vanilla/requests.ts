@@ -1,5 +1,4 @@
-﻿import {parseOriginalTokens} from "./parseTokens";
-import {DefaultCrypto} from "./crypto_utils";  
+import { parseOriginalTokens } from './parseTokens';
 
 const internalFetch = async (url, headers, numberRetry = 0, timeoutMs = 10000) => {
     let response;
@@ -22,7 +21,6 @@ const internalFetch = async (url, headers, numberRetry = 0, timeoutMs = 10000) =
     }
     return response;
 };
-
 
 export const TOKEN_TYPE = {
     refresh_token: 'refresh_token',
@@ -59,7 +57,6 @@ export const performRevocationRequestAsync = async (url, token, token_type = TOK
     };
 };
 
-
 export const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs = 10000) => {
     for (const [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
@@ -89,46 +86,5 @@ export const performTokenRequestAsync = async (url, details, extras, oldTokens, 
     return {
         success: true,
         data: parseOriginalTokens(tokens, oldTokens, tokenRenewMode),
-    };
-};
-
-
-export const performAuthorizationRequestAsync = async (url, details, extras, tokenRenewMode: string, timeoutMs = 10000) => {
-    let crypto = new DefaultCrypto();
-    
-    const codeVerifier = crypto.generateRandom(128);
-    const challenge = await crypto.deriveChallenge(codeVerifier);
-    const result = await challenge;
-    extras['code_challenge'] = result;
-    extras['code_challenge_method'] = 'S256';
-    
-    for (const [key, value] of Object.entries(extras)) {
-        if (details[key] === undefined) {
-            details[key] = value;
-        }
-    }
-
-    const formBody = [];
-    for (const property in details) {
-        const encodedKey = encodeURIComponent(property);
-        const encodedValue = encodeURIComponent(details[property]);
-        formBody.push(`${encodedKey}=${encodedValue}`);
-    }
-    const formBodyString = formBody.join('&');
-
-    const response = await internalFetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        },
-        body: formBodyString,
-    }, timeoutMs);
-    if (response.status !== 200) {
-        return { success: false, status: response.status };
-    }
-    const tokens = await response.json();
-    return {
-        success: true,
-        data: parseOriginalTokens(tokens, null, tokenRenewMode),
     };
 };

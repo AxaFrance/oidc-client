@@ -22,16 +22,12 @@ import {
     computeTimeLeft,
     isTokensOidcValid,
     isTokensValid,
-    parseOriginalTokens,
     setTokens, TokenRenewMode,
     Tokens,
 } from './parseTokens';
+import { performRevocationRequestAsync, performTokenRequestAsync, TOKEN_TYPE } from './requests';
 import { getParseQueryStringFromLocation } from './route-utils';
 import timer from './timer';
-import {performRevocationRequestAsync, performTokenRequestAsync, TOKEN_TYPE} from "./requests";
-
-
-
 
 const randomString = function(length) {
     let text = '';
