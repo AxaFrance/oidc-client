@@ -1,7 +1,7 @@
 import { initSession } from './initSession';
-import { OidcConfiguration } from './oidc';
 import { parseOriginalTokens } from './parseTokens';
 import timer from './timer';
+import { OidcConfiguration } from './types';
 
 export const getOperatingSystem = () => {
     const nVer = navigator.appVersion;

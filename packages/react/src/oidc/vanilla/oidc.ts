@@ -13,7 +13,9 @@ import {
 import { AuthorizationServiceConfigurationJson } from '@openid/appauth/src/authorization_service_configuration';
 
 import { getFromCache, setCache } from './cache';
+import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession';
 import { CheckSessionIFrame } from './checkSessionIFrame';
+import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync, sleepAsync } from './initWorker';
 import { MemoryStorageBackend } from './memoryStorageBackend';
@@ -27,7 +29,9 @@ import {
 } from './parseTokens';
 import { performRevocationRequestAsync, performTokenRequestAsync, TOKEN_TYPE } from './requests';
 import { getParseQueryStringFromLocation } from './route-utils';
+import defaultSilentLoginAsync from './silentLogin';
 import timer from './timer';
+import { AuthorityConfiguration, OidcConfiguration, StringMap } from './types';
 
 const randomString = function(length) {
     let text = '';
@@ -57,41 +61,6 @@ export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceC
         this.issuer = request.issuer;
     }
 }
-
-export interface StringMap {
-    [key: string]: string;
-}
-
-export interface AuthorityConfiguration {
-    authorization_endpoint: string;
-    token_endpoint: string;
-    revocation_endpoint: string;
-    end_session_endpoint?: string;
-    userinfo_endpoint?: string;
-    check_session_iframe?:string;
-    issuer:string;
-}
-
- export type OidcConfiguration = {
-     client_id: string;
-     redirect_uri: string;
-     silent_redirect_uri?:string;
-     silent_login_uri?:string;
-     silent_login_timeout?:number;
-     scope: string;
-     authority: string;
-     authority_time_cache_wellknowurl_in_second?: number;
-     authority_configuration?: AuthorityConfiguration;
-     refresh_time_before_tokens_expiration_in_second?: number;
-     token_request_timeout?: number;
-     service_worker_relative_url?:string;
-     service_worker_only?:boolean;
-     extras?:StringMap;
-     token_request_extras?:StringMap;
-     storage?: Storage;
-     monitor_session?: boolean;
-     token_renew_mode?: string;
-};
 
 const oidcDatabase = {};
 const oidcFactory = (configuration: OidcConfiguration, name = 'default') => {
@@ -183,35 +152,6 @@ const userInfoAsync = async (oidc) => {
    return userInfo;
 };
 
-const eventNames = {
-    service_worker_not_supported_by_browser: 'service_worker_not_supported_by_browser',
-    token_aquired: 'token_aquired',
-    logout_from_another_tab: 'logout_from_another_tab',
-    logout_from_same_tab: 'logout_from_same_tab',
-    token_renewed: 'token_renewed',
-    token_timer: 'token_timer',
-    loginAsync_begin: 'loginAsync_begin',
-    loginAsync_error: 'loginAsync_error',
-    loginCallbackAsync_begin: 'loginCallbackAsync_begin',
-    loginCallbackAsync_end: 'loginCallbackAsync_end',
-    loginCallbackAsync_error: 'loginCallbackAsync_error',
-    refreshTokensAsync_begin: 'refreshTokensAsync_begin',
-    refreshTokensAsync: 'refreshTokensAsync',
-    refreshTokensAsync_end: 'refreshTokensAsync_end',
-    refreshTokensAsync_error: 'refreshTokensAsync_error',
-    refreshTokensAsync_silent_error: 'refreshTokensAsync_silent_error',
-    tryKeepExistingSessionAsync_begin: 'tryKeepExistingSessionAsync_begin',
-    tryKeepExistingSessionAsync_end: 'tryKeepExistingSessionAsync_end',
-    tryKeepExistingSessionAsync_error: 'tryKeepExistingSessionAsync_error',
-    silentLoginAsync_begin: 'silentLoginAsync_begin',
-    silentLoginAsync: 'silentLoginAsync',
-    silentLoginAsync_end: 'silentLoginAsync_end',
-    silentLoginAsync_error: 'silentLoginAsync_error',
-    syncTokensAsync_begin: 'syncTokensAsync_begin',
-    syncTokensAsync_end: 'syncTokensAsync_end',
-    syncTokensAsync_error: 'syncTokensAsync_error',
-};
-
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
 };
@@ -244,7 +184,7 @@ export class Oidc {
     public tokens?: Tokens;
     public events: Array<any>;
     private timeoutId: NodeJS.Timeout;
-    private configurationName: string;
+    public configurationName: string;
     private checkSessionIFrame: CheckSessionIFrame;
     constructor(configuration:OidcConfiguration, configurationName = 'default') {
       let silent_login_uri = configuration.silent_login_uri;
@@ -335,96 +275,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     async silentLoginAsync(extras:StringMap = null, state:string = null, scope:string = null) {
-        if (!this.configuration.silent_redirect_uri || !this.configuration.silent_login_uri) {
-            return Promise.resolve(null);
-        }
-
-        try {
-            this.publishEvent(eventNames.silentLoginAsync_begin, {});
-            const configuration = this.configuration;
-            let queries = '';
-
-            if (state) {
-                if (extras == null) {
-                    extras = {};
-                }
-                extras.state = state;
-            }
-
-            if (scope) {
-                if (extras == null) {
-                    extras = {};
-                }
-                extras.scope = scope;
-            }
-
-            if (extras != null) {
-                for (const [key, value] of Object.entries(extras)) {
-                    if (queries === '') {
-                      queries = `?${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-                    } else {
-                        queries += `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-                    }
-                }
-            }
-            const link = configuration.silent_login_uri + queries;
-            const idx = link.indexOf('/', link.indexOf('//') + 2);
-            const iFrameOrigin = link.substr(0, idx);
-            const iframe = document.createElement('iframe');
-            iframe.width = '0px';
-            iframe.height = '0px';
-
-            iframe.id = `${this.configurationName}_oidc_iframe`;
-            iframe.setAttribute('src', link);
-            document.body.appendChild(iframe);
-            return new Promise((resolve, reject) => {
-                try {
-                    let isResolved = false;
-                    window.onmessage = (e: MessageEvent<any>) => {
-                        if (e.origin === iFrameOrigin &&
-                            e.source === iframe.contentWindow
-                        ) {
-                            const key = `${this.configurationName}_oidc_tokens:`;
-                            const key_error = `${this.configurationName}_oidc_error:`;
-                            const data = e.data;
-                            if (data && typeof (data) === 'string') {
-                                if (!isResolved) {
-                                    if (data.startsWith(key)) {
-                                        const result = JSON.parse(e.data.replace(key, ''));
-                                        this.publishEvent(eventNames.silentLoginAsync_end, {});
-                                        iframe.remove();
-                                        isResolved = true;
-                                        resolve(result);
-                                    } else if (data.startsWith(key_error)) {
-                                        const result = JSON.parse(e.data.replace(key_error, ''));
-                                        this.publishEvent(eventNames.silentLoginAsync_error, result);
-                                        iframe.remove();
-                                        isResolved = true;
-                                        reject(new Error('oidc_' + result.error));
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    const silentSigninTimeout = configuration.silent_login_timeout;
-                    setTimeout(() => {
-                        if (!isResolved) {
-                            this.publishEvent(eventNames.silentLoginAsync_error, { reason: 'timeout' });
-                            iframe.remove();
-                            isResolved = true;
-                            reject(new Error('timeout'));
-                        }
-                    }, silentSigninTimeout);
-                } catch (e) {
-                    iframe.remove();
-                    this.publishEvent(eventNames.silentLoginAsync_error, e);
-                    reject(e);
-                }
-            });
-        } catch (e) {
-            this.publishEvent(eventNames.silentLoginAsync_error, e);
-            throw e;
-        }
+        return defaultSilentLoginAsync(this.configurationName, this.configuration, this.publishEvent)(extras, state, scope);
     }
 
     initPromise = null;
@@ -636,56 +487,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) {
-        return new Promise<void>((resolve, reject): void => {
-            if (this.configuration.silent_login_uri && this.configuration.silent_redirect_uri && this.configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
-                const checkSessionCallback = () => {
-                    this.checkSessionIFrame.stop();
-
-                    if (this.tokens === null) {
-                        return;
-                    }
-                    // @ts-ignore
-                    const idToken = this.tokens.idToken;
-                    // @ts-ignore
-                    const idTokenPayload = this.tokens.idTokenPayload;
-                    this.silentLoginAsync({
-                        prompt: 'none',
-                        id_token_hint: idToken,
-                        scope: 'openid',
-                    }).then((silentSigninResponse) => {
-                        const iFrameIdTokenPayload = silentSigninResponse.tokens.idTokenPayload;
-                        if (idTokenPayload.sub === iFrameIdTokenPayload.sub) {
-                            const sessionState = silentSigninResponse.sessionState;
-                            this.checkSessionIFrame.start(silentSigninResponse.sessionState);
-                            if (idTokenPayload.sid === iFrameIdTokenPayload.sid) {
-                                console.debug('SessionMonitor._callback: Same sub still logged in at OP, restarting check session iframe; session_state:', sessionState);
-                            } else {
-                                console.debug('SessionMonitor._callback: Same sub still logged in at OP, session state has changed, restarting check session iframe; session_state:', sessionState);
-                            }
-                        } else {
-                            console.debug('SessionMonitor._callback: Different subject signed into OP:', iFrameIdTokenPayload.sub);
-                        }
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    }).catch(async (e) => {
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        for (const [key, oidc] of Object.entries(oidcDatabase)) {
-                            // @ts-ignore
-                            await oidc.logoutOtherTabAsync(this.configuration.client_id, idTokenPayload.sub);
-                        }
-                    });
-                };
-
-                this.checkSessionIFrame = new CheckSessionIFrame(checkSessionCallback, clientId, checkSessionIFrameUri);
-                this.checkSessionIFrame.load().then(() => {
-                    this.checkSessionIFrame.start(sessionState);
-                    resolve();
-                }).catch((e) => {
-                    reject(e);
-                });
-            } else {
-                resolve();
-            }
-        });
+        this.checkSessionIFrame = await defaultStartCheckSessionAsync(oidcDatabase, this.configuration, this.checkSessionIFrame, this.silentLoginAsync, this.tokens)(checkSessionIFrameUri, clientId, sessionState, isSilentSignin);
     }
 
     loginCallbackPromise : Promise<any> = null;

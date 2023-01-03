@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { StringMap } from './vanilla/oidc';
+import { StringMap } from './vanilla/types';
 import { VanillaOidc } from './vanilla/vanillaOidc';
 
 const defaultConfigurationName = 'default';
