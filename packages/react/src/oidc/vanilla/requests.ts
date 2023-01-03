@@ -1,4 +1,28 @@
+import { getFromCache, setCache } from './cache';
+import { OidcAuthorizationServiceConfiguration } from './oidc';
 import { parseOriginalTokens } from './parseTokens';
+
+const oneHourSecond = 60 * 60;
+export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage):
+    Promise<OidcAuthorizationServiceConfiguration> => {
+    const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
+
+    const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
+    const data = getFromCache(localStorageKey, storage, timeCacheSecond);
+    if (data) {
+        return new OidcAuthorizationServiceConfiguration(data);
+    }
+    const response = await fetch(fullUrl);
+
+    if (response.status !== 200) {
+        return null;
+    }
+
+    const result = await response.json();
+
+    setCache(localStorageKey, result, storage);
+    return new OidcAuthorizationServiceConfiguration(result);
+};
 
 const internalFetch = async (url, headers, numberRetry = 0, timeoutMs = 10000) => {
     let response;

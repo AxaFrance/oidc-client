@@ -3,12 +3,12 @@ import { Tokens } from './parseTokens';
 import { OidcConfiguration } from './types';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const startCheckSessionAsync = (oidcDatabase:any, configuration :OidcConfiguration, checkSessionIFrame: CheckSessionIFrame, silentLoginAsync:Function, tokens?: Tokens) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
+export const startCheckSessionAsync = (oidcDatabase:any, configuration :OidcConfiguration, checkSessionIFrame: CheckSessionIFrame, silentLoginAsync:Function, getCurrentTokens: () => Tokens) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
     return new Promise<CheckSessionIFrame>((resolve, reject): void => {
         if (configuration.silent_login_uri && configuration.silent_redirect_uri && configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
             const checkSessionCallback = () => {
                 checkSessionIFrame.stop();
-
+                const tokens = getCurrentTokens();
                 if (tokens === null) {
                     return;
                 }
