@@ -141,7 +141,6 @@ export class Oidc {
       this.loginCallbackAsync.bind(this);
       this._loginCallbackAsync.bind(this);
       this.subscribeEvents.bind(this);
-      this.publishEvent.bind(this);
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
       this.destroyAsync.bind(this);
@@ -207,7 +206,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     async silentLoginAsync(extras:StringMap = null, state:string = null, scope:string = null) {
-        return defaultSilentLoginAsync(this.configurationName, this.configuration, this.publishEvent)(extras, state, scope);
+        return defaultSilentLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this))(extras, state, scope);
     }
 
     initPromise = null;
@@ -322,7 +321,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) {
         const getCurrentTokens = () => this.tokens;
-        this.checkSessionIFrame = await defaultStartCheckSessionAsync(oidcDatabase, this.configuration, this.checkSessionIFrame, this.silentLoginAsync, getCurrentTokens)(checkSessionIFrameUri, clientId, sessionState, isSilentSignin);
+        this.checkSessionIFrame = await defaultStartCheckSessionAsync(oidcDatabase, this.configuration, this.checkSessionIFrame, this.silentLoginAsync.bind(this), getCurrentTokens)(checkSessionIFrameUri, clientId, sessionState, isSilentSignin);
     }
 
     loginPromise: Promise<void> = null;
@@ -330,7 +329,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.loginPromise !== null) {
             return this.loginPromise;
         }
-        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.silentLoginAsync, this.publishEvent, this.initAsync, this)(callbackPath, extras, isSilentSignin, scope, silentLoginOnly);
+        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.silentLoginAsync.bind(this), this.publishEvent.bind(this), this.initAsync.bind(this), this)(callbackPath, extras, isSilentSignin, scope, silentLoginOnly);
         return this.loginPromise.then(result => {
             this.loginPromise = null;
             return result;
