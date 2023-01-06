@@ -17,7 +17,7 @@ const randomString = function(length) {
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const defaultLoginAsync = (window, configurationName, configuration:OidcConfiguration, silentLoginAsync:Function, publishEvent :(string, any)=>void, initAsync:Function, oidc:any) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined, silentLoginOnly = false) => {
+export const defaultLoginAsync = (window, configurationName, configuration:OidcConfiguration, silentLoginAsync:Function, publishEvent :(string, any)=>void, initAsync:Function) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {
     const originExtras = extras;
     extras = { ...extras };
     const loginLocalAsync = async () => {
@@ -29,25 +29,6 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
             delete extras.state;
         }
 
-        if (silentLoginOnly) {
-            try {
-                const extraFinal = extras ?? configuration.extras ?? {};
-                const silentResult = await silentLoginAsync({
-                    ...extraFinal,
-                    prompt: 'none',
-                }, state, scope);
-
-                if (silentResult) {
-                    oidc.tokens = silentResult.tokens;
-                    publishEvent(eventNames.token_aquired, {});
-                    // @ts-ignore
-                    this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt, extras);
-                    return {};
-                }
-            } catch (e) {
-                return e;
-            }
-        }
         publishEvent(eventNames.loginAsync_begin, {});
         if (extras) {
             for (const key of Object.keys(extras)) {
@@ -101,6 +82,37 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
             publishEvent(eventNames.loginAsync_error, exception);
             throw exception;
         }
+    };
+    return loginLocalAsync();
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const defaultSilentLoginAsync2 = (window, configurationName, configuration:OidcConfiguration, publishEvent :(string, any)=>void, oidc:any) => (extras:StringMap = null, scope:string = undefined) => {
+    extras = { ...extras };
+    const loginLocalAsync = async () => {
+        let state;
+        if (extras && 'state' in extras) {
+            state = extras.state;
+            delete extras.state;
+        }
+
+            try {
+                const extraFinal = extras ?? configuration.extras ?? {};
+                const silentResult = await oidc.silentLoginAsync({
+                    ...extraFinal,
+                    prompt: 'none',
+                }, state, scope);
+
+                if (silentResult) {
+                    oidc.tokens = silentResult.tokens;
+                    publishEvent(eventNames.token_aquired, {});
+                    // @ts-ignore
+                    this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt, extras);
+                    return {};
+                }
+            } catch (e) {
+                return e;
+            }
     };
     return loginLocalAsync();
 };

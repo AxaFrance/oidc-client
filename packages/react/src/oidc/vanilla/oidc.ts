@@ -16,7 +16,7 @@ import { CheckSessionIFrame } from './checkSessionIFrame';
 import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync, sleepAsync } from './initWorker';
-import { defaultLoginAsync } from './login';
+import { defaultLoginAsync, defaultSilentLoginAsync2 } from './login';
 import { MemoryStorageBackend } from './memoryStorageBackend';
 import { HashQueryStringUtils, NoHashQueryStringUtils } from './noHashQueryStringUtils';
 import {
@@ -329,7 +329,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.loginPromise !== null) {
             return this.loginPromise;
         }
-        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.silentLoginAsync.bind(this), this.publishEvent.bind(this), this.initAsync.bind(this), this)(callbackPath, extras, isSilentSignin, scope, silentLoginOnly);
+        if (silentLoginOnly) {
+            return defaultSilentLoginAsync2(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this)(extras, scope);
+        }
+        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.silentLoginAsync.bind(this), this.publishEvent.bind(this), this.initAsync.bind(this))(callbackPath, extras, isSilentSignin, scope);
         return this.loginPromise.then(result => {
             this.loginPromise = null;
             return result;

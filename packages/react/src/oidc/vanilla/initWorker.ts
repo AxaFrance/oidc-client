@@ -268,12 +268,12 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const setLoginParams = (configurationName:string, data) => {
         const sessionKey = getLoginSessionKey(configurationName);
         getLoginParamsCache = data;
-        sessionStorage[sessionKey] = JSON.stringify(data);
+        localStorage[sessionKey] = JSON.stringify(data);
     };
 
     let getLoginParamsCache = null;
     const getLoginParams = (configurationName) => {
-        const dataString = sessionStorage[getLoginSessionKey(configurationName)];
+        const dataString = localStorage[getLoginSessionKey(configurationName)];
         if (!getLoginParamsCache) {
             getLoginParamsCache = JSON.parse(dataString);
         }
