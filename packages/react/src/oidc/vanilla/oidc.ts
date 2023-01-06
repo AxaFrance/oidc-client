@@ -426,9 +426,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         return;
                     }
 
-                    let extras = null;
+                    const extras = {};
                     if (request && request.internal) {
-                        extras = {};
+                        // @ts-ignore
                         extras.code_verifier = request.internal.code_verifier;
                         if (configuration.token_request_extras) {
                             for (const [key, value] of Object.entries(configuration.token_request_extras)) {
@@ -446,8 +446,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
                     const tokenRequest = new TokenRequest({
                         client_id: clientId,
-                        redirect_uri: redirectUri,
-                        grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
+                        redirect_uri: redirectUri, // @ts-ignore
+                        grant_type: extras.grant_type ?? GRANT_TYPE_AUTHORIZATION_CODE,
                         code: response.code,
                         refresh_token: undefined,
                         extras,
