@@ -215,9 +215,17 @@ const getCurrentDatabaseDomain = (database, url) => {
         } else {
             for (let i = 0; i < domainsToSendTokens.length; i++) {
                 const domain = domainsToSendTokens[i];
-                if (url.startsWith(domain)) {
-                    hasToSendToken = true;
-                    break;
+                
+                if (typeof domain === 'string') {
+                    if (url.startsWith(domain)) {
+                        hasToSendToken = true;
+                        break;
+                    }
+                } else {
+                    if (domain.test?.(url)) {
+                        hasToSendToken = true;
+                        break;
+                    }
                 }
             }
         }
@@ -384,7 +392,15 @@ const checkDomain = (domains, endpoint) => {
         return;
     }
 
-    const domain = domains.find(domain => endpoint.startsWith(domain));
+    const domain = domains.find((domain) => {
+        if (typeof domain === 'string') {
+            return endpoint.startsWith(domain);
+        } else if (typeof domain === 'object') {
+            return domain.test?.(endpoint);
+        }
+        
+        return false;
+    });
     if (!domain) {
         throw new Error('Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename);
     }
