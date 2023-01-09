@@ -1,7 +1,6 @@
 ﻿const path = require('path');
 const fs = require('fs');
 
-
 const applyCopy=(input) => {
     try {
         const destinationPath = path.join(__dirname, input);
@@ -26,12 +25,16 @@ const applyCopy=(input) => {
     }
 }
 
-const args = process.argv;
-if (args.length >= 3) {
-    const input = args[2];
-    applyCopy(input);
-} else if(__dirname.includes("@axa-fr")) {
-    applyCopy("../../../../public");
-} else {
-    applyCopy("../public");
+try {
+    const args = process.argv;
+    if (args.length >= 3) {
+        const input = args[2];
+        applyCopy(input);
+    } else if(__dirname.includes("@axa-fr")) {
+        applyCopy("../../../../public");
+    } else {
+        applyCopy("../public");
+    }
+} catch (ex) {
+    console.error(ex);
 }
