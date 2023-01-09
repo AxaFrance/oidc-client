@@ -214,18 +214,15 @@ const getCurrentDatabaseDomain = (database, url) => {
             hasToSendToken = true;
         } else {
             for (let i = 0; i < domainsToSendTokens.length; i++) {
-                const domain = domainsToSendTokens[i];
-                
+                let domain = domainsToSendTokens[i];
+
                 if (typeof domain === 'string') {
-                    if (url.startsWith(domain)) {
-                        hasToSendToken = true;
-                        break;
-                    }
-                } else {
-                    if (domain.test?.(url)) {
-                        hasToSendToken = true;
-                        break;
-                    }
+                    domain = new RegExp(`^${domain}`, 'gm');
+                }
+
+                if (domain.test?.(url)) {
+                    hasToSendToken = true;
+                    break;
                 }
             }
         }
@@ -393,13 +390,13 @@ const checkDomain = (domains, endpoint) => {
     }
 
     const domain = domains.find((domain) => {
+        let testable = domain;
+
         if (typeof domain === 'string') {
-            return endpoint.startsWith(domain);
-        } else if (typeof domain === 'object') {
-            return domain.test?.(endpoint);
+            testable = new RegExp(`^${domain}`, 'gm');
         }
-        
-        return false;
+
+        return testable.test?.(endpoint);
     });
     if (!domain) {
         throw new Error('Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename);
