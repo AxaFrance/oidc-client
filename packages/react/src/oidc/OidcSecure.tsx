@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useEffect } from 'react';
 
-import { StringMap } from './vanilla/oidc';
+import { StringMap } from './vanilla/types';
 import { VanillaOidc } from './vanilla/vanillaOidc';
 
 export type OidcSecureProps = {

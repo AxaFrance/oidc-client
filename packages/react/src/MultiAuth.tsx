@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 
 import { configurationGoogle, configurationIdentityServer, configurationIdentityServerWithHash } from './configurations';
 import { OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken } from './oidc';
@@ -39,7 +39,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
                         <option value="config_with_hash">config_with_hash</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
-                    {!isAuthenticated && isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
+                    {isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { 'test:token_request': 'test', youhou: 'youhou', grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
                 </div>
             </div>
@@ -50,10 +50,26 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
 if (!sessionStorage.configurationName) {
     sessionStorage.configurationName = 'config_classic';
 }
+const getRandomInt = (max) => {
+    return Math.floor(Math.random() * max);
+};
+
+function reducer(state, action) {
+    switch (action.type) {
+        case 'event':
+        {
+            const id = getRandomInt(9999999999999).toString();
+            return [{ ...action.data, id, date: Date.now() }, ...state];
+        }
+        default:
+            throw new Error();
+    }
+}
 
 export const MultiAuthContainer = () => {
     const [isSessionLost, setIsSessionLost] = useState(false);
     const [configurationName, setConfigurationName] = useState(sessionStorage.configurationName);
+    const [events, dispatch] = useReducer(reducer, []);
     const callBack = window.location.origin + '/multi-auth/authentification/callback2';
     const silent_redirect_uri = window.location.origin + '/multi-auth/authentification/silent-callback2';
     const configurations = {
@@ -62,6 +78,7 @@ export const MultiAuthContainer = () => {
             redirect_uri: callBack,
             silent_redirect_uri,
             scope: 'openid profile email api offline_access',
+            client_id: 'interactive.public.short',
         },
         config_without_refresh_token: {
             ...configurationIdentityServer,
@@ -93,6 +110,10 @@ export const MultiAuthContainer = () => {
     const onSessionLost = () => {
         setIsSessionLost(true);
     };
+    const onEvent = (configurationName, eventName, data) => {
+        // console.log(`oidc:${configurationName}:${eventName}`, data);
+        dispatch({ type: 'event', data: { name: `oidc:${configurationName}:${eventName}`, data } });
+    };
 
     return (
         <>
@@ -104,11 +125,26 @@ export const MultiAuthContainer = () => {
                       serviceWorkerNotSupportedComponent={ServiceWorkerNotSupported}
                       callbackSuccessComponent={CallBackSuccess}
                       onSessionLost={onSessionLost}
+                      onEvent={onEvent}
         >
             { isSessionLost && <SessionLost configurationName={configurationName}/>}
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
             <DisplayAccessToken configurationName={configurationName} />
         </OidcProvider>
+            <div className="container-fluid mt-3">
+                <div className="card">
+                    <div className="card-body" >
+                        <h5 className="card-title">Default configuration Events</h5>
+                        <div style={{ overflowX: 'hidden', overflowY: 'scroll', maxHeight: '400px' }}>
+                            {events.map(e => {
+                                const date = new Date(e.date);
+                                const dateFormated = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                                return <p key={e.id}>{dateFormated} {e.name}: { JSON.stringify(e.data)}</p>;
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </div>
     </>
     );
 };

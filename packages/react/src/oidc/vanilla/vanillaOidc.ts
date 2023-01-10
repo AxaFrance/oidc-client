@@ -1,5 +1,6 @@
-import { LoginCallback, Oidc, OidcConfiguration, StringMap } from './oidc';
+import { LoginCallback, Oidc } from './oidc';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens';
+import { OidcConfiguration, StringMap } from './types';
 
 export interface EventSubscriber {
     (name: string, data:any);
