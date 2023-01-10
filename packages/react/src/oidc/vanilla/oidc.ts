@@ -216,8 +216,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         serviceWorker.startKeepAliveServiceWorker();
                         // @ts-ignore
                         this.tokens = tokens;
+                        const getLoginParams = serviceWorker.getLoginParams(this.configurationName);
                         // @ts-ignore
-                        this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt);
+                        this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
                         const sessionState = await serviceWorker.getSessionStateAsync();
                         // @ts-ignore
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
@@ -242,8 +243,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     if (tokens) {
                         // @ts-ignore
                         this.tokens = setTokens(tokens, null, configuration.token_renew_mode);
+                        const getLoginParams = session.getLoginParams(this.configurationName);
                         // @ts-ignore
-                        this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt);
+                        this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
                         const sessionState = session.getSessionState();
                         // @ts-ignore
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
@@ -427,7 +429,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const redirectUri = configuration.redirect_uri;
                     const authority = configuration.authority;
                     const tokenExtras = configuration.token_request_extras ? configuration.token_request_extras : {};
-                    const finalExtras = { ...tokenExtras, ...extras };
+                    const finalExtras = { ...tokenExtras };
+
+                    for (const [key, value] of Object.entries(extras)) {
+                        if (key.endsWith(':token_request')) {
+                            finalExtras[key.replace(':token_request', '')] = value;
+                        }
+                    }
                     const localFunctionAsync = async () => {
                         const details = {
                             client_id: clientId,

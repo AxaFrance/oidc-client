@@ -174,7 +174,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
                 const tokenRequest = new TokenRequest({
                     client_id: clientId,
                     redirect_uri: redirectUri, // @ts-ignore
-                    grant_type: extras.grant_type ?? GRANT_TYPE_AUTHORIZATION_CODE,
+                    grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
                     code: response.code,
                     refresh_token: undefined,
                     extras,

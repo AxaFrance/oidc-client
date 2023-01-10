@@ -1,6 +1,7 @@
 import { eventNames } from './events';
 import { Tokens } from './parseTokens';
 import { autoRenewTokens } from './renewTokens';
+import timer from './timer';
 import { OidcConfiguration, StringMap } from './types';
 type SilentLoginResponse = {
     tokens:Tokens;
@@ -108,6 +109,10 @@ export const defaultSilentLoginAsync = (window, configurationName, configuration
     };
 
     const loginLocalAsync = async () => {
+        if (oidc.timeoutId) {
+            timer.clearTimeout(oidc.timeoutId);
+        }
+
         let state;
         if (extras && 'state' in extras) {
             state = extras.state;
@@ -125,7 +130,7 @@ export const defaultSilentLoginAsync = (window, configurationName, configuration
                 oidc.tokens = silentResult.tokens;
                 publishEvent(eventNames.token_aquired, {});
                 // @ts-ignore
-                this.timeoutId = autoRenewTokens(oidc, oidc.tokens.refreshToken, oidc.tokens.expiresAt, extras);
+                oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.refreshToken, oidc.tokens.expiresAt, extras);
                 return {};
             }
         } catch (e) {
