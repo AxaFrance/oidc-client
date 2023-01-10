@@ -1,13 +1,13 @@
 import { eventNames } from './events';
 import { Tokens } from './parseTokens';
+import { autoRenewTokens } from './renewTokens';
 import { OidcConfiguration, StringMap } from './types';
-
 type SilentLoginResponse = {
     tokens:Tokens;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-const silentLoginAsync = (configurationName:string, configuration:OidcConfiguration, publishEvent:Function) => (extras:StringMap = null, state:string = null, scope:string = null):Promise<SilentLoginResponse> => {
+export const _silentLoginAsync = (configurationName:string, configuration:OidcConfiguration, publishEvent:Function) => (extras:StringMap = null, state:string = null, scope:string = null):Promise<SilentLoginResponse> => {
     if (!configuration.silent_redirect_uri || !configuration.silent_login_uri) {
         return Promise.resolve(null);
     }
@@ -99,4 +99,40 @@ const silentLoginAsync = (configurationName:string, configuration:OidcConfigurat
     }
 };
 
-export default silentLoginAsync;
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const defaultSilentLoginAsync = (window, configurationName, configuration:OidcConfiguration, publishEvent :(string, any)=>void, oidc:any) => (extras:StringMap = null, scope:string = undefined) => {
+    extras = { ...extras };
+
+    const silentLoginAsync = (extras, state, scope) => {
+        return _silentLoginAsync(configurationName, configuration, publishEvent.bind(oidc))(extras, state, scope);
+    };
+
+    const loginLocalAsync = async () => {
+        let state;
+        if (extras && 'state' in extras) {
+            state = extras.state;
+            delete extras.state;
+        }
+
+        try {
+            const extraFinal = extras ?? configuration.extras ?? {};
+            const silentResult = await silentLoginAsync({
+                ...extraFinal,
+                prompt: 'none',
+            }, state, scope);
+
+            if (silentResult) {
+                oidc.tokens = silentResult.tokens;
+                publishEvent(eventNames.token_aquired, {});
+                // @ts-ignore
+                this.timeoutId = autoRenewTokens(oidc, oidc.tokens.refreshToken, oidc.tokens.expiresAt, extras);
+                return {};
+            }
+        } catch (e) {
+            return e;
+        }
+    };
+    return loginLocalAsync();
+};
+
+export default defaultSilentLoginAsync;

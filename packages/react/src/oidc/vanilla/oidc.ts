@@ -1,13 +1,6 @@
 import {
-    AuthorizationNotifier,
     AuthorizationServiceConfiguration,
-    BaseTokenRequestHandler,
-    DefaultCrypto,
-    FetchRequestor,
-    GRANT_TYPE_AUTHORIZATION_CODE,
     GRANT_TYPE_REFRESH_TOKEN,
-    RedirectRequestHandler,
-    TokenRequest,
 } from '@openid/appauth';
 import { AuthorizationServiceConfigurationJson } from '@openid/appauth/src/authorization_service_configuration';
 
@@ -16,18 +9,17 @@ import { CheckSessionIFrame } from './checkSessionIFrame';
 import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync, sleepAsync } from './initWorker';
-import { defaultLoginAsync, defaultSilentLoginAsync2 } from './login';
-import { MemoryStorageBackend } from './memoryStorageBackend';
-import { HashQueryStringUtils, NoHashQueryStringUtils } from './noHashQueryStringUtils';
+import { defaultLoginAsync, loginCallbackAsync } from './login';
 import {
     computeTimeLeft,
     isTokensOidcValid,
     setTokens, TokenRenewMode,
     Tokens,
 } from './parseTokens';
+import { autoRenewTokens, renewTokensAndStartTimerAsync } from './renewTokens';
 import { fetchFromIssuer, performRevocationRequestAsync, performTokenRequestAsync, TOKEN_TYPE } from './requests';
 import { getParseQueryStringFromLocation } from './route-utils';
-import defaultSilentLoginAsync from './silentLogin';
+import defaultSilentLoginAsync, { _silentLoginAsync } from './silentLogin';
 import timer from './timer';
 import { AuthorityConfiguration, OidcConfiguration, StringMap } from './types';
 import { userInfoAsync } from './user';
@@ -75,36 +67,6 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc) : Promise<LoginCallba
     return { callbackPath };
 };
 
-async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh = false, extras:StringMap = null) {
-    const updateTokens = (tokens) => { oidc.tokens = tokens; };
-    const { tokens, status } = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras, updateTokens);
-
-    const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
-    if (!serviceWorker) {
-        const session = initSession(oidc.configurationName, oidc.configuration.storage);
-        await session.setTokens(oidc.tokens);
-    }
-
-    if (!oidc.tokens) {
-        await oidc.destroyAsync(status);
-        return;
-    }
-
-    if (oidc.timeoutId) {
-        oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, extras);
-    }
-}
-
-const autoRenewTokens = (oidc, refreshToken, expiresAt, extras:StringMap = null) => {
-    const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second;
-    return timer.setTimeout(async () => {
-        const timeLeft = computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond, expiresAt);
-        const timeInfo = { timeLeft };
-        oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
-        await renewTokensAndStartTimerAsync(oidc, refreshToken, false, extras);
-    }, 1000);
-};
-
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
 };
@@ -139,7 +101,6 @@ export class Oidc {
       this.loginCallbackWithAutoTokensRenewAsync.bind(this);
       this.initAsync.bind(this);
       this.loginCallbackAsync.bind(this);
-      this._loginCallbackAsync.bind(this);
       this.subscribeEvents.bind(this);
       this.removeEventSubscription.bind(this);
       this.publishEvent.bind(this);
@@ -203,10 +164,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             console.error(error);
             this._silentLoginErrorCallbackFromIFrame();
         }
-    }
-
-    async silentLoginAsync(extras:StringMap = null, state:string = null, scope:string = null) {
-        return defaultSilentLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this))(extras, state, scope);
     }
 
     initPromise = null;
@@ -321,7 +278,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     async startCheckSessionAsync(checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) {
         const getCurrentTokens = () => this.tokens;
-        this.checkSessionIFrame = await defaultStartCheckSessionAsync(oidcDatabase, this.configuration, this.checkSessionIFrame, this.silentLoginAsync.bind(this), getCurrentTokens)(checkSessionIFrameUri, clientId, sessionState, isSilentSignin);
+
+        const silentLoginAsync = (extras, state, scope) => {
+            return _silentLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this))(extras, state, scope);
+        };
+
+        this.checkSessionIFrame = await defaultStartCheckSessionAsync(oidcDatabase, this.configuration, this.checkSessionIFrame, silentLoginAsync.bind(this), getCurrentTokens)(checkSessionIFrameUri, clientId, sessionState, isSilentSignin);
     }
 
     loginPromise: Promise<void> = null;
@@ -330,9 +292,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return this.loginPromise;
         }
         if (silentLoginOnly) {
-            return defaultSilentLoginAsync2(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this)(extras, scope);
+            return defaultSilentLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this)(extras, scope);
         }
-        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.silentLoginAsync.bind(this), this.publishEvent.bind(this), this.initAsync.bind(this))(callbackPath, extras, isSilentSignin, scope);
+        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this.initAsync.bind(this))(callbackPath, extras, isSilentSignin, scope);
         return this.loginPromise.then(result => {
             this.loginPromise = null;
             return result;
@@ -346,7 +308,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
 
         const loginCallbackLocalAsync = async():Promise<InternalLoginCallback> => {
-            const response = await this._loginCallbackAsync(isSilenSignin);
+            const response = await loginCallbackAsync(this)(isSilenSignin);
             // @ts-ignore
             const parsedTokens = response.tokens;
             // @ts-ignore
@@ -365,153 +327,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             this.loginCallbackPromise = null;
             return result;
         });
-    }
-
-    async _loginCallbackAsync(isSilentSignin = false) {
-        try {
-            this.publishEvent(eventNames.loginCallbackAsync_begin, {});
-            const configuration = this.configuration;
-            const clientId = configuration.client_id;
-            const redirectUri = isSilentSignin ? configuration.silent_redirect_uri : configuration.redirect_uri;
-            const authority = configuration.authority;
-            const tokenRequestTimeout = configuration.token_request_timeout;
-            const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
-            const queryParams = getParseQueryStringFromLocation(window.location.href);
-            const sessionState = queryParams.session_state;
-            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-            let storage = null;
-            let nonceData = null;
-            let getLoginParams = null;
-            if (serviceWorker) {
-                serviceWorker.startKeepAliveServiceWorker();
-                await serviceWorker.initAsync(oidcServerConfiguration, 'loginCallbackAsync', configuration);
-                const items = await serviceWorker.loadItemsAsync();
-                storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
-                const dummy = await storage.getItem('dummy');
-                if (!dummy) {
-                    throw new Error('Service Worker storage disapear');
-                }
-                await storage.removeItem('dummy');
-                await serviceWorker.setSessionStateAsync(sessionState);
-                nonceData = await serviceWorker.getNonceAsync();
-                getLoginParams = serviceWorker.getLoginParams(this.configurationName);
-            } else {
-                const session = initSession(this.configurationName);
-                session.setSessionState(sessionState);
-                const items = await session.loadItemsAsync();
-                storage = new MemoryStorageBackend(session.saveItemsAsync, items);
-                nonceData = await session.getNonceAsync();
-                getLoginParams = session.getLoginParams(this.configurationName);
-            }
-
-            return new Promise((resolve, reject) => {
-                let queryStringUtil = new NoHashQueryStringUtils();
-                if (redirectUri.includes('#')) {
-                    const splithash = window.location.href.split('#');
-                    if (splithash.length === 2 && splithash[1].includes('?')) {
-                        queryStringUtil = new HashQueryStringUtils();
-                    }
-                }
-                const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
-                const notifier = new AuthorizationNotifier();
-                authorizationHandler.setAuthorizationNotifier(notifier);
-
-                notifier.setAuthorizationListener((request, response, error) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    if (!response) {
-                        reject(new Error('no response'));
-                        return;
-                    }
-
-                    const extras = {};
-                    if (request && request.internal) {
-                        // @ts-ignore
-                        extras.code_verifier = request.internal.code_verifier;
-                        if (configuration.token_request_extras) {
-                            for (const [key, value] of Object.entries(configuration.token_request_extras)) {
-                                extras[key] = value;
-                            }
-                        }
-                        if (getLoginParams && getLoginParams.extras) {
-                            for (const [key, value] of Object.entries(getLoginParams.extras)) {
-                                if (key.endsWith(':token_request')) {
-                                    extras[key.replace(':token_request', '')] = value;
-                                }
-                            }
-                        }
-                    }
-
-                    const tokenRequest = new TokenRequest({
-                        client_id: clientId,
-                        redirect_uri: redirectUri, // @ts-ignore
-                        grant_type: extras.grant_type ?? GRANT_TYPE_AUTHORIZATION_CODE,
-                        code: response.code,
-                        refresh_token: undefined,
-                        extras,
-                    });
-
-                    let timeoutId = setTimeout(() => {
-                        reject(new Error('performTokenRequest timeout'));
-                        timeoutId = null;
-                    }, tokenRequestTimeout ?? 12000);
-                    try {
-                        const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-                        tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then(async (tokenResponse) => {
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                                this.timeoutId = null;
-                                let loginParams = null;
-                                let formattedTokens = null;
-                                if (serviceWorker) {
-                                    const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
-                                    loginParams = serviceWorker.getLoginParams(this.configurationName);
-                                    formattedTokens = tokens;
-                                } else {
-                                    const session = initSession(this.configurationName, configuration.storage);
-                                    loginParams = session.getLoginParams(this.configurationName);
-                                    formattedTokens = setTokens(tokenResponse, null, configuration.token_renew_mode);
-                                }
-                                if (!isTokensOidcValid(formattedTokens, nonceData.nonce, oidcServerConfiguration)) {
-                                    const exception = new Error('Tokens are not OpenID valid');
-                                    if (timeoutId) {
-                                        clearTimeout(timeoutId);
-                                        this.timeoutId = null;
-                                        this.publishEvent(eventNames.loginCallbackAsync_error, exception);
-                                        console.error(exception);
-                                        reject(exception);
-                                    }
-                                }
-
-                                this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() => {
-                                    this.publishEvent(eventNames.loginCallbackAsync_end, {});
-                                    resolve({
-                                        tokens: formattedTokens,
-                                        state: request.state,
-                                        callbackPath: loginParams.callbackPath,
-                                    });
-                                });
-                            }
-                        });
-                    } catch (exception) {
-                        if (timeoutId) {
-                            clearTimeout(timeoutId);
-                            this.timeoutId = null;
-                            this.publishEvent(eventNames.loginCallbackAsync_error, exception);
-                            console.error(exception);
-                            reject(exception);
-                        }
-                    }
-                });
-                authorizationHandler.completeAuthorizationRequestIfPossible();
-            });
-        } catch (exception) {
-            console.error(exception);
-            this.publishEvent(eventNames.loginCallbackAsync_error, exception);
-            throw exception;
-        }
     }
 
     async synchroniseTokensAsync(refreshToken, index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) {
@@ -537,6 +352,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             extras = {};
         }
         const configuration = this.configuration;
+
+        const silentLoginAsync = (extras: StringMap, state:string, scope:string = null) => {
+            return _silentLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this))(extras, state, scope);
+        };
         const localsilentLoginAsync = async () => {
             try {
                 let loginParams = null;
@@ -547,7 +366,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     const session = initSession(this.configurationName, configuration.storage);
                     loginParams = session.getLoginParams(this.configurationName);
                 }
-                const silent_token_response = await this.silentLoginAsync({
+                const silent_token_response = await silentLoginAsync({
                     ...loginParams.extras,
                     ...extras,
                     prompt: 'none',
