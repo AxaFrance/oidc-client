@@ -51,7 +51,7 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
                 scope = configuration.scope;
             }
 
-            const extraFinal = extras ?? configuration.extras ?? {};
+            const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
             if (!extraFinal.nonce) {
                 extraFinal.nonce = randomString(12);
             }

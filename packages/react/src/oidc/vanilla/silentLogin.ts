@@ -120,7 +120,7 @@ export const defaultSilentLoginAsync = (window, configurationName, configuration
         }
 
         try {
-            const extraFinal = extras ?? configuration.extras ?? {};
+            const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
             const silentResult = await silentLoginAsync({
                 ...extraFinal,
                 prompt: 'none',
