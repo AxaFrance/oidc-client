@@ -261,19 +261,13 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return { nonce: keyNonce };
     };
 
-    const getLoginSessionKey = (configurationName:string) => {
-        return `oidc_login.${configurationName}`;
-    };
-
-    const setLoginParams = (configurationName:string, data) => {
-        const sessionKey = getLoginSessionKey(configurationName);
-        getLoginParamsCache = data;
-        localStorage[sessionKey] = JSON.stringify(data);
-    };
-
     let getLoginParamsCache = null;
+    const setLoginParams = (configurationName:string, data) => {
+        getLoginParamsCache = data;
+        localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
+    };
     const getLoginParams = (configurationName) => {
-        const dataString = localStorage[getLoginSessionKey(configurationName)];
+        const dataString = localStorage[`oidc.login.${configurationName}`];
         if (!getLoginParamsCache) {
             getLoginParamsCache = JSON.parse(dataString);
         }

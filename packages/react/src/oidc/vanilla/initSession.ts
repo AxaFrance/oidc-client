@@ -1,11 +1,11 @@
 export const initSession = (configurationName, storage = sessionStorage) => {
     const saveItemsAsync = (items) => {
-        storage[`oidc_items.${configurationName}`] = JSON.stringify(items);
+        storage[`oidc.items.${configurationName}`] = JSON.stringify(items);
         return Promise.resolve();
     };
 
     const loadItemsAsync = () => {
-        return Promise.resolve(JSON.parse(storage[`oidc_items.${configurationName}`]));
+        return Promise.resolve(JSON.parse(storage[`oidc.items.${configurationName}`]));
     };
 
     const clearAsync = (status) => {
@@ -50,19 +50,13 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return JSON.stringify({ tokens: JSON.parse(storage[`oidc.${configurationName}`]).tokens });
     };
 
-    const getLoginSessionKey = (configurationName:string) => {
-        return `oidc_login.${configurationName}`;
-    };
-
-    const setLoginParams = (configurationName:string, data) => {
-        const sessionKey = getLoginSessionKey(configurationName);
-        getLoginParamsCache = data;
-        storage[sessionKey] = JSON.stringify(data);
-    };
-
     let getLoginParamsCache = null;
+    const setLoginParams = (configurationName:string, data) => {
+        getLoginParamsCache = data;
+        storage[`oidc.login.${configurationName}`] = JSON.stringify(data);
+    };
     const getLoginParams = (configurationName) => {
-        const dataString = storage[getLoginSessionKey(configurationName)];
+        const dataString = storage[`oidc.login.${configurationName}`];
         if (!getLoginParamsCache) {
             getLoginParamsCache = JSON.parse(dataString);
         }
