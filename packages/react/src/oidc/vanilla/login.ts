@@ -67,9 +67,8 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
                 storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
                 await storage.setItem('dummy', {});
             } else {
-                let session = initSession(configurationName, configuration.storage ?? sessionStorage);
+                const session = initSession(configurationName, configuration.storage ?? sessionStorage);
                 session.setLoginParams(configurationName, { callbackPath: url, extras: originExtras, state });
-                session = initSession(configurationName);
                 await session.setNonceAsync(nonce);
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
@@ -123,7 +122,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             nonceData = await serviceWorker.getNonceAsync();
             getLoginParams = serviceWorker.getLoginParams(oidc.configurationName);
         } else {
-            const session = initSession(oidc.configurationName);
+            const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
             session.setSessionState(sessionState);
             const items = await session.loadItemsAsync();
             storage = new MemoryStorageBackend(session.saveItemsAsync, items);
