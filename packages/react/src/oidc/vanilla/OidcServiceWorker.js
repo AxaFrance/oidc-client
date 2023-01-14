@@ -217,7 +217,7 @@ const getCurrentDatabaseDomain = (database, url) => {
                 let domain = domainsToSendTokens[i];
 
                 if (typeof domain === 'string') {
-                    domain = new RegExp(`^${domain}`, 'gm');
+                    domain = new RegExp(`^${domain}`);
                 }
 
                 if (domain.test?.(url)) {
@@ -393,7 +393,7 @@ const checkDomain = (domains, endpoint) => {
         let testable = domain;
 
         if (typeof domain === 'string') {
-            testable = new RegExp(`^${domain}`, 'gm');
+            testable = new RegExp(`^${domain}`);
         }
 
         return testable.test?.(endpoint);
