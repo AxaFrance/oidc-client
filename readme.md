@@ -155,7 +155,7 @@ render(<App />, document.getElementById('root'));
 
 // Domains used by OIDC server must be also declared here
 const trustedDomains = {
-  default:["https://demo.duendesoftware.com", "https://www.myapi.com/users"]
+  default:["https://demo.duendesoftware.com", "https://www.myapi.com/users", new RegExp('^(https://[a-zA-Z0-9-]+.domain.com/api/)')]
 };
 ```
 
