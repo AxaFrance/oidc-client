@@ -23,10 +23,9 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
     const loginLocalAsync = async () => {
         const location = window.location;
         const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
-        let state;
-        if (extras && 'state' in extras) {
-            state = extras.state;
-            delete extras.state;
+
+        if (!('state' in extras)) {
+            extras.state = randomString(16);
         }
 
         publishEvent(eventNames.loginAsync_begin, {});
@@ -52,7 +51,7 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
             const oidcServerConfiguration = await initAsync(configuration.authority, configuration.authority_configuration);
             let storage;
             if (serviceWorker) {
-                serviceWorker.setLoginParams(configurationName, { callbackPath: url, extras: originExtras, state });
+                serviceWorker.setLoginParams(configurationName, { callbackPath: url, extras: originExtras });
                 serviceWorker.startKeepAliveServiceWorker();
                 await serviceWorker.initAsync(oidcServerConfiguration, 'loginAsync', configuration);
                 await serviceWorker.setNonceAsync(nonce);
@@ -60,7 +59,7 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
                 await storage.setItem('dummy', {});
             } else {
                 const session = initSession(configurationName, configuration.storage ?? sessionStorage);
-                session.setLoginParams(configurationName, { callbackPath: url, extras: originExtras, state });
+                session.setLoginParams(configurationName, { callbackPath: url, extras: originExtras });
                 await session.setNonceAsync(nonce);
                 storage = new MemoryStorageBackend(session.saveItemsAsync, {});
             }
@@ -71,7 +70,6 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
                 redirect_uri: redirectUri,
                 scope,
                 response_type: 'code',
-                state,
                 ...extraFinal,
             };
             await performAuthorizationRequestAsync(storage)(oidcServerConfiguration.authorizationEndpoint, extraInternal);
