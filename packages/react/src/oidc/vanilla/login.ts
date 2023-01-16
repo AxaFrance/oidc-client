@@ -1,17 +1,9 @@
-import {
-    AuthorizationNotifier,
-    AuthorizationRequest, BaseTokenRequestHandler,
-    DefaultCrypto, FetchRequestor, GRANT_TYPE_AUTHORIZATION_CODE,
-    RedirectRequestHandler,
-    TokenRequest,
-} from '@openid/appauth';
-
 import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync } from './initWorker';
 import { MemoryStorageBackend } from './memoryStorageBackend';
-import { HashQueryStringUtils, NoHashQueryStringUtils } from './noHashQueryStringUtils';
-import { isTokensOidcValid, setTokens } from './parseTokens';
+import { isTokensOidcValid } from './parseTokens';
+import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests';
 import { getParseQueryStringFromLocation } from './route-utils';
 import { OidcConfiguration, StringMap } from './types';
 
@@ -74,17 +66,15 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
             }
 
             // @ts-ignore
-            const queryStringUtil = redirectUri.includes('#') ? new HashQueryStringUtils() : new NoHashQueryStringUtils();
-            const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
-            const authRequest = new AuthorizationRequest({
+            const extraInternal = {
                 client_id: configuration.client_id,
                 redirect_uri: redirectUri,
                 scope,
-                response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+                response_type: 'code',
                 state,
-                extras: extraFinal,
-            });
-            authorizationHandler.performAuthorizationRequest(oidcServerConfiguration, authRequest);
+                ...extraFinal,
+            };
+            await performAuthorizationRequestAsync(storage)(oidcServerConfiguration.authorizationEndpoint, extraInternal);
         } catch (exception) {
             publishEvent(eventNames.loginAsync_error, exception);
             throw exception;
@@ -130,32 +120,26 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             getLoginParams = session.getLoginParams(oidc.configurationName);
         }
 
-        return new Promise((resolve, reject) => {
-            let queryStringUtil = new NoHashQueryStringUtils();
-            if (redirectUri.includes('#')) {
-                const splithash = window.location.href.split('#');
-                if (splithash.length === 2 && splithash[1].includes('?')) {
-                    queryStringUtil = new HashQueryStringUtils();
-                }
-            }
-            const authorizationHandler = new RedirectRequestHandler(storage, queryStringUtil, window.location, new DefaultCrypto());
-            const notifier = new AuthorizationNotifier();
-            authorizationHandler.setAuthorizationNotifier(notifier);
+        const params = getParseQueryStringFromLocation(window.location.toString());
+        /* code=7F466C207CDC4035E117F8B20079C3A86BEB4341B41CB751A6B1A8EA4E49AC2B-1&
+        scope=openid%20profile%20email%20api%20offline_access&
+        state=undefined&
+        session_state=jbENbQxNj0r939Yx-yvtNKEjHO7SFpiqzovSCEQZX9s.03C29EE513E382401C1AF8558A84326E&
+        iss=https%3A%2F%2Fdemo.duendesoftware.com */
+        // const sessionState = params.session_state;
 
-            notifier.setAuthorizationListener((request, response, error) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                if (!response) {
-                    reject(new Error('no response'));
-                    return;
-                }
+        if (params.iss !== oidcServerConfiguration.issuer) {
+            throw new Error('issuer not valid');
+        }
+        const data = {
+            code: params.code,
+            grant_type: 'authorization_code',
+            client_id: configuration.client_id,
+            redirect_uri: 'http://localhost:4200/authentication/callback',
+        };
 
                 const extras = {};
-                if (request && request.internal) {
                     // @ts-ignore
-                    extras.code_verifier = request.internal.code_verifier;
                     if (configuration.token_request_extras) {
                         for (const [key, value] of Object.entries(configuration.token_request_extras)) {
                             extras[key] = value;
@@ -168,71 +152,30 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
                             }
                         }
                     }
-                }
 
-                const tokenRequest = new TokenRequest({
-                    client_id: clientId,
-                    redirect_uri: redirectUri, // @ts-ignore
-                    grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
-                    code: response.code,
-                    refresh_token: undefined,
-                    extras,
-                });
+                    const tokenResponse = await performFirstTokenRequestAsync(storage)(oidcServerConfiguration.tokenEndpoint, { ...data, ...extras }, oidc.configuration.token_renew_mode, tokenRequestTimeout);
+                    console.log(tokenResponse);
 
-                let timeoutId = setTimeout(() => {
-                    reject(new Error('performTokenRequest timeout'));
-                    timeoutId = null;
-                }, tokenRequestTimeout ?? 12000);
-                try {
-                    const tokenHandler = new BaseTokenRequestHandler(new FetchRequestor());
-                    tokenHandler.performTokenRequest(oidcServerConfiguration, tokenRequest).then(async (tokenResponse) => {
-                        if (timeoutId) {
-                            clearTimeout(timeoutId);
-                            oidc.timeoutId = null;
                             let loginParams = null;
-                            let formattedTokens = null;
+                            const formattedTokens = tokenResponse.data;
                             if (serviceWorker) {
-                                const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
+                                await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
                                 loginParams = serviceWorker.getLoginParams(oidc.configurationName);
-                                formattedTokens = tokens;
                             } else {
                                 const session = initSession(oidc.configurationName, configuration.storage);
                                 loginParams = session.getLoginParams(oidc.configurationName);
-                                formattedTokens = setTokens(tokenResponse, null, configuration.token_renew_mode);
                             }
                             if (!isTokensOidcValid(formattedTokens, nonceData.nonce, oidcServerConfiguration)) {
-                                const exception = new Error('Tokens are not OpenID valid');
-                                if (timeoutId) {
-                                    clearTimeout(timeoutId);
-                                    oidc.timeoutId = null;
-                                    oidc.publishEvent(eventNames.loginCallbackAsync_error, exception);
-                                    console.error(exception);
-                                    reject(exception);
-                                }
+                                throw new Error('Tokens are not OpenID valid');
                             }
 
-                            oidc.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin).then(() => {
-                                oidc.publishEvent(eventNames.loginCallbackAsync_end, {});
-                                resolve({
-                                    tokens: formattedTokens,
-                                    state: request.state,
-                                    callbackPath: loginParams.callbackPath,
-                                });
-                            });
-                        }
-                    });
-                } catch (exception) {
-                    if (timeoutId) {
-                        clearTimeout(timeoutId);
-                        oidc.timeoutId = null;
-                        oidc.publishEvent(eventNames.loginCallbackAsync_error, exception);
-                        console.error(exception);
-                        reject(exception);
-                    }
-                }
-            });
-            authorizationHandler.completeAuthorizationRequestIfPossible();
-        });
+                            await oidc.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin);
+                            oidc.publishEvent(eventNames.loginCallbackAsync_end, {});
+                            return {
+                                tokens: formattedTokens,
+                                state: 'request.state',
+                                callbackPath: loginParams.callbackPath,
+                            };
     } catch (exception) {
         console.error(exception);
         oidc.publishEvent(eventNames.loginCallbackAsync_error, exception);

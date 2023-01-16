@@ -1,6 +1,9 @@
 import { getFromCache, setCache } from './cache';
+import { DefaultCrypto } from './crypto';
+import { MemoryStorageBackend } from './memoryStorageBackend';
 import { OidcAuthorizationServiceConfiguration } from './oidc';
 import { parseOriginalTokens } from './parseTokens';
+import { StringMap } from './types';
 
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage):
@@ -110,5 +113,76 @@ export const performTokenRequestAsync = async (url, details, extras, oldTokens, 
     return {
         success: true,
         data: parseOriginalTokens(tokens, oldTokens, tokenRenewMode),
+    };
+};
+
+export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) => async (url,
+
+                                                           extras: StringMap,
+
+                                                       ) => {
+    extras = extras ? { ...extras } : {};
+    const crypto = new DefaultCrypto();
+    const codeVerifier = crypto.generateRandom(128);
+    const challenge: Promise<string|undefined> =
+        crypto.deriveChallenge(codeVerifier).catch(error => {
+            console.error('Unable to generate PKCE challenge. Not using PKCE', error);
+            return undefined;
+        });
+    const result = await challenge;
+
+    // keep track of the code used.
+    const internal = { code_verifier: codeVerifier };
+
+    await storage.setItem('oidc:internal', JSON.stringify(internal));
+    extras.code_challenge = result;
+    // We always use S256. Plain is not good enough.
+    extras.code_challenge_method = 'S256';
+
+    let queryString = '';
+    if (extras) {
+        for (const [key, value] of Object.entries(extras)) {
+            if (queryString === '') {
+                queryString += '?';
+            } else {
+                queryString += '&';
+            }
+            queryString += `${key}=${encodeURIComponent(value)}`;
+        }
+    }
+
+    window.location.href = `${url}${queryString}`;
+};
+
+export const performFirstTokenRequestAsync = (storage: MemoryStorageBackend) => async (url, extras, tokenRenewMode: string, timeoutMs = 10000) => {
+    extras = extras ? { ...extras } : {};
+
+    const data = await storage.getItem('oidc:internal');
+    await storage.clear();
+    const dataJson = JSON.parse(data);
+    extras.code_verifier = dataJson.code_verifier;
+
+    const formBody = [];
+    for (const property in extras) {
+        const encodedKey = encodeURIComponent(property);
+        const encodedValue = encodeURIComponent(extras[property]);
+        formBody.push(`${encodedKey}=${encodedValue}`);
+    }
+    const formBodyString = formBody.join('&');
+
+    const response = await internalFetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+        body: formBodyString,
+    }, timeoutMs);
+    if (response.status !== 200) {
+        return { success: false, status: response.status };
+    }
+    const tokens = await response.json();
+    return {
+        success: true,
+        data: parseOriginalTokens(tokens, null, tokenRenewMode),
     };
 };
