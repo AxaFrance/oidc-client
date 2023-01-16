@@ -18,7 +18,7 @@ export const getLocation = (href: string) => {
         }
     }
 
-    if (search) {
+    if (search.startsWith('?')) {
         search = search.slice(1);
     }
 

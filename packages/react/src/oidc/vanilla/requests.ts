@@ -116,11 +116,7 @@ export const performTokenRequestAsync = async (url, details, extras, oldTokens, 
     };
 };
 
-export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) => async (url,
-
-                                                           extras: StringMap,
-
-                                                       ) => {
+export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) => async (url, extras: StringMap) => {
     extras = extras ? { ...extras } : {};
     const crypto = new DefaultCrypto();
     const codeVerifier = crypto.generateRandom(128);
@@ -132,7 +128,7 @@ export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) 
     const result = await challenge;
 
     // keep track of the code used.
-    const internal = { code_verifier: codeVerifier };
+    const internal = { code_verifier: codeVerifier, state: extras.state };
 
     await storage.setItem('oidc:internal', JSON.stringify(internal));
     extras.code_challenge = result;
@@ -183,6 +179,9 @@ export const performFirstTokenRequestAsync = (storage: MemoryStorageBackend) => 
     const tokens = await response.json();
     return {
         success: true,
-        data: parseOriginalTokens(tokens, null, tokenRenewMode),
+        data: {
+            state: extras.state,
+            tokens: parseOriginalTokens(tokens, null, tokenRenewMode),
+            },
     };
 };
