@@ -1,5 +1,5 @@
 import { getFromCache, setCache } from './cache';
-import { DefaultCrypto } from './crypto';
+import { deriveChallengeAsync, generateRandom } from './crypto';
 import { MemoryStorageBackend } from './memoryStorageBackend';
 import { OidcAuthorizationServiceConfiguration } from './oidc';
 import { parseOriginalTokens } from './parseTokens';
@@ -118,20 +118,14 @@ export const performTokenRequestAsync = async (url, details, extras, oldTokens, 
 
 export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) => async (url, extras: StringMap) => {
     extras = extras ? { ...extras } : {};
-    const crypto = new DefaultCrypto();
-    const codeVerifier = crypto.generateRandom(128);
-    const challenge: Promise<string|undefined> =
-        crypto.deriveChallenge(codeVerifier).catch(error => {
-            console.error('Unable to generate PKCE challenge. Not using PKCE', error);
-            return undefined;
-        });
-    const result = await challenge;
+    const codeVerifier = generateRandom(128);
+    const codeChallenge = await deriveChallengeAsync(codeVerifier);
 
     // keep track of the code used.
     const internal = { code_verifier: codeVerifier, state: extras.state };
 
     await storage.setItem('oidc:internal', JSON.stringify(internal));
-    extras.code_challenge = result;
+    extras.code_challenge = codeChallenge;
     // We always use S256. Plain is not good enough.
     extras.code_challenge_method = 'S256';
 

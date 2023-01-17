@@ -1,3 +1,4 @@
+import { generateRandom } from './crypto';
 import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync } from './initWorker';
@@ -6,15 +7,6 @@ import { isTokensOidcValid } from './parseTokens';
 import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests';
 import { getParseQueryStringFromLocation } from './route-utils';
 import { OidcConfiguration, StringMap } from './types';
-
-const randomString = function(length) {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const defaultLoginAsync = (window, configurationName, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {
@@ -25,7 +17,7 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
         const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
 
         if (!('state' in extras)) {
-            extras.state = randomString(16);
+            extras.state = generateRandom(16);
         }
 
         publishEvent(eventNames.loginAsync_begin, {});
@@ -44,7 +36,7 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
 
             const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
             if (!extraFinal.nonce) {
-                extraFinal.nonce = randomString(12);
+                extraFinal.nonce = generateRandom(12);
             }
             const nonce = { nonce: extraFinal.nonce };
             const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
