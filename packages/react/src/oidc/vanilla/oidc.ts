@@ -25,20 +25,22 @@ export interface OidcAuthorizationServiceConfigurationJson {
 }
 
 export class OidcAuthorizationServiceConfiguration {
-    private check_session_iframe: string;
+    private checkSessionIframe: string;
     private issuer: string;
     private authorizationEndpoint: string;
     private tokenEndpoint: string;
     private revocationEndpoint: string;
     private userInfoEndpoint: string;
+    private endSessionEndpoint: string;
 
     constructor(request: any) {
         this.authorizationEndpoint = request.authorization_endpoint;
         this.tokenEndpoint = request.token_endpoint;
         this.revocationEndpoint = request.revocation_endpoint;
         this.userInfoEndpoint = request.userinfo_endpoint;
-        this.check_session_iframe = request.check_session_iframe;
+        this.checkSessionIframe = request.check_session_iframe;
         this.issuer = request.issuer;
+        this.endSessionEndpoint = request.end_session_endpoint;
     }
 }
 
