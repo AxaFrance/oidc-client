@@ -148,6 +148,7 @@ const propTypes = {
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
+    service_worker_convert_all_requests_to_cors: PropTypes.boolean, // force all requests that servie worker upgrades to have 'cors' mode. This allows setting authentication token on requests initialted by html parsing(e.g. img tags, download links etc).
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server during token request (more info: https://github.com/openid/AppAuth-JS)
     withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState())
