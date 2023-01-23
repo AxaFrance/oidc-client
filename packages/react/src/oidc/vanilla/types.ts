@@ -13,6 +13,7 @@ export type OidcConfiguration = {
     token_request_timeout?: number;
     service_worker_relative_url?:string;
     service_worker_only?:boolean;
+    service_worker_convert_all_requests_to_cors?:boolean;
     extras?:StringMap;
     token_request_extras?:StringMap;
     storage?: Storage;
