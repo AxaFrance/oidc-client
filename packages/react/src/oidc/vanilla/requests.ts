@@ -120,15 +120,10 @@ export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) 
     extras = extras ? { ...extras } : {};
     const codeVerifier = generateRandom(128);
     const codeChallenge = await deriveChallengeAsync(codeVerifier);
-
-    // keep track of the code used.
     const internal = { code_verifier: codeVerifier, state: extras.state };
-
     await storage.setItem('oidc:internal', JSON.stringify(internal));
     extras.code_challenge = codeChallenge;
-    // We always use S256. Plain is not good enough.
     extras.code_challenge_method = 'S256';
-
     let queryString = '';
     if (extras) {
         for (const [key, value] of Object.entries(extras)) {
@@ -140,7 +135,6 @@ export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) 
             queryString += `${key}=${encodeURIComponent(value)}`;
         }
     }
-
     window.location.href = `${url}${queryString}`;
 };
 

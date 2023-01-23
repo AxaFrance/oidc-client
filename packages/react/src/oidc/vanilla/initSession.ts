@@ -1,3 +1,5 @@
+import {ItemName} from "./memoryStorageBackend";
+
 export const initSession = (configurationName, storage = sessionStorage) => {
     const saveItemsAsync = (items) => {
         storage[`oidc.items.${configurationName}`] = JSON.stringify(items);
@@ -43,7 +45,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return { nonce: localStorage[`oidc.nonce.${configurationName}`] };
     };
 
-    const getTokens = () => {
+        const getTokens = () => {
         if (!storage[`oidc.${configurationName}`]) {
             return null;
         }
@@ -62,6 +64,21 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         }
         return getLoginParamsCache;
     };
+    /*
+    const getItemAsync(name: string) {
+        return Promise.resolve(this.items[name]);
+    }
+
+    const removeItemAsync(name: string) {
+        delete this.items[name];
+        return this.saveItemsAsync(this.items);
+    }
+
+    const setItemAsync(name: string, value: any) {
+        this.items[name] = value;
+        return this.saveItemsAsync(this.items);
+    }
+    */
 
     return {
         saveItemsAsync,
