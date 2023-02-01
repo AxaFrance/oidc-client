@@ -18,7 +18,7 @@ export const getLocation = (href: string) => {
         }
     }
 
-    if (search) {
+    if (search.startsWith('?')) {
         search = search.slice(1);
     }
 
@@ -72,7 +72,7 @@ const parseQueryString = (queryString:string) => {
     // Convert the array of strings into an object
     for (i = 0, l = queries.length; i < l; i++) {
         temp = queries[i].split('=');
-        params[decodeURIComponent(temp[0])] = temp[1];
+        params[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1]);
     }
 
     return params;

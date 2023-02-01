@@ -1,6 +1,8 @@
 import { getFromCache, setCache } from './cache';
+import { deriveChallengeAsync, generateRandom } from './crypto';
 import { OidcAuthorizationServiceConfiguration } from './oidc';
 import { parseOriginalTokens } from './parseTokens';
+import { StringMap } from './types';
 
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage):
@@ -110,5 +112,58 @@ export const performTokenRequestAsync = async (url, details, extras, oldTokens, 
     return {
         success: true,
         data: parseOriginalTokens(tokens, oldTokens, tokenRenewMode),
+    };
+};
+
+export const performAuthorizationRequestAsync = (storage: any) => async (url, extras: StringMap) => {
+    extras = extras ? { ...extras } : {};
+    const codeVerifier = generateRandom(128);
+    const codeChallenge = await deriveChallengeAsync(codeVerifier);
+    await storage.setCodeVerifierAsync(codeVerifier);
+    await storage.setStateAsync(extras.state);
+    extras.code_challenge = codeChallenge;
+    extras.code_challenge_method = 'S256';
+    let queryString = '';
+    if (extras) {
+        for (const [key, value] of Object.entries(extras)) {
+            if (queryString === '') {
+                queryString += '?';
+            } else {
+                queryString += '&';
+            }
+            queryString += `${key}=${encodeURIComponent(value)}`;
+        }
+    }
+    window.location.href = `${url}${queryString}`;
+};
+
+export const performFirstTokenRequestAsync = (storage:any) => async (url, extras, tokenRenewMode: string, timeoutMs = 10000) => {
+    extras = extras ? { ...extras } : {};
+    extras.code_verifier = await storage.getCodeVerifierAsync();
+    const formBody = [];
+    for (const property in extras) {
+        const encodedKey = encodeURIComponent(property);
+        const encodedValue = encodeURIComponent(extras[property]);
+        formBody.push(`${encodedKey}=${encodedValue}`);
+    }
+    const formBodyString = formBody.join('&');
+    const response = await internalFetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+        body: formBodyString,
+    }, timeoutMs);
+    await Promise.all([storage.setCodeVerifierAsync(null), storage.setStateAsync(null)]);
+    if (response.status !== 200) {
+        return { success: false, status: response.status };
+    }
+    const tokens = await response.json();
+    return {
+        success: true,
+        data: {
+            state: extras.state,
+            tokens: parseOriginalTokens(tokens, null, tokenRenewMode),
+            },
     };
 };

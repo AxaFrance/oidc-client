@@ -1,8 +1,3 @@
-import {
-    AuthorizationServiceConfiguration,
-    GRANT_TYPE_REFRESH_TOKEN,
-} from '@openid/appauth';
-import { AuthorizationServiceConfigurationJson } from '@openid/appauth/src/authorization_service_configuration';
 
 import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession';
 import { CheckSessionIFrame } from './checkSessionIFrame';
@@ -24,23 +19,28 @@ import timer from './timer';
 import { AuthorityConfiguration, OidcConfiguration, StringMap } from './types';
 import { userInfoAsync } from './user';
 
-export interface OidcAuthorizationServiceConfigurationJson extends AuthorizationServiceConfigurationJson{
+export interface OidcAuthorizationServiceConfigurationJson {
     check_session_iframe?: string;
     issuer:string;
 }
 
-export class OidcAuthorizationServiceConfiguration extends AuthorizationServiceConfiguration {
-    private check_session_iframe: string;
+export class OidcAuthorizationServiceConfiguration {
+    private checkSessionIframe: string;
     private issuer: string;
+    private authorizationEndpoint: string;
+    private tokenEndpoint: string;
+    private revocationEndpoint: string;
+    private userInfoEndpoint: string;
+    private endSessionEndpoint: string;
 
     constructor(request: any) {
-        super(request);
         this.authorizationEndpoint = request.authorization_endpoint;
         this.tokenEndpoint = request.token_endpoint;
         this.revocationEndpoint = request.revocation_endpoint;
         this.userInfoEndpoint = request.userinfo_endpoint;
-        this.check_session_iframe = request.check_session_iframe;
+        this.checkSessionIframe = request.check_session_iframe;
         this.issuer = request.issuer;
+        this.endSessionEndpoint = request.end_session_endpoint;
     }
 }
 
@@ -246,7 +246,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const getLoginParams = session.getLoginParams(this.configurationName);
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
-                        const sessionState = session.getSessionState();
+                        const sessionState = await session.getSessionStateAsync();
                         // @ts-ignore
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
@@ -440,7 +440,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const details = {
                             client_id: clientId,
                             redirect_uri: redirectUri,
-                            grant_type: GRANT_TYPE_REFRESH_TOKEN,
+                            grant_type: 'refresh_token',
                             refresh_token: tokens.refreshToken,
                         };
                         const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
@@ -548,13 +548,22 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          });
      }
 
+    renewTokensPromise:Promise<any> = null;
+
      async renewTokensAsync (extras:StringMap = null) {
+         if (this.renewTokensPromise !== null) {
+             return this.renewTokensPromise;
+         }
          if (!this.timeoutId) {
              return;
          }
          timer.clearTimeout(this.timeoutId);
          // @ts-ignore
-         await renewTokensAndStartTimerAsync(this, this.tokens.refreshToken, true, extras);
+         this.renewTokensPromise = renewTokensAndStartTimerAsync(this, this.tokens.refreshToken, true, extras);
+         return this.renewTokensPromise.then(result => {
+             this.renewTokensPromise = null;
+             return result;
+         });
      }
 
      async destroyAsync(status) {

@@ -1,13 +1,5 @@
+
 export const initSession = (configurationName, storage = sessionStorage) => {
-    const saveItemsAsync = (items) => {
-        storage[`oidc.items.${configurationName}`] = JSON.stringify(items);
-        return Promise.resolve();
-    };
-
-    const loadItemsAsync = () => {
-        return Promise.resolve(JSON.parse(storage[`oidc.items.${configurationName}`]));
-    };
-
     const clearAsync = (status) => {
         storage[`oidc.${configurationName}`] = JSON.stringify({ tokens: null, status });
         return Promise.resolve();
@@ -26,11 +18,11 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         storage[`oidc.${configurationName}`] = JSON.stringify({ tokens });
     };
 
-    const setSessionState = (sessionState) => {
+    const setSessionStateAsync = async (sessionState) => {
         storage[`oidc.session_state.${configurationName}`] = sessionState;
     };
 
-    const getSessionState = () => {
+    const getSessionStateAsync = async () => {
         return storage[`oidc.session_state.${configurationName}`];
     };
 
@@ -63,18 +55,36 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return getLoginParamsCache;
     };
 
+    const getStateAsync = async () => {
+        return storage[`oidc.state.${configurationName}`];
+    };
+
+    const setStateAsync = async (state) => {
+        storage[`oidc.state.${configurationName}`] = state;
+    };
+
+    const getCodeVerifierAsync = async () => {
+        return storage[`oidc.code_verifier.${configurationName}`];
+    };
+
+    const setCodeVerifierAsync = async (codeVerifier) => {
+        storage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
+    };
+
     return {
-        saveItemsAsync,
-        loadItemsAsync,
         clearAsync,
         initAsync,
         setTokens,
         getTokens,
-        setSessionState,
-        getSessionState,
+        setSessionStateAsync,
+        getSessionStateAsync,
         setNonceAsync,
         getNonceAsync,
         setLoginParams,
         getLoginParams,
+        getStateAsync,
+        setStateAsync,
+        getCodeVerifierAsync,
+        setCodeVerifierAsync,
     };
 };
