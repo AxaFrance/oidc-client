@@ -2,7 +2,6 @@ import { generateRandom } from './crypto';
 import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync } from './initWorker';
-import { MemoryStorageBackend } from './memoryStorageBackend';
 import { isTokensOidcValid } from './parseTokens';
 import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests';
 import { getParseQueryStringFromLocation } from './route-utils';
@@ -47,13 +46,12 @@ export const defaultLoginAsync = (window, configurationName, configuration:OidcC
                 serviceWorker.startKeepAliveServiceWorker();
                 await serviceWorker.initAsync(oidcServerConfiguration, 'loginAsync', configuration);
                 await serviceWorker.setNonceAsync(nonce);
-                storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, {});
-                await storage.setItem('dummy', {});
+                storage = serviceWorker;
             } else {
                 const session = initSession(configurationName, configuration.storage ?? sessionStorage);
                 session.setLoginParams(configurationName, { callbackPath: url, extras: originExtras });
                 await session.setNonceAsync(nonce);
-                storage = new MemoryStorageBackend(session.saveItemsAsync, {});
+                storage = session;
             }
 
             // @ts-ignore
@@ -85,29 +83,25 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         const queryParams = getParseQueryStringFromLocation(window.location.href);
         const sessionState = queryParams.session_state;
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, oidc.configurationName);
-        let storage = null;
-        let nonceData = null;
-        let getLoginParams = null;
+        let storage;
+        let nonceData;
+        let getLoginParams;
+        let state;
         if (serviceWorker) {
             serviceWorker.startKeepAliveServiceWorker();
             await serviceWorker.initAsync(oidcServerConfiguration, 'loginCallbackAsync', configuration);
-            const items = await serviceWorker.loadItemsAsync();
-            storage = new MemoryStorageBackend(serviceWorker.saveItemsAsync, items);
-            const dummy = await storage.getItem('dummy');
-            if (!dummy) {
-                throw new Error('Service Worker storage disapear');
-            }
-            await storage.removeItem('dummy');
             await serviceWorker.setSessionStateAsync(sessionState);
             nonceData = await serviceWorker.getNonceAsync();
             getLoginParams = serviceWorker.getLoginParams(oidc.configurationName);
+            state = await serviceWorker.getStateAsync();
+            storage = serviceWorker;
         } else {
             const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
-            session.setSessionState(sessionState);
-            const items = await session.loadItemsAsync();
-            storage = new MemoryStorageBackend(session.saveItemsAsync, items);
+            await session.setSessionStateAsync(sessionState);
             nonceData = await session.getNonceAsync();
             getLoginParams = session.getLoginParams(oidc.configurationName);
+            state = await session.getStateAsync();
+            storage = session;
         }
 
         const params = getParseQueryStringFromLocation(window.location.toString());
@@ -115,6 +109,10 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         if (params.iss && params.iss !== oidcServerConfiguration.issuer) {
             throw new Error('issuer not valid');
         }
+        if (params.state && params.state !== state) {
+            throw new Error('state not valid');
+        }
+
         const data = {
             code: params.code,
             grant_type: 'authorization_code',

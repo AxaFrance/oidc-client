@@ -189,22 +189,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         });
     });
 
-    const saveItemsAsync = (items) => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.saveItemsAsync(items);
-        }
-        return sendMessageAsync(registration)({ type: 'saveItems', data: items, configurationName });
-    };
-    const loadItemsAsync = () => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.loadItemsAsync();
-        }
-        return sendMessageAsync(registration)({ type: 'loadItems', data: null, configurationName });
-    };
     const clearAsync = async (status) => {
         // iOS kill Service Worker when domain we leave domain
         if (operatingSystem.os === 'iOS') {
@@ -274,9 +258,46 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return getLoginParamsCache;
     };
 
+    const getStateAsync = async () => {
+        // iOS kill Service Worker when domain we leave domain
+        if (operatingSystem.os === 'iOS') {
+            const session = initSession(configurationName);
+            return session.getStateAsync();
+        }
+        const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
+        // @ts-ignore
+        return result.state;
+    };
+
+    const setStateAsync = async (state) => {
+        // iOS kill Service Worker when domain we leave domain
+        if (operatingSystem.os === 'iOS') {
+            const session = initSession(configurationName);
+            return session.setStateAsync(state);
+        }
+        return sendMessageAsync(registration)({ type: 'setState', data: { state }, configurationName });
+    };
+
+    const getCodeVerifierAsync = async () => {
+        // iOS kill Service Worker when domain we leave domain
+        if (operatingSystem.os === 'iOS') {
+            const session = initSession(configurationName);
+            return session.getCodeVerifierAsync();
+        }
+        const result = await sendMessageAsync(registration)({ type: 'getCodeVerifier', data: null, configurationName });
+        // @ts-ignore
+        return result.codeVerifier;
+    };
+
+    const setCodeVerifierAsync = async (codeVerifier) => {
+        if (operatingSystem.os === 'iOS') {
+            const session = initSession(configurationName);
+            return session.setCodeVerifierAsync(codeVerifier);
+        }
+        return sendMessageAsync(registration)({ type: 'setCodeVerifier', data: { codeVerifier }, configurationName });
+    };
+
     return {
-        saveItemsAsync,
-        loadItemsAsync,
         clearAsync,
         initAsync,
         startKeepAliveServiceWorker,
@@ -288,5 +309,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         unregisterAsync,
         setLoginParams,
         getLoginParams,
+        getStateAsync,
+        setStateAsync,
+        getCodeVerifierAsync,
+        setCodeVerifierAsync,
     };
 };

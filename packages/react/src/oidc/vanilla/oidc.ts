@@ -246,7 +246,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const getLoginParams = session.getLoginParams(this.configurationName);
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
-                        const sessionState = session.getSessionState();
+                        const sessionState = await session.getSessionStateAsync();
                         // @ts-ignore
                         await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                         this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {

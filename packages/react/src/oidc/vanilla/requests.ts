@@ -1,6 +1,5 @@
 import { getFromCache, setCache } from './cache';
 import { deriveChallengeAsync, generateRandom } from './crypto';
-import { MemoryStorageBackend } from './memoryStorageBackend';
 import { OidcAuthorizationServiceConfiguration } from './oidc';
 import { parseOriginalTokens } from './parseTokens';
 import { StringMap } from './types';
@@ -116,12 +115,12 @@ export const performTokenRequestAsync = async (url, details, extras, oldTokens, 
     };
 };
 
-export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) => async (url, extras: StringMap) => {
+export const performAuthorizationRequestAsync = (storage: any) => async (url, extras: StringMap) => {
     extras = extras ? { ...extras } : {};
     const codeVerifier = generateRandom(128);
     const codeChallenge = await deriveChallengeAsync(codeVerifier);
-    const internal = { code_verifier: codeVerifier, state: extras.state };
-    await storage.setItem('oidc:internal', JSON.stringify(internal));
+    await storage.setCodeVerifierAsync(codeVerifier);
+    await storage.setStateAsync(extras.state);
     extras.code_challenge = codeChallenge;
     extras.code_challenge_method = 'S256';
     let queryString = '';
@@ -138,14 +137,9 @@ export const performAuthorizationRequestAsync = (storage: MemoryStorageBackend) 
     window.location.href = `${url}${queryString}`;
 };
 
-export const performFirstTokenRequestAsync = (storage: MemoryStorageBackend) => async (url, extras, tokenRenewMode: string, timeoutMs = 10000) => {
+export const performFirstTokenRequestAsync = (storage:any) => async (url, extras, tokenRenewMode: string, timeoutMs = 10000) => {
     extras = extras ? { ...extras } : {};
-
-    const data = await storage.getItem('oidc:internal');
-    await storage.clear();
-    const dataJson = JSON.parse(data);
-    extras.code_verifier = dataJson.code_verifier;
-
+    extras.code_verifier = await storage.getCodeVerifierAsync();
     const formBody = [];
     for (const property in extras) {
         const encodedKey = encodeURIComponent(property);
@@ -153,7 +147,6 @@ export const performFirstTokenRequestAsync = (storage: MemoryStorageBackend) => 
         formBody.push(`${encodedKey}=${encodedValue}`);
     }
     const formBodyString = formBody.join('&');
-
     const response = await internalFetch(url, {
         method: 'POST',
         headers: {
@@ -161,6 +154,7 @@ export const performFirstTokenRequestAsync = (storage: MemoryStorageBackend) => 
         },
         body: formBodyString,
     }, timeoutMs);
+    await Promise.all([storage.setCodeVerifierAsync(null), storage.setStateAsync(null)]);
     if (response.status !== 200) {
         return { success: false, status: response.status };
     }
