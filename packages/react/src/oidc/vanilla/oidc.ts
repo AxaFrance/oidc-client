@@ -548,13 +548,22 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          });
      }
 
+    renewTokensPromise:Promise<any> = null;
+
      async renewTokensAsync (extras:StringMap = null) {
+         if (this.renewTokensPromise !== null) {
+             return this.renewTokensPromise;
+         }
          if (!this.timeoutId) {
              return;
          }
          timer.clearTimeout(this.timeoutId);
          // @ts-ignore
-         await renewTokensAndStartTimerAsync(this, this.tokens.refreshToken, true, extras);
+         this.renewTokensPromise = renewTokensAndStartTimerAsync(this, this.tokens.refreshToken, true, extras);
+         return this.renewTokensPromise.then(result => {
+             this.renewTokensPromise = null;
+             return result;
+         });
      }
 
      async destroyAsync(status) {
