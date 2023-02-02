@@ -1,1 +1,0 @@
-﻿export * from '@axa-fr/react-oidc';
