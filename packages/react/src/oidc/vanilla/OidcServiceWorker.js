@@ -288,7 +288,7 @@ const handleFetch = async (event) => {
                 ...serializeHeaders(originalRequest.headers),
                 authorization: 'Bearer ' + currentDatabaseForRequestAccessToken.tokens.access_token,
             },
-            mode: currentDatabaseForRequestAccessToken.oidcConfiguration.service_worker_convert_all_requests_to_cors ? "cors" : originalRequest.mode,
+            mode: currentDatabaseForRequestAccessToken.oidcConfiguration.service_worker_convert_all_requests_to_cors ? 'cors' : originalRequest.mode,
         });
         event.waitUntil(event.respondWith(fetch(newRequest)));
         return;

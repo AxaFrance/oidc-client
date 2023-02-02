@@ -5,6 +5,7 @@ import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync, sleepAsync } from './initWorker';
 import { defaultLoginAsync, loginCallbackAsync } from './login';
+import { destroyAsync, logoutAsync } from './logout';
 import {
     computeTimeLeft,
     isTokensOidcValid,
@@ -12,7 +13,7 @@ import {
     Tokens,
 } from './parseTokens';
 import { autoRenewTokens, renewTokensAndStartTimerAsync } from './renewTokens';
-import { fetchFromIssuer, performRevocationRequestAsync, performTokenRequestAsync, TOKEN_TYPE } from './requests';
+import { fetchFromIssuer, performTokenRequestAsync } from './requests';
 import { getParseQueryStringFromLocation } from './route-utils';
 import defaultSilentLoginAsync, { _silentLoginAsync } from './silentLogin';
 import timer from './timer';
@@ -314,7 +315,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             // @ts-ignore
             const parsedTokens = response.tokens;
             // @ts-ignore
-            this.tokens = response.tokens;
+            this.tokens = parsedTokens;
             const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
             if (!serviceWorker) {
                 const session = initSession(this.configurationName, this.configuration.storage);
@@ -360,7 +361,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         };
         const localsilentLoginAsync = async () => {
             try {
-                let loginParams = null;
+                let loginParams;
                 const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 if (serviceWorker) {
                     loginParams = serviceWorker.getLoginParams(this.configurationName);
@@ -567,21 +568,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
      }
 
      async destroyAsync(status) {
-         timer.clearTimeout(this.timeoutId);
-         this.timeoutId = null;
-         if (this.checkSessionIFrame) {
-             this.checkSessionIFrame.stop();
-         }
-         const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
-         if (!serviceWorker) {
-             const session = initSession(this.configurationName, this.configuration.storage);
-             await session.clearAsync(status);
-         } else {
-             await serviceWorker.clearAsync(status);
-         }
-         this.tokens = null;
-         this.userInfo = null;
-        // this.events = [];
+         return await destroyAsync(this)(status);
      }
 
      async logoutSameTabAsync(clientId: string, sub: any) {
@@ -600,75 +587,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
 
+    logoutPromise:Promise<void> = null;
     async logoutAsync(callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) {
-        const configuration = this.configuration;
-        const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        if (callbackPathOrUrl && (typeof callbackPathOrUrl !== 'string')) {
-            callbackPathOrUrl = undefined;
-            console.warn('callbackPathOrUrl path is not a string');
+        if (this.logoutPromise) {
+            return this.logoutPromise;
         }
-        const path = (callbackPathOrUrl === null || callbackPathOrUrl === undefined) ? location.pathname + (location.search || '') + (location.hash || '') : callbackPathOrUrl;
-        let isUri = false;
-        if (callbackPathOrUrl) {
-            isUri = callbackPathOrUrl.includes('https://') || callbackPathOrUrl.includes('http://');
-        }
-        const url = isUri ? callbackPathOrUrl : window.location.origin + path;
-        // @ts-ignore
-        const idToken = this.tokens ? this.tokens.idToken : '';
-        try {
-            const revocationEndpoint = oidcServerConfiguration.revocationEndpoint;
-            if (revocationEndpoint) {
-                const promises = [];
-                if (this.tokens.accessToken) {
-                    const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.accessToken, TOKEN_TYPE.access_token, configuration.client_id);
-                    promises.push(revokeAccessTokenPromise);
-                }
-                if (this.tokens.refreshToken) {
-                    const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, this.tokens.refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
-                    promises.push(revokeRefreshTokenPromise);
-                }
-                if (promises.length > 0) {
-                    await Promise.all(promises);
-                }
-            }
-        } catch (exception) {
-            console.warn(exception);
-        }
-        // @ts-ignore
-        const sub = this.tokens && this.tokens.idTokenPayload ? this.tokens.idTokenPayload.sub : null;
-        await this.destroyAsync('LOGGED_OUT');
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        for (const [key, oidc] of Object.entries(oidcDatabase)) {
-            if (oidc !== this) {
-                // @ts-ignore
-                await oidc.logoutSameTabAsync(this.configuration.client_id, sub);
-            }
-        }
-
-        if (oidcServerConfiguration.endSessionEndpoint) {
-            if (!extras) {
-                extras = {
-                    id_token_hint: idToken,
-                };
-                if (callbackPathOrUrl !== null) {
-                    extras.post_logout_redirect_uri = url;
-                }
-            }
-            let queryString = '';
-            if (extras) {
-                for (const [key, value] of Object.entries(extras)) {
-                    if (queryString === '') {
-                        queryString += '?';
-                    } else {
-                        queryString += '&';
-                    }
-                    queryString += `${key}=${encodeURIComponent(value)}`;
-                }
-            }
-            window.location.href = `${oidcServerConfiguration.endSessionEndpoint}${queryString}`;
-        } else {
-            window.location.reload();
-        }
+        this.logoutPromise = logoutAsync(this, oidcDatabase)(callbackPathOrUrl, extras);
+        return this.logoutPromise.then(result => {
+            this.logoutPromise = null;
+            return result;
+        });
     }
   }
 
