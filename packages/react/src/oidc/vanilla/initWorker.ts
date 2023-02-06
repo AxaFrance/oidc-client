@@ -136,7 +136,9 @@ const sendMessageAsync = (registration) => (data) => {
                 resolve(event.data);
             }
         };
-        registration.active.postMessage(data, [messageChannel.port2]);
+        if(registration.active) {
+            registration.active.postMessage(data, [messageChannel.port2]);
+        }
     });
 };
 
