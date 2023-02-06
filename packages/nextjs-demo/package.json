@@ -6,7 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@axa-fr/react-oidc": "^6.13.4",
+    "@axa-fr/react-oidc": "^6.14.1",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"

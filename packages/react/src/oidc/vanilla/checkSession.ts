@@ -33,10 +33,11 @@ export const startCheckSessionAsync = (oidcDatabase:any, configuration :OidcConf
                     }
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 }).catch(async (e) => {
+                    console.warn('SessionMonitor._callback: Silent login failed, logging out other tabs:', e);
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     for (const [key, oidc] of Object.entries(oidcDatabase)) {
                         // @ts-ignore
-                        await oidc.logoutOtherTabAsync(this.configuration.client_id, idTokenPayload.sub);
+                        await oidc.logoutOtherTabAsync(configuration.client_id, idTokenPayload.sub);
                     }
                 });
             };
