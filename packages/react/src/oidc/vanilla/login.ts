@@ -137,7 +137,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
 
         const tokenResponse = await performFirstTokenRequestAsync(storage)(oidcServerConfiguration.tokenEndpoint, { ...data, ...extras }, oidc.configuration.token_renew_mode, tokenRequestTimeout);
 
-        let loginParams = null;
+        let loginParams;
         const formattedTokens = tokenResponse.data.tokens;
         if (serviceWorker) {
             await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
@@ -154,7 +154,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             throw new Error('Tokens are not OpenID valid');
         }
 
-        await oidc.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, clientId, sessionState, isSilentSignin);
+        await oidc.startCheckSessionAsync(oidcServerConfiguration.checkSessionIframe, clientId, sessionState, isSilentSignin);
         oidc.publishEvent(eventNames.loginCallbackAsync_end, {});
         return {
             tokens: formattedTokens,
