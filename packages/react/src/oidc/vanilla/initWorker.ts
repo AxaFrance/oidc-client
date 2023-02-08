@@ -108,9 +108,11 @@ export const sleepAsync = (milliseconds) => {
     return new Promise(resolve => timer.setTimeout(resolve, milliseconds));
 };
 
+let controller= null;
 const keepAlive = () => {
     try {
-        const promise = fetch('/OidcKeepAliveServiceWorker.json');
+        controller = new AbortController();
+        const promise = fetch('/OidcKeepAliveServiceWorker.json', { signal: controller.signal });
         promise.catch(error => { console.log(error); });
         sleepAsync(230 * 1000).then(keepAlive);
     } catch (error) { console.log(error); }
@@ -182,6 +184,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             switch (newWorker.state) {
                 case 'installed':
                     if (navigator.serviceWorker.controller) {
+                        if(controller != null) {
+                            controller.abort();
+                        }
                         registration.unregister().then(() => {
                             window.location.reload();
                         });

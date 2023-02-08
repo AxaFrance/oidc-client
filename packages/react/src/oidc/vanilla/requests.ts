@@ -42,7 +42,7 @@ const internalFetch = async (url, headers, numberRetry = 0, timeoutMs = 10000) =
             }
         } else {
             console.error(e.message);
-            throw e; // rethrow other unexpected errors
+            throw e; 
         }
     }
     return response;
