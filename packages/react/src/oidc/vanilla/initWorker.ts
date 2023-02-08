@@ -108,7 +108,7 @@ export const sleepAsync = (milliseconds) => {
     return new Promise(resolve => timer.setTimeout(resolve, milliseconds));
 };
 
-let controller= null;
+let controller = null;
 const keepAlive = () => {
     try {
         controller = new AbortController();
@@ -138,7 +138,7 @@ const sendMessageAsync = (registration) => (data) => {
                 resolve(event.data);
             }
         };
-        if(registration.active) {
+        if (registration.active) {
             registration.active.postMessage(data, [messageChannel.port2]);
         }
     });
@@ -184,7 +184,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             switch (newWorker.state) {
                 case 'installed':
                     if (navigator.serviceWorker.controller) {
-                        if(controller != null) {
+                        if (controller != null) {
                             controller.abort();
                         }
                         registration.unregister().then(() => {
