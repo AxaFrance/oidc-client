@@ -26,7 +26,7 @@ export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond =
     return new OidcAuthorizationServiceConfiguration(result);
 };
 
-const internalFetch = async (url, headers, numberRetry = 0, timeoutMs = 10000) => {
+const internalFetch = async (url, headers, timeoutMs = 10000, numberRetry = 0) => {
     let response;
     try {
         const controller = new AbortController();
@@ -36,7 +36,7 @@ const internalFetch = async (url, headers, numberRetry = 0, timeoutMs = 10000) =
         if (e.message === 'AbortError' ||
             e.message === 'Network request failed') {
             if (numberRetry <= 1) {
-                return await internalFetch(url, headers, numberRetry + 1, timeoutMs);
+                return await internalFetch(url, headers, timeoutMs, numberRetry + 1);
             } else {
                 throw e;
             }
