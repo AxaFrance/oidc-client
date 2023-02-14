@@ -286,7 +286,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return _silentLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this))(extras, state, scope);
         };
 
-        this.checkSessionIFrame = await defaultStartCheckSessionAsync( oidcDatabase, this.configuration, this.checkSessionIFrame, silentLoginAsync.bind(this), getCurrentTokens)(checkSessionIFrameUri, clientId, sessionState, isSilentSignin);
+        this.checkSessionIFrame = await defaultStartCheckSessionAsync(oidcDatabase, this.configuration, this.checkSessionIFrame, silentLoginAsync.bind(this), getCurrentTokens)(checkSessionIFrameUri, clientId, sessionState, isSilentSignin);
     }
 
     loginPromise: Promise<void> = null;
