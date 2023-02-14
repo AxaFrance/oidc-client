@@ -393,6 +393,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         };
 
         if (index > 4) {
+            updateTokens(null);
             this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
             return { tokens: null, status: 'SESSION_LOST' };
         }
@@ -465,8 +466,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             return await this.synchroniseTokensAsync(refreshToken, nextIndex, forceRefresh, extras, updateTokens);
                         }
                     };
-                    // const promise =
-                    return await localFunctionAsync(); // executeWithTimeoutAsync(promise, 30000);
+                    return await localFunctionAsync();
                 }
             }
         } catch (exception) {
