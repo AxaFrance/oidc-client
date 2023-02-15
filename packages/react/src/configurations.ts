@@ -13,7 +13,7 @@ export const configurationIdentityServer = {
     service_worker_only: false,
     // storage: localStorage,
     // silent_login_timeout: 3333000
-    // monitor_session: true,
+    monitor_session: true,
     extras: { youhou_demo: 'youhou' },
     token_renew_mode: TokenRenewMode.access_token_invalid,
 };
