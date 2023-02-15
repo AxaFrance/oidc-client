@@ -1,20 +1,24 @@
 import { CheckSessionIFrame } from './checkSessionIFrame';
-import { Tokens } from './parseTokens';
+import { _silentLoginAsync, SilentLoginResponse } from './silentLogin';
 import { OidcConfiguration } from './types';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const startCheckSessionAsync = (oidcDatabase:any, configuration :OidcConfiguration, checkSessionIFrame: CheckSessionIFrame, silentLoginAsync:Function, getCurrentTokens: () => Tokens) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
+export const startCheckSessionAsync = (oidc:any, oidcDatabase:any, configuration :OidcConfiguration) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
+    const silentLoginAsync = (extras, state = undefined, scope = undefined):Promise<SilentLoginResponse> => {
+        return _silentLoginAsync(oidc.configurationName, configuration, oidc.publishEvent.bind(oidc))(extras, state, scope);
+    };
+
     return new Promise<CheckSessionIFrame>((resolve, reject): void => {
         if (configuration.silent_login_uri && configuration.silent_redirect_uri && configuration.monitor_session && checkSessionIFrameUri && sessionState && !isSilentSignin) {
             const checkSessionCallback = () => {
-                checkSessionIFrame.stop();
-                const tokens = getCurrentTokens();
+                oidc.checkSessionIFrame.stop();
+                const tokens = oidc.tokens;
                 if (tokens === null) {
                     return;
                 }
                 const idToken = tokens.idToken;
                 const idTokenPayload = tokens.idTokenPayload;
-                silentLoginAsync({
+                return silentLoginAsync({
                     prompt: 'none',
                     id_token_hint: idToken,
                     scope: 'openid',
@@ -22,7 +26,7 @@ export const startCheckSessionAsync = (oidcDatabase:any, configuration :OidcConf
                     const iFrameIdTokenPayload = silentSigninResponse.tokens.idTokenPayload;
                     if (idTokenPayload.sub === iFrameIdTokenPayload.sub) {
                         const sessionState = silentSigninResponse.sessionState;
-                        checkSessionIFrame.start(silentSigninResponse.sessionState);
+                        oidc.checkSessionIFrame.start(silentSigninResponse.sessionState);
                         if (idTokenPayload.sid === iFrameIdTokenPayload.sid) {
                             console.debug('SessionMonitor._callback: Same sub still logged in at OP, restarting check session iframe; session_state:', sessionState);
                         } else {
@@ -42,10 +46,10 @@ export const startCheckSessionAsync = (oidcDatabase:any, configuration :OidcConf
                 });
             };
 
-            checkSessionIFrame = new CheckSessionIFrame(checkSessionCallback, clientId, checkSessionIFrameUri);
-            checkSessionIFrame.load().then(() => {
-                checkSessionIFrame.start(sessionState);
-                resolve(checkSessionIFrame);
+            oidc.checkSessionIFrame = new CheckSessionIFrame(checkSessionCallback, clientId, checkSessionIFrameUri);
+            oidc.checkSessionIFrame.load().then(() => {
+                oidc.checkSessionIFrame.start(sessionState);
+                resolve(oidc.checkSessionIFrame);
             }).catch((e) => {
                 reject(e);
             });

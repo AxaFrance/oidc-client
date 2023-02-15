@@ -3,8 +3,9 @@ import { Tokens } from './parseTokens';
 import { autoRenewTokens } from './renewTokens';
 import timer from './timer';
 import { OidcConfiguration, StringMap } from './types';
-type SilentLoginResponse = {
+export type SilentLoginResponse = {
     tokens:Tokens;
+    sessionState:string;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
