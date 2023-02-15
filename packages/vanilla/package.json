@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/vanilla-oidc",
-  "version": "6.14.4",
+  "version": "6.14.5",
   "private": false,
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
