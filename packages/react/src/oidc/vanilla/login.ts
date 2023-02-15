@@ -137,6 +137,10 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
 
         const tokenResponse = await performFirstTokenRequestAsync(storage)(oidcServerConfiguration.tokenEndpoint, { ...data, ...extras }, oidc.configuration.token_renew_mode, tokenRequestTimeout);
 
+        if (!tokenResponse.success) {
+            throw new Error('Token request failed');
+        }
+
         let loginParams;
         const formattedTokens = tokenResponse.data.tokens;
         if (serviceWorker) {
