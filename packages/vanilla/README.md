@@ -15,7 +15,7 @@ Try the demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
 @axa-fr/vanilla-oidc is a pure OIDC client library agnostic to any framework. It is used by @axa-fr/react-oidc and can be used by any framework.
 
-It use AppAuthJS behind the scene because it very lightweight and created by OpenID certification team. 
+It is a real alternative too existing oidc-client libraries.
 
 - **Secure** :
     - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSRF attacks)
@@ -135,7 +135,7 @@ npm start
 
 These components encapsulate the use of [AppAuth-JS](https://github.com/openid/AppAuth-JS) in order to hide workflow complexity.
 Internally, native History API is used to be router library agnostic.
-It use AppAuthJS behind the scene because it very lightweight and created by OpenID certification team. `oidc-client` used in V3 was heavy and no longer maintained.
+It is a real alternative too existing oidc-client libraries.
 
 More information about OIDC
 

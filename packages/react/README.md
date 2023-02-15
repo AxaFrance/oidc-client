@@ -18,7 +18,7 @@ A set of react components to make OIDC (OpenID Connect) client easy. It aim to s
 ## About
 
 Easy set up of OIDC for react.
-It use AppAuthJS behind the scene because it very lightweight and created by OpenID certification team. `oidc-client` that was used in V3 was heavy and not longer maintained.
+It is a real alternative too existing oidc-client libraries.
 
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSRF attacks)
@@ -537,7 +537,7 @@ render(<App />, document.getElementById("root"));
 
 These components encapsulate the use of [AppAuth-JS](https://github.com/openid/AppAuth-JS) in order to hide workflow complexity.
 Internally, native History API is used to be router library agnostic.
-It use AppAuthJS behind the scene because it very lightweight and created by OpenID certification team. `oidc-client` used in V3 was heavy and no longer maintained.
+It is a real alternative too existing oidc-client libraries.
 
 More information about OIDC
 
