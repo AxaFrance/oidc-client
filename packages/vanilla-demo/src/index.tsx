@@ -9,6 +9,7 @@ export const configuration = {
     refresh_time_before_tokens_expiration_in_second: 40,
     service_worker_relative_url:'/OidcServiceWorker.js',
     service_worker_only: false,
+    // monitor_session: true,
 };
 
 const href = window.location.href;
