@@ -443,9 +443,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const timeoutMs = document.hidden ? 10000 : 30000 * 10;
                         const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode, timeoutMs);
                         if (tokenResponse.success) {
-                            if (!isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration)) {
+                            const { isValid, reason } = isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration);
+                            if (!isValid) {
                                 updateTokens(null);
-                                this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token return not valid tokens' });
+                                this.publishEvent(eventNames.refreshTokensAsync_error, { message: `refresh token return not valid tokens, reason: ${reason}` });
                                 return { tokens: null, status: 'SESSION_LOST' };
                             }
                             updateTokens(tokenResponse.data);

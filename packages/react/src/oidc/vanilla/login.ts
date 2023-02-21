@@ -154,8 +154,9 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         if (tokenResponse.data.state !== extras.state) {
             throw new Error('state is not valid');
         }
-        if (!isTokensOidcValid(formattedTokens, nonceData.nonce, oidcServerConfiguration)) {
-            throw new Error('Tokens are not OpenID valid');
+        const { isValid, reason } = isTokensOidcValid(formattedTokens, nonceData.nonce, oidcServerConfiguration);
+        if (!isValid) {
+            throw new Error(`Tokens are not OpenID valid, reason: ${reason}`);
         }
 
         await oidc.startCheckSessionAsync(oidcServerConfiguration.checkSessionIframe, clientId, sessionState, isSilentSignin);

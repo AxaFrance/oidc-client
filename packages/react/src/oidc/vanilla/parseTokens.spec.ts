@@ -40,7 +40,7 @@ describe('ParseTokens test Suite', () => {
             const oidc = {
                 idTokenPayload
             }
-            const isValid = await isTokensOidcValid(oidc, nonce, oidcServerConfiguration);
+            const {isValid} = await isTokensOidcValid(oidc, nonce, oidcServerConfiguration);
             expect(isValid).toEqual(expectIsValidToken);
         });
     });
