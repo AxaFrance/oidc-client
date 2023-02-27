@@ -15,7 +15,7 @@ export const Home = () => {
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('/profile')}>logout /profile</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout(null)}>logout whithout callbackredirect</button></p>}
-                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={async () => console.log("renewTokens result", await renewTokens())}>renew tokens</button></p>}
+                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={async () => console.log('renewTokens result', await renewTokens())}>renew tokens</button></p>}
                 </div>
             </div>
         </div>
