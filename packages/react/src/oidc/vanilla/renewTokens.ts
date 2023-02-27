@@ -23,6 +23,7 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     if (oidc.timeoutId) {
         oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, extras);
     }
+    return oidc.tokens;
 }
 
 export const autoRenewTokens = (oidc, refreshToken, expiresAt, extras:StringMap = null) => {

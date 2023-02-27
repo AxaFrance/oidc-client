@@ -1,11 +1,9 @@
-﻿// __tests__/fetch.test.js
-/*import React from 'react'
+﻿import React from 'react'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import App from "./App";
-import {act} from "react-dom/test-utils";
 
 const server = setupServer(
    rest.get('http://api/.well-known/openid-configuration', (req, res, ctx) => {
@@ -38,9 +36,8 @@ test('Load home page then login should log', async () => {
     };
     // @ts-ignore
     const {debug, getByText, rerender} = render(<App configuration={configuration}/>);
-    await waitFor(() => getByText('React Demo Application protected by OpenId Connect'));
+    await waitFor(() => getByText('GitHub @axa-fr/react-oidc'));
     fireEvent.click(screen.getByText('Login'));
     await waitFor(() => getByText('Authentification en cours'));
     
 })
-*/
