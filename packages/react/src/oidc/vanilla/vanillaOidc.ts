@@ -95,7 +95,7 @@ export interface OidcUserInfo {
     phone_number_verified?: boolean;
     address?: OidcAddressClaim;
     updated_at?: number;
-    groups?: string[]
+    groups?: string[];
 }
 
 export interface OidcAddressClaim {
