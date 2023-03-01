@@ -1,5 +1,8 @@
+const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
+declare let trustedDomains: any;
+
 const scriptFilename = 'OidcTrustedDomains.js'; /* global trustedDomains */
-this.importScripts(scriptFilename);
+_self.importScripts(scriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
@@ -8,12 +11,12 @@ const acceptAnyDomainToken = '*';
 const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
 const handleInstall = (event) => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
-    event.waitUntil(self.skipWaiting());
+    event.waitUntil(_self.skipWaiting());
 };
 
 const handleActivate = (event) => {
     console.log('[OidcServiceWorker] service worker activated ' + id);
-    event.waitUntil(self.clients.claim());
+    event.waitUntil(_self.clients.claim());
 };
 
 let currentLoginCallbackConfigurationName = null;
@@ -33,7 +36,7 @@ const countLetter = (str, find) => {
     return (str.split(find)).length - 1;
 };
 
-const b64DecodeUnicode = (str) =>
+const b64DecodeUnicode = (str: string) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
 const parseJwt = (token) => JSON.parse(b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')));
 const extractTokenPayload = (token) => {
@@ -174,7 +177,7 @@ function hideTokens(currentDatabaseElement) {
 const getCurrentDatabasesTokenEndpoint = (database, url) => {
     const databases = [];
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [key, value] of Object.entries(database)) {
+    for (const [key, value] of Object.entries<any>(database)) {
         if (value) {
             if (value.oidcServerConfiguration != null && url.startsWith(value.oidcServerConfiguration.tokenEndpoint)) {
                 databases.push(value);
@@ -191,7 +194,7 @@ const getCurrentDatabaseDomain = (database, url) => {
     if (url.endsWith(openidWellknownUrlEndWith)) {
         return null;
     }
-    for (const [key, currentDatabase] of Object.entries(database)) {
+    for (const [key, currentDatabase] of Object.entries<any>(database)) {
         const oidcServerConfiguration = currentDatabase.oidcServerConfiguration;
 
         if (!oidcServerConfiguration) {
@@ -253,9 +256,9 @@ const ACCESS_TOKEN = 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER';
 const NONCE_TOKEN = 'NONCE_SECURED_BY_OIDC_SERVICE_WORKER';
 const CODE_VERIFIER = 'CODE_VERIFIER_SECURED_BY_OIDC_SERVICE_WORKER';
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const keepAliveAsync = async (event) => {
+const keepAliveAsync = async (event: FetchEvent) => {
     const originalRequest = event.request;
     const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
     const init = { status: 200, statusText: 'oidc-service-worker' };
@@ -271,7 +274,7 @@ const keepAliveAsync = async (event) => {
     return response;
 };
 
-const handleFetch = async (event) => {
+const handleFetch = async (event:FetchEvent|any) => {
     const originalRequest = event.request;
     const url = originalRequest.url;
     if (originalRequest.url.includes(keepAliveJsonFilename)) {
@@ -392,30 +395,7 @@ const handleFetch = async (event) => {
     }
 };
 
-self.addEventListener('install', handleInstall);
-self.addEventListener('activate', handleActivate);
-self.addEventListener('fetch', handleFetch);
-
-const checkDomain = (domains, endpoint) => {
-    if (!endpoint) {
-        return;
-    }
-
-    const domain = domains.find((domain) => {
-        let testable = domain;
-
-        if (typeof domain === 'string') {
-            testable = new RegExp(`^${domain}`);
-        }
-
-        return testable.test?.(endpoint);
-    });
-    if (!domain) {
-        throw new Error('Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename);
-    }
-};
-
-addEventListener('message', event => {
+const handleMessage = (event: ExtendableMessageEvent) => {
     const port = event.ports[0];
     const data = event.data;
     const configurationName = data.configurationName;
@@ -526,4 +506,28 @@ addEventListener('message', event => {
             currentDatabase.items = { ...data.data };
             port.postMessage({ configurationName });
     }
-});
+};
+
+_self.addEventListener('install', handleInstall);
+_self.addEventListener('activate', handleActivate);
+_self.addEventListener('fetch', handleFetch);
+_self.addEventListener('message', handleMessage);
+
+const checkDomain = (domains, endpoint) => {
+    if (!endpoint) {
+        return;
+    }
+
+    const domain = domains.find((domain) => {
+        let testable = domain;
+
+        if (typeof domain === 'string') {
+            testable = new RegExp(`^${domain}`);
+        }
+
+        return testable.test?.(endpoint);
+    });
+    if (!domain) {
+        throw new Error('Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename);
+    }
+};

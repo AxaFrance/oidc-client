@@ -30,14 +30,15 @@
     "next"
   ],
   "scripts": {
-    "copy": "copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./public && copyfiles -f -soft ./src/oidc/vanilla/OidcTrustedDomains.js ./public",
-    "start": "npm run copy && cross-env PORT=4200 react-scripts start",
-    "build": "npm run copy && react-scripts build",
+    "copy": "copyfiles -f ./dist/OidcServiceWorker.js ./public && copyfiles -f -soft ./dist/OidcTrustedDomains.js ./public",
+    "start": "npm run build:service-worker && npm run copy && cross-env PORT=4200 react-scripts start",
+    "build": "npm run build:service-worker && npm run copy && react-scripts build",
     "test": "react-scripts test --coverage",
     "eject": "react-scripts eject",
     "clean": "rimraf dist",
-    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && copyfiles -f ./src/oidc/vanilla/OidcServiceWorker.js ./dist && copyfiles -f ./src/oidc/vanilla/OidcTrustedDomains.js ./dist",
     "postinstall": "node ./bin/copy.js",
+    "build:service-worker": "tsc --build \"./service_worker/tsconfig.json\" && copyfiles -f ./service_worker/OidcTrustedDomains.js ./dist",
+    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && npm run build:service-worker",
     "lint": "eslint src"
   },
   "dependencies": {

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "rootDir": ".",
+    "composite": true,
+    "module": "ES2020",
+    "target": "ES2020",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "declarationMap": true,
+    "outDir": "../dist",
+    // From https://joshuatz.com/posts/2021/strongly-typed-service-workers/
+    "lib": ["webworker", "ES2020"],
+    "types": [] // Don't include the default node types or we'll get conflicts.
+  },
+  "include": ["./OidcServiceWorker.ts"]
+}
