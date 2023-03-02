@@ -1,5 +1,100 @@
+type Domain = string | RegExp;
+
+type TrustedDomains = {
+    [key: string]: Domain[]
+}
+type OidcServerConfiguration = {
+    revocationEndpoint: string;
+    issuer: string;
+    authorizationEndpoint: string;
+    tokenEndpoint: string;
+    userInfoEndpoint: string;
+}
+
+type OidcConfiguration = {
+    token_renew_mode: string;
+    service_worker_convert_all_requests_to_cors: boolean;
+}
+
+
+// Uncertain why the Headers interface in lib.webworker.d.ts does not have a keys() function, so extending
+interface FetchHeaders extends Headers {
+    keys(): string[];
+}
+
+type Status = 'LOGGED' | 'LOGGED_IN' | 'LOGGED_OUT' | 'NOT_CONNECTED' | 'LOGOUT_FROM_ANOTHER_TAB' | 'SESSION_LOST' | 'REQUIRE_SYNC_TOKENS' | 'FORCE_REFRESH' | null;
+type MessageEventType = 'clear' | 'init' | 'setState' | 'getState' | 'setCodeVerifier' | 'getCodeVerifier' | 'setSessionState' | 'getSessionState' | 'setNonce';
+
+type MessageData = {
+    status: Status;
+    oidcServerConfiguration: OidcServerConfiguration;
+    oidcConfiguration: OidcConfiguration;
+    where: string;
+    state: string;
+    codeVerifier: string;
+    sessionState: string;
+    nonce: Nonce;
+}
+
+type MessageEventData = {
+    configurationName: string;
+    type: MessageEventType;
+    data: MessageData;
+}
+
+type Nonce = {
+    nonce: string;
+} | null;
+
+type OidcConfig = {
+    configurationName: string;
+    tokens: Tokens | null;
+    status: Status;
+    state: string | null;
+    codeVerifier: string | null;
+    nonce: Nonce;
+    oidcServerConfiguration: OidcServerConfiguration | null;
+    oidcConfiguration?: OidcConfiguration;
+    sessionState?: string | null;
+    items?: MessageData;
+}
+
+type IdTokenPayload = {
+    iss: string;
+    /**
+     * (Expiration Time) Claim
+     */
+    exp: number;
+    /**
+     * (Issued At) Claim
+     */
+    iat: number;
+    nonce: string | null;
+}
+
+type AccessTokenPayload = {
+    exp: number;
+    sub: string;
+}
+
+type Tokens = {
+    issued_at: number;
+    access_token: string;
+    accessTokenPayload: AccessTokenPayload | null;
+    id_token: null | string;
+    idTokenPayload: IdTokenPayload;
+    refresh_token?: string;
+    expiresAt: number;
+    expires_in: number;
+};
+
+type Database = {
+    [key: string]: OidcConfig
+}
+
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
-declare let trustedDomains: any;
+
+declare let trustedDomains: TrustedDomains;
 
 const scriptFilename = 'OidcTrustedDomains.js'; /* global trustedDomains */
 _self.importScripts(scriptFilename);
@@ -9,18 +104,19 @@ const id = Math.round(new Date().getTime() / 1000).toString();
 const acceptAnyDomainToken = '*';
 
 const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
-const handleInstall = (event) => {
+const handleInstall = (event: ExtendableEvent) => {
     console.log('[OidcServiceWorker] service worker installed ' + id);
     event.waitUntil(_self.skipWaiting());
 };
 
-const handleActivate = (event) => {
+const handleActivate = (event: ExtendableEvent) => {
     console.log('[OidcServiceWorker] service worker activated ' + id);
     event.waitUntil(_self.clients.claim());
 };
 
-let currentLoginCallbackConfigurationName = null;
-const database = {
+
+let currentLoginCallbackConfigurationName: string | null = null;
+const database: Database = {
     default: {
         configurationName: 'default',
         tokens: null,
@@ -29,17 +125,17 @@ const database = {
         codeVerifier: null,
         nonce: null,
         oidcServerConfiguration: null,
-    },
+    }
 };
 
-const countLetter = (str, find) => {
+const countLetter = (str: string, find: string) => {
     return (str.split(find)).length - 1;
 };
 
 const b64DecodeUnicode = (str: string) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-const parseJwt = (token) => JSON.parse(b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')));
-const extractTokenPayload = (token) => {
+const parseJwt = (token: string)  => JSON.parse(b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')));
+const extractTokenPayload = (token: string) => {
     try {
         if (!token) {
             return null;
@@ -55,12 +151,12 @@ const extractTokenPayload = (token) => {
     return null;
 };
 
-const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt) => {
+const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond: number, expiresAt: number) => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
     return Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond) - currentTimeUnixSecond));
 };
 
-const isTokensValid = (tokens) => {
+const isTokensValid = (tokens: Tokens | null) => {
     if (!tokens) {
         return false;
     }
@@ -69,7 +165,7 @@ const isTokensValid = (tokens) => {
 
 // https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation (excluding rules #1, #4, #5, #7, #8, #12, and #13 which did not apply).
 // https://github.com/openid/AppAuth-JS/issues/65
-const isTokensOidcValid = (tokens, nonce, oidcServerConfiguration) => {
+const isTokensOidcValid = (tokens: Tokens, nonce: string | null, oidcServerConfiguration: OidcServerConfiguration): {isValid: boolean, reason: string} => {
     if (tokens.idTokenPayload) {
         const idTokenPayload = tokens.idTokenPayload;
         // 2: The Issuer Identifier for the OpenID Provider (which is typically obtained during Discovery) MUST exactly match the value of the iss (issuer) Claim.
@@ -104,13 +200,13 @@ const TokenRenewMode = {
     id_token_invalid: 'id_token_invalid',
 };
 
-function hideTokens(currentDatabaseElement) {
+function hideTokens(currentDatabaseElement: OidcConfig) {
     const configurationName = currentDatabaseElement.configurationName;
-    return (response) => {
+    return (response: Response) => {
         if (response.status !== 200) {
             return response;
         }
-        return response.json().then(tokens => {
+        return response.json().then<Response>((tokens: Tokens) => {
             if (!tokens.issued_at) {
                 const currentTimeUnixSecond = new Date().getTime() / 1000;
                 tokens.issued_at = currentTimeUnixSecond;
@@ -141,8 +237,8 @@ function hideTokens(currentDatabaseElement) {
             const idTokenExpiresAt = (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp : Number.MAX_VALUE;
             const accessTokenExpiresAt = (accessTokenPayload && accessTokenPayload.exp) ? accessTokenPayload.exp : tokens.issued_at + tokens.expires_in;
 
-            let expiresAt;
-            const tokenRenewMode = currentDatabaseElement.oidcConfiguration.token_renew_mode;
+            let expiresAt: number;
+            const tokenRenewMode = (currentDatabaseElement.oidcConfiguration as OidcConfiguration).token_renew_mode;
             if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
                 expiresAt = accessTokenExpiresAt;
             } else if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
@@ -154,7 +250,7 @@ function hideTokens(currentDatabaseElement) {
 
             tokens.expiresAt = expiresAt;
             const nonce = currentDatabaseElement.nonce ? currentDatabaseElement.nonce.nonce : null;
-            const { isValid, reason } = isTokensOidcValid(tokens, nonce, currentDatabaseElement.oidcServerConfiguration);
+            const { isValid, reason } = isTokensOidcValid(tokens, nonce, currentDatabaseElement.oidcServerConfiguration as OidcServerConfiguration); //TODO: Type assertion, could be null.
             if (!isValid) {
                 throw Error(`Tokens are not OpenID valid, reason: ${reason}`);
             }
@@ -162,6 +258,7 @@ function hideTokens(currentDatabaseElement) {
             // When refresh_token is not rotated we reuse ald refresh_token
             if (currentDatabaseElement.tokens != null && 'refresh_token' in currentDatabaseElement.tokens && !('refresh_token' in tokens)) {
                 const refreshToken = currentDatabaseElement.tokens.refresh_token;
+                
                 currentDatabaseElement.tokens = { ...tokens, refresh_token: refreshToken };
             } else {
                 currentDatabaseElement.tokens = tokens;
@@ -174,27 +271,24 @@ function hideTokens(currentDatabaseElement) {
     };
 }
 
-const getCurrentDatabasesTokenEndpoint = (database, url) => {
-    const databases = [];
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [key, value] of Object.entries<any>(database)) {
-        if (value) {
-            if (value.oidcServerConfiguration != null && url.startsWith(value.oidcServerConfiguration.tokenEndpoint)) {
-                databases.push(value);
-            } else if (value.oidcServerConfiguration != null && value.oidcServerConfiguration.revocationEndpoint && url.startsWith(value.oidcServerConfiguration.revocationEndpoint)) {
-                databases.push(value);
-            }
+const getCurrentDatabasesTokenEndpoint = (database: Database, url: string) => {
+    const databases: OidcConfig[] = [];
+    for (const [, value] of Object.entries<OidcConfig>(database)) {
+        if (value.oidcServerConfiguration != null && url.startsWith(value.oidcServerConfiguration.tokenEndpoint)) {
+            databases.push(value);
+        } else if (value.oidcServerConfiguration != null && value.oidcServerConfiguration.revocationEndpoint && url.startsWith(value.oidcServerConfiguration.revocationEndpoint)) {
+            databases.push(value);
         }
     }
     return databases;
 };
 
 const openidWellknownUrlEndWith = '/.well-known/openid-configuration';
-const getCurrentDatabaseDomain = (database, url) => {
+const getCurrentDatabaseDomain = (database: Database, url: string) => {
     if (url.endsWith(openidWellknownUrlEndWith)) {
         return null;
     }
-    for (const [key, currentDatabase] of Object.entries<any>(database)) {
+    for (const [key, currentDatabase] of Object.entries<OidcConfig>(database)) {
         const oidcServerConfiguration = currentDatabase.oidcServerConfiguration;
 
         if (!oidcServerConfiguration) {
@@ -243,10 +337,12 @@ const getCurrentDatabaseDomain = (database, url) => {
     return null;
 };
 
-const serializeHeaders = (headers) => {
-    const headersObj = {};
-    for (const key of headers.keys()) {
-        headersObj[key] = headers.get(key);
+const serializeHeaders = (headers: Headers) => {
+    const headersObj: Record<string,string> = {};
+    for (const key of (headers as FetchHeaders).keys()) {
+        if (headers.has(key)) {
+            headersObj[key] = headers.get(key) as string;
+        }
     }
     return headersObj;
 };
@@ -274,7 +370,7 @@ const keepAliveAsync = async (event: FetchEvent) => {
     return response;
 };
 
-const handleFetch = async (event:FetchEvent|any) => {
+const handleFetch = async (event:FetchEvent) => {
     const originalRequest = event.request;
     const url = originalRequest.url;
     if (originalRequest.url.includes(keepAliveJsonFilename)) {
@@ -292,9 +388,12 @@ const handleFetch = async (event:FetchEvent|any) => {
                 ...serializeHeaders(originalRequest.headers),
                 authorization: 'Bearer ' + currentDatabaseForRequestAccessToken.tokens.access_token,
             },
-            mode: currentDatabaseForRequestAccessToken.oidcConfiguration.service_worker_convert_all_requests_to_cors ? 'cors' : originalRequest.mode,
+            mode: (currentDatabaseForRequestAccessToken.oidcConfiguration as OidcConfiguration).service_worker_convert_all_requests_to_cors ? 'cors' : originalRequest.mode,
         });
+        
+        //@ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
         event.waitUntil(event.respondWith(fetch(newRequest)));
+        
         return;
     }
 
@@ -302,11 +401,11 @@ const handleFetch = async (event:FetchEvent|any) => {
         return;
     }
 
-    let currentDatabase = null;
+    let currentDatabase: OidcConfig | null = null;
     const currentDatabases = getCurrentDatabasesTokenEndpoint(database, originalRequest.url);
     const numberDatabase = currentDatabases.length;
     if (numberDatabase > 0) {
-        const maPromesse = new Promise((resolve, reject) => {
+        const maPromesse = new Promise<Response>((resolve, reject) => {
             const clonedRequest = originalRequest.clone();
             const response = clonedRequest.text().then(actualBody => {
                 if (actualBody.includes(REFRESH_TOKEN) || actualBody.includes(ACCESS_TOKEN)) {
@@ -317,7 +416,7 @@ const handleFetch = async (event:FetchEvent|any) => {
                         if (currentDb && currentDb.tokens != null) {
                             const keyRefreshToken = REFRESH_TOKEN + '_' + currentDb.configurationName;
                             if (actualBody.includes(keyRefreshToken)) {
-                                newBody = newBody.replace(keyRefreshToken, encodeURIComponent(currentDb.tokens.refresh_token));
+                                newBody = newBody.replace(keyRefreshToken, encodeURIComponent(currentDb.tokens.refresh_token as string));
                                 currentDatabase = currentDb;
                                 break;
                             }
@@ -342,13 +441,14 @@ const handleFetch = async (event:FetchEvent|any) => {
                         credentials: clonedRequest.credentials,
                         integrity: clonedRequest.integrity,
                     });
-                    if (currentDatabase.oidcServerConfiguration != null && currentDatabase.oidcServerConfiguration.revocationEndpoint && url.startsWith(currentDatabase.oidcServerConfiguration.revocationEndpoint)) {
+                    
+                    if (currentDatabase && currentDatabase.oidcServerConfiguration != null && currentDatabase.oidcServerConfiguration.revocationEndpoint && url.startsWith(currentDatabase.oidcServerConfiguration.revocationEndpoint)) {
                         return fetchPromise.then(async response => {
                             const text = await response.text();
                             return new Response(text, response);
                         });
                     }
-                    return fetchPromise.then(hideTokens(currentDatabase));
+                    return fetchPromise.then(hideTokens(currentDatabase as OidcConfig)); //todo type assertion to OidcConfig but could be null, NEEDS REVIEW
                 } else if (actualBody.includes('code_verifier=') && currentLoginCallbackConfigurationName) {
                     currentDatabase = database[currentLoginCallbackConfigurationName];
                     currentLoginCallbackConfigurationName = null;
@@ -391,13 +491,15 @@ const handleFetch = async (event:FetchEvent|any) => {
                 }
             });
         });
+
+        //@ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
         event.waitUntil(event.respondWith(maPromesse));
     }
 };
 
 const handleMessage = (event: ExtendableMessageEvent) => {
     const port = event.ports[0];
-    const data = event.data;
+    const data = event.data as MessageEventData;
     const configurationName = data.configurationName;
     let currentDatabase = database[configurationName];
 
@@ -407,7 +509,8 @@ const handleMessage = (event: ExtendableMessageEvent) => {
             state: null,
             codeVerifier: null,
             oidcServerConfiguration: null,
-            oidcConfiguration: null,
+            oidcConfiguration: undefined,
+            nonce: null,
             status: null,
             configurationName,
         };
@@ -430,10 +533,10 @@ const handleMessage = (event: ExtendableMessageEvent) => {
             const oidcServerConfiguration = data.data.oidcServerConfiguration;
             const domains = trustedDomains[configurationName];
             if (!domains.find(f => f === acceptAnyDomainToken)) {
-                checkDomain(domains, oidcServerConfiguration.tokenEndpoint);
-                checkDomain(domains, oidcServerConfiguration.revocationEndpoint);
-                checkDomain(domains, oidcServerConfiguration.userInfoEndpoint);
-                checkDomain(domains, oidcServerConfiguration.issuer);
+                [oidcServerConfiguration.tokenEndpoint,
+                oidcServerConfiguration.revocationEndpoint,
+                oidcServerConfiguration.userInfoEndpoint,
+                oidcServerConfiguration.issuer].forEach(url => {checkDomain(domains, url);});
             }
             currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
             currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
@@ -513,16 +616,18 @@ _self.addEventListener('activate', handleActivate);
 _self.addEventListener('fetch', handleFetch);
 _self.addEventListener('message', handleMessage);
 
-const checkDomain = (domains, endpoint) => {
+const checkDomain = (domains: Domain[], endpoint: string) => {
     if (!endpoint) {
         return;
     }
 
     const domain = domains.find((domain) => {
-        let testable = domain;
+        let testable: RegExp;
 
         if (typeof domain === 'string') {
             testable = new RegExp(`^${domain}`);
+        } else {
+            testable = domain;
         }
 
         return testable.test?.(endpoint);
