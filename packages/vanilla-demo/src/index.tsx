@@ -1,10 +1,6 @@
 import { VanillaOidc } from '@axa-fr/vanilla-oidc';
-
-
 class Router
-{
-
-    getCustomHistory(){
+{    getCustomHistory(){
         const generateKey = () =>
             Math.random()
                 .toString(36)
@@ -27,16 +23,19 @@ class Router
         };
 
         // IE Polyfill for CustomEvent
-        const CreateEvent = (windowInternal: WindowInternal, documentInternal: Document) => (
+        const CreateEvent = (windowInternal: Window, documentInternal: Document) => (
             event: string,
             params: InitCustomEventParams,
         ): CustomEvent => {
+            // @ts-ignore
             if (typeof windowInternal.CustomEvent === 'function') {
+                // @ts-ignore
                 return new windowInternal.CustomEvent(event, params);
             }
             const paramsToFunction = params || { bubbles: false, cancelable: false, detail: undefined };
             const evt: CustomEvent = documentInternal.createEvent('CustomEvent');
             evt.initCustomEvent(event, paramsToFunction.bubbles, paramsToFunction.cancelable, paramsToFunction.detail);
+            // @ts-ignore
             (evt as CustomEvent & IPrototype).prototype = windowInternal.Event.prototype;
             return evt;
         };
@@ -56,13 +55,15 @@ class Router
                 replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {
                     const key = generateKeyInternal();
                     const state = stateHistory || windowInternal.history.state;
+                    // @ts-ignore
                     windowInternal.history.replaceState({ key, state }, null, url);
                     windowInternal.dispatchEvent(CreateEventInternal('popstate'));
                 },
             };
         };
 
-        const getCustomHistory = () => getHistory(window, CreateEvent(window, document), generateKey);
+        // @ts-ignore
+    const getCustomHistory = () => getHistory(window, CreateEvent(window, document), generateKey);
         return getCustomHistory();
     }
 
@@ -72,6 +73,7 @@ const router = new Router();
 
 document.body.innerHTML = `<div id="my-vanilla-app"></div>`;
 const element = document.getElementById("my-vanilla-app");
+
 export const configuration = {
     client_id: 'interactive.public.short',
     redirect_uri: window.location.origin + '/#/authentication/callback',
@@ -93,6 +95,7 @@ console.log(href);
 
 vanillaOidc.tryKeepExistingSessionAsync().then(() => {
     if(href.includes(configuration.redirect_uri)){
+        // @ts-ignore
         element.innerHTML = `<div>
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <h2>Loading callback</h2>
@@ -102,6 +105,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
             // @ts-ignore
             window.logout = () =>  vanillaOidc.logoutAsync();
             let tokens = vanillaOidc.tokens;
+            // @ts-ignore
             element.innerHTML = `<div>
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.logout()">Logout</button>
@@ -118,6 +122,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
 
         // @ts-ignore
         window.logout = () =>  vanillaOidc.logoutAsync();
+        // @ts-ignore
         element.innerHTML = `<div>
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.logout()">Logout</button>
@@ -129,12 +134,14 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
     else {
         // @ts-ignore
         window.login= () =>  {
+            // @ts-ignore
             element.innerHTML = `<div>
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <h2>Loading</h2>
         </div>`;
             vanillaOidc.loginAsync("/")
         };
+        // @ts-ignore
         element.innerHTML = `<div>
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.login()">Login</button>
