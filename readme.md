@@ -151,7 +151,7 @@ Any domain that has a match in the `OidcTrustedDomains.js` will have the access 
 The `OidcTrustedDomains.js` format is key (`default` being the default key) that has an array of string URLs or RegExp to match trusted domain URLs.  
 
 > **Warning**
-> You could in theory use a wildcard for RegExp as `RegExp('^http.*')` , but you are reducing the security of your application by doing so and it is strongly discouraged.
+> You could use a wildcard for the value, by either providing the wildcard string value `'*'` or a RegExp such as `RegExp('^http.*')` , but you are reducing the security of your application by doing so and it is strongly discouraged.
 
 ```javascript
 // OidcTrustedDomains.js
