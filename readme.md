@@ -56,14 +56,14 @@ These libraries is used to manage client authentication.
   The service worker catch <b>access_token</b> and <b>refresh_token</b> that will never be accessible to the client.
 </p>
 
-Work perfectly well with:
+Works perfectly well with:
 
-- [auth0](https://auth0.com/)
-- [identity server](https://duendesoftware.com/)
+- [Auth0](https://auth0.com/)
+- [Duende Identity Server](https://duendesoftware.com/)
 - Google
 - AWS
-- [keycloak](https://www.keycloak.org/)
-- all oidc compatible providers
+- [Keycloak](https://www.keycloak.org/)
+- all OIDC compatible providers
 
 <p align="center">
     <img src="./docs/img/react-oidc-secure.PNG"
@@ -133,12 +133,12 @@ const configuration = {
 };
 
 const App = () => (
-    <OidcProvider configuration={configuration} >
-      <Router>
-        <Header />
-        <Routes />
-      </Router>
-    </OidcProvider>
+  <OidcProvider configuration={configuration} >
+  <Router>
+    <Header />
+    <Routes />
+  </Router>
+  </OidcProvider>
 );
 
 render(<App />, document.getElementById('root'));
@@ -169,7 +169,7 @@ const trustedDomains = {
 };
 ```
 
-How to consume
+#### How to consume
 
 `useOidc` returns all props from the Hook :
 
@@ -179,20 +179,22 @@ import {useOidc} from "./oidc";
 
 export const Home = () => {
 
-    const { login, logout, isAuthenticated} = useOidc();
-    
-    return (
-        <div className="container-fluid mt-3">
-            <div className="card">
-                <div className="card-body">
-                    <h5 className="card-title">Welcome !!!</h5>
-                    <p className="card-text">React Demo Application protected by OpenID Connect</p>
-                    {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
-                    {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
-                </div>
-            </div>
+  const { login, logout, isAuthenticated} = useOidc();
+  
+  return (
+    <div className="container-fluid mt-3">
+      <div className="card">
+        <div className="card-body">
+          <h5 className="card-title">Welcome!</h5>
+          <p className="card-text">React Demo Application protected by OpenID Connect</p>
+          {!isAuthenticated && 
+            <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
+          {isAuthenticated && 
+            <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
         </div>
-    )
+      </div>
+    </div>
+  )
 };
 
 ```
@@ -224,26 +226,26 @@ How to get IDToken
 import { useOidcIdToken } from '@axa-fr/react-oidc';
 
 const DisplayIdToken =() => {
-    const{ idToken, idTokenPayload } = useOidcIdToken();
+  const{ idToken, idTokenPayload } = useOidcIdToken();
 
-    if(!idToken){
-        return <p>you are not authentified</p>
-    }
-    
-    return (
-        <div className="card text-white bg-info mb-3">
-            <div className="card-body">
-                <h5 className="card-title">ID Token</h5>
-                {<p className="card-text">{JSON.stringify(idToken)}</p>}
-                {idTokenPayload != null && <p className="card-text">{JSON.stringify(idTokenPayload)}</p>}
-            </div>
-        </div>
-    );
+  if(!idToken){
+    return <p>you are not authentified</p>
+  }
+  
+  return (
+    <div className="card text-white bg-info mb-3">
+      <div className="card-body">
+        <h5 className="card-title">ID Token</h5>
+        {<p className="card-text">{JSON.stringify(idToken)}</p>}
+        {idTokenPayload != null && 
+          <p className="card-text">{JSON.stringify(idTokenPayload)}</p>}
+      </div>
+    </div>
+  );
 }
-
 ```
 
-How to get User Information
+#### How to get User Information
 
 ```javascript
 import {useOidcUser} from '@axa-fr/react-oidc';
@@ -260,16 +262,15 @@ const DisplayUserInfo = () => {
       return <p>Fail to load user information</p>;
     default:
       return (
-              <div className="card text-white bg-success mb-3">
-                <div className="card-body">
-                  <h5 className="card-title">User information</h5>
-                  <p className="card-text">{JSON.stringify(oidcUser)}</p>
-                </div>
-              </div>
+        <div className="card text-white bg-success mb-3">
+          <div className="card-body">
+            <h5 className="card-title">User information</h5>
+            <p className="card-text">{JSON.stringify(oidcUser)}</p>
+          </div>
+        </div>
       );
   }
 };
-
 ```
 
 More documentation :
@@ -304,7 +305,7 @@ npm run dev
 
 ## How It Works
 
-These components encapsulate the use of "@axa-fr/vanilla-oidc" in order to hide workflow complexity.
+These components encapsulate the use of "`@axa-fr/vanilla-oidc`" in order to hide workflow complexity.
 Internally, native History API is used to be router library agnostic.
 
 More information about OIDC
@@ -314,14 +315,14 @@ More information about OIDC
 
 ## Migrations
 
-V4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
-In the v4 we have chosen to remove a lot the surface API in order to simplify usage and enforce security.
-In this version you can use a ServiceWorker that will hide the refresh_token and access_token (more secure).
+v4 is a complete rewrite. It uses the libraries ["App-AuthJS"](https://github.com/openid/AppAuth-JS) instead of oidc-client.
+In v4 we have chosen to remove a lot of the surface API in order to simplify usage and enforce security.
+In this version you can use a ServiceWorker that will hide the `refresh_token` and `access_token` (more secure).
 
-- For migrating from v3 to v4 checkout our [`migration guide v3 to v4`](./MIGRATION_GUIDE_V3_TO_V4.md)
-- For migrating from v3 to v5 checkout our [`migration guide v3 to v5`](./MIGRATION_GUIDE_V3_TO_V5.md)
-- For migrating from v4 to v5 checkout our [`migration guide v4 to v5`](./MIGRATION_GUIDE_V4_TO_V5.md)
-- For migrating from v5 to v6 checkout our [`migration guide v5 to v6`](./MIGRATION_GUIDE_V5_TO_V6.md)
+- Migrating from v3 to v4 [`guide`](./MIGRATION_GUIDE_V3_TO_V4.md)
+- Migrating from v3 to v5 [`guide`](./MIGRATION_GUIDE_V3_TO_V5.md)
+- Migrating from v4 to v5 [`guide`](./MIGRATION_GUIDE_V4_TO_V5.md)
+- Migrating from v5 to v6 [`guide`](./MIGRATION_GUIDE_V5_TO_V6.md)
 
 ## Contribute
 
