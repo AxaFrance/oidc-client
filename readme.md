@@ -1,10 +1,10 @@
 # @axa-fr/react-oidc
 
 [![Continuous Integration](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Corevage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
 - Try the demo react at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
-- Try the demo vanilla at https://icy-glacier-004ab4303.2.azurestaticapps.net/ 
+- Try the demo vanilla at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
 <p align="center">
     <img src="./docs/img/introduction.gif"
@@ -12,14 +12,12 @@
       />
 </p>
 
-<p align="center">
-  A set of react components to make Oidc (OpenID Connect) client easy. It aim to simplify OAuth authentication between multiples providers. It is compatible with NextJS.
-</p>
+A set of react components to make Oidc (OpenID Connect) client easy. It aim to simplify OAuth authentication between multiples providers. It is compatible with NextJS.
 
 - [About](#about)
 - [Getting Started](#getting-started)
 - [Run The Demo](#run-the-demo)
-- [Run The Nextjs Demo](#run-the-nextjs-demo)
+- [Run The NextJS Demo](#run-the-nextjs-demo)
 - [How It Works](#how-it-works)
 - Packages
   - [`@axa-fr/react-oidc`](./packages/react#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc)
@@ -37,13 +35,13 @@
 These libraries is used to manage client authentication.
 
 - **Secure** :
-  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the javascript client code (big protection against XSRF attacks)
+  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSRF attacks)
   - OIDC using client side Code Credential Grant with pkce only
-- **Lightweight** 
-- **Simple** :
+- **Lightweight**
+- **Simple**
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
-- **No cookies problem** : You can disable silent signin (that internally use an iframe). For your information, your OIDC server should be in the same domain of your website in order to be able to send OIDC server cookies from your website via an internal IFRAME, else, you may encounter COOKIES problem.
+- **No cookies problem** : You can disable silent signin (that internally use an iFrame). For your information, your OIDC server should be in the same domain of your website in order to be able to send OIDC server cookies from your website via an internal IFRAME, else, you may encounter COOKIES problem.
 - **Multiple Authentication** :
   - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
@@ -58,11 +56,12 @@ These libraries is used to manage client authentication.
   The service worker catch <b>access_token</b> and <b>refresh_token</b> that will never be accessible to the client.
 </p>
 
-Work perfectly well with :
+Work perfectly well with:
+
 - [auth0](https://auth0.com/)
 - [identity server](https://duendesoftware.com/)
-- google
-- aws
+- Google
+- AWS
 - [keycloak](https://www.keycloak.org/)
 - all oidc compatible providers
 
@@ -71,7 +70,7 @@ Work perfectly well with :
      alt="@axa-fr/react-oidc is one of the securest way to Authenticate."
       />
   <br>
-  @axa-fr/react-oidc is one of the securest way to Authenticate. 
+  @axa-fr/react-oidc is one of the securest way to Authenticate.
 </p>
 
 <p align="center">
@@ -79,7 +78,7 @@ Work perfectly well with :
      alt="Service Worker lifetime drawback. "
       />
   <br>
-  Service Worker lifetime drawback. 
+  Service Worker lifetime drawback.
 </p>
 
 <p align="center">
@@ -87,17 +86,16 @@ Work perfectly well with :
      alt="Silent-Signing constraints. "
       />
   <br>
-  Silent-Signing constraints. 
+  Silent-Signing constraints.
 </p>
 
 <p align="center">
     <img src="./docs/img/react-oidc-cost.PNG"
-     alt="@axa-fr/react-oidc is the simpliest and cheapest."
+     alt="@axa-fr/react-oidc is the simplest and cheapest."
       />
   <br>
-  @axa-fr/react-oidc is the simpliest and cheapest. 
+  @axa-fr/react-oidc is the simplest and cheapest.
 </p>
-
 
 ## Getting Started
 
@@ -111,8 +109,8 @@ npm install @axa-fr/react-oidc --save
 # ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
 
-If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
-The only file you should edit is "OidcTrustedDomains.js".
+If you require a very secure mode where `refresh_token` and `access_token` will be hidden behind a service worker that will proxify requests.
+The only file you should edit is `OidcTrustedDomains.js`.
 
 ```javascript
 import React from 'react';
@@ -146,22 +144,34 @@ const App = () => (
 render(<App />, document.getElementById('root'));
 ```
 
+#### Trusted Domains
+
+Any domain that has a match in the `OidcTrustedDomains.js` will have the access token automatically injected on requests.
+
+The `OidcTrustedDomains.js` format is key (`default` being the default key) that has an array of string URLs or RegExp to match trusted domain URLs.  
+
+> **Warning**
+> You could in theory use a wildcard for RegExp as `RegExp('^http.*')` , but you are reducing the security of your application by doing so and it is strongly discouraged.
+
 ```javascript
 // OidcTrustedDomains.js
 
-// Add bellow trusted domains, access tokens will automatically injected to be send to
+// Add below trusted domains, access tokens will automatically injected to be send to
 // trusted domain can also be a path like https://www.myapi.com/users, 
 // then all subroute like https://www.myapi.com/useers/1 will be authorized to send access_token to.
 
 // Domains used by OIDC server must be also declared here
 const trustedDomains = {
-  default:["https://demo.duendesoftware.com", "https://www.myapi.com/users", new RegExp('^(https://[a-zA-Z0-9-]+.domain.com/api/)')]
+  default:[
+    "https://demo.duendesoftware.com", 
+    "https://www.myapi.com/users", 
+    new RegExp('^(https://[a-zA-Z0-9-]+.domain.com/api/)')]
 };
 ```
 
 How to consume
 
-"useOidc" returns all props from the Hook :
+`useOidc` returns all props from the Hook :
 
 ```javascript
 import React from 'react';
@@ -176,7 +186,7 @@ export const Home = () => {
             <div className="card">
                 <div className="card-body">
                     <h5 className="card-title">Welcome !!!</h5>
-                    <p className="card-text">React Demo Application protected by OpenId Connect</p>
+                    <p className="card-text">React Demo Application protected by OpenID Connect</p>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button>}
                     {isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button>}
                 </div>
@@ -186,7 +196,9 @@ export const Home = () => {
 };
 
 ```
+
 The Hook method exposes :
+
 - isAuthenticated : if the user is logged in or not
 - logout: logout function (return a promise)
 - login: login function 'return a promise'
@@ -261,11 +273,13 @@ const DisplayUserInfo = () => {
 ```
 
 More documentation :
+
 - [`@axa-fr/react-oidc`](./packages/react#readme)
 
 ### Getting Started Vanilla
 
 More documentation :
+
 - [`@axa-fr/vanilla-oidc`](./packages/vanilla#readme)
 
 ## Run The Demo
@@ -294,8 +308,9 @@ These components encapsulate the use of "@axa-fr/vanilla-oidc" in order to hide 
 Internally, native History API is used to be router library agnostic.
 
 More information about OIDC
+
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
-- [English : Increase the security and simplicity of your information system with openid connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
+- [English : Increase the security and simplicity of your information system with OpenID Connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
 
 ## Migrations
 
