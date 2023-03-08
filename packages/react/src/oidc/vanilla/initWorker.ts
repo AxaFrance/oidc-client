@@ -161,7 +161,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     }
 
    const operatingSystem = getOperatingSystem();
-    operatingSystem.os = 'iOS';
+    operatingSystem.os = 'iOSssss';
 
     const registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
 
