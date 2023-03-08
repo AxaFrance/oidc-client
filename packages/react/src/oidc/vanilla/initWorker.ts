@@ -74,7 +74,7 @@ export const getOperatingSystem = () => {
 
 function getBrowser() {
     const ua = navigator.userAgent; let tem;
-    alert(ua)
+    alert(ua);
         let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
     if (/trident/i.test(M[1])) {
         tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
@@ -163,7 +163,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
 
    const operatingSystem = getOperatingSystem();
 
-    alert("operating system : " + operatingSystem.os + " version : " + operatingSystem.osVersion)
+    alert('operating system : ' + operatingSystem.os + ' version : ' + operatingSystem.osVersion);
     operatingSystem.os = 'iOSssss';
 
     const registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
