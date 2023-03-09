@@ -50,7 +50,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
     const getLoginParams = (configurationName) => {
         const dataString = storage[`oidc.login.${configurationName}`];
         if (!getLoginParamsCache) {
-            getLoginParamsCache = JSON.parse(dataString);
+            getLoginParamsCache = JSON.parse(dataString || '{}');
         }
         return getLoginParamsCache;
     };
