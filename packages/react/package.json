@@ -38,7 +38,7 @@
     "clean": "rimraf dist",
     "postinstall": "node ./bin/copy.js",
     "build:service-worker": "tsc --build \"./service_worker/tsconfig.json\" && copyfiles -f ./service_worker/OidcTrustedDomains.js ./dist",
-    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && npm run build:service-worker",
+    "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && npm run build:service-worker && node ./bin/copy.js",
     "lint": "eslint src"
   },
   "dependencies": {
