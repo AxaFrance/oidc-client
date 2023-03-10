@@ -1,9 +1,8 @@
-import { initSession } from './initSession';
 import { parseOriginalTokens } from './parseTokens';
 import timer from './timer';
 import { OidcConfiguration } from './types';
 
-export const getOperatingSystem = () => {
+export const getOperatingSystem = (navigator) => {
     const nVer = navigator.appVersion;
     const nAgt = navigator.userAgent;
     const unknown = '-';
@@ -126,6 +125,16 @@ const isServiceWorkerProxyActiveAsync = () => {
     }).catch(error => { console.log(error); });
 };
 
+export const excludeOs = (operatingSystem) => {
+    if (operatingSystem.os === 'iOS' && operatingSystem.osVersion.startsWith('12')) {
+        return true;
+    }
+    if (operatingSystem.os === 'Mac OS X' && operatingSystem.osVersion.startsWith('10_15')) {
+        return true;
+    }
+    return false;
+};
+
 const sendMessageAsync = (registration) => (data) => {
     return new Promise(function(resolve, reject) {
         const messageChannel = new MessageChannel();
@@ -160,7 +169,10 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return null;
     }
 
-   const operatingSystem = getOperatingSystem();
+   const operatingSystem = getOperatingSystem(navigator);
+    if (excludeOs(operatingSystem)) {
+        return null;
+    }
 
     const registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
 
@@ -190,11 +202,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     });
 
     const clearAsync = async (status) => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            await session.clearAsync(status);
-        }
         return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
     };
     const initAsync = async (oidcServerConfiguration, where, oidcConfiguration:OidcConfiguration) => {
@@ -232,21 +239,11 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const setNonceAsync = (nonce) => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.setNonceAsync(nonce);
-        }
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
 
     const NONCE_TOKEN = 'NONCE_SECURED_BY_OIDC_SERVICE_WORKER';
     const getNonceAsync = async () => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.getNonceAsync();
-        }
         // @ts-ignore
         const keyNonce = NONCE_TOKEN + '_' + configurationName;
         return { nonce: keyNonce };
@@ -266,41 +263,22 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const getStateAsync = async () => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.getStateAsync();
-        }
         const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
         // @ts-ignore
         return result.state;
     };
 
     const setStateAsync = async (state) => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.setStateAsync(state);
-        }
         return sendMessageAsync(registration)({ type: 'setState', data: { state }, configurationName });
     };
 
     const getCodeVerifierAsync = async () => {
-        // iOS kill Service Worker when domain we leave domain
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.getCodeVerifierAsync();
-        }
         const result = await sendMessageAsync(registration)({ type: 'getCodeVerifier', data: null, configurationName });
         // @ts-ignore
         return result.codeVerifier;
     };
 
     const setCodeVerifierAsync = async (codeVerifier) => {
-        if (operatingSystem.os === 'iOS') {
-            const session = initSession(configurationName);
-            return session.setCodeVerifierAsync(codeVerifier);
-        }
         return sendMessageAsync(registration)({ type: 'setCodeVerifier', data: { codeVerifier }, configurationName });
     };
 
