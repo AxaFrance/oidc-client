@@ -2,6 +2,7 @@
   "name": "@axa-fr/react-oidc",
   "version": "6.15.8",
   "private": false,
+  "type":"module",
   "main": "dist/index.js",
   "jsnext:main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,14 +31,15 @@
     "next"
   ],
   "scripts": {
-    "copy": "copyfiles -f ./dist/OidcServiceWorker.js ./public && copyfiles -f -soft ./dist/OidcTrustedDomains.js ./public",
+    "copy": "copyfiles -f ./dist/OidcServiceWorker.js ./dist/*.ts ./dist/*.map ./public && copyfiles -f -soft ./dist/OidcTrustedDomains.js ./public",
     "start": "npm run build:service-worker && npm run copy && cross-env PORT=4200 react-scripts start",
     "build": "npm run build:service-worker && npm run copy && react-scripts build",
     "test": "react-scripts test --coverage",
     "eject": "react-scripts eject",
     "clean": "rimraf dist",
     "postinstall": "node ./bin/copy.js",
-    "build:service-worker": "tsc --build \"./service_worker/tsconfig.json\" && copyfiles -f ./service_worker/OidcTrustedDomains.js ./dist",
+    "test:service-worker": "vitest --root ./service_worker --coverage",
+    "build:service-worker": "tsc -p ./service_worker/tsconfig.json && vite build ./service_worker --config ./vite.serviceWorker.config.js",
     "prepare": "npm run clean && tsc --build \"./tsconfig.json\" && npm run build:service-worker && node ./bin/copy.js",
     "lint": "eslint src"
   },
@@ -55,6 +57,7 @@
     "@types/react": "^18.0.21",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
+    "@vitest/coverage-c8": "^0.29.2",
     "bootstrap": "4.6.1",
     "copyfiles": "2.4.1",
     "cross-env": "^7.0.3",
@@ -69,7 +72,10 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "6.3.0",
     "react-scripts": "5.0.1",
-    "typescript": "4.8.2"
+    "typescript": "4.8.2",
+    "vite": "^4.1.4",
+    "vite-plugin-dts": "^2.0.2",
+    "vitest": "^0.29.2"
   },
   "license": "MIT",
   "publishConfig": {

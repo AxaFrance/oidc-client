@@ -1,18 +1,26 @@
 {
   "compilerOptions": {
     "strict": true,
+    "useDefineForClassFields": true,
     "forceConsistentCasingInFileNames": true,
-    "rootDir": ".",
     "composite": true,
-    "module": "ES2020",
-    "target": "ES2020",
+    "module": "ESNext",
+    "target": "ESNext",
     "moduleResolution": "Node",
     "sourceMap": true,
     "declarationMap": true,
     "outDir": "../dist",
     // From https://joshuatz.com/posts/2021/strongly-typed-service-workers/
-    "lib": ["webworker", "ES2020"],
-    "types": [] // Don't include the default node types or we'll get conflicts.
+    "lib": ["webworker", "ESNext"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+    "types": [] // Don't include the default node types or will get conflicts.
   },
-  "include": ["./OidcServiceWorker.ts"]
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "scripts"]
 }
