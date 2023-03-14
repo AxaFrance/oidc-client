@@ -129,7 +129,7 @@ export const excludeOs = (operatingSystem) => {
     if (operatingSystem.os === 'iOS' && operatingSystem.osVersion.startsWith('12')) {
         return true;
     }
-    if (operatingSystem.os === 'Mac OS X' && operatingSystem.osVersion.startsWith('10_15')) {
+    if (operatingSystem.os === 'Mac OS X' && operatingSystem.osVersion.startsWith('10_15_6')) {
         return true;
     }
     return false;
