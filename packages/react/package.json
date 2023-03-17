@@ -16,6 +16,7 @@
     "bin",
     "src/oidc",
     "src/override",
+    "service_worker",
     "README.md",
     "package.json",
     "package-lock.json"
