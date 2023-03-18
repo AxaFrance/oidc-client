@@ -60,7 +60,7 @@
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
     "@vitest/coverage-c8": "^0.29.2",
-    "bootstrap": "4.6.1",
+    "bootstrap": "^4.6.2",
     "copyfiles": "2.4.1",
     "cross-env": "^7.0.3",
     "eslint": "^8.26.0",
