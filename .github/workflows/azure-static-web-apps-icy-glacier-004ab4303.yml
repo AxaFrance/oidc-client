@@ -4,14 +4,17 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - master
 
 jobs:
+  skip_ci:
+    runs-on: ubuntu-latest
+    outputs:
+      canSkip: ${{ steps.check.outputs.canSkip }}
+    steps:
+      - id: check
+        uses: Legorooj/skip-ci@main
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) && !github.event.pull_request.head.repo.fork && needs.skip_ci.outputs.canSkip != 'true'
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:

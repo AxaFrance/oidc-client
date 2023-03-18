@@ -6,8 +6,6 @@ name: React Oidc CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   skip_ci:
@@ -20,7 +18,7 @@ jobs:
   build:
     environment: react-oidc
     runs-on: ubuntu-latest
-    if: ${{ needs.skip_ci.outputs.canSkip != 'true' }}
+    if: needs.skip_ci.outputs.canSkip != 'true'
     steps:
       - uses: actions/checkout@v2
         with:
