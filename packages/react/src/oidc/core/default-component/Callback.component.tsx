@@ -1,8 +1,8 @@
 import React, { ComponentType, useEffect, useState } from 'react';
 
-import { VanillaOidc } from '../../vanilla/vanillaOidc';
-import { getCustomHistory } from '../routes/withRouter';
-import AuthenticatingError from './AuthenticateError.component';
+import { VanillaOidc } from '../../vanilla/vanillaOidc.js';
+import { getCustomHistory } from '../routes/withRouter.js';
+import AuthenticatingError from './AuthenticateError.component.js';
 
 export const CallBackSuccess: ComponentType<any> = () => (<div className="oidc-callback">
   <div className="oidc-callback__container">

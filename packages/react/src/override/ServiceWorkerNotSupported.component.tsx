@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ComponentType } from 'react';
 
-import { style } from './style';
+import { style } from './style.js';
 
 const ServiceWorkerNotSupported : ComponentType<any> = ({ configurationName }) => (
   <div className="oidc-serviceworker" style={style}>

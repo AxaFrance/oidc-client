@@ -1,6 +1,6 @@
-import { parseOriginalTokens } from './parseTokens';
-import timer from './timer';
-import { OidcConfiguration } from './types';
+import { parseOriginalTokens } from './parseTokens.js';
+import timer from './timer.js';
+import { OidcConfiguration } from './types.js';
 
 export const getOperatingSystem = (navigator) => {
     const nVer = navigator.appVersion;

@@ -1,8 +1,8 @@
-import { eventNames } from './events';
-import { Tokens } from './parseTokens';
-import { autoRenewTokens } from './renewTokens';
-import timer from './timer';
-import { OidcConfiguration, StringMap } from './types';
+import { eventNames } from './events.js';
+import { Tokens } from './parseTokens.js';
+import { autoRenewTokens } from './renewTokens.js';
+import timer from './timer.js';
+import { OidcConfiguration, StringMap } from './types.js';
 export type SilentLoginResponse = {
     tokens:Tokens;
     sessionState:string;

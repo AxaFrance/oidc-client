@@ -1,4 +1,4 @@
-import { VanillaOidc } from './vanilla/vanillaOidc';
+import { VanillaOidc } from './vanilla/vanillaOidc.js';
 
 export type Fetch = typeof window.fetch;
 

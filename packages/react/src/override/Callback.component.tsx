@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
 
-import { style } from './style';
+import { style } from './style.js';
 
 export const CallBackSuccess: ComponentType<any> = ({ configurationName }) => (<><div className="oidc-callback" style={style}>
   <div className="oidc-callback__container">

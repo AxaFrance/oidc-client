@@ -1,9 +1,9 @@
-import { initSession } from './initSession';
-import { initWorkerAsync } from './initWorker';
-import Oidc from './oidc';
-import { computeTimeLeft } from './parseTokens';
-import timer from './timer';
-import { StringMap } from './types';
+import { initSession } from './initSession.js';
+import { initWorkerAsync } from './initWorker.js';
+import Oidc from './oidc.js';
+import { computeTimeLeft } from './parseTokens.js';
+import timer from './timer.js';
+import { StringMap } from './types.js';
 
 export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh = false, extras:StringMap = null) {
     const updateTokens = (tokens) => { oidc.tokens = tokens; };

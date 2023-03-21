@@ -1,6 +1,6 @@
-export { default as AuthenticateError } from './AuthenticateError.component';
-export { default as Authenticating } from './Authenticating.component';
-export { default as Callback, CallBackSuccess } from './Callback.component';
-export { default as Loading } from './Loading.component';
-export { default as ServiceWorkerNotSupported } from './ServiceWorkerNotSupported.component';
-export { default as SessionLost } from './SessionLost.component';
+export { default as AuthenticateError } from './AuthenticateError.component.js';
+export { default as Authenticating } from './Authenticating.component.js';
+export { default as Callback, CallBackSuccess } from './Callback.component.js';
+export { default as Loading } from './Loading.component.js';
+export { default as ServiceWorkerNotSupported } from './ServiceWorkerNotSupported.component.js';
+export { default as SessionLost } from './SessionLost.component.js';

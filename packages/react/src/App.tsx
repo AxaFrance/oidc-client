@@ -1,12 +1,12 @@
 import React, { useReducer } from 'react';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 
-import { configurationIdentityServer } from './configurations';
-import { FetchUserHoc, FetchUserHook } from './FetchUser';
-import { Home } from './Home';
-import { MultiAuthContainer } from './MultiAuth';
+import { configurationIdentityServer } from './configurations.js';
+import { FetchUserHoc, FetchUserHook } from './FetchUser.js';
+import { Home } from './Home.js';
+import { MultiAuthContainer } from './MultiAuth.js';
 import { OidcProvider, withOidcSecure } from './oidc';
-import { Profile, SecureProfile } from './Profile';
+import { Profile, SecureProfile } from './Profile.js';
 
 const OidcSecureHoc = withOidcSecure(Profile);
 

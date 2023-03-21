@@ -1,8 +1,8 @@
-import { initSession } from './initSession';
-import { initWorkerAsync } from './initWorker';
-import { performRevocationRequestAsync, TOKEN_TYPE } from './requests';
-import timer from './timer';
-import { StringMap } from './types';
+import { initSession } from './initSession.js';
+import { initWorkerAsync } from './initWorker.js';
+import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
+import timer from './timer.js';
+import { StringMap } from './types.js';
 
 export const destroyAsync = (oidc) => async (status) => {
     timer.clearTimeout(oidc.timeoutId);

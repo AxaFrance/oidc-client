@@ -1,6 +1,6 @@
 import { ComponentType, useEffect } from 'react';
 
-import { VanillaOidc } from '../../vanilla/vanillaOidc';
+import { VanillaOidc } from '../../vanilla/vanillaOidc.js';
 
 const SilentCallbackManager: ComponentType<any> = ({ configurationName }) => {
     useEffect(() => {

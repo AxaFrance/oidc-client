@@ -1,7 +1,7 @@
-export { useOidcFetch, withOidcFetch } from './FetchToken';
-export { OidcProvider } from './OidcProvider';
-export { OidcSecure, withOidcSecure } from './OidcSecure';
-export { useOidc, useOidcAccessToken, useOidcIdToken } from './ReactOidc';
-export { OidcUserStatus, useOidcUser } from './User';
-export { TokenRenewMode } from './vanilla/parseTokens';
-export type { AuthorityConfiguration, OidcConfiguration, StringMap } from './vanilla/types';
+export { useOidcFetch, withOidcFetch } from './FetchToken.js';
+export { OidcProvider } from './OidcProvider.js';
+export { OidcSecure, withOidcSecure } from './OidcSecure.js';
+export { useOidc, useOidcAccessToken, useOidcIdToken } from './ReactOidc.js';
+export { OidcUserStatus, useOidcUser } from './User.js';
+export { TokenRenewMode } from './vanilla/parseTokens.js';
+export type { AuthorityConfiguration, OidcConfiguration, StringMap } from './vanilla/types.js';
