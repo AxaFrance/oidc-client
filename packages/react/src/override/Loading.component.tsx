@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
 
-import { style } from './style';
+import { style } from './style.js';
 
 const Loading : ComponentType<any> = ({ configurationName }) => (
       <span className="oidc-loading" style={style}>

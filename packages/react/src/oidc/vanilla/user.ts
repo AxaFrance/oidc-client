@@ -1,5 +1,5 @@
-import { sleepAsync } from './initWorker';
-import { isTokensValid } from './parseTokens';
+import { sleepAsync } from './initWorker.js';
+import { isTokensValid } from './parseTokens.js';
 
 export const userInfoAsync = async (oidc) => {
     if (oidc.userInfo != null) {

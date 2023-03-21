@@ -1,6 +1,6 @@
-import { CheckSessionIFrame } from './checkSessionIFrame';
-import { _silentLoginAsync, SilentLoginResponse } from './silentLogin';
-import { OidcConfiguration } from './types';
+import { CheckSessionIFrame } from './checkSessionIFrame.js';
+import { _silentLoginAsync, SilentLoginResponse } from './silentLogin.js';
+import { OidcConfiguration } from './types.js';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const startCheckSessionAsync = (oidc:any, oidcDatabase:any, configuration :OidcConfiguration) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
