@@ -17,10 +17,39 @@ jobs:
     steps:
       - id: check
         uses: Legorooj/skip-ci@main
+  tests:
+    runs-on: ubuntu-latest
+    if: needs.skip_ci.outputs.canSkip != 'true' && github.event.pull_request.head.repo.fork
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: npm ci
+        run: npm ci
+        working-directory: ./packages/react
+
+      - name: npm prepare
+        run: npm run prepare
+        working-directory: ./packages/react
+
+      - name: npm test
+        run: npm test -- --runInBand --coverage --watchAll=false
+        working-directory: ./packages/react
+
+      - name: npm ci
+        run: npm ci
+        working-directory: ./packages/vanilla
+
+      - name: npm prepare
+        run: npm run prepare
+        working-directory: ./packages/vanilla
+
   build:
     environment: react-oidc
     runs-on: ubuntu-latest
-    if: ${{ needs.skip_ci.outputs.canSkip != 'true' }}
+    if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
       - uses: actions/checkout@v2
         with:
