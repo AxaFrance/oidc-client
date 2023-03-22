@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
 
-import { useOidc } from '../oidc.js';
+import { useOidc } from '../oidc';
 import { style } from './style.js';
 
 export const SessionLost: ComponentType<any> = ({ configurationName }) => {
