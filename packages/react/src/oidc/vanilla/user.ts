@@ -5,17 +5,18 @@ export const userInfoAsync = async (oidc) => {
     if (oidc.userInfo != null) {
         return oidc.userInfo;
     }
+
+    // We wait the synchronisation before making a request
+    while (oidc.tokens && !isTokensValid(oidc.tokens)) {
+        await sleepAsync(200);
+    }
+
     if (!oidc.tokens) {
         return null;
     }
     const accessToken = oidc.tokens.accessToken;
     if (!accessToken) {
         return null;
-    }
-
-    // We wait the synchronisation before making a request
-    while (oidc.tokens && !isTokensValid(oidc.tokens)) {
-        await sleepAsync(200);
     }
 
     const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
