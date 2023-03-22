@@ -34,9 +34,9 @@
   "scripts": {
     "copy:public": "copyfiles -f ./service_worker/dist/* ./public && copyfiles -f -soft ./dist/OidcTrustedDomains.js ./public",
     "copy:dist": "copyfiles -f ./service_worker/dist/* ./dist/service_worker && copyfiles -f ./service_worker/dist/utils/* ./dist/service_worker/utils && copyfiles -f ./service_worker/oidcTrustedDomains.js ./dist",
-    "start": "npm run build:service-worker && npm run copy:public && cross-env PORT=4200 react-scripts start",
-    "build": "npm run build:service-worker && npm run copy:public && react-scripts build",
-    "test": "react-scripts test --coverage",
+    "start": "npm run build:service-worker && npm run copy:public && cross-env PORT=4200 craco start",
+    "build": "npm run build:service-worker && npm run copy:public && craco build",
+    "test": "craco test --coverage",
     "eject": "react-scripts eject",
     "clean": "rimraf dist && rimraf service_worker/dist",
     "postinstall": "node ./bin/copy.cjs",
@@ -53,6 +53,8 @@
     "react-dom": "^17.0.0 || ^18.0.0"
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@craco/types": "^7.1.0",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.3.0",
     "@testing-library/user-event": "14.4.3",
