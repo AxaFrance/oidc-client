@@ -21,3 +21,6 @@ examples/**/build/
 .scannerwork/
 .vscode/
 .idea/
+**/public/*.mjs
+**/public/*.mjs.map
+**/public/*.d.ts
