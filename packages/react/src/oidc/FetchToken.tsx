@@ -22,7 +22,7 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => Vanill
 
   // @ts-ignore
   const getValidToken = await oidc.getValidTokenAsync();
-  const accessToken = getValidToken.tokens.accessToken;
+  const accessToken = getValidToken?.tokens?.accessToken;
 
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json');
