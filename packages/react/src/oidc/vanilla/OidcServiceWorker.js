@@ -261,7 +261,9 @@ const keepAliveAsync = async (event) => {
     const init = { status: 200, statusText: 'oidc-service-worker' };
     const response = new Response('{}', init);
     if (!isFromVanilla) {
-        for (let i = 0; i < 150; i++) {
+        const originalRequestBody = await originalRequest.json();
+        const minSleepSeconds = originalRequestBody.minSleepSeconds ?? 240;
+        for (let i = 0; i < minSleepSeconds; i++) {
             await sleep(1000 + Math.floor(Math.random() * 1000));
             const cache = await caches.open('oidc_dummy_cache');
             await cache.put(event.request, response.clone());
