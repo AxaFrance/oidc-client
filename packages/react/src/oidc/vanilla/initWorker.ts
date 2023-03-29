@@ -109,7 +109,7 @@ export const sleepAsync = (milliseconds) => {
 
 const keepAlive = () => {
     try {
-        const operatingSystem = getOperatingSystem();
+        const operatingSystem = getOperatingSystem(navigator);
         const minSleepSeconds = operatingSystem.os === 'Android' ? 240 : 150;
         const promise = fetch('/OidcKeepAliveServiceWorker.json', { body: JSON.stringify({ minSleepSeconds: minSleepSeconds }) });
         promise.catch(error => { console.log(error); });
