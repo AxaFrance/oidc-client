@@ -1,11 +1,10 @@
-﻿// __tests__/fetch.test.js
-/*import React from 'react'
+﻿import React from 'react'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import App from "./App";
-import {act} from "react-dom/test-utils";
+import {sleepAsync} from "./oidc/vanilla/initWorker";
 
 const server = setupServer(
    rest.get('http://api/.well-known/openid-configuration', (req, res, ctx) => {
@@ -23,6 +22,22 @@ const server = setupServer(
     }),
 )
 
+// @ts-ignore
+global.window["crypto"]={
+    // @ts-ignore
+    getRandomValues:(buffer)=>{return ""},
+    // @ts-ignore
+    subtle:{
+        // @ts-ignore
+        digest:(algo, code) => {return  Promise.resolve(new ArrayBuffer(32))}}
+}
+// @ts-ignore
+const url = "http://dummy.com";
+Object.defineProperty(global.window, 'location', {
+    value: {
+        href: url
+    }
+});
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -37,10 +52,10 @@ test('Load home page then login should log', async () => {
         refresh_time_before_tokens_expiration_in_second: 70,
     };
     // @ts-ignore
-    const {debug, getByText, rerender} = render(<App configuration={configuration}/>);
-    await waitFor(() => getByText('React Demo Application protected by OpenId Connect'));
+    const { getByText } = render(<App configuration={configuration}/>);
+    await waitFor(() => getByText('GitHub @axa-fr/react-oidc'));
     fireEvent.click(screen.getByText('Login'));
-    await waitFor(() => getByText('Authentification en cours'));
-    
+    await waitFor(() => getByText('Authentication in progress'));
+    await sleepAsync(4000);
+    expect(global.window.location.href).toBe("https://demo.duendesoftware.com/connect/authorize?client_id=interactive.public.short&redirect_uri=http%3A%2F%2Flocalhost%2Fauthentication%2Fcallback&scope=openid%20profile%20email%20api%20offline_access&response_type=code&youhou_demo=youhou&state=AAAAAAAAAAAAAAAA&nonce=AAAAAAAAAAAA&code_challenge=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&code_challenge_method=S256");
 })
-*/

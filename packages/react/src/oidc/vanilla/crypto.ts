@@ -18,7 +18,6 @@ const bufferToString = (buffer: Uint8Array) => {
 
 const urlSafe = (buffer: Uint8Array): string => {
   const encoded = base64.fromByteArray(new Uint8Array(buffer));
-  console.log(encoded);
   return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 };
 

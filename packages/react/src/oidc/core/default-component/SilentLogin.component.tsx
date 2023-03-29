@@ -1,7 +1,7 @@
 import { ComponentType, useEffect } from 'react';
 
-import { getParseQueryStringFromLocation } from '../../vanilla/route-utils';
-import { VanillaOidc } from '../../vanilla/vanillaOidc';
+import { getParseQueryStringFromLocation } from '../../vanilla/route-utils.js';
+import { VanillaOidc } from '../../vanilla/vanillaOidc.js';
 
 const SilentLogin: ComponentType<any> = ({ configurationName }) => {
     const queryParams = getParseQueryStringFromLocation(window.location.href);

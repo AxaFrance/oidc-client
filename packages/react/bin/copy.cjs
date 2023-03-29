@@ -10,8 +10,11 @@ const applyCopy=(input) => {
             if (fs.existsSync(serviceWorkerDestinationPath)) {
                 fs.unlinkSync(serviceWorkerDestinationPath);
             }
-            fs.copyFileSync(path.join(__dirname, "..", "dist", serviceworkerFilename), serviceWorkerDestinationPath);
-            console.log(`File copied successfully at ${serviceWorkerDestinationPath}`);
+            const serviceworkerFilePath = path.join(__dirname, "..", "dist/service_worker", serviceworkerFilename);
+            if (fs.existsSync(serviceworkerFilePath)) {
+                fs.copyFileSync(serviceworkerFilePath, serviceWorkerDestinationPath);
+                console.log(`File copied successfully at ${serviceWorkerDestinationPath}`);
+            }
             
             const trustedDomainsFilename = "OidcTrustedDomains.js";
             const trustedDomainsDestinationPath = path.join(destinationPath, `${trustedDomainsFilename}`);

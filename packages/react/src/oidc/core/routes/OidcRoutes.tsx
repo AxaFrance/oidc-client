@@ -1,10 +1,10 @@
 import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
-import { getPath } from '../../vanilla/route-utils';
-import CallbackComponent from '../default-component/Callback.component';
-import SilentCallbackComponent from '../default-component/SilentCallback.component';
-import SilentLoginComponent from '../default-component/SilentLogin.component';
-import { CustomHistory } from './withRouter';
+import { getPath } from '../../vanilla/route-utils.js';
+import CallbackComponent from '../default-component/Callback.component.js';
+import SilentCallbackComponent from '../default-component/SilentCallback.component.js';
+import SilentLoginComponent from '../default-component/SilentLogin.component.js';
+import { CustomHistory } from './withRouter.js';
 
 const defaultProps: Partial<OidcRoutesProps> = {
 

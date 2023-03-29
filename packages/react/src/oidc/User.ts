@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { OidcUserInfo, VanillaOidc } from './vanilla/vanillaOidc';
+import { OidcUserInfo, VanillaOidc } from './vanilla/vanillaOidc.js';
 
 export enum OidcUserStatus {
     Unauthenticated= 'Unauthenticated',

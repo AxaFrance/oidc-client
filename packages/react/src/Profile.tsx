@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { OidcSecure, OidcUserStatus, useOidcAccessToken, useOidcIdToken, useOidcUser } from './oidc';
-import { OidcUserInfo } from './oidc/User';
+import { OidcUserInfo } from './oidc/vanilla';
 
 interface OidcUserRoleInfo extends OidcUserInfo{
     role?: string[];

@@ -1,24 +1,24 @@
 
-import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession';
-import { CheckSessionIFrame } from './checkSessionIFrame';
-import { eventNames } from './events';
-import { initSession } from './initSession';
-import { initWorkerAsync, sleepAsync } from './initWorker';
-import { defaultLoginAsync, loginCallbackAsync } from './login';
-import { destroyAsync, logoutAsync } from './logout';
+import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession.js';
+import { CheckSessionIFrame } from './checkSessionIFrame.js';
+import { eventNames } from './events.js';
+import { initSession } from './initSession.js';
+import { initWorkerAsync, sleepAsync } from './initWorker.js';
+import { defaultLoginAsync, loginCallbackAsync } from './login.js';
+import { destroyAsync, logoutAsync } from './logout.js';
 import {
     computeTimeLeft,
     isTokensOidcValid,
     setTokens, TokenRenewMode,
     Tokens,
-} from './parseTokens';
-import { autoRenewTokens, renewTokensAndStartTimerAsync } from './renewTokens';
-import { fetchFromIssuer, performTokenRequestAsync } from './requests';
-import { getParseQueryStringFromLocation } from './route-utils';
-import defaultSilentLoginAsync, { _silentLoginAsync } from './silentLogin';
-import timer from './timer';
-import { AuthorityConfiguration, OidcConfiguration, StringMap } from './types';
-import { userInfoAsync } from './user';
+} from './parseTokens.js';
+import { autoRenewTokens, renewTokensAndStartTimerAsync } from './renewTokens.js';
+import { fetchFromIssuer, performTokenRequestAsync } from './requests.js';
+import { getParseQueryStringFromLocation } from './route-utils.js';
+import defaultSilentLoginAsync, { _silentLoginAsync } from './silentLogin.js';
+import timer from './timer.js';
+import { AuthorityConfiguration, OidcConfiguration, StringMap } from './types.js';
+import { userInfoAsync } from './user.js';
 
 export interface OidcAuthorizationServiceConfigurationJson {
     check_session_iframe?: string;

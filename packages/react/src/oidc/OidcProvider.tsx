@@ -1,12 +1,12 @@
 import { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
-import AuthenticatingError from './core/default-component/AuthenticateError.component';
-import { Authenticating, CallBackSuccess, Loading, SessionLost } from './core/default-component/index';
-import ServiceWorkerNotSupported from './core/default-component/ServiceWorkerNotSupported.component';
-import OidcRoutes from './core/routes/OidcRoutes';
-import { CustomHistory } from './core/routes/withRouter';
-import { OidcConfiguration } from './vanilla/types';
-import { VanillaOidc } from './vanilla/vanillaOidc';
+import AuthenticatingError from './core/default-component/AuthenticateError.component.js';
+import { Authenticating, CallBackSuccess, Loading, SessionLost } from './core/default-component/index.js';
+import ServiceWorkerNotSupported from './core/default-component/ServiceWorkerNotSupported.component.js';
+import OidcRoutes from './core/routes/OidcRoutes.js';
+import { CustomHistory } from './core/routes/withRouter.js';
+import { OidcConfiguration } from './vanilla/types.js';
+import { VanillaOidc } from './vanilla/vanillaOidc.js';
 
 export type oidcContext = {
     (name?: string): VanillaOidc;

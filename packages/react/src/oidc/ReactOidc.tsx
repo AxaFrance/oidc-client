@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { StringMap } from './vanilla/types';
-import { VanillaOidc } from './vanilla/vanillaOidc';
+import { StringMap } from './vanilla/types.js';
+import { VanillaOidc } from './vanilla/vanillaOidc.js';
 
 const defaultConfigurationName = 'default';
 
@@ -47,8 +47,19 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
     const logout = (callbackPath: string | null | undefined = undefined, extras:StringMap = null) => {
         return getOidc(configurationName).logoutAsync(callbackPath, extras);
     };
-    const renewTokens = (extras:StringMap = null) => {
-        return getOidc(configurationName).renewTokensAsync(extras);
+    const renewTokens = async (extras: StringMap = null) : Promise<OidcAccessToken | OidcIdToken> => {
+        const tokens = await getOidc(configurationName).renewTokensAsync(extras);
+
+        return {
+            // @ts-ignore
+            accessToken: tokens.accessToken,
+            // @ts-ignore
+            accessTokenPayload: tokens.accessTokenPayload,
+            // @ts-ignore
+            idToken: tokens.idToken,
+            // @ts-ignore
+            idTokenPayload: tokens.idTokenPayload,
+        };
     };
     return { login, logout, renewTokens, isAuthenticated };
 };
@@ -60,7 +71,10 @@ const initTokens = (configurationName: string) => {
     const oidc = getOidc(configurationName);
     if (oidc.tokens) {
         const tokens = oidc.tokens;
-        return { accessToken: tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload };
+        return {
+            accessToken: tokens.accessToken,
+            accessTokenPayload: tokens.accessTokenPayload,
+        };
     }
     return accessTokenInitialState;
 };
