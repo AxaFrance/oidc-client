@@ -17,7 +17,7 @@ export default defineConfig({
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, './service_worker/OidcServiceWorker.ts'),
       name: 'OidcServiceWorker',
-      formats: ['es'],
+      formats: ['cjs'],
       // the proper extensions will be added
       fileName: 'OidcServiceWorker',
     },
