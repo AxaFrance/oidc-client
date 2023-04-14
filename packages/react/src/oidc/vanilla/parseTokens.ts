@@ -1,5 +1,4 @@
 import { sleepAsync } from './initWorker.js';
-import {Nullable} from "vitest";
 
 const b64DecodeUnicode = (str) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
@@ -148,7 +147,7 @@ export interface OidcToken{
 
 export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWait = 50): Promise<ValidToken> => {
     let numberWaitTemp = numberWait;
-    if(!oidc.tokens){
+    if (!oidc.tokens) {
         return null;
     }
     while (!isTokensValid(oidc.tokens) && numberWaitTemp > 0) {
