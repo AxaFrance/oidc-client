@@ -147,6 +147,9 @@ export interface OidcToken{
 
 export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWait = 50): Promise<ValidToken> => {
     let numberWaitTemp = numberWait;
+    if (!oidc.tokens) {
+        return null;
+    }
     while (!isTokensValid(oidc.tokens) && numberWaitTemp > 0) {
         await sleepAsync(waitMs);
         numberWaitTemp = numberWaitTemp - 1;
