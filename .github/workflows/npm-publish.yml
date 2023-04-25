@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
 
       - name: npm ci
         run: npm ci
@@ -35,7 +35,7 @@ jobs:
         working-directory: ./packages/react
 
       - name: npm test
-        run: npm test -- --runInBand --coverage --watchAll=false
+        run: npm test -- --run
         working-directory: ./packages/react
 
       - name: npm ci
@@ -64,7 +64,7 @@ jobs:
       
       - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
 
       - name: npm version ${{ steps.tag_version.outputs.new_tag }}
         if: github.ref == 'refs/heads/master'
@@ -79,9 +79,9 @@ jobs:
         run: npm run prepare
         working-directory: ./packages/react
         
-      #- name: npm test
-      #  run: npm test -- --runInBand --coverage --watchAll=false
-      #  working-directory: ./packages/react
+      - name: npm test
+        run: npm test -- --run
+        working-directory: ./packages/react
         
       - id: publish-react
         uses: JS-DevTools/npm-publish@v1

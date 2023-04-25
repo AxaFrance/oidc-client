@@ -1,4 +1,10 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Authenticating test suite > renders correctly 1`] = `
+<DocumentFragment>
+  http://url.com
+</DocumentFragment>
+`;
 
 exports[`Authenticating test suite renders correctly 1`] = `
 <DocumentFragment>

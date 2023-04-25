@@ -1,4 +1,5 @@
 ﻿import {getValidTokenAsync, isTokensOidcValid} from "./parseTokens";
+import { describe, it, expect } from 'vitest';
 
 describe('ParseTokens test Suite', () => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;

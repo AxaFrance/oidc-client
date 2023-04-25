@@ -5,7 +5,8 @@ import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import App from "./App";
 import {sleepAsync} from "./oidc/vanilla/initWorker";
-
+import { describe, it, expect } from 'vitest';
+ 
 const server = setupServer(
    rest.get('http://api/.well-known/openid-configuration', (req, res, ctx) => {
         return res( ctx.status(200),ctx.json({
@@ -42,20 +43,22 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-test('Load home page then login should log', async () => {
-    
-    const configuration = {
-        client_id: 'interactive.public.short',
-        redirect_uri: 'http://localhost:4200/authentication/callback',
-        scope: 'openid profile email api offline_access',
-        authority: 'http://api',
-        refresh_time_before_tokens_expiration_in_second: 70,
-    };
-    // @ts-ignore
-    const { getByText } = render(<App configuration={configuration}/>);
-    await waitFor(() => getByText('GitHub @axa-fr/react-oidc'));
-    fireEvent.click(screen.getByText('Login'));
-    await waitFor(() => getByText('Authentication in progress'));
-    await sleepAsync(4000);
-    expect(global.window.location.href).toBe("https://demo.duendesoftware.com/connect/authorize?client_id=interactive.public.short&redirect_uri=http%3A%2F%2Flocalhost%2Fauthentication%2Fcallback&scope=openid%20profile%20email%20api%20offline_access&response_type=code&youhou_demo=youhou&state=AAAAAAAAAAAAAAAA&nonce=AAAAAAAAAAAA&code_challenge=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&code_challenge_method=S256");
-})
+describe('Authenticating test suite', () => {
+    it('Load home page then login should log', async () => {
+        
+        const configuration = {
+            client_id: 'interactive.public.short',
+            redirect_uri: 'http://localhost:4200/authentication/callback',
+            scope: 'openid profile email api offline_access',
+            authority: 'http://api',
+            refresh_time_before_tokens_expiration_in_second: 70,
+        };
+        // @ts-ignore
+        const { getByText } = render(<App configuration={configuration}/>);
+        await waitFor(() => getByText('GitHub @axa-fr/react-oidc'));
+        fireEvent.click(screen.getByText('Login'));
+        await waitFor(() => getByText('Authentication in progress'));
+        await sleepAsync(4000);
+        expect(global.window.location.href).toBe("https://demo.duendesoftware.com/connect/authorize?client_id=interactive.public.short&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauthentication%2Fcallback&scope=openid%20profile%20email%20api%20offline_access&response_type=code&youhou_demo=youhou&state=AAAAAAAAAAAAAAAA&nonce=AAAAAAAAAAAA&code_challenge=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&code_challenge_method=S256");
+    });
+});
