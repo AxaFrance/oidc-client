@@ -1,6 +1,7 @@
 import * as React from 'react';
 import OidcRoutes from './OidcRoutes';
 import {render} from "@testing-library/react";
+import { describe, it, expect } from 'vitest';
 
 describe('Authenticating test suite', () => {
   it('renders correctly', () => {

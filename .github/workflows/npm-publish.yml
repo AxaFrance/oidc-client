@@ -79,9 +79,9 @@ jobs:
         run: npm run prepare
         working-directory: ./packages/react
         
-      #- name: npm test
-      #  run: npm test -- --runInBand --coverage --watchAll=false
-      #  working-directory: ./packages/react
+      - name: npm test
+        run: npm test -- --runInBand --coverage --watchAll=false
+        working-directory: ./packages/react
         
       - id: publish-react
         uses: JS-DevTools/npm-publish@v1

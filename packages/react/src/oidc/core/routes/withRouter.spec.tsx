@@ -1,6 +1,6 @@
 import React from 'react';
-import '@testing-library/jest-dom/extend-expect';
 import { CreateEvent, WindowInternal } from './withRouter';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('WithRouter test Suite', () => {
   const generateKeyMock = () => '123ABC';
@@ -8,7 +8,7 @@ describe('WithRouter test Suite', () => {
   beforeEach(() => {});
   it('should CreateEvent return correct Event if not on IE', () => {
     const windowMock = {
-      CustomEvent: jest.fn().mockImplementation((event, params) => {
+      CustomEvent: vi.fn().mockImplementation((event, params) => {
         return { event, params };
       }),
     };
@@ -30,10 +30,10 @@ describe('WithRouter test Suite', () => {
       },
     };
     const evtMock = {
-      initCustomEvent: jest.fn(),
+      initCustomEvent: vi.fn(),
     };
     const documentMock = {
-      createEvent: jest.fn(() => evtMock),
+      createEvent: vi.fn(() => evtMock),
     };
     const typedDocumentMock = (documentMock as unknown) as Document;
     const res = CreateEvent((windowMock as unknown) as WindowInternal, typedDocumentMock)(
