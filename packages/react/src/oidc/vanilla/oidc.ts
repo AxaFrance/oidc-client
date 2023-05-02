@@ -85,11 +85,15 @@ export class Oidc {
       if (configuration.silent_redirect_uri && !configuration.silent_login_uri) {
           silent_login_uri = `${configuration.silent_redirect_uri.replace('-callback', '').replace('callback', '')}-login`;
       }
+      let refresh_time_before_tokens_expiration_in_second = configuration.refresh_time_before_tokens_expiration_in_second ?? 120;
+      if (refresh_time_before_tokens_expiration_in_second > 60) {
+          refresh_time_before_tokens_expiration_in_second = refresh_time_before_tokens_expiration_in_second - Math.floor(Math.random() * 40);
+      }
       this.configuration = {
           ...configuration,
           silent_login_uri,
           monitor_session: configuration.monitor_session ?? false,
-          refresh_time_before_tokens_expiration_in_second: configuration.refresh_time_before_tokens_expiration_in_second ?? 60,
+          refresh_time_before_tokens_expiration_in_second,
           silent_login_timeout: configuration.silent_login_timeout ?? 12000,
           token_renew_mode: configuration.token_renew_mode ?? TokenRenewMode.access_token_or_id_token_invalid,
       };
