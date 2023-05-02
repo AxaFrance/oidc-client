@@ -93,7 +93,7 @@ export class Oidc {
           ...configuration,
           silent_login_uri,
           monitor_session: configuration.monitor_session ?? false,
-          refresh_time_before_tokens_expiration_in_second: refresh_time_before_tokens_expiration_in_second,
+          refresh_time_before_tokens_expiration_in_second,
           silent_login_timeout: configuration.silent_login_timeout ?? 12000,
           token_renew_mode: configuration.token_renew_mode ?? TokenRenewMode.access_token_or_id_token_invalid,
       };
