@@ -133,6 +133,7 @@ class OidcConfigBuilder {
     oidcConfiguration: undefined,
     sessionState: null,
     items: undefined,
+    hideAccessToken: true,
   };
 
   constructor() {}

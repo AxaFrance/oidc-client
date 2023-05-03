@@ -5,6 +5,7 @@ import {
   OidcConfig,
   OidcConfiguration,
   MessageEventData,
+  TrustedDomainsHideAccessToken,
 } from './types';
 import {
   checkDomain,
@@ -18,6 +19,11 @@ import {
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
 declare let trustedDomains: TrustedDomains;
+declare let trustedDomainsHideAccessToken: TrustedDomainsHideAccessToken;
+
+if(!trustedDomainsHideAccessToken){
+  trustedDomainsHideAccessToken = {};
+}
 
 _self.importScripts(scriptFilename);
 
@@ -44,6 +50,7 @@ const database: Database = {
     codeVerifier: null,
     nonce: null,
     oidcServerConfiguration: null,
+    hideAccessToken: true,
   },
 };
 
@@ -80,7 +87,6 @@ const keepAliveAsync = async (event: FetchEvent) => {
       await cache.put(event.request, response.clone());
     }
   }
-
   return response;
 };
 
@@ -265,6 +271,9 @@ const handleMessage = (event: ExtendableMessageEvent) => {
   let currentDatabase = database[configurationName];
 
   if (!currentDatabase) {
+    if (trustedDomainsHideAccessToken[configurationName] === undefined) {
+      trustedDomainsHideAccessToken[configurationName] = true;
+    }
     database[configurationName] = {
       tokens: null,
       state: null,
@@ -274,11 +283,14 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       nonce: null,
       status: null,
       configurationName,
+      hideAccessToken: trustedDomainsHideAccessToken[configurationName],
     };
+    console.log(database[configurationName]);
     currentDatabase = database[configurationName];
     if (!trustedDomains[configurationName]) {
       trustedDomains[configurationName] = [];
     }
+   
   }
 
   switch (data.type) {
@@ -323,8 +335,10 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       } else {
         const tokens = {
           ...currentDatabase.tokens,
-          access_token: TOKEN.ACCESS_TOKEN + '_' + configurationName,
         };
+        if(currentDatabase.hideAccessToken) {
+          tokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName;
+        }
         if (tokens.refresh_token) {
           tokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName;
         }

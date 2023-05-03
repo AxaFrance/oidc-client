@@ -106,9 +106,11 @@ function hideTokens(currentDatabaseElement: OidcConfig) {
       const accessTokenPayload = extractTokenPayload(tokens.access_token);
       const secureTokens = {
         ...tokens,
-        access_token: TOKEN.ACCESS_TOKEN + '_' + configurationName,
         accessTokenPayload,
       };
+      if(currentDatabaseElement.hideAccessToken){
+        secureTokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName;
+      }
       tokens.accessTokenPayload = accessTokenPayload;
 
       let _idTokenPayload = null;

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { OidcServerConfiguration } from '../../types';
-import { extractTokenPayload, isTokensOidcValid, isTokensValid } from '..';
+import {extractTokenPayload, isTokensOidcValid, isTokensValid} from '..';
 import { OidcServerConfigBuilder, TokenBuilder } from './testHelper';
 
 describe('tokens', () => {
@@ -65,4 +65,5 @@ describe('tokens', () => {
       expect(result.reason).toBe('');
     });
   });
+  
 });

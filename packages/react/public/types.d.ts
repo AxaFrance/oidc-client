@@ -2,6 +2,9 @@ export type Domain = string | RegExp;
 export type TrustedDomains = {
     [key: string]: Domain[];
 };
+export type TrustedDomainsHideAccessToken = {
+    [key: string]: boolean;
+};
 export type OidcServerConfiguration = {
     revocationEndpoint: string;
     issuer: string;
@@ -47,6 +50,7 @@ export type OidcConfig = {
     oidcConfiguration?: OidcConfiguration;
     sessionState?: string | null;
     items?: MessageData;
+    hideAccessToken: boolean;
 };
 export type IdTokenPayload = {
     iss: string;
