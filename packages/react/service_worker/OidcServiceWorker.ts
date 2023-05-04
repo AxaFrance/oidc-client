@@ -20,11 +20,7 @@ const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
 declare let trustedDomains: TrustedDomains;
 declare let trustedDomainsHideAccessToken: TrustedDomainsHideAccessToken;
-
-if(!trustedDomainsHideAccessToken){
-  trustedDomainsHideAccessToken = {};
-}
-
+trustedDomainsHideAccessToken = {};
 _self.importScripts(scriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();

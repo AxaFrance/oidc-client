@@ -15,6 +15,6 @@ const trustedDomains = {
     config_hide_access_token: ["https://demo.duendesoftware.com"]
 };
 
-const trustedDomainsHideAccessToken = {
+/*const trustedDomainsHideAccessToken = {
     config_hide_access_token: false
-}
+}*/
