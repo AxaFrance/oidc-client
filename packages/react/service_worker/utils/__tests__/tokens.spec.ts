@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { OidcServerConfiguration } from '../../types';
-import {extractTokenPayload, isTokensOidcValid, isTokensValid} from '..';
-import { OidcServerConfigBuilder, TokenBuilder } from './testHelper';
+import {_hideTokens, extractTokenPayload, isTokensOidcValid, isTokensValid} from '..';
+import {OidcConfigBuilder, OidcServerConfigBuilder, TokenBuilder} from './testHelper';
 
 describe('tokens', () => {
   let oidcServerConfig: OidcServerConfiguration;
@@ -63,6 +63,29 @@ describe('tokens', () => {
       const result = isTokensOidcValid(token, null, oidcServerConfig);
       expect(result.isValid).toBeTruthy();
       expect(result.reason).toBe('');
+    });
+  });
+
+  describe('_hideTokens', () => {
+    
+    it.each([
+      {hideAccessToken:true, expectedAccessToken:'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_test'},
+      {hideAccessToken:false, expectedAccessToken:'test_access_token'},
+    ])('accesstoken will be hide $hideAccessToken result shoulbe be $expectedAccessToken', ({hideAccessToken, expectedAccessToken}) => {
+      const token = new TokenBuilder()
+          .withIdTokenPayload({
+            iss: oidcServerConfig.issuer,
+            exp: 0,
+            iat: 0,
+            nonce: null,
+          })
+          .WithNonExpiredToken()
+          .withAccessToken('test_access_token')
+          .build();
+      
+      const oidcConfiguration = new OidcConfigBuilder().withTestingDefault().withHideAccessToken(hideAccessToken).build()
+      const secureTokens = _hideTokens(token, oidcConfiguration, 'test');
+      expect(secureTokens.access_token).toBe(expectedAccessToken);
     });
   });
   
