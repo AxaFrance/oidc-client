@@ -41,12 +41,12 @@ export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: str
         if (revocationEndpoint) {
             const promises = [];
             const accessToken = oidc.tokens.accessToken;
-            if (accessToken) {
+            if (accessToken && configuration.logout_tokens_to_invalidate.includes('access_token')) {
                 const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
                 promises.push(revokeAccessTokenPromise);
             }
             const refreshToken = oidc.tokens.refreshToken;
-            if (refreshToken) {
+            if (refreshToken && configuration.logout_tokens_to_invalidate.includes('refresh_token')) {
                 const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
                 promises.push(revokeRefreshTokenPromise);
             }

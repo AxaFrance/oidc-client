@@ -1,4 +1,6 @@
 
+export type LogoutToken = 'access_token' | 'refresh_token';
+
 export type OidcConfiguration = {
     client_id: string;
     redirect_uri: string;
@@ -19,6 +21,7 @@ export type OidcConfiguration = {
     storage?: Storage;
     monitor_session?: boolean;
     token_renew_mode?: string;
+    logout_tokens_to_invalidate?:Array<LogoutToken>;
 };
 
 export interface StringMap {
