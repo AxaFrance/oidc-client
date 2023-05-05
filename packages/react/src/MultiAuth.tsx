@@ -37,7 +37,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
                         <option value="config_without_refresh_token_silent_login">config_without_refresh_token_silent_login</option>
                         <option value="config_google">google</option>
                         <option value="config_with_hash">config_with_hash</option>
-                        <option value="config_hide_access_token">config_hide_access_token</option>
+                        <option value="config_show_access_token">config_show_access_token</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { 'test:token_request': 'test', youhou: 'youhou', grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
@@ -99,7 +99,7 @@ export const MultiAuthContainer = () => {
             silent_redirect_uri: '',
             scope: 'openid profile email api',
 },
-        config_hide_access_token: {
+        config_show_access_token: {
             ...configurationIdentityServer,
             redirect_uri: callBack,
             silent_redirect_uri,

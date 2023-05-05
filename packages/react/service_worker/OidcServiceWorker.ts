@@ -5,7 +5,7 @@ import {
   OidcConfig,
   OidcConfiguration,
   MessageEventData,
-  TrustedDomainsHideAccessToken,
+  TrustedDomainsShowAccessToken,
 } from './types';
 import {
   checkDomain,
@@ -19,7 +19,7 @@ import {
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
 declare let trustedDomains: TrustedDomains;
-let trustedDomainsHideAccessToken: TrustedDomainsHideAccessToken = {};
+let trustedDomainsShowAccessToken: TrustedDomainsShowAccessToken = {};
 
 _self.importScripts(scriptFilename);
 
@@ -267,8 +267,8 @@ const handleMessage = (event: ExtendableMessageEvent) => {
   let currentDatabase = database[configurationName];
 
   if (!currentDatabase) {
-    if (trustedDomainsHideAccessToken[configurationName] === undefined) {
-      trustedDomainsHideAccessToken[configurationName] = true;
+    if (trustedDomainsShowAccessToken[configurationName] === undefined) {
+      trustedDomainsShowAccessToken[configurationName] = false;
     }
     database[configurationName] = {
       tokens: null,
@@ -279,7 +279,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       nonce: null,
       status: null,
       configurationName,
-      hideAccessToken: trustedDomainsHideAccessToken[configurationName],
+      hideAccessToken: !trustedDomainsShowAccessToken[configurationName],
     };
     console.log(database[configurationName]);
     currentDatabase = database[configurationName];

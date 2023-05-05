@@ -2,7 +2,7 @@ export type Domain = string | RegExp;
 export type TrustedDomains = {
     [key: string]: Domain[];
 };
-export type TrustedDomainsHideAccessToken = {
+export type TrustedDomainsShowAccessToken = {
     [key: string]: boolean;
 };
 export type OidcServerConfiguration = {
