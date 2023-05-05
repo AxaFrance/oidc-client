@@ -1,5 +1,4 @@
 
-
 export type LogoutToken = 'access_token' | 'refresh_token';
 
 export type OidcConfiguration = {
