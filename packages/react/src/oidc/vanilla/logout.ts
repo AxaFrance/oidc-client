@@ -4,7 +4,7 @@ import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
 
-export const OidcLogoutTokens = {
+export const oidcLogoutTokens = {
     access_token: 'access_token',
     refresh_token: 'refresh_token',
 };
@@ -46,12 +46,12 @@ export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: str
         if (revocationEndpoint) {
             const promises = [];
             const accessToken = oidc.tokens.accessToken;
-            if (accessToken && configuration.logout_tokens_to_invalidate.includes(OidcLogoutTokens.access_token)) {
+            if (accessToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.access_token)) {
                 const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
                 promises.push(revokeAccessTokenPromise);
             }
             const refreshToken = oidc.tokens.refreshToken;
-            if (refreshToken && configuration.logout_tokens_to_invalidate.includes(OidcLogoutTokens.refresh_token)) {
+            if (refreshToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.refresh_token)) {
                 const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
                 promises.push(revokeRefreshTokenPromise);
             }
