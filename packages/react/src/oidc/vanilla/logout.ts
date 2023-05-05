@@ -60,6 +60,7 @@ export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: str
             }
         }
     } catch (exception) {
+        console.warn('logoutAsync: error when revoking tokens, if the error persist, you ay configure property logout_tokens_to_invalidate from configuration to avoid this error');
         console.warn(exception);
     }
     // @ts-ignore
