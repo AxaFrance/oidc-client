@@ -19,13 +19,9 @@ import {
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
 declare let trustedDomains: TrustedDomains;
-declare let trustedDomainsHideAccessToken: TrustedDomainsHideAccessToken;
+let trustedDomainsHideAccessToken: TrustedDomainsHideAccessToken = {};
 
 _self.importScripts(scriptFilename);
-
-if (typeof trustedDomainsHideAccessToken === 'undefined') {
-  trustedDomainsHideAccessToken = {};
-}
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 
