@@ -2,7 +2,12 @@ import { initSession } from './initSession.js';
 import { initWorkerAsync } from './initWorker.js';
 import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
-import {OidcLogoutTokens, StringMap} from './types.js';
+import { StringMap } from './types.js';
+
+export const OidcLogoutTokens = {
+    access_token: 'access_token',
+    refresh_token: 'refresh_token',
+};
 
 export const destroyAsync = (oidc) => async (status) => {
     timer.clearTimeout(oidc.timeoutId);

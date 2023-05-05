@@ -89,7 +89,7 @@ export class Oidc {
       if (refresh_time_before_tokens_expiration_in_second > 60) {
           refresh_time_before_tokens_expiration_in_second = refresh_time_before_tokens_expiration_in_second - Math.floor(Math.random() * 40);
       }
-      if(!configuration.logout_tokens_to_invalidate){
+      if (!configuration.logout_tokens_to_invalidate) {
           configuration.logout_tokens_to_invalidate = ['access_token', 'refresh_token'];
       }
       this.configuration = {

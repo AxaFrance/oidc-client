@@ -1,11 +1,6 @@
 
 
-export const OidcLogoutTokens = {
-    access_token: "access_token",
-    refresh_token: 'refresh_token'
-};
-
-export type LogoutToken = "access_token" | "refresh_token";
+export type LogoutToken = 'access_token' | 'refresh_token';
 
 export type OidcConfiguration = {
     client_id: string;
