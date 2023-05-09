@@ -594,7 +594,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.logoutPromise) {
             return this.logoutPromise;
         }
-        this.logoutPromise = logoutAsync(this, oidcDatabase)(callbackPathOrUrl, extras);
+        this.logoutPromise = logoutAsync(this, oidcDatabase, fetch, window, console)(callbackPathOrUrl, extras);
         return this.logoutPromise.then(result => {
             this.logoutPromise = null;
             return result;

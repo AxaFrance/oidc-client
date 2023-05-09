@@ -26,7 +26,7 @@ export const destroyAsync = (oidc) => async (status) => {
     oidc.userInfo = null;
 };
 
-export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
+export const logoutAsync = (oidc, oidcDatabase, fetch, window, console) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
     const configuration = oidc.configuration;
     const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     if (callbackPathOrUrl && (typeof callbackPathOrUrl !== 'string')) {
@@ -47,12 +47,12 @@ export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: str
             const promises = [];
             const accessToken = oidc.tokens.accessToken;
             if (accessToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.access_token)) {
-                const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
+                const revokeAccessTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
                 promises.push(revokeAccessTokenPromise);
             }
             const refreshToken = oidc.tokens.refreshToken;
             if (refreshToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.refresh_token)) {
-                const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+                const revokeRefreshTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
                 promises.push(revokeRefreshTokenPromise);
             }
             if (promises.length > 0) {
