@@ -160,6 +160,7 @@ const propTypes = {
     onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user with the same subject is logged out from another tab when session_monitor is active
     onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user is logged out from same tab when session_monitor is active
     token_renew_mode: PropTypes.string, // Optional, update tokens base on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid" , "id_token_invalid"
+    logout_tokens_to_invalidate : Array<string> // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
   }).isRequired,
 };
 ```

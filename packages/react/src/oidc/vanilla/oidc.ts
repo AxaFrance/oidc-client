@@ -89,6 +89,9 @@ export class Oidc {
       if (refresh_time_before_tokens_expiration_in_second > 60) {
           refresh_time_before_tokens_expiration_in_second = refresh_time_before_tokens_expiration_in_second - Math.floor(Math.random() * 40);
       }
+      if (!configuration.logout_tokens_to_invalidate) {
+          configuration.logout_tokens_to_invalidate = ['access_token', 'refresh_token'];
+      }
       this.configuration = {
           ...configuration,
           silent_login_uri,
@@ -591,7 +594,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.logoutPromise) {
             return this.logoutPromise;
         }
-        this.logoutPromise = logoutAsync(this, oidcDatabase)(callbackPathOrUrl, extras);
+        this.logoutPromise = logoutAsync(this, oidcDatabase, fetch, window, console)(callbackPathOrUrl, extras);
         return this.logoutPromise.then(result => {
             this.logoutPromise = null;
             return result;

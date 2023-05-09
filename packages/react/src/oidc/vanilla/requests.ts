@@ -26,7 +26,7 @@ export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond =
     return new OidcAuthorizationServiceConfiguration(result);
 };
 
-const internalFetch = async (url, headers, timeoutMs = 10000, numberRetry = 0) => {
+const internalFetch = (fetch) => async (url, headers, timeoutMs = 10000, numberRetry = 0) => {
     let response;
     try {
         const controller = new AbortController();
@@ -36,7 +36,7 @@ const internalFetch = async (url, headers, timeoutMs = 10000, numberRetry = 0) =
         if (e.message === 'AbortError' ||
             e.message === 'Network request failed') {
             if (numberRetry <= 1) {
-                return await internalFetch(url, headers, timeoutMs, numberRetry + 1);
+                return await internalFetch(fetch)(url, headers, timeoutMs, numberRetry + 1);
             } else {
                 throw e;
             }
@@ -53,7 +53,7 @@ export const TOKEN_TYPE = {
     access_token: 'access_token',
 };
 
-export const performRevocationRequestAsync = async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id, timeoutMs = 10000) => {
+export const performRevocationRequestAsync = (fetch) => async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id, timeoutMs = 10000) => {
     const details = {
         token,
         token_type_hint: token_type,
@@ -68,7 +68,7 @@ export const performRevocationRequestAsync = async (url, token, token_type = TOK
     }
     const formBodyString = formBody.join('&');
 
-    const response = await internalFetch(url, {
+    const response = await internalFetch(fetch)(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -98,7 +98,7 @@ export const performTokenRequestAsync = async (url, details, extras, oldTokens, 
     }
     const formBodyString = formBody.join('&');
 
-    const response = await internalFetch(url, {
+    const response = await internalFetch(fetch)(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -147,7 +147,7 @@ export const performFirstTokenRequestAsync = (storage:any) => async (url, extras
         formBody.push(`${encodedKey}=${encodedValue}`);
     }
     const formBodyString = formBody.join('&');
-    const response = await internalFetch(url, {
+    const response = await internalFetch(fetch)(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
