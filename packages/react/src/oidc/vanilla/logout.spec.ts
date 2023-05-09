@@ -24,7 +24,6 @@ describe('Logout test suite', () => {
         };
 
         const fetch = (url, data) => {
-
             if(url === "http://api/connect/revocation") {
                 return Promise.resolve({status: 200});
             }
