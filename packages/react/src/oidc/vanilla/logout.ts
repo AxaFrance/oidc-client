@@ -45,7 +45,7 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, window, console) => async
         const revocationEndpoint = oidcServerConfiguration.revocationEndpoint;
         if (revocationEndpoint) {
             const promises = [];
-            const accessToken = oidc.tokens.accessToken;
+            const accessToken = oidc.tokens.accessToken; 
             if (accessToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.access_token)) {
                 const revokeAccessTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
                 promises.push(revokeAccessTokenPromise);
