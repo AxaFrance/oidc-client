@@ -23,6 +23,7 @@ const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, c
         history.replaceState(callbackPath || '/');
       } catch (error) {
           if (isMounted) {
+            console.warn(error);
             setIsError(true);
           }
       }

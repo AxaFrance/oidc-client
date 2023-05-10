@@ -147,6 +147,7 @@ const propTypes = {
       end_session_endpoint: PropTypes.string,
       revocation_endpoint: PropTypes.string,
       check_session_iframe: PropTypes.string,
+      issuer: PropTypes.string,
     }),
     refresh_time_before_tokens_expiration_in_second: PropTypes.number,
     service_worker_relative_url: PropTypes.string,
