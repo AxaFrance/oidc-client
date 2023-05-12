@@ -19,7 +19,6 @@ import {
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
 declare let trustedDomains: TrustedDomains;
-// let trustedDomainsShowAccessToken: TrustedDomainsShowAccessToken = {};
 
 _self.importScripts(scriptFilename);
 

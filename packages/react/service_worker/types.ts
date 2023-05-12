@@ -10,10 +10,6 @@ export type TrustedDomains = {
     [key: string]: Domain[] | DomainDetails;
 }  | null;
 
-/*export type TrustedDomainsShowAccessToken = {
-    [key: string]: boolean
-}*/
-
 export type OidcServerConfiguration = {
     revocationEndpoint: string;
     issuer: string;
