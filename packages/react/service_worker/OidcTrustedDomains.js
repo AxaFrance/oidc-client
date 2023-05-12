@@ -13,3 +13,8 @@ const trustedDomains = {
     config_google: ['https://oauth2.googleapis.com', 'https://openidconnect.googleapis.com'],
     config_with_hash: ['https://demo.duendesoftware.com'],
 };
+
+// Service worker will continue to give access token to the JavaScript client
+// Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
+// scenarios which require it. For example, to send it via websocket connection.
+trustedDomains.config_show_access_token = { domains : ["https://demo.duendesoftware.com"], showAccessToken: true };

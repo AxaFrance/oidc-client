@@ -37,6 +37,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
                         <option value="config_without_refresh_token_silent_login">config_without_refresh_token_silent_login</option>
                         <option value="config_google">google</option>
                         <option value="config_with_hash">config_with_hash</option>
+                        <option value="config_show_access_token">config_show_access_token</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { 'test:token_request': 'test', youhou: 'youhou', grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
@@ -98,6 +99,11 @@ export const MultiAuthContainer = () => {
             silent_redirect_uri: '',
             scope: 'openid profile email api',
 },
+        config_show_access_token: {
+            ...configurationIdentityServer,
+            redirect_uri: callBack,
+            silent_redirect_uri,
+        },
         config_google: { ...configurationGoogle },
         config_with_hash: { ...configurationIdentityServerWithHash },
     };
@@ -134,7 +140,7 @@ export const MultiAuthContainer = () => {
             <div className="container-fluid mt-3">
                 <div className="card">
                     <div className="card-body" >
-                        <h5 className="card-title">Default configuration Events</h5>
+                        <h5 className="card-title">Current configuration Events</h5>
                         <div style={{ overflowX: 'hidden', overflowY: 'scroll', maxHeight: '400px' }}>
                             {events.map(e => {
                                 const date = new Date(e.date);

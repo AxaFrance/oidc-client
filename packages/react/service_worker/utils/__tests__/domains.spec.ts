@@ -54,6 +54,7 @@ describe('domains', () => {
           codeVerifier: null,
           nonce: null,
           oidcServerConfiguration: null,
+          hideAccessToken: true,
         },
       };
       const url = 'http://url' + openidWellknownUrlEndWith;

@@ -5,6 +5,7 @@ import {
   OidcConfig,
   OidcConfiguration,
   MessageEventData,
+  // TrustedDomainsShowAccessToken,
 } from './types';
 import {
   checkDomain,
@@ -44,6 +45,7 @@ const database: Database = {
     codeVerifier: null,
     nonce: null,
     oidcServerConfiguration: null,
+    hideAccessToken: true,
   },
 };
 
@@ -80,7 +82,6 @@ const keepAliveAsync = async (event: FetchEvent) => {
       await cache.put(event.request, response.clone());
     }
   }
-
   return response;
 };
 
@@ -269,13 +270,26 @@ const handleFetch = async (event: FetchEvent) => {
   }
 };
 
+type TrustedDomainsShowAccessToken = {
+  [key: string]: boolean
+}
+
+const trustedDomainsShowAccessToken: TrustedDomainsShowAccessToken = {};
+
 const handleMessage = (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
   const configurationName = data.configurationName;
   let currentDatabase = database[configurationName];
-
+  if(trustedDomains== null){
+    trustedDomains = {};
+  }
   if (!currentDatabase) {
+    
+    if (trustedDomainsShowAccessToken[configurationName] === undefined) {
+      let trustedDomain = trustedDomains[configurationName];
+      trustedDomainsShowAccessToken[configurationName] = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
+    }
     database[configurationName] = {
       tokens: null,
       state: null,
@@ -285,11 +299,15 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       nonce: null,
       status: null,
       configurationName,
+      hideAccessToken: !trustedDomainsShowAccessToken[configurationName],
     };
+    console.log(database[configurationName]);
     currentDatabase = database[configurationName];
+    
     if (!trustedDomains[configurationName]) {
       trustedDomains[configurationName] = [];
     }
+   
   }
 
   switch (data.type) {
@@ -302,7 +320,9 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       return;
     case 'init': {
       const oidcServerConfiguration = data.data.oidcServerConfiguration;
-      const domains = trustedDomains[configurationName];
+      let trustedDomain = trustedDomains[configurationName];
+      
+      const domains = Array.isArray(trustedDomain) ? trustedDomain : trustedDomain.domains;
       if (!domains.find((f) => f === acceptAnyDomainToken)) {
         [
           oidcServerConfiguration.tokenEndpoint,
@@ -313,7 +333,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
           checkDomain(domains, url);
         });
       }
-      currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
+    currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
       currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
       const where = data.data.where;
       if (
@@ -334,8 +354,10 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       } else {
         const tokens = {
           ...currentDatabase.tokens,
-          access_token: TOKEN.ACCESS_TOKEN + '_' + configurationName,
         };
+        if(currentDatabase.hideAccessToken) {
+          tokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName;
+        }
         if (tokens.refresh_token) {
           tokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName;
         }

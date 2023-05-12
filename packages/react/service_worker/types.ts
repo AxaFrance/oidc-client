@@ -1,8 +1,15 @@
+
+export type DomainDetails = {
+    domains: Domain[];
+    showAccessToken: boolean;
+}
+
 export type Domain = string | RegExp;
 
 export type TrustedDomains = {
-    [key: string]: Domain[]
-}
+    [key: string]: Domain[] | DomainDetails;
+}  | null;
+
 export type OidcServerConfiguration = {
     revocationEndpoint: string;
     issuer: string;
@@ -57,6 +64,7 @@ export type OidcConfig = {
     oidcConfiguration?: OidcConfiguration;
     sessionState?: string | null;
     items?: MessageData;
+    hideAccessToken: boolean;
 }
 
 export type IdTokenPayload = {

@@ -133,6 +133,7 @@ class OidcConfigBuilder {
     oidcConfiguration: undefined,
     sessionState: null,
     items: undefined,
+    hideAccessToken: true,
   };
 
   constructor() {}
@@ -150,9 +151,14 @@ class OidcConfigBuilder {
       .build();
     this.oidcConfig.sessionState = null;
     this.oidcConfig.items = undefined;
+    this.oidcConfig.hideAccessToken =true;
     return this;
   }
 
+  public withHideAccessToken(hideAccessToken: boolean): OidcConfigBuilder {
+    this.oidcConfig.hideAccessToken = hideAccessToken;
+    return this;
+  }
   public withConfigurationName(configurationName: string): OidcConfigBuilder {
     this.oidcConfig.configurationName = configurationName;
     return this;
