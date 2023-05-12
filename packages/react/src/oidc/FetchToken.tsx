@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { VanillaOidc } from './vanilla/vanillaOidc.js';
 
 export type Fetch = typeof window.fetch;
@@ -47,7 +49,14 @@ export const withOidcFetch = (fetch: Fetch = null, configurationName = defaultCo
 export const useOidcFetch = (fetch: Fetch = null, configurationName = defaultConfigurationName) => {
   const previousFetch = fetch || window.fetch;
   const getOidc = VanillaOidc.get;
-  const getOidcWithConfigurationName = () => getOidc(configurationName);
-  const newFetch = fetchWithToken(previousFetch, getOidcWithConfigurationName);
-  return { fetch: newFetch };
+
+  const memoizedFetchCallback = useCallback(
+      (arg1, arg2) => {
+        const getOidcWithConfigurationName = () => getOidc(configurationName);
+        const newFetch = fetchWithToken(previousFetch, getOidcWithConfigurationName);
+        return newFetch(arg1, arg2);
+      },
+      [previousFetch, configurationName],
+  );
+  return { fetch: memoizedFetchCallback };
 };

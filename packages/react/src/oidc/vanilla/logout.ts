@@ -4,6 +4,11 @@ import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
 
+export const oidcLogoutTokens = {
+    access_token: 'access_token',
+    refresh_token: 'refresh_token',
+};
+
 export const destroyAsync = (oidc) => async (status) => {
     timer.clearTimeout(oidc.timeoutId);
     oidc.timeoutId = null;
@@ -21,7 +26,7 @@ export const destroyAsync = (oidc) => async (status) => {
     oidc.userInfo = null;
 };
 
-export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
+export const logoutAsync = (oidc, oidcDatabase, fetch, window, console) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
     const configuration = oidc.configuration;
     const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     if (callbackPathOrUrl && (typeof callbackPathOrUrl !== 'string')) {
@@ -41,13 +46,13 @@ export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: str
         if (revocationEndpoint) {
             const promises = [];
             const accessToken = oidc.tokens.accessToken;
-            if (accessToken) {
-                const revokeAccessTokenPromise = performRevocationRequestAsync(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
+            if (accessToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.access_token)) {
+                const revokeAccessTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
                 promises.push(revokeAccessTokenPromise);
             }
             const refreshToken = oidc.tokens.refreshToken;
-            if (refreshToken) {
-                const revokeRefreshTokenPromise = performRevocationRequestAsync(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+            if (refreshToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.refresh_token)) {
+                const revokeRefreshTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
                 promises.push(revokeRefreshTokenPromise);
             }
             if (promises.length > 0) {
@@ -55,6 +60,7 @@ export const logoutAsync = (oidc, oidcDatabase) => async (callbackPathOrUrl: str
             }
         }
     } catch (exception) {
+        console.warn('logoutAsync: error when revoking tokens, if the error persist, you ay configure property logout_tokens_to_invalidate from configuration to avoid this error');
         console.warn(exception);
     }
     // @ts-ignore

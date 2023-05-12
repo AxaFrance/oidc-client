@@ -109,18 +109,29 @@ const handleFetch = async (event: FetchEvent) => {
     ) {
       await sleep(200);
     }
-    const newRequest = new Request(originalRequest, {
-      headers: {
-        ...serializeHeaders(originalRequest.headers),
-        authorization:
-          'Bearer ' + currentDatabaseForRequestAccessToken.tokens.access_token,
-      },
-      mode: (
-        currentDatabaseForRequestAccessToken.oidcConfiguration as OidcConfiguration
-      ).service_worker_convert_all_requests_to_cors
-        ? 'cors'
-        : originalRequest.mode,
-    });
+    const newRequest =
+      originalRequest.mode == 'navigate'
+        ? new Request(originalRequest, {
+            headers: {
+              ...serializeHeaders(originalRequest.headers),
+              authorization:
+                'Bearer ' +
+                currentDatabaseForRequestAccessToken.tokens.access_token,
+            },
+          })
+        : new Request(originalRequest, {
+            headers: {
+              ...serializeHeaders(originalRequest.headers),
+              authorization:
+                'Bearer ' +
+                currentDatabaseForRequestAccessToken.tokens.access_token,
+            },
+            mode: (
+              currentDatabaseForRequestAccessToken.oidcConfiguration as OidcConfiguration
+            ).service_worker_convert_all_requests_to_cors
+              ? 'cors'
+              : originalRequest.mode,
+          });
 
     //@ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
     event.waitUntil(event.respondWith(fetch(newRequest)));
