@@ -1,10 +1,11 @@
+export type DomainDetails = {
+    domains: Domain[];
+    showAccessToken: boolean;
+};
 export type Domain = string | RegExp;
 export type TrustedDomains = {
-    [key: string]: Domain[];
-};
-export type TrustedDomainsShowAccessToken = {
-    [key: string]: boolean;
-};
+    [key: string]: Domain[] | DomainDetails;
+} | null;
 export type OidcServerConfiguration = {
     revocationEndpoint: string;
     issuer: string;

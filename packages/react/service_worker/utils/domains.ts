@@ -59,10 +59,11 @@ const getCurrentDatabaseDomain = (
     ) {
       continue;
     }
-
+    const trustedDomain = trustedDomains == null ? [] : trustedDomains[key];
+    const domains = Array.isArray(trustedDomain) ? trustedDomain : trustedDomain.domains;
     const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint
-      ? [oidcServerConfiguration.userInfoEndpoint, ...trustedDomains[key]]
-      : [...trustedDomains[key]];
+      ? [oidcServerConfiguration.userInfoEndpoint, ...domains]
+      : [...domains];
 
     let hasToSendToken = false;
     if (domainsToSendTokens.find((f) => f === acceptAnyDomainToken)) {
