@@ -33,7 +33,7 @@ const internalFetch = (fetch) => async (url, headers, timeoutMs = 10000, numberR
         setTimeout(() => controller.abort(), timeoutMs);
         response = await fetch(url, { ...headers, signal: controller.signal });
     } catch (e) {
-        if (e.message === 'AbortError' ||
+        if (e.name === 'AbortError' ||
             e.message === 'Network request failed') {
             if (numberRetry <= 1) {
                 return await internalFetch(fetch)(url, headers, timeoutMs, numberRetry + 1);
