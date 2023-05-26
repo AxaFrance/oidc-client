@@ -51,10 +51,10 @@ export const useOidcFetch = (fetch: Fetch = null, configurationName = defaultCon
   const getOidc = VanillaOidc.get;
 
   const memoizedFetchCallback = useCallback(
-      (arg1, arg2) => {
+      (input: RequestInfo | URL, init?: RequestInit) => {
         const getOidcWithConfigurationName = () => getOidc(configurationName);
         const newFetch = fetchWithToken(previousFetch, getOidcWithConfigurationName);
-        return newFetch(arg1, arg2);
+        return newFetch(input, init);
       },
       [previousFetch, configurationName],
   );
