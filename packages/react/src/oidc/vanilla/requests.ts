@@ -5,7 +5,7 @@ import { parseOriginalTokens } from './parseTokens.js';
 import { StringMap } from './types.js';
 
 const oneHourSecond = 60 * 60;
-export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage):
+export const fetchFromIssuer = (fetch) => async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage, timeoutMs = 10000):
     Promise<OidcAuthorizationServiceConfiguration> => {
     const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
 
@@ -14,7 +14,7 @@ export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond =
     if (data) {
         return new OidcAuthorizationServiceConfiguration(data);
     }
-    const response = await fetch(fullUrl);
+    const response = await internalFetch(fetch)(fullUrl, {}, timeoutMs);
 
     if (response.status !== 200) {
         return null;
@@ -26,7 +26,7 @@ export const fetchFromIssuer = async (openIdIssuerUrl: string, timeCacheSecond =
     return new OidcAuthorizationServiceConfiguration(result);
 };
 
-const internalFetch = (fetch) => async (url, headers, timeoutMs = 10000, numberRetry = 0) => {
+const internalFetch = (fetch) => async (url, headers = {}, timeoutMs = 10000, numberRetry = 0) : Promise<Response> => {
     let response;
     try {
         const controller = new AbortController();

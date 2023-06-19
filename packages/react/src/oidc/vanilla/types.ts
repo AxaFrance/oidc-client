@@ -10,6 +10,7 @@ export type OidcConfiguration = {
     scope: string;
     authority: string;
     authority_time_cache_wellknowurl_in_second?: number;
+    authority_timeout_wellknowurl_in_millisecond?: number;
     authority_configuration?: AuthorityConfiguration;
     refresh_time_before_tokens_expiration_in_second?: number;
     token_request_timeout?: number;

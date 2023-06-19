@@ -92,6 +92,9 @@ export class Oidc {
       if (!configuration.logout_tokens_to_invalidate) {
           configuration.logout_tokens_to_invalidate = ['access_token', 'refresh_token'];
       }
+      if (!configuration.authority_timeout_wellknowurl_in_millisecond) {
+          configuration.authority_timeout_wellknowurl_in_millisecond = 10000;
+      }
       this.configuration = {
           ...configuration,
           silent_login_uri,
@@ -194,7 +197,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
             const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
             const storage = serviceWorker ? window.localStorage : null;
-            return await fetchFromIssuer(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage);
+            return await fetchFromIssuer(fetch)(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage, this.configuration.authority_timeout_wellknowurl_in_millisecond);
         };
         this.initPromise = localFuncAsync();
         return this.initPromise.then((result) => {
