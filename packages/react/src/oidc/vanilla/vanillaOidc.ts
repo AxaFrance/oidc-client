@@ -1,3 +1,4 @@
+import { Fetch } from '../FetchToken';
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
 import { OidcConfiguration, StringMap } from './types.js';
@@ -24,9 +25,9 @@ export class VanillaOidc {
         this._oidc.publishEvent(eventName, data);
     }
 
-    static getOrCreate(configuration:OidcConfiguration, name = 'default'):VanillaOidc {
-        return new VanillaOidc(Oidc.getOrCreate(configuration, name));
-    }
+    static getOrCreate = (fetch: Fetch = window.fetch) => (configuration:OidcConfiguration, name = 'default'): VanillaOidc => {
+        return new VanillaOidc(Oidc.getOrCreate(fetch)(configuration, name));
+    };
 
     static get(name = 'default'):VanillaOidc {
         return new VanillaOidc(Oidc.get(name));

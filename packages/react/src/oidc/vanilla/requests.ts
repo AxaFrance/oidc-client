@@ -1,3 +1,4 @@
+import { Fetch } from '../FetchToken';
 import { getFromCache, setCache } from './cache.js';
 import { deriveChallengeAsync, generateRandom } from './crypto.js';
 import { OidcAuthorizationServiceConfiguration } from './oidc.js';
@@ -83,7 +84,7 @@ export const performRevocationRequestAsync = (fetch) => async (url, token, token
     };
 };
 
-export const performTokenRequestAsync = async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs = 10000) => {
+export const performTokenRequestAsync = (fetch:Fetch) => async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs = 10000) => {
     for (const [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
