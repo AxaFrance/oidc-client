@@ -1,4 +1,4 @@
-import { TrustedDomains, Database } from './../../types';
+import { TrustedDomains, Database, OidcServerConfiguration, Tokens } from './../../types';
 import { describe, it, expect } from 'vitest';
 import { checkDomain, getCurrentDatabaseDomain } from '..';
 import { openidWellknownUrlEndWith } from '../../constants';
@@ -38,6 +38,19 @@ describe('domains', () => {
     });
   });
   describe('getCurrentDatabaseDomain', () => {
+    const db: Database = {
+      default: {
+        configurationName: 'config',
+        tokens: {} as Tokens,
+        status: 'NOT_CONNECTED',
+        state: null,
+        codeVerifier: null,
+        nonce: null,
+        oidcServerConfiguration: {} as OidcServerConfiguration,
+        hideAccessToken: true,
+      },
+    };
+
     it('will return null when url ends with openidWellknownUrlEndWith', () => {
       const trustedDomains: TrustedDomains = {
         default: [
@@ -45,20 +58,33 @@ describe('domains', () => {
           'https://kdhttps.auth0.com',
         ],
       };
-      const db: Database = {
-        default: {
-          configurationName: 'config',
-          tokens: null,
-          status: 'NOT_CONNECTED',
-          state: null,
-          codeVerifier: null,
-          nonce: null,
-          oidcServerConfiguration: null,
-          hideAccessToken: true,
-        },
-      };
       const url = 'http://url' + openidWellknownUrlEndWith;
-      getCurrentDatabaseDomain(db, url, trustedDomains);
+      expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toBeNull();
+    });
+
+    it('will test urls against domains list if accessTokenDomains list is not present', () => {
+      const trustedDomains: TrustedDomains = {
+        default: {
+          domains: ['https://domain'],
+          showAccessToken: false,
+        }
+      };
+
+      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toBe(db.default);
+
+    });
+
+    it('will test urls against accessTokenDomains list if it is present and ignore domains list', () => {
+      const trustedDomains: TrustedDomains = {
+        default: {
+          domains: ['https://domain'],
+          accessTokenDomains: ['https://myapi'],
+          showAccessToken: false,
+        }
+      };
+
+      expect(getCurrentDatabaseDomain(db, 'https://myapi/test', trustedDomains)).toBe(db.default);
+      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toBeNull();
     });
   });
 });

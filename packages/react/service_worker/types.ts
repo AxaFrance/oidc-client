@@ -1,6 +1,8 @@
 
 export type DomainDetails = {
-    domains: Domain[];
+    domains?: Domain[];
+    oidcDomains?: Domain[];
+    accessTokenDomains?: Domain[];
     showAccessToken: boolean;
 }
 

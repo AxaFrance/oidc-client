@@ -1,5 +1,7 @@
 export type DomainDetails = {
-    domains: Domain[];
+    domains?: Domain[];
+    oidcDomains?: Domain[];
+    accessTokenDomains?: Domain[];
     showAccessToken: boolean;
 };
 export type Domain = string | RegExp;

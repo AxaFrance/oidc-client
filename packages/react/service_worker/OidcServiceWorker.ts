@@ -14,6 +14,7 @@ import {
   isTokensValid,
   serializeHeaders,
   sleep,
+  getDomains,
 } from './utils';
 
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
@@ -321,8 +322,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
     case 'init': {
       const oidcServerConfiguration = data.data.oidcServerConfiguration;
       let trustedDomain = trustedDomains[configurationName];
-      
-      const domains = Array.isArray(trustedDomain) ? trustedDomain : trustedDomain.domains;
+      const domains = getDomains(trustedDomain, 'oidc');
       if (!domains.find((f) => f === acceptAnyDomainToken)) {
         [
           oidcServerConfiguration.tokenEndpoint,
