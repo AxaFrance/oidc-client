@@ -21,7 +21,7 @@ export const startCheckSessionAsync = (oidc:any, oidcDatabase:any, configuration
                 return silentLoginAsync({
                     prompt: 'none',
                     id_token_hint: idToken,
-                    scope: 'openid',
+                    scope: configuration.scope || 'openid',
                 }).then((silentSigninResponse) => {
                     const iFrameIdTokenPayload = silentSigninResponse.tokens.idTokenPayload;
                     if (idTokenPayload.sub === iFrameIdTokenPayload.sub) {
