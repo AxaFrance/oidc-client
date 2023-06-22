@@ -1,5 +1,4 @@
 
-import { Fetch } from '../FetchToken';
 import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession.js';
 import { CheckSessionIFrame } from './checkSessionIFrame.js';
 import { eventNames } from './events.js';

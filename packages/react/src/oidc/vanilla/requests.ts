@@ -1,4 +1,3 @@
-import { Fetch } from '../FetchToken';
 import { getFromCache, setCache } from './cache.js';
 import { deriveChallengeAsync, generateRandom } from './crypto.js';
 import { OidcAuthorizationServiceConfiguration } from './oidc.js';

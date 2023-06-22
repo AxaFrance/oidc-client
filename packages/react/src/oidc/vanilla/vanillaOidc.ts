@@ -1,4 +1,4 @@
-import { Fetch } from '../FetchToken';
+
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
 import { OidcConfiguration, StringMap } from './types.js';
