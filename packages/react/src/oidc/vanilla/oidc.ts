@@ -47,7 +47,7 @@ export class OidcAuthorizationServiceConfiguration {
 }
 
 const oidcDatabase = {};
-const oidcFactory = (configuration: OidcConfiguration, name = 'default', fetch: Fetch = window.fetch) => {
+const oidcFactory = (fetch: Fetch = window?.fetch) => (configuration: OidcConfiguration, name = 'default') => {
     if (oidcDatabase[name]) {
         return oidcDatabase[name];
     }
@@ -82,7 +82,7 @@ export class Oidc {
     public configurationName: string;
     private checkSessionIFrame: CheckSessionIFrame;
     private fetch: Fetch;
-    constructor(configuration:OidcConfiguration, configurationName = 'default', fetch: Fetch = window.fetch) {
+    constructor(configuration:OidcConfiguration, configurationName = 'default', fetch: Fetch = window?.fetch) {
       let silent_login_uri = configuration.silent_login_uri;
       if (configuration.silent_redirect_uri && !configuration.silent_login_uri) {
           silent_login_uri = `${configuration.silent_redirect_uri.replace('-callback', '').replace('callback', '')}-login`;
@@ -141,8 +141,8 @@ export class Oidc {
         });
     }
 
-    static getOrCreate = (fetch: Fetch = window.fetch) => (configuration, name = 'default') => {
-        return oidcFactory(configuration, name, fetch);
+    static getOrCreate = (fetch: Fetch = window?.fetch) => (configuration, name = 'default') => {
+        return oidcFactory(fetch)(configuration, name);
     };
 
     static get(name = 'default') {

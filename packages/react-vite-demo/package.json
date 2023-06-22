@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@axa-fr/react-oidc": "6.18.0",
+    "@axa-fr/react-oidc": "6.22.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
