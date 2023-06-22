@@ -3,7 +3,7 @@ import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
 import { OidcConfiguration, StringMap } from './types.js';
 
-type Fetch = typeof window.fetch;
+export type Fetch = typeof window.fetch;
 export interface EventSubscriber {
     (name: string, data:any);
 }
