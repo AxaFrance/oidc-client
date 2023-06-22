@@ -12,9 +12,7 @@ import SessionLost from './override/SessionLost.component';
 
 const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => {
     const [url, options, ...rest] = params;
-
     console.log('fetchWithLogs', url, options, ...rest);
-
     return await fetch(url, options, ...rest);
 };
 

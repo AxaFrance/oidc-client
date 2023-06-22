@@ -81,7 +81,7 @@ export const configuration = {
 };
 
 const href = window.location.href;
-const vanillaOidc = VanillaOidc.getOrCreate(configuration);
+const vanillaOidc = VanillaOidc.getOrCreate(fetch)(configuration);
 
 console.log(href);
 
