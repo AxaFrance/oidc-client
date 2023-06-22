@@ -4,7 +4,6 @@ import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
 import { StringMap } from './types.js';
 
-
 type Fetch = typeof window.fetch;
 
 const oneHourSecond = 60 * 60;
