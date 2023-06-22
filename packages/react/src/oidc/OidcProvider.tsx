@@ -95,7 +95,7 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
                                                                              fetch = window?.fetch,
                                                                          }) => {
     const getOidc = (configurationName = 'default') => {
-        if(!fetch) {
+        if (!fetch) {
             fetch = window?.fetch;
         }
         return VanillaOidc.getOrCreate(fetch)(configuration, configurationName);
