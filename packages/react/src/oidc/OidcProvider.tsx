@@ -7,8 +7,7 @@ import OidcRoutes from './core/routes/OidcRoutes.js';
 import { CustomHistory } from './core/routes/withRouter.js';
 import { OidcConfiguration } from './vanilla/types.js';
 import { VanillaOidc } from './vanilla/vanillaOidc.js';
-
-type Fetch = typeof window.fetch;
+import { Fetch } from './vanilla/types.js';
 
 export type oidcContext = {
     (name?: string): VanillaOidc;

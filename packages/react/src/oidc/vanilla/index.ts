@@ -1,2 +1,2 @@
-export { AuthorityConfiguration, OidcConfiguration, StringMap } from './types.js';
+export { AuthorityConfiguration, OidcConfiguration, StringMap, Fetch } from './types.js';
 export { OidcUserInfo, VanillaOidc } from './vanillaOidc.js';
