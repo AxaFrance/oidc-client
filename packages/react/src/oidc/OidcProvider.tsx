@@ -5,9 +5,8 @@ import { Authenticating, CallBackSuccess, Loading, SessionLost } from './core/de
 import ServiceWorkerNotSupported from './core/default-component/ServiceWorkerNotSupported.component.js';
 import OidcRoutes from './core/routes/OidcRoutes.js';
 import { CustomHistory } from './core/routes/withRouter.js';
-import { OidcConfiguration } from './vanilla/types.js';
+import { Fetch, OidcConfiguration } from './vanilla/types.js';
 import { VanillaOidc } from './vanilla/vanillaOidc.js';
-import { Fetch } from './vanilla/types.js';
 
 export type oidcContext = {
     (name?: string): VanillaOidc;
