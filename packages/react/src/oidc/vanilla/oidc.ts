@@ -52,7 +52,7 @@ const oidcFactory = (fetch) => (configuration: OidcConfiguration, name = 'defaul
     if (!fetch && window) {
         internalFetch = window?.fetch;
     }
-    
+
     if (oidcDatabase[name]) {
         return oidcDatabase[name];
     }
@@ -151,7 +151,7 @@ export class Oidc {
         if (!fetch && window) {
             internalFetch = window?.fetch;
         }
-        return oidcFactory(fetch)(configuration, name);
+        return oidcFactory(internalFetch)(configuration, name);
     };
 
     static get(name = 'default') {
