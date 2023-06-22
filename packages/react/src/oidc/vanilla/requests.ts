@@ -1,9 +1,8 @@
-import { Fetch } from '../FetchToken';
 import { getFromCache, setCache } from './cache.js';
 import { deriveChallengeAsync, generateRandom } from './crypto.js';
 import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
-import { StringMap } from './types.js';
+import { Fetch, StringMap } from './types.js';
 
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer = (fetch) => async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage, timeoutMs = 10000):

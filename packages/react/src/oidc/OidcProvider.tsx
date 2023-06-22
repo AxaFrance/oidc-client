@@ -5,8 +5,8 @@ import { Authenticating, CallBackSuccess, Loading, SessionLost } from './core/de
 import ServiceWorkerNotSupported from './core/default-component/ServiceWorkerNotSupported.component.js';
 import OidcRoutes from './core/routes/OidcRoutes.js';
 import { CustomHistory } from './core/routes/withRouter.js';
-import { Fetch } from './FetchToken';
-import { OidcConfiguration } from './vanilla/types.js';
+import { getFetchDefault } from './vanilla/oidc';
+import { Fetch, OidcConfiguration } from './vanilla/types.js';
 import { VanillaOidc } from './vanilla/vanillaOidc.js';
 
 export type oidcContext = {
@@ -30,7 +30,7 @@ export type OidcProviderProps = {
     onLogoutFromSameTab?: () => void;
     withCustomHistory?: () => CustomHistory;
     onEvent?: (configuration: string, name: string, data:any) => void;
-    fetch : Fetch;
+    getFetch : () => Fetch;
 };
 
 export type OidcSessionProps = {
@@ -93,10 +93,10 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
                                                                              onLogoutFromSameTab = null,
                                                                              withCustomHistory = null,
                                                                              onEvent = null,
-                                                                             fetch = window.fetch,
+                                                                             getFetch = null,
                                                                          }) => {
     const getOidc = (configurationName = 'default') => {
-        return VanillaOidc.getOrCreate(fetch)(configuration, configurationName);
+        return VanillaOidc.getOrCreate(getFetch ?? getFetchDefault)(configuration, configurationName);
     };
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const [loading, setLoading] = useState(true);
