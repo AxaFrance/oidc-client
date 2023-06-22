@@ -546,11 +546,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
      }
 
     userInfoPromise:Promise<any> = null;
-     userInfoAsync() {
+     userInfoAsync(noCache = false) {
          if (this.userInfoPromise !== null) {
              return this.userInfoPromise;
          }
-         this.userInfoPromise = userInfoAsync(this);
+         this.userInfoPromise = userInfoAsync(this)(noCache);
          return this.userInfoPromise.then(result => {
              this.userInfoPromise = null;
              return result;

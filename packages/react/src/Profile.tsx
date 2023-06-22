@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { OidcSecure, OidcUserStatus, useOidcAccessToken, useOidcIdToken, useOidcUser } from './oidc';
 import { OidcUserInfo } from './oidc/vanilla';
 
@@ -6,7 +8,7 @@ interface OidcUserRoleInfo extends OidcUserInfo{
 }
 
 const DisplayUserInfo = () => {
-    const { oidcUser, oidcUserLoadingState } = useOidcUser<OidcUserRoleInfo>();
+    const { oidcUser, oidcUserLoadingState, updateOidcUser } = useOidcUser<OidcUserRoleInfo>();
 
     switch (oidcUserLoadingState) {
         case OidcUserStatus.Loading:
@@ -21,6 +23,7 @@ const DisplayUserInfo = () => {
                     <div className="card-body">
                         <h5 className="card-title">User information</h5>
                         <p className="card-text">{JSON.stringify(oidcUser)}</p>
+                        <p><button type="button" className="btn btn-primary" onClick={updateOidcUser}>Reload user</button></p>
                     </div>
                 </div>
             );
