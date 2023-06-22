@@ -1,5 +1,4 @@
 
-import { Fetch } from '../FetchToken';
 import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession.js';
 import { CheckSessionIFrame } from './checkSessionIFrame.js';
 import { eventNames } from './events.js';
@@ -21,6 +20,7 @@ import timer from './timer.js';
 import { AuthorityConfiguration, OidcConfiguration, StringMap } from './types.js';
 import { userInfoAsync } from './user.js';
 
+type Fetch = typeof window.fetch;
 export interface OidcAuthorizationServiceConfigurationJson {
     check_session_iframe?: string;
     issuer:string;

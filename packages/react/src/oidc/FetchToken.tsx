@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { VanillaOidc } from './vanilla/vanillaOidc.js';
 
-export type Fetch = typeof window.fetch;
+type Fetch = typeof window.fetch;
 
 export interface ComponentWithOidcFetchProps {
   fetch?: Fetch;
