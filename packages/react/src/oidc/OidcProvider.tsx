@@ -92,13 +92,14 @@ export const OidcProvider : FC<PropsWithChildren<OidcProviderProps>> = ({
                                                                              onLogoutFromSameTab = null,
                                                                              withCustomHistory = null,
                                                                              onEvent = null,
-                                                                             fetch = window?.fetch,
+                                                                             fetch = null,
                                                                          }) => {
     const getOidc = (configurationName = 'default') => {
-        if (!fetch) {
-            fetch = window?.fetch;
+        let internalFetch = null;
+        if (!fetch && window) {
+            internalFetch = window?.fetch;
         }
-        return VanillaOidc.getOrCreate(fetch)(configuration, configurationName);
+        return VanillaOidc.getOrCreate(internalFetch)(configuration, configurationName);
     };
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const [loading, setLoading] = useState(true);

@@ -26,8 +26,12 @@ export class VanillaOidc {
         this._oidc.publishEvent(eventName, data);
     }
 
-    static getOrCreate = (fetch: Fetch = window?.fetch) => (configuration:OidcConfiguration, name = 'default'): VanillaOidc => {
-        return new VanillaOidc(Oidc.getOrCreate(fetch)(configuration, name));
+    static getOrCreate = (fetch: Fetch) => (configuration:OidcConfiguration, name = 'default'): VanillaOidc => {
+        let internalFetch = null;
+        if (!fetch && window) {
+            internalFetch = window?.fetch;
+        }
+        return new VanillaOidc(Oidc.getOrCreate(internalFetch)(configuration, name));
     };
 
     static get(name = 'default'):VanillaOidc {
