@@ -5,6 +5,9 @@ import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
 import { StringMap } from './types.js';
 
+
+type Fetch = typeof window.fetch;
+
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer = (fetch) => async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage, timeoutMs = 10000):
     Promise<OidcAuthorizationServiceConfiguration> => {
