@@ -301,13 +301,11 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       configurationName,
       hideAccessToken: !trustedDomainsShowAccessToken[configurationName],
     };
-    console.log(database[configurationName]);
     currentDatabase = database[configurationName];
     
     if (!trustedDomains[configurationName]) {
       trustedDomains[configurationName] = [];
     }
-   
   }
 
   switch (data.type) {

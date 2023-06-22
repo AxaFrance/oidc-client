@@ -155,7 +155,7 @@ const propTypes = {
       check_session_iframe: PropTypes.string,
       issuer: PropTypes.string,
     }),
-    refresh_time_before_tokens_expiration_in_second: PropTypes.number,
+    refresh_time_before_tokens_expiration_in_second: PropTypes.number, // default is 120 seconds
     service_worker_relative_url: PropTypes.string,
     service_worker_only: PropTypes.boolean, // default false
     service_worker_convert_all_requests_to_cors: PropTypes.boolean, // force all requests that servie worker upgrades to have 'cors' mode. This allows setting authentication token on requests initialted by html parsing(e.g. img tags, download links etc).

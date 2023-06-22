@@ -1,4 +1,5 @@
 
+import { Fetch } from '../FetchToken';
 import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession.js';
 import { CheckSessionIFrame } from './checkSessionIFrame.js';
 import { eventNames } from './events.js';
@@ -46,11 +47,11 @@ export class OidcAuthorizationServiceConfiguration {
 }
 
 const oidcDatabase = {};
-const oidcFactory = (configuration: OidcConfiguration, name = 'default') => {
+const oidcFactory = (configuration: OidcConfiguration, name = 'default', fetch: Fetch = window.fetch) => {
     if (oidcDatabase[name]) {
         return oidcDatabase[name];
     }
-    oidcDatabase[name] = new Oidc(configuration, name);
+    oidcDatabase[name] = new Oidc(configuration, name, fetch);
     return oidcDatabase[name];
 };
 export type LoginCallback = {
@@ -80,7 +81,8 @@ export class Oidc {
     private timeoutId: NodeJS.Timeout;
     public configurationName: string;
     private checkSessionIFrame: CheckSessionIFrame;
-    constructor(configuration:OidcConfiguration, configurationName = 'default') {
+    private fetch: Fetch;
+    constructor(configuration:OidcConfiguration, configurationName = 'default', fetch: Fetch = window.fetch) {
       let silent_login_uri = configuration.silent_login_uri;
       if (configuration.silent_redirect_uri && !configuration.silent_login_uri) {
           silent_login_uri = `${configuration.silent_redirect_uri.replace('-callback', '').replace('callback', '')}-login`;
@@ -103,6 +105,7 @@ export class Oidc {
           silent_login_timeout: configuration.silent_login_timeout ?? 12000,
           token_renew_mode: configuration.token_renew_mode ?? TokenRenewMode.access_token_or_id_token_invalid,
       };
+      this.fetch = fetch;
       this.configurationName = configurationName;
       this.tokens = null;
       this.userInfo = null;
@@ -138,9 +141,9 @@ export class Oidc {
         });
     }
 
-    static getOrCreate(configuration, name = 'default') {
-        return oidcFactory(configuration, name);
-    }
+    static getOrCreate = (fetch: Fetch = window.fetch) => (configuration, name = 'default') => {
+        return oidcFactory(configuration, name, fetch);
+    };
 
     static get(name = 'default') {
         const isInsideBrowser = (typeof process === 'undefined');
@@ -197,7 +200,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
             const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
             const storage = serviceWorker ? window.localStorage : null;
-            return await fetchFromIssuer(fetch)(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage, this.configuration.authority_timeout_wellknowurl_in_millisecond);
+            return await fetchFromIssuer(this.fetch)(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage, this.configuration.authority_timeout_wellknowurl_in_millisecond);
         };
         this.initPromise = localFuncAsync();
         return this.initPromise.then((result) => {
@@ -451,7 +454,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         };
                         const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
                         const timeoutMs = document.hidden ? 10000 : 30000 * 10;
-                        const tokenResponse = await performTokenRequestAsync(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode, timeoutMs);
+                        const tokenResponse = await performTokenRequestAsync(this.fetch)(oidcServerConfiguration.tokenEndpoint, details, finalExtras, tokens, configuration.token_renew_mode, timeoutMs);
                         if (tokenResponse.success) {
                             const { isValid, reason } = isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration);
                             if (!isValid) {
@@ -597,7 +600,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.logoutPromise) {
             return this.logoutPromise;
         }
-        this.logoutPromise = logoutAsync(this, oidcDatabase, fetch, window, console)(callbackPathOrUrl, extras);
+        this.logoutPromise = logoutAsync(this, oidcDatabase, this.fetch, window, console)(callbackPathOrUrl, extras);
         return this.logoutPromise.then(result => {
             this.logoutPromise = null;
             return result;

@@ -2,12 +2,19 @@ import React, { useReducer, useState } from 'react';
 
 import { configurationGoogle, configurationIdentityServer, configurationIdentityServerWithHash } from './configurations';
 import { OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken } from './oidc';
+import { Fetch } from './oidc/FetchToken';
 import AuthenticatingError from './override/AuthenticateError.component';
 import Authenticating from './override/Authenticating.component';
 import { CallBackSuccess } from './override/Callback.component';
 import Loading from './override/Loading.component';
 import ServiceWorkerNotSupported from './override/ServiceWorkerNotSupported.component';
 import SessionLost from './override/SessionLost.component';
+
+const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => {
+    const [url, options, ...rest] = params;
+    console.log('fetchWithLogs', url, options, ...rest);
+    return await fetch(url, options, ...rest);
+};
 
 const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
     const { login, logout, isAuthenticated } = useOidc(configurationName);
@@ -132,6 +139,7 @@ export const MultiAuthContainer = () => {
                       callbackSuccessComponent={CallBackSuccess}
                       onSessionLost={onSessionLost}
                       onEvent={onEvent}
+                      fetch={fetchWithLogs(fetch)}
         >
             { isSessionLost && <SessionLost configurationName={configurationName}/>}
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
