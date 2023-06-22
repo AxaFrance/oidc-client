@@ -1,4 +1,4 @@
-import { TrustedDomains } from './../types';
+import { DomainDetails, TrustedDomains } from './../types';
 import {
   acceptAnyDomainToken,
   openidWellknownUrlEndWith,
@@ -32,6 +32,14 @@ function checkDomain(domains: Domain[], endpoint: string) {
   }
 }
 
+export const getDomains = (trustedDomain: Domain[] | DomainDetails, type: 'oidc' | 'accessToken') => {
+  if(Array.isArray(trustedDomain)) {
+    return trustedDomain;
+  }
+
+  return trustedDomain[`${type}Domains`] ?? trustedDomain.domains ?? [];
+}
+
 const getCurrentDatabaseDomain = (
   database: Database,
   url: string,
@@ -60,7 +68,8 @@ const getCurrentDatabaseDomain = (
       continue;
     }
     const trustedDomain = trustedDomains == null ? [] : trustedDomains[key];
-    const domains = Array.isArray(trustedDomain) ? trustedDomain : trustedDomain.domains;
+
+    const domains = getDomains(trustedDomain, 'accessToken');
     const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint
       ? [oidcServerConfiguration.userInfoEndpoint, ...domains]
       : [...domains];

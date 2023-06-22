@@ -18,3 +18,9 @@ const trustedDomains = {
 // Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
 // scenarios which require it. For example, to send it via websocket connection.
 trustedDomains.config_show_access_token = { domains : ["https://demo.duendesoftware.com"], showAccessToken: true };
+
+// This example defines domains used by OIDC server separately from domains to which access tokens will be injected.
+trustedDomains.config_separate_oidc_access_token_domains = {
+    oidcDomains: ["https://demo.duendesoftware.com"],
+    accessTokenDomains: ["https://myapi"]
+};

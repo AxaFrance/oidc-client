@@ -45,6 +45,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
                         <option value="config_google">google</option>
                         <option value="config_with_hash">config_with_hash</option>
                         <option value="config_show_access_token">config_show_access_token</option>
+                        <option value="config_separate_oidc_access_token_domains">config_separate_oidc_access_token_domains</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { 'test:token_request': 'test', youhou: 'youhou', grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
@@ -113,6 +114,11 @@ export const MultiAuthContainer = () => {
         },
         config_google: { ...configurationGoogle },
         config_with_hash: { ...configurationIdentityServerWithHash },
+        config_separate_oidc_access_token_domains: {
+            ...configurationIdentityServer,
+            redirect_uri: callBack,
+            silent_redirect_uri,
+        },
     };
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
