@@ -21,12 +21,9 @@ import { AuthorityConfiguration, Fetch, OidcConfiguration, StringMap } from './t
 import { userInfoAsync } from './user.js';
 
 export const getFetchDefault = () => {
-    let internalFetch = null;
-    if (window) {
-        internalFetch = window.fetch;
-    }
-    return internalFetch;
+    return fetch;
 };
+
 export interface OidcAuthorizationServiceConfigurationJson {
     check_session_iframe?: string;
     issuer:string;
