@@ -1,7 +1,7 @@
 import React, { useReducer, useState } from 'react';
 
 import { configurationGoogle, configurationIdentityServer, configurationIdentityServerWithHash } from './configurations';
-import { OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken } from './oidc';
+import { Fetch, OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken } from './oidc';
 import AuthenticatingError from './override/AuthenticateError.component';
 import Authenticating from './override/Authenticating.component';
 import { CallBackSuccess } from './override/Callback.component';
@@ -144,7 +144,7 @@ export const MultiAuthContainer = () => {
                       callbackSuccessComponent={CallBackSuccess}
                       onSessionLost={onSessionLost}
                       onEvent={onEvent}
-                      fetch={fetchWithLogs(fetch)}
+                      getFetch={() => fetchWithLogs(fetch)}
         >
             { isSessionLost && <SessionLost configurationName={configurationName}/>}
             <MultiAuth configurationName={configurationName} handleConfigurationChange={handleConfigurationChange} />
