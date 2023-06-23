@@ -30,7 +30,7 @@ export type OidcProviderProps = {
     onLogoutFromSameTab?: () => void;
     withCustomHistory?: () => CustomHistory;
     onEvent?: (configuration: string, name: string, data:any) => void;
-    getFetch : () => Fetch;
+    getFetch? : () => Fetch;
 };
 
 export type OidcSessionProps = {
