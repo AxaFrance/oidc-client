@@ -16,13 +16,15 @@ export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
 
 export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName = 'default') => {
     const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: null, status: OidcUserStatus.Unauthenticated });
+    const [oidcUserId, setOidcUserId] = useState<string>('');
 
     const oidc = VanillaOidc.get(configurationName);
     useEffect(() => {
         let isMounted = true;
         if (oidc && oidc.tokens) {
             setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
-            oidc.userInfoAsync()
+            const isNoCache = oidcUserId !== '';
+            oidc.userInfoAsync(isNoCache)
                 .then((info) => {
                     if (isMounted) {
                         // @ts-ignore
@@ -30,9 +32,15 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
                     }
                 })
                 .catch(() => setOidcUser({ ...oidcUser, status: OidcUserStatus.LoadingError }));
+        } else {
+            setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
         }
         return () => { isMounted = false; };
-    }, []);
+    }, [oidcUserId]);
 
-    return { oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status };
+    const reloadOidcUser = () => {
+        setOidcUserId(oidcUserId + ' ');
+    };
+
+    return { oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status, reloadOidcUser };
 };
