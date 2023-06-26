@@ -38,9 +38,9 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
         return () => { isMounted = false; };
     }, [oidcUserId]);
 
-    const updateOidcUser = () => {
+    const reloadOidcUser = () => {
         setOidcUserId(oidcUserId + ' ');
     };
 
-    return { oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status, updateOidcUser };
+    return { oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status, reloadOidcUser };
 };

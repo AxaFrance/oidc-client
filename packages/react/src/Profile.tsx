@@ -8,7 +8,7 @@ interface OidcUserRoleInfo extends OidcUserInfo{
 }
 
 const DisplayUserInfo = () => {
-    const { oidcUser, oidcUserLoadingState, updateOidcUser } = useOidcUser<OidcUserRoleInfo>();
+    const { oidcUser, oidcUserLoadingState, reloadOidcUser } = useOidcUser<OidcUserRoleInfo>();
 
     switch (oidcUserLoadingState) {
         case OidcUserStatus.Loading:
@@ -23,7 +23,7 @@ const DisplayUserInfo = () => {
                     <div className="card-body">
                         <h5 className="card-title">User information</h5>
                         <p className="card-text">{JSON.stringify(oidcUser)}</p>
-                        <p><button type="button" className="btn btn-primary" onClick={updateOidcUser}>Reload user</button></p>
+                        <p><button type="button" className="btn btn-primary" onClick={reloadOidcUser}>Reload user</button></p>
                     </div>
                 </div>
             );
