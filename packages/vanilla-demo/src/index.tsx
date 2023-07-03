@@ -86,66 +86,70 @@ export const configuration = {
     // monitor_session: true,
 };
 
-const href = window.location.href;
+navigator.serviceWorker.register('main-service-worker.js')
+  // wip: let's wait 1s, to test what happens if our service worker loads earlier, before any axa-oidc stuff runs
+  .then(() => new Promise(r => setTimeout(r, 1000))).then(() => {
+  const href = window.location.href;
 
-const vanillaOidc = VanillaOidc.getOrCreate(fetch)(configuration);
-
-console.log(href);
-
-
-vanillaOidc.tryKeepExistingSessionAsync().then(() => {
-    if(href.includes(configuration.redirect_uri)){
-        // @ts-ignore
-        element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
-            <h2>Loading callback</h2>
-        </div>`;
-        vanillaOidc.loginCallbackAsync().then(()=>{
-            router.getCustomHistory().replaceState("/");
-            // @ts-ignore
-            window.logout = () =>  vanillaOidc.logoutAsync();
-            let tokens = vanillaOidc.tokens;
-            // @ts-ignore
-            element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
-            <button onclick="window.logout()">Logout</button>
-            <h2>Authenticated</h2>
-            <pre>${JSON.stringify(tokens,null,'\t')}</pre>
-        </div>`
-        });
-        return
-    }
-
-    let tokens = vanillaOidc.tokens;
-
-    if(tokens){
-
-        // @ts-ignore
-        window.logout = () =>  vanillaOidc.logoutAsync();
-        // @ts-ignore
-        element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
-            <button onclick="window.logout()">Logout</button>
-            <h2>Authenticated</h2>
-            <pre>${JSON.stringify(tokens,null,'\t')}</pre>
-        </div>`
-        
-    }
-    else {
-        // @ts-ignore
-        window.login= () =>  {
-            // @ts-ignore
-            element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
-            <h2>Loading</h2>
-        </div>`;
-            vanillaOidc.loginAsync("/")
-        };
-        // @ts-ignore
-        element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
-            <button onclick="window.login()">Login</button>
-        </div>`
-    }
-})
+  const vanillaOidc = VanillaOidc.getOrCreate(() => fetch)(configuration);
+  
+  console.log(href);
+  
+  
+  vanillaOidc.tryKeepExistingSessionAsync().then(() => {
+      if(href.includes(configuration.redirect_uri)){
+          // @ts-ignore
+          element.innerHTML = `<div>
+              <h1>@axa-fr/vanilla-oidc demo</h1>
+              <h2>Loading callback</h2>
+          </div>`;
+          vanillaOidc.loginCallbackAsync().then(()=>{
+              router.getCustomHistory().replaceState("/");
+              // @ts-ignore
+              window.logout = () =>  vanillaOidc.logoutAsync();
+              let tokens = vanillaOidc.tokens;
+              // @ts-ignore
+              element.innerHTML = `<div>
+              <h1>@axa-fr/vanilla-oidc demo</h1>
+              <button onclick="window.logout()">Logout</button>
+              <h2>Authenticated</h2>
+              <pre>${JSON.stringify(tokens,null,'\t')}</pre>
+          </div>`
+          });
+          return
+      }
+  
+      let tokens = vanillaOidc.tokens;
+  
+      if(tokens){
+  
+          // @ts-ignore
+          window.logout = () =>  vanillaOidc.logoutAsync();
+          // @ts-ignore
+          element.innerHTML = `<div>
+              <h1>@axa-fr/vanilla-oidc demo</h1>
+              <button onclick="window.logout()">Logout</button>
+              <h2>Authenticated</h2>
+              <pre>${JSON.stringify(tokens,null,'\t')}</pre>
+          </div>`
+          
+      }
+      else {
+          // @ts-ignore
+          window.login= () =>  {
+              // @ts-ignore
+              element.innerHTML = `<div>
+              <h1>@axa-fr/vanilla-oidc demo</h1>
+              <h2>Loading</h2>
+          </div>`;
+              vanillaOidc.loginAsync("/")
+          };
+          // @ts-ignore
+          element.innerHTML = `<div>
+              <h1>@axa-fr/vanilla-oidc demo</h1>
+              <button onclick="window.login()">Login</button>
+          </div>`
+      }
+  })
+});
 
