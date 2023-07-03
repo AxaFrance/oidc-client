@@ -201,7 +201,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 });
             }
 
-            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName, this.configuration.service_worker_no_auto_register);
             const storage = serviceWorker ? window.localStorage : null;
             return await fetchFromIssuer(this.getFetch())(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage, this.configuration.authority_timeout_wellknowurl_in_millisecond);
         };
@@ -226,7 +226,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             try {
                 const configuration = this.configuration;
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-                serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName, configuration.service_worker_no_auto_register);
                 if (serviceWorker) {
                     const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'tryKeepExistingSessionAsync', configuration);
                     if (tokens) {
@@ -326,7 +326,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const parsedTokens = response.tokens;
             // @ts-ignore
             this.tokens = parsedTokens;
-            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName, this.configuration.service_worker_no_auto_register);
             if (!serviceWorker) {
                 const session = initSession(this.configurationName, this.configuration.storage);
                 session.setTokens(parsedTokens);
@@ -372,7 +372,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const localsilentLoginAsync = async () => {
             try {
                 let loginParams;
-                const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName, configuration.service_worker_no_auto_register);
                 if (serviceWorker) {
                     loginParams = serviceWorker.getLoginParams(this.configurationName);
                 } else {
@@ -496,7 +496,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
         let nonce = nullNonce;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
+        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName, configuration.service_worker_no_auto_register);
         if (serviceWorker) {
             const { status, tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
             if (status === 'LOGGED_OUT') {

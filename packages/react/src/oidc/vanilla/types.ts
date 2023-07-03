@@ -19,6 +19,7 @@ export type OidcConfiguration = {
     service_worker_relative_url?:string;
     service_worker_only?:boolean;
     service_worker_convert_all_requests_to_cors?:boolean;
+    service_worker_no_auto_register?: boolean;
     extras?:StringMap;
     token_request_extras?:StringMap;
     storage?: Storage;

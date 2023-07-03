@@ -151,7 +151,7 @@ const sendMessageAsync = (registration) => (data) => {
     });
 };
 
-export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
+export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName, noAutoRegister) => {
     if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.serviceWorker || !serviceWorkerRelativeUrl) {
         return null;
     }
@@ -175,8 +175,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     if (excludeOs(operatingSystem)) {
         return null;
     }
-
-    const registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
+    const registration = await (noAutoRegister ? navigator.serviceWorker.getRegistration() : navigator.serviceWorker.register(serviceWorkerRelativeUrl));
 
     try {
         await navigator.serviceWorker.ready;
@@ -187,21 +186,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const unregisterAsync = async () => {
         return await registration.unregister();
     };
-
-    registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        newWorker.addEventListener('statechange', () => {
-            switch (newWorker.state) {
-                case 'installed':
-                    if (navigator.serviceWorker.controller) {
-                        registration.unregister().then(() => {
-                            window.location.reload();
-                        });
-                    }
-                    break;
-            }
-        });
-    });
 
     const clearAsync = async (status) => {
         return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });

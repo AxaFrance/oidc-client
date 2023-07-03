@@ -15,7 +15,7 @@ export const destroyAsync = (oidc) => async (status) => {
     if (oidc.checkSessionIFrame) {
         oidc.checkSessionIFrame.stop();
     }
-    const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
+    const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName, oidc.configuration.service_worker_no_auto_register);
     if (!serviceWorker) {
         const session = initSession(oidc.configurationName, oidc.configuration.storage);
         await session.clearAsync(status);

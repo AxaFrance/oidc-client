@@ -9,7 +9,7 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     const updateTokens = (tokens) => { oidc.tokens = tokens; };
     const { tokens, status } = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras, updateTokens);
 
-    const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName);
+    const serviceWorker = await initWorkerAsync(oidc.configuration.service_worker_relative_url, oidc.configurationName, oidc.configuration.service_worker_no_auto_register);
     if (!serviceWorker) {
         const session = initSession(oidc.configurationName, oidc.configuration.storage);
         await session.setTokens(oidc.tokens);
