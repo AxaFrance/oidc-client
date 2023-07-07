@@ -391,7 +391,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
     case 'getCodeVerifier': {
       port.postMessage({
         configurationName,
-        codeVerifier: TOKEN.CODE_VERIFIER + '_' + configurationName,
+        codeVerifier: currentDatabase.codeVerifier != null ? TOKEN.CODE_VERIFIER + '_' + configurationName : null,
       });
       return;
     }
@@ -408,6 +408,11 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       currentDatabase.nonce = data.data.nonce;
       port.postMessage({ configurationName });
       return;
+    case 'getNonce':
+      const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName;
+      const nonce = currentDatabase.nonce != null ? keyNonce : null;
+      port.postMessage({ configurationName, nonce});
+      return;  
     default:
       currentDatabase.items = { ...data.data };
       port.postMessage({ configurationName });
