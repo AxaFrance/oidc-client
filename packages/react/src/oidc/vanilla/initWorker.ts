@@ -251,6 +251,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         let nonce = result.nonce;
         if (!nonce) {
             nonce = sessionStorage['oidc.nonce'];
+            console.warn("nonce not found in service worker, using sessionStorage");
         }
         return { nonce };
     };
@@ -274,6 +275,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         let state = result.state;
         if (!state) {
             state = sessionStorage[`oidc.state.${configurationName}`];
+            console.warn("state not found in service worker, using sessionStorage");
         }
         return state;
     };
@@ -289,6 +291,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         let codeVerifier = result.codeVerifier;
         if (!codeVerifier) {
             codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
+            console.warn("codeVerifier not found in service worker, using sessionStorage");
         }
         return codeVerifier;
     };
