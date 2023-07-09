@@ -241,7 +241,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const setNonceAsync = (nonce) => {
-        sessionStorage[`oidc.nonce`] = nonce;
+        sessionStorage['oidc.nonce'] = nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
   const getNonceAsync = async () => {
@@ -249,8 +249,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         const result = await sendMessageAsync(registration)({ type: 'getNonce', data: null, configurationName });
         // @ts-ignore
         let nonce = result.nonce;
-        if(!nonce){
-            nonce = sessionStorage[`oidc.nonce`];      
+        if (!nonce) {
+            nonce = sessionStorage['oidc.nonce'];
         }
         return { nonce };
     };
@@ -272,10 +272,10 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
         // @ts-ignore
         let state = result.state;
-        if(!state){
-            state = localStorage[`oidc.state.${configurationName}`];    
+        if (!state) {
+            state = localStorage[`oidc.state.${configurationName}`];
         }
-        return state; 
+        return state;
     };
 
     const setStateAsync = async (state:string) => {
@@ -287,8 +287,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         const result = await sendMessageAsync(registration)({ type: 'getCodeVerifier', data: null, configurationName });
         // @ts-ignore
         let codeVerifier = result.codeVerifier;
-        if(!codeVerifier){
-            codeVerifier = localStorage[`oidc.code_verifier.${configurationName}`]; 
+        if (!codeVerifier) {
+            codeVerifier = localStorage[`oidc.code_verifier.${configurationName}`];
         }
         return codeVerifier;
     };
