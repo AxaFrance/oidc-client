@@ -408,7 +408,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
     }
     case 'getNonce': {
       const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName;
-      const nonce = currentDatabase.nonce != null ? keyNonce : null;
+      const nonce = currentDatabase.nonce ? keyNonce : null;
       port.postMessage({configurationName, nonce});
       return;
     }

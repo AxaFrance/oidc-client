@@ -241,7 +241,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const setNonceAsync = (nonce) => {
-        sessionStorage['oidc.nonce'] = nonce;
+        sessionStorage['oidc.nonce'] = nonce.nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
   const getNonceAsync = async () => {
