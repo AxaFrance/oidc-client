@@ -14,6 +14,7 @@ import {
   serializeHeaders,
   sleep,
 } from './utils';
+import {replaceCodeVerifier} from "./utils/codeVerifier";
 
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
@@ -208,14 +209,7 @@ const handleFetch = async (event: FetchEvent) => {
           currentLoginCallbackConfigurationName = null;
           let newBody = actualBody;
           if (currentDatabase && currentDatabase.codeVerifier != null) {
-            const keyCodeVerifier =
-              TOKEN.CODE_VERIFIER + '_' + currentDatabase.configurationName;
-            if (actualBody.includes(keyCodeVerifier)) {
-              newBody = newBody.replace(
-                keyCodeVerifier,
-                currentDatabase.codeVerifier
-              );
-            }
+              newBody =  replaceCodeVerifier(newBody, currentDatabase.codeVerifier);
           }
 
           return fetch(originalRequest, {
@@ -287,7 +281,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       currentDatabase.state = null;
       currentDatabase.codeVerifier = null;
       currentDatabase.status = data.data.status;
-      port.postMessage({ configurationName });
+      port.postMessage({configurationName});
       return;
     case 'init': {
       const oidcServerConfiguration = data.data.oidcServerConfiguration;
@@ -306,8 +300,8 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
       const where = data.data.where;
       if (
-        where === 'loginCallbackAsync' ||
-        where === 'tryKeepExistingSessionAsync'
+          where === 'loginCallbackAsync' ||
+          where === 'tryKeepExistingSessionAsync'
       ) {
         currentLoginCallbackConfigurationName = configurationName;
       } else {
@@ -329,12 +323,12 @@ const handleMessage = (event: ExtendableMessageEvent) => {
           tokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName;
         }
         if (
-          tokens.idTokenPayload &&
-          tokens.idTokenPayload.nonce &&
-          currentDatabase.nonce != null
+            tokens.idTokenPayload &&
+            tokens.idTokenPayload.nonce &&
+            currentDatabase.nonce != null
         ) {
           tokens.idTokenPayload.nonce =
-            TOKEN.NONCE_TOKEN + '_' + configurationName;
+              TOKEN.NONCE_TOKEN + '_' + configurationName;
         }
         port.postMessage({
           tokens,
@@ -346,16 +340,16 @@ const handleMessage = (event: ExtendableMessageEvent) => {
     }
     case 'setState':
       currentDatabase.state = data.data.state;
-      port.postMessage({ configurationName });
+      port.postMessage({configurationName});
       return;
     case 'getState': {
       const state = currentDatabase.state;
-      port.postMessage({ configurationName, state });
+      port.postMessage({configurationName, state});
       return;
     }
     case 'setCodeVerifier':
       currentDatabase.codeVerifier = data.data.codeVerifier;
-      port.postMessage({ configurationName });
+      port.postMessage({configurationName});
       return;
     case 'getCodeVerifier': {
       port.postMessage({
@@ -366,15 +360,18 @@ const handleMessage = (event: ExtendableMessageEvent) => {
     }
     case 'setSessionState':
       currentDatabase.sessionState = data.data.sessionState;
-      port.postMessage({ configurationName });
+      port.postMessage({configurationName});
       return;
     case 'getSessionState': {
       const sessionState = currentDatabase.sessionState;
-      port.postMessage({ configurationName, sessionState });
+      port.postMessage({configurationName, sessionState});
       return;
     }
     case 'setNonce':
-      currentDatabase.nonce = data.data.nonce;
+      let nonce = data.data.nonce;
+      if (nonce){
+        currentDatabase.nonce = nonce;
+      }
       port.postMessage({ configurationName });
       return;
     default:
