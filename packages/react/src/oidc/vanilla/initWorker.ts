@@ -273,13 +273,13 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         // @ts-ignore
         let state = result.state;
         if (!state) {
-            state = localStorage[`oidc.state.${configurationName}`];
+            state = sessionStorage[`oidc.state.${configurationName}`];
         }
         return state;
     };
 
     const setStateAsync = async (state:string) => {
-        localStorage[`oidc.state.${configurationName}`] = state;
+        sessionStorage[`oidc.state.${configurationName}`] = state;
         return sendMessageAsync(registration)({ type: 'setState', data: { state }, configurationName });
     };
 
@@ -288,13 +288,13 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         // @ts-ignore
         let codeVerifier = result.codeVerifier;
         if (!codeVerifier) {
-            codeVerifier = localStorage[`oidc.code_verifier.${configurationName}`];
+            codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
         }
         return codeVerifier;
     };
 
     const setCodeVerifierAsync = async (codeVerifier:string) => {
-        localStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
+        sessionStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
         return sendMessageAsync(registration)({ type: 'setCodeVerifier', data: { codeVerifier }, configurationName });
     };
 
