@@ -84,7 +84,7 @@ const isTokensOidcValid = (
       return { isValid: false, reason: 'Token is used from too long time' };
     }
     // 11: If a nonce value was sent in the Authentication Request, a nonce Claim MUST be present and its value checked to verify that it is the same value as the one that was sent in the Authentication Request. The Client SHOULD check the nonce value for replay attacks. The precise method for detecting replay attacks is Client specific.
-    if (idTokenPayload.nonce && idTokenPayload.nonce !== nonce) {
+    if (nonce && idTokenPayload.nonce && idTokenPayload.nonce !== nonce) {
       return { isValid: false, reason: 'Nonce does not match' };
     }
   }

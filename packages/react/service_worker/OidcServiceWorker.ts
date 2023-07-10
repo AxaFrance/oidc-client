@@ -16,6 +16,7 @@ import {
   sleep,
   getDomains,
 } from './utils';
+import {replaceCodeVerifier} from "./utils/codeVerifier";
 
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
@@ -221,14 +222,7 @@ const handleFetch = async (event: FetchEvent) => {
           currentLoginCallbackConfigurationName = null;
           let newBody = actualBody;
           if (currentDatabase && currentDatabase.codeVerifier != null) {
-            const keyCodeVerifier =
-              TOKEN.CODE_VERIFIER + '_' + currentDatabase.configurationName;
-            if (actualBody.includes(keyCodeVerifier)) {
-              newBody = newBody.replace(
-                keyCodeVerifier,
-                currentDatabase.codeVerifier
-              );
-            }
+            newBody = replaceCodeVerifier(newBody, currentDatabase.codeVerifier);
           }
 
           return fetch(originalRequest, {
@@ -391,7 +385,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
     case 'getCodeVerifier': {
       port.postMessage({
         configurationName,
-        codeVerifier: TOKEN.CODE_VERIFIER + '_' + configurationName,
+        codeVerifier: currentDatabase.codeVerifier != null ? TOKEN.CODE_VERIFIER + '_' + configurationName : null,
       });
       return;
     }
@@ -404,10 +398,20 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       port.postMessage({ configurationName, sessionState });
       return;
     }
-    case 'setNonce':
-      currentDatabase.nonce = data.data.nonce;
-      port.postMessage({ configurationName });
+    case 'setNonce': {
+      let nonce = data.data.nonce;
+      if (nonce) {
+        currentDatabase.nonce = nonce;
+      }
+      port.postMessage({configurationName});
       return;
+    }
+    case 'getNonce': {
+      const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName;
+      const nonce = currentDatabase.nonce ? keyNonce : null;
+      port.postMessage({configurationName, nonce});
+      return;
+    }
     default:
       currentDatabase.items = { ...data.data };
       port.postMessage({ configurationName });

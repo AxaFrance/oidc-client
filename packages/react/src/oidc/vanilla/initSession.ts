@@ -59,7 +59,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return storage[`oidc.state.${configurationName}`];
     };
 
-    const setStateAsync = async (state) => {
+    const setStateAsync = async (state:string) => {
         storage[`oidc.state.${configurationName}`] = state;
     };
 

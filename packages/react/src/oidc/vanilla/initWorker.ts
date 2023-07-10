@@ -230,7 +230,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         }
     };
 
-    const setSessionStateAsync = (sessionState) => {
+    const setSessionStateAsync = (sessionState:string) => {
         return sendMessageAsync(registration)({ type: 'setSessionState', data: { sessionState }, configurationName });
     };
 
@@ -241,14 +241,19 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const setNonceAsync = (nonce) => {
+        sessionStorage['oidc.nonce'] = nonce.nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
-
-    const NONCE_TOKEN = 'NONCE_SECURED_BY_OIDC_SERVICE_WORKER';
-    const getNonceAsync = async () => {
+  const getNonceAsync = async () => {
         // @ts-ignore
-        const keyNonce = NONCE_TOKEN + '_' + configurationName;
-        return { nonce: keyNonce };
+        const result = await sendMessageAsync(registration)({ type: 'getNonce', data: null, configurationName });
+        // @ts-ignore
+        let nonce = result.nonce;
+        if (!nonce) {
+            nonce = sessionStorage['oidc.nonce'];
+            console.warn('nonce not found in service worker, using sessionStorage');
+        }
+        return { nonce };
     };
 
     let getLoginParamsCache = null;
@@ -267,20 +272,32 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     const getStateAsync = async () => {
         const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
         // @ts-ignore
-        return result.state;
+        let state = result.state;
+        if (!state) {
+            state = sessionStorage[`oidc.state.${configurationName}`];
+            console.warn('state not found in service worker, using sessionStorage');
+        }
+        return state;
     };
 
-    const setStateAsync = async (state) => {
+    const setStateAsync = async (state:string) => {
+        sessionStorage[`oidc.state.${configurationName}`] = state;
         return sendMessageAsync(registration)({ type: 'setState', data: { state }, configurationName });
     };
 
     const getCodeVerifierAsync = async () => {
         const result = await sendMessageAsync(registration)({ type: 'getCodeVerifier', data: null, configurationName });
         // @ts-ignore
-        return result.codeVerifier;
+        let codeVerifier = result.codeVerifier;
+        if (!codeVerifier) {
+            codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
+            console.warn('codeVerifier not found in service worker, using sessionStorage');
+        }
+        return codeVerifier;
     };
 
-    const setCodeVerifierAsync = async (codeVerifier) => {
+    const setCodeVerifierAsync = async (codeVerifier:string) => {
+        sessionStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
         return sendMessageAsync(registration)({ type: 'setCodeVerifier', data: { codeVerifier }, configurationName });
     };
 
