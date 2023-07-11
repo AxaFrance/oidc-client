@@ -6,10 +6,6 @@ import SilentCallbackComponent from '../default-component/SilentCallback.compone
 import SilentLoginComponent from '../default-component/SilentLogin.component.js';
 import { CustomHistory } from './withRouter.js';
 
-const defaultProps: Partial<OidcRoutesProps> = {
-
-};
-
 type OidcRoutesProps = {
   callbackSuccessComponent?: ComponentType;
   callbackErrorComponent?: ComponentType;
@@ -63,8 +59,5 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
       return <>{children}</>;
   }
 };
-
-// @ts-ignore
-OidcRoutes.defaultProps = defaultProps;
 
 export default React.memo(OidcRoutes);
