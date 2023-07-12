@@ -70,6 +70,10 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: npm version ${{ steps.tag_version.outputs.new_tag }}
         working-directory: ./packages/react
+        
+      - name: npm install
+        run: npm install
+        working-directory: .
       
       - name: npm ci
         run: npm ci

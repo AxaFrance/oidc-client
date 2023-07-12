@@ -1,0 +1,26 @@
+﻿{
+  "name": "root",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Root package for the project",
+  "license": "MIT",
+  "workspaces": [
+    "packages/oidc-service-worker",
+    "packages/vanilla",
+    "packages/react",
+    "packages/vanilla-demo"
+  ],
+  "repository": {
+    "url": "https://github.com/AxaGuilDEv/react-oidc.git",
+    "type": "git"
+  },
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "prepare": "npm run prepare --workspaces --if-present"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "16.* || >= 18"
+  }
+}
