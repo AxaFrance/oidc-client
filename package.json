@@ -1,0 +1,48 @@
+{
+  "name": "@axafr/react-oidc-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Root package for the project",
+  "license": "MIT",
+  "workspaces": [
+    "packages/oidc-service-worker",
+    "packages/vanilla",
+    "packages/react",
+    "packages/vanilla-demo"
+  ],
+  "keywords": [
+    "react",
+    "oidc"
+  ],
+  "repository": {
+    "url": "https://github.com/AxaGuilDEv/react-oidc.git",
+    "type": "git"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "format": "prettier --write --cache .",
+    "lint": "eslint --cache .",
+    "test": "pnpm run test --workspaces --if-present",
+    "build": "pnpm -r --filter=./packages/* run build"
+  },
+  "devDependencies": {
+    "eslint": "^8.45.0",
+    "eslint-define-config": "^1.21.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-regexp": "^1.15.0",
+    "tslib": "^2.6.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.0.2",
+    "vitest": "^0.33.0"
+  },
+  "engines": {
+    "node": "16.* || >= 18.0.0"
+  },
+  "packageManager": "pnpm@8.6.7",
+  "__pnpm": {
+    "overrides": {
+      "vite": "workspace:*"
+    }
+  }
+}

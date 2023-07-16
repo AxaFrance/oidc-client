@@ -1,0 +1,63 @@
+{
+  "name": "@axa-fr/oidc-client-service-worker",
+  "version": "6.16.1",
+  "private": true,
+  "type": "module",
+  "main": "dist/OidcServiceWorker.js",
+  "types": "dist/OidcServiceWorker.d.ts",
+  "description": "OpenID Connect & OAuth authentication service worker",
+  "files": [
+    "dist",
+    "src",
+    "package.json",
+    "package-lock.json"
+  ],
+  "keywords": [
+    "oidc",
+    "OpenID Connect",
+    "openid",
+    "oauth2",
+    "oauth"
+  ],
+  "scripts": {
+    "copy": "cpy --flat ./src/OidcTrustedDomains.js ./dist/",
+    "build": "tsc && vite build && pnpm run copy",
+    "test": "vitest run",
+    "test:watch": "vitest --coverage",
+    "coverage": "vitest run --coverage",
+    "clean": "rimraf dist",
+    "prepare": "pnpm run clean && pnpm run build",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "@vitest/coverage-c8": "^0.33.0",
+    "cpy": "^10.1.0",
+    "cpy-cli": "^5.0.0",
+    "eslint": "^8.26.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-config-standard-with-typescript": "^36.1.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "msw": "1.2.2",
+    "typescript": "5.1.6",
+    "vite": "^4.4.4",
+    "vite-plugin-dts": "^3.3.0",
+    "vitest": "^0.33.0"
+  },
+  "license": "MIT",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
