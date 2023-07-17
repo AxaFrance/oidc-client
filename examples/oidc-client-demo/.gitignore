@@ -11,6 +11,10 @@
 # production
 /build
 
+public/OidcServiceWorker.js
+dist/OidcServiceWorker.js
+
+
 # misc
 .DS_Store
 .env.local
