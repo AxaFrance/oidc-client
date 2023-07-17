@@ -8,7 +8,7 @@ import path from 'path';
  */
 
 const initPath = process.env.INIT_CWD;
-// console.log('currentdir:', process.cwd());
+// console.log('current dir:', process.cwd());
 // console.log('userPath:', initPath);
 
 function copyProgress(progress) {

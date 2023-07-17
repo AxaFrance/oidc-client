@@ -1,8 +1,6 @@
 ﻿import '@testing-library/jest-dom'
 import { logoutAsync } from "./logout";
-import { describe, it, expect } from 'vitest';
-import { vi } from 'vitest';
-
+import { describe, it, expect, vi } from 'vitest';
 
 describe('Logout test suite', () => {
 
@@ -11,7 +9,7 @@ describe('Logout test suite', () => {
         {logout_tokens_to_invalidate:['refresh_token'], expectedResults: ["token=abdc&token_type_hint=refresh_token&client_id=interactive.public.short"]}, 
         {logout_tokens_to_invalidate:['access_token'], expectedResults: ["token=abcd&token_type_hint=access_token&client_id=interactive.public.short"]}, 
         {logout_tokens_to_invalidate:[], expectedResults: []}, 
-    ])('Logout should revocate tokens $logout_tokens_to_invalidate', async ({ logout_tokens_to_invalidate, expectedResults}) => {
+    ])('Logout should revoke tokens $logout_tokens_to_invalidate', async ({ logout_tokens_to_invalidate, expectedResults}) => {
 
         const configuration = {
             client_id: 'interactive.public.short',
