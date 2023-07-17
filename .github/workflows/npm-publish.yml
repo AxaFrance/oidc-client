@@ -26,6 +26,12 @@ jobs:
         with:
           node-version: 18
 
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8.5.1
+          run_install: false          
+
       - name: pnpm i
         run: pnpm i --frozen-lockfile
         working-directory: ./packages/react-oidc
@@ -111,6 +117,12 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 18
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8.5.1
+          run_install: false          
 
       - name: npm version ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
