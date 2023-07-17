@@ -3,11 +3,11 @@ name: Azure Static Web Apps CI/CD Demo React Oidc
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - master
+      - main
 
 jobs:
   skip_ci:
@@ -28,12 +28,12 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 18
-      - name: npm ci
-        run: npm ci
-        working-directory: ./packages/react
-      - name: npm run build
-        run: npm run build
-        working-directory: ./packages/react
+      - name: pnpm install
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/react-oidc
+      - name: pnpm run build
+        run: pnpm run build
+        working-directory: ./packages/react-oidc
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -44,7 +44,7 @@ jobs:
           skip_app_build: true
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/packages/react/build" # App source code path
+          app_location: "/packages/react-oidc/build" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "build" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
