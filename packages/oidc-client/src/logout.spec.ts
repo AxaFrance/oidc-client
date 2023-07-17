@@ -1,5 +1,4 @@
-﻿import React from 'react'
-import '@testing-library/jest-dom'
+﻿import '@testing-library/jest-dom'
 import { logoutAsync } from "./logout";
 import { describe, it, expect } from 'vitest';
 import { vi } from 'vitest';

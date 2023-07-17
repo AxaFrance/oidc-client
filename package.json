@@ -33,16 +33,11 @@
     "eslint-plugin-regexp": "^1.15.0",
     "tslib": "^2.6.0",
     "tsx": "^3.12.7",
-    "typescript": "^5.0.2",
+    "typescript": "^5.1.6",
     "vitest": "^0.33.0"
   },
   "engines": {
     "node": "16.* || >= 18.0.0"
   },
-  "packageManager": "pnpm@8.6.7",
-  "__pnpm": {
-    "overrides": {
-      "vite": "workspace:*"
-    }
-  }
+  "packageManager": "pnpm@8.6.7"
 }

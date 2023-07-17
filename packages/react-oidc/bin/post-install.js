@@ -1,5 +1,3 @@
-// post-install.js
-
 import cpy from 'cpy';
 import path from 'path';
 
@@ -17,14 +15,15 @@ function copyProgress(progress) {
   console.log('✓ [react-oidc:copy] ', progress.destinationPath);
 }
 
+const srcDir = '../oidc-client-service-worker/dist/';
 const destinationDir = path.join(initPath, 'public');
 
-await cpy(['./dist/OidcServiceWorker.js'], destinationDir, {
+await cpy([path.join(srcDir,'OidcServiceWorker.js')], destinationDir, {
   overwrite: true,
 }).on('progress', copyProgress);
 
 try {
-  await cpy(['./dist/OidcTrustedDomains.js'], destinationDir, {
+  await cpy([path.join(srcDir,'OidcTrustedDomains.js')], destinationDir, {
     overwrite: false,
   }).on('progress', copyProgress);
 } catch (e) {
