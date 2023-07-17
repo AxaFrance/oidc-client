@@ -29,7 +29,13 @@
     "rimraf": "5.0.1",
     "typescript": "5.1.6",
     "vite": "^4.4.4",
-    "vite-plugin-dts": "^3.3.0"
+    "vite-plugin-dts": "^3.3.0",
+    "eslint": "^8.26.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-config-standard-with-typescript": "^36.1.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-simple-import-sort": "^10.0.0"
   },
   "keywords": [
     "oidc",

@@ -1,4 +1,3 @@
-
 export const eventNames = {
     service_worker_not_supported_by_browser: 'service_worker_not_supported_by_browser',
     token_aquired: 'token_aquired',

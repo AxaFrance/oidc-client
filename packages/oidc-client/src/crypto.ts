@@ -1,6 +1,6 @@
 import * as base64 from 'base64-js';
 
-const crytoInfo = () => {
+const cryptoInfo = () => {
   const hasCrypto = typeof window !== 'undefined' && !!(window.crypto as any);
   const hasSubtleCrypto = hasCrypto && !!(window.crypto.subtle as any);
   return { hasCrypto, hasSubtleCrypto };
@@ -23,7 +23,7 @@ const urlSafe = (buffer: Uint8Array): string => {
 
 export const generateRandom = (size: number) => {
     const buffer = new Uint8Array(size);
-    const { hasCrypto } = crytoInfo();
+    const { hasCrypto } = cryptoInfo();
     if (hasCrypto) {
       window.crypto.getRandomValues(buffer);
     } else {
@@ -48,7 +48,7 @@ export function textEncodeLite(str: string) {
     if (code.length < 43 || code.length > 128) {
       return Promise.reject(new Error('Invalid code length.'));
     }
-    const { hasSubtleCrypto } = crytoInfo();
+    const { hasSubtleCrypto } = cryptoInfo();
     if (!hasSubtleCrypto) {
       return Promise.reject(new Error('window.crypto.subtle is unavailable.'));
     }

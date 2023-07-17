@@ -1,4 +1,3 @@
-
 const fetchFromIssuerCache = {};
 
 export const getFromCache = (localStorageKey, storage = window.sessionStorage, timeCacheSecond) => {

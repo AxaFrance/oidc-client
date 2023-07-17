@@ -15,3 +15,5 @@ jest.config.js
 App.specold.tsx
 vite.config.ts
 tests/setup.js
+public/OidcServiceWorker.js
+public/OidcTrustedDomains.js

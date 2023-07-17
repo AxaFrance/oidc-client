@@ -2,10 +2,12 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     extends: [
       'standard',
-      'plugin:react/recommended',
+      // 'plugin:react/recommended',
       'plugin:react-hooks/recommended',
       'plugin:@typescript-eslint/eslint-recommended',
       'plugin:@typescript-eslint/recommended',
+      // 'plugin:import/errors',
+      //'plugin:import/warnings',
       'plugin:import/typescript',
       'plugin:jsx-a11y/recommended',
     ],
@@ -25,6 +27,7 @@ module.exports = {
       warnOnUnsupportedTypeScriptVersion: true,
     },
     rules: {
+    //   '@typescript-eslint/indent': ['error', 2],
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
