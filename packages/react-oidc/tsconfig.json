@@ -5,6 +5,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "jsx": "react-jsx",
+    "forceConsistentCasingInFileNames":true,
     "skipLibCheck":true,
     "module": "CommonJS",
     "declaration": true,

@@ -27,17 +27,17 @@ export default defineConfig({
   },
 
   plugins: [
-    dts(), //generate typescript typedefs
+    dts(), // generate typescript typedefs
     react(),
   ],
   resolve: {
     preserveSymlinks: true, //https://github.com/vitejs/vite/issues/11657
   },
-  // test: {
-  //   globals: true,
-  //   environment: 'jsdom',
-  //   setupFiles: './tests/setup.js',
-  // },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './tests/setup.js',
+  },
 });
 
 function externalDependencies(): Array<string> {

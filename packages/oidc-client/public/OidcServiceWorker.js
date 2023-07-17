@@ -81,6 +81,16 @@ const getCurrentDatabaseDomain = (database2, url, trustedDomains2) => {
   }
   return null;
 };
+function serializeHeaders(headers) {
+  const headersObj = {};
+  for (const key of headers.keys()) {
+    if (headers.has(key)) {
+      headersObj[key] = headers.get(key);
+    }
+  }
+  return headersObj;
+}
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function countLetter(str, find) {
   return str.split(find).length - 1;
 }
@@ -218,16 +228,6 @@ function hideTokens(currentDatabaseElement) {
     });
   };
 }
-function serializeHeaders(headers) {
-  const headersObj = {};
-  for (const key of headers.keys()) {
-    if (headers.has(key)) {
-      headersObj[key] = headers.get(key);
-    }
-  }
-  return headersObj;
-}
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function replaceCodeVerifier(codeVerifier, newCodeVerifier) {
   const regex = /code_verifier=[A-Za-z0-9_-]+/i;
   return codeVerifier.replace(regex, `code_verifier=${newCodeVerifier}`);
@@ -300,7 +300,7 @@ const handleFetch = async (event) => {
     while (currentDatabaseForRequestAccessToken.tokens && !isTokensValid(currentDatabaseForRequestAccessToken.tokens)) {
       await sleep(200);
     }
-    const newRequest = originalRequest.mode == "navigate" ? new Request(originalRequest, {
+    const newRequest = originalRequest.mode === "navigate" ? new Request(originalRequest, {
       headers: {
         ...serializeHeaders(originalRequest.headers),
         authorization: "Bearer " + currentDatabaseForRequestAccessToken.tokens.access_token
@@ -428,7 +428,7 @@ const handleMessage = (event) => {
   }
   if (!currentDatabase) {
     if (trustedDomainsShowAccessToken[configurationName] === void 0) {
-      let trustedDomain = trustedDomains[configurationName];
+      const trustedDomain = trustedDomains[configurationName];
       trustedDomainsShowAccessToken[configurationName] = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
     }
     database[configurationName] = {
@@ -457,7 +457,7 @@ const handleMessage = (event) => {
       return;
     case "init": {
       const oidcServerConfiguration = data.data.oidcServerConfiguration;
-      let trustedDomain = trustedDomains[configurationName];
+      const trustedDomain = trustedDomains[configurationName];
       const domains = getDomains(trustedDomain, "oidc");
       if (!domains.find((f) => f === acceptAnyDomainToken)) {
         [
@@ -534,7 +534,7 @@ const handleMessage = (event) => {
       return;
     }
     case "setNonce": {
-      let nonce = data.data.nonce;
+      const nonce = data.data.nonce;
       if (nonce) {
         currentDatabase.nonce = nonce;
       }

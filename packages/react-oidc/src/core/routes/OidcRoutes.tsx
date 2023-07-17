@@ -10,19 +10,19 @@ type OidcRoutesProps = {
   callbackSuccessComponent?: ComponentType;
   callbackErrorComponent?: ComponentType;
   authenticatingComponent?: ComponentType;
-  configurationName:string;
+  configurationName: string;
   redirect_uri: string;
   silent_redirect_uri?: string;
-  silent_login_uri?:string;
+  silent_login_uri?: string;
   withCustomHistory?: () => CustomHistory;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   callbackErrorComponent,
   callbackSuccessComponent,
-                                                              redirect_uri,
-                                                              silent_redirect_uri,
-                                                              silent_login_uri,
+  redirect_uri,
+  silent_redirect_uri,
+  silent_login_uri,
   children, configurationName,
   withCustomHistory = null,
 }) => {

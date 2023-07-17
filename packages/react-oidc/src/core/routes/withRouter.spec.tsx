@@ -1,10 +1,9 @@
 import { CreateEvent, WindowInternal } from './withRouter';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('WithRouter test Suite', () => {
-  const generateKeyMock = () => '123ABC';
   const paramsMock = { bubbles: false, cancelable: false, detail: 'detail' };
-  beforeEach(() => {});
+  beforeEach(() => { });
   it('should CreateEvent return correct Event if not on IE', () => {
     const windowMock = {
       CustomEvent: vi.fn().mockImplementation((event, params) => {
@@ -43,5 +42,5 @@ describe('WithRouter test Suite', () => {
     expect(documentMock.createEvent).toHaveBeenCalledWith('CustomEvent');
     expect(evtMock.initCustomEvent).toHaveBeenCalledWith('event test', false, false, 'detail');
   });
-  
+
 });
