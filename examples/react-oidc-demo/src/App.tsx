@@ -26,12 +26,6 @@ function reducer(state, action) {
   }
 }
 
-export function App2() {
-  return (<div>
-    <h1>Test</h1>
-  </div>)
-};
-
 
 function App() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
