@@ -22,6 +22,7 @@
     "preinstall": "npx only-allow pnpm",
     "format": "prettier --write --cache .",
     "lint": "eslint --cache .",
+    "outdated": "pnpm outdated -r",
     "test": "pnpm run test --workspaces --if-present",
     "build": "pnpm -r --filter=./packages/* run build"
   },

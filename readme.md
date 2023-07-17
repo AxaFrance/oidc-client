@@ -102,7 +102,7 @@ Works perfectly well with:
 ### Getting Started React using create-react-app
 
 ```sh
-npm install @axa-fr/react-oidc --save
+pnpm install @axa-fr/react-oidc --save
 
 # If you have a "public" folder, the 2 files will be created :
 # ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
@@ -300,8 +300,8 @@ More documentation :
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
 cd react-oidc/packages/react
-npm install
-npm start
+pnpm install
+pnpm start
 # then navigate to http://localhost:4200
 ```
 
@@ -310,8 +310,8 @@ npm start
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
 cd react-oidc/packages/nextjs-demo
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 # then navigate to http://localhost:3001
 ```
 
