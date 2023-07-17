@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+
 import {
   AccessTokenPayload,
   IdTokenPayload,
@@ -17,7 +18,7 @@ const currentTimeUnixSeconds = (): number => {
 const createToken = (expires: number, issued_at: number): Tokens => {
   return {
     expiresAt: expires,
-    issued_at: issued_at,
+    issued_at,
     expires_in: 60,
     id_token: null,
     accessTokenPayload: null,
@@ -37,13 +38,12 @@ class TokenBuilder {
     idTokenPayload: { iss: '', exp: 0, iat: 0, nonce: null },
   };
 
-  constructor() {}
-
   public withExpiredToken(): TokenBuilder {
     this.withExpiresIn(currentTimeUnixSeconds() - 10);
     this.withIssuedAt(currentTimeUnixSeconds() - 60);
     return this;
   }
+
   public WithNonExpiredToken(): TokenBuilder {
     this.withExpiresAt(currentTimeUnixSeconds() + 60);
     this.withExpiresIn(currentTimeUnixSeconds() + 60);
@@ -72,7 +72,7 @@ class TokenBuilder {
   }
 
   public withAccessTokenPayload(
-    accessTokenPayload: AccessTokenPayload
+    accessTokenPayload: AccessTokenPayload,
   ): TokenBuilder {
     this.tokens.accessTokenPayload = accessTokenPayload;
     return this;
@@ -99,17 +99,15 @@ class OidcConfigurationBuilder {
     service_worker_convert_all_requests_to_cors: true,
   };
 
-  constructor() {}
-
   public withTokenRenewMode(
-    token_renew_mode: string
+    token_renew_mode: string,
   ): OidcConfigurationBuilder {
     this.oidcConfiguration.token_renew_mode = token_renew_mode;
     return this;
   }
 
   public withServiceWorkerConvertAllRequestsToCors(
-    service_worker_convert_all_requests_to_cors: boolean
+    service_worker_convert_all_requests_to_cors: boolean,
   ): OidcConfigurationBuilder {
     this.oidcConfiguration.service_worker_convert_all_requests_to_cors =
       service_worker_convert_all_requests_to_cors;
@@ -136,8 +134,6 @@ class OidcConfigBuilder {
     hideAccessToken: true,
   };
 
-  constructor() {}
-
   public withTestingDefault(): OidcConfigBuilder {
     this.oidcConfig.configurationName = 'test';
     this.oidcConfig.tokens = new TokenBuilder().WithNonExpiredToken().build();
@@ -151,7 +147,7 @@ class OidcConfigBuilder {
       .build();
     this.oidcConfig.sessionState = null;
     this.oidcConfig.items = undefined;
-    this.oidcConfig.hideAccessToken =true;
+    this.oidcConfig.hideAccessToken = true;
     return this;
   }
 
@@ -159,6 +155,7 @@ class OidcConfigBuilder {
     this.oidcConfig.hideAccessToken = hideAccessToken;
     return this;
   }
+
   public withConfigurationName(configurationName: string): OidcConfigBuilder {
     this.oidcConfig.configurationName = configurationName;
     return this;
@@ -190,11 +187,12 @@ class OidcConfigBuilder {
   }
 
   public withOidcServerConfiguration(
-    oidcServerConfiguration: OidcServerConfiguration
+    oidcServerConfiguration: OidcServerConfiguration,
   ): OidcConfigBuilder {
     this.oidcConfig.oidcServerConfiguration = oidcServerConfiguration;
     return this;
   }
+
   public build() {
     return this.oidcConfig;
   }
@@ -209,8 +207,6 @@ class OidcServerConfigBuilder {
     userInfoEndpoint: '',
   };
 
-  constructor() {}
-
   public withTestingDefault(): OidcServerConfigBuilder {
     this.oidcServerConfig.revocationEndpoint =
       'http://localhost:3000/revocation';
@@ -223,7 +219,7 @@ class OidcServerConfigBuilder {
   }
 
   public withRevocationEndpoint(
-    revocationEndpoint: string
+    revocationEndpoint: string,
   ): OidcServerConfigBuilder {
     this.oidcServerConfig.revocationEndpoint = revocationEndpoint;
     return this;
@@ -235,7 +231,7 @@ class OidcServerConfigBuilder {
   }
 
   public withAuthorizationEndpoint(
-    authorizationEndpoint: string
+    authorizationEndpoint: string,
   ): OidcServerConfigBuilder {
     this.oidcServerConfig.authorizationEndpoint = authorizationEndpoint;
     return this;
@@ -247,7 +243,7 @@ class OidcServerConfigBuilder {
   }
 
   public withUserInfoEndpoint(
-    userInfoEndpoint: string
+    userInfoEndpoint: string,
   ): OidcServerConfigBuilder {
     this.oidcServerConfig.userInfoEndpoint = userInfoEndpoint;
     return this;
@@ -269,8 +265,6 @@ class ResponseBuilder {
     headers: {},
     bodyContent: { issued_at: 343434 },
   };
-
-  constructor() {}
 
   public withStatus(status: number): ResponseBuilder {
     this.response.status = status;
@@ -343,10 +337,10 @@ class ResponseBuilder {
 }
 
 export {
-  currentTimeUnixSeconds,
   createToken,
-  TokenBuilder,
-  OidcServerConfigBuilder,
+  currentTimeUnixSeconds,
   OidcConfigBuilder,
+  OidcServerConfigBuilder,
   ResponseBuilder,
+  TokenBuilder,
 };

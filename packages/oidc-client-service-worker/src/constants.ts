@@ -1,4 +1,4 @@
-const scriptFilename = 'OidcTrustedDomains.js'; /* global trustedDomains */
+const scriptFilename = 'OidcTrustedDomains.js';
 const acceptAnyDomainToken = '*';
 
 type TokenType = {
@@ -29,4 +29,4 @@ const TokenRenewMode: TokenRenewModeType = {
 
 const openidWellknownUrlEndWith = '/.well-known/openid-configuration';
 
-export { scriptFilename, acceptAnyDomainToken, TOKEN, TokenRenewMode, openidWellknownUrlEndWith };
+export { acceptAnyDomainToken, openidWellknownUrlEndWith, scriptFilename, TOKEN, TokenRenewMode };

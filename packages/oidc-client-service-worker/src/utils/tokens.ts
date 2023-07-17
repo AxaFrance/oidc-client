@@ -1,10 +1,11 @@
+/* eslint-disable simple-import-sort/exports */
 import { TOKEN, TokenRenewMode } from '../constants';
 import { OidcConfig, OidcConfiguration, OidcServerConfiguration, Tokens } from '../types';
 import { countLetter } from './strings';
 
 function parseJwt(token: string) {
   return JSON.parse(
-    b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/'))
+    b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')),
   );
 }
 function b64DecodeUnicode(str: string) {
@@ -12,21 +13,21 @@ function b64DecodeUnicode(str: string) {
     Array.prototype.map
       .call(
         atob(str),
-        (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2),
       )
-      .join('')
+      .join(''),
   );
 }
 
 function computeTimeLeft(
   refreshTimeBeforeTokensExpirationInSecond: number,
-  expiresAt: number
+  expiresAt: number,
 ) {
   const currentTimeUnixSecond = new Date().getTime() / 1000;
   return Math.round(
     expiresAt -
       refreshTimeBeforeTokensExpirationInSecond -
-      currentTimeUnixSecond
+      currentTimeUnixSecond,
   );
 }
 
@@ -58,7 +59,7 @@ const extractTokenPayload = (token?: string) => {
 const isTokensOidcValid = (
   tokens: Tokens,
   nonce: string | null,
-  oidcServerConfiguration: OidcServerConfiguration
+  oidcServerConfiguration: OidcServerConfiguration,
 ): { isValid: boolean; reason: string } => {
   if (tokens.idTokenPayload) {
     const idTokenPayload = tokens.idTokenPayload;
@@ -110,7 +111,7 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   let _idTokenPayload = null;
   if (tokens.id_token) {
     _idTokenPayload = extractTokenPayload(tokens.id_token);
-    tokens.idTokenPayload = {..._idTokenPayload};
+    tokens.idTokenPayload = { ..._idTokenPayload };
     if (_idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
       const keyNonce =
           TOKEN.NONCE_TOKEN + '_' + currentDatabaseElement.configurationName;
@@ -152,11 +153,11 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   const nonce = currentDatabaseElement.nonce
       ? currentDatabaseElement.nonce.nonce
       : null;
-  const {isValid, reason} = isTokensOidcValid(
+  const { isValid, reason } = isTokensOidcValid(
       tokens,
       nonce,
-      currentDatabaseElement.oidcServerConfiguration as OidcServerConfiguration
-  ); //TODO: Type assertion, could be null.
+      currentDatabaseElement.oidcServerConfiguration as OidcServerConfiguration,
+  ); // TODO: Type assertion, could be null.
   if (!isValid) {
     throw Error(`Tokens are not OpenID valid, reason: ${reason}`);
   }
@@ -202,5 +203,5 @@ export {
   extractTokenPayload,
   isTokensOidcValid,
   hideTokens,
-  _hideTokens
+  _hideTokens,
 };

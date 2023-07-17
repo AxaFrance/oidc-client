@@ -1,4 +1,3 @@
-
 export type DomainDetails = {
     domains?: Domain[];
     oidcDomains?: Domain[];
@@ -10,7 +9,7 @@ export type Domain = string | RegExp;
 
 export type TrustedDomains = {
     [key: string]: Domain[] | DomainDetails;
-}  | null;
+} | null;
 
 export type OidcServerConfiguration = {
     revocationEndpoint: string;
@@ -24,7 +23,6 @@ export type OidcConfiguration = {
     token_renew_mode: string;
     service_worker_convert_all_requests_to_cors: boolean;
 }
-
 
 // Uncertain why the Headers interface in lib.webworker.d.ts does not have a keys() function, so extending
 export interface FetchHeaders extends Headers {
@@ -99,5 +97,5 @@ export type Tokens = {
 };
 
 export type Database = {
-    [key: string]: OidcConfig
+    [key: string]: OidcConfig;
 }

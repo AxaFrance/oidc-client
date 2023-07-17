@@ -9,4 +9,4 @@ function serializeHeaders(headers: Headers) {
   }
   return headersObj;
 }
-export {serializeHeaders};
+export { serializeHeaders };

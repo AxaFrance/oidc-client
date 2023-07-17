@@ -1,22 +1,22 @@
-import { acceptAnyDomainToken, TOKEN, scriptFilename } from './constants';
+import { acceptAnyDomainToken, scriptFilename, TOKEN } from './constants';
 import {
-  TrustedDomains,
   Database,
+  MessageEventData,
   OidcConfig,
   OidcConfiguration,
-  MessageEventData,
+  TrustedDomains,
   // TrustedDomainsShowAccessToken,
 } from './types';
 import {
   checkDomain,
   getCurrentDatabaseDomain,
+  getDomains,
   hideTokens,
   isTokensValid,
   serializeHeaders,
   sleep,
-  getDomains,
 } from './utils';
-import {replaceCodeVerifier} from "./utils/codeVerifier";
+import { replaceCodeVerifier } from './utils/codeVerifier';
 
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
@@ -98,7 +98,7 @@ const handleFetch = async (event: FetchEvent) => {
   const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(
     database,
     originalRequest.url,
-    trustedDomains
+    trustedDomains,
   );
   if (
     currentDatabaseForRequestAccessToken &&
@@ -112,7 +112,7 @@ const handleFetch = async (event: FetchEvent) => {
       await sleep(200);
     }
     const newRequest =
-      originalRequest.mode == 'navigate'
+      originalRequest.mode === 'navigate'
         ? new Request(originalRequest, {
             headers: {
               ...serializeHeaders(originalRequest.headers),
@@ -135,7 +135,7 @@ const handleFetch = async (event: FetchEvent) => {
               : originalRequest.mode,
           });
 
-    //@ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
+    // @ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
     event.waitUntil(event.respondWith(fetch(newRequest)));
 
     return;
@@ -148,7 +148,7 @@ const handleFetch = async (event: FetchEvent) => {
   let currentDatabase: OidcConfig | null = null;
   const currentDatabases = getCurrentDatabasesTokenEndpoint(
     database,
-    originalRequest.url
+    originalRequest.url,
   );
   const numberDatabase = currentDatabases.length;
   if (numberDatabase > 0) {
@@ -169,7 +169,7 @@ const handleFetch = async (event: FetchEvent) => {
               if (actualBody.includes(keyRefreshToken)) {
                 newBody = newBody.replace(
                   keyRefreshToken,
-                  encodeURIComponent(currentDb.tokens.refresh_token as string)
+                  encodeURIComponent(currentDb.tokens.refresh_token as string),
                 );
                 currentDatabase = currentDb;
                 break;
@@ -179,7 +179,7 @@ const handleFetch = async (event: FetchEvent) => {
               if (actualBody.includes(keyAccessToken)) {
                 newBody = newBody.replace(
                   keyAccessToken,
-                  encodeURIComponent(currentDb.tokens.access_token)
+                  encodeURIComponent(currentDb.tokens.access_token),
                 );
                 currentDatabase = currentDb;
                 break;
@@ -205,7 +205,7 @@ const handleFetch = async (event: FetchEvent) => {
             currentDatabase.oidcServerConfiguration != null &&
             currentDatabase.oidcServerConfiguration.revocationEndpoint &&
             url.startsWith(
-              currentDatabase.oidcServerConfiguration.revocationEndpoint
+              currentDatabase.oidcServerConfiguration.revocationEndpoint,
             )
           ) {
             return fetchPromise.then(async (response) => {
@@ -213,7 +213,7 @@ const handleFetch = async (event: FetchEvent) => {
               return new Response(text, response);
             });
           }
-          return fetchPromise.then(hideTokens(currentDatabase as OidcConfig)); //todo type assertion to OidcConfig but could be null, NEEDS REVIEW
+          return fetchPromise.then(hideTokens(currentDatabase as OidcConfig)); // todo type assertion to OidcConfig but could be null, NEEDS REVIEW
         } else if (
           actualBody.includes('code_verifier=') &&
           currentLoginCallbackConfigurationName
@@ -260,13 +260,13 @@ const handleFetch = async (event: FetchEvent) => {
         });
     });
 
-    //@ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
+    // @ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
     event.waitUntil(event.respondWith(maPromesse));
   }
 };
 
 type TrustedDomainsShowAccessToken = {
-  [key: string]: boolean
+  [key: string]: boolean;
 }
 
 const trustedDomainsShowAccessToken: TrustedDomainsShowAccessToken = {};
@@ -276,13 +276,12 @@ const handleMessage = (event: ExtendableMessageEvent) => {
   const data = event.data as MessageEventData;
   const configurationName = data.configurationName;
   let currentDatabase = database[configurationName];
-  if(trustedDomains== null){
+  if (trustedDomains == null) {
     trustedDomains = {};
   }
   if (!currentDatabase) {
-    
     if (trustedDomainsShowAccessToken[configurationName] === undefined) {
-      let trustedDomain = trustedDomains[configurationName];
+      const trustedDomain = trustedDomains[configurationName];
       trustedDomainsShowAccessToken[configurationName] = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
     }
     database[configurationName] = {
@@ -297,7 +296,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       hideAccessToken: !trustedDomainsShowAccessToken[configurationName],
     };
     currentDatabase = database[configurationName];
-    
+
     if (!trustedDomains[configurationName]) {
       trustedDomains[configurationName] = [];
     }
@@ -313,7 +312,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       return;
     case 'init': {
       const oidcServerConfiguration = data.data.oidcServerConfiguration;
-      let trustedDomain = trustedDomains[configurationName];
+      const trustedDomain = trustedDomains[configurationName];
       const domains = getDomains(trustedDomain, 'oidc');
       if (!domains.find((f) => f === acceptAnyDomainToken)) {
         [
@@ -347,7 +346,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
         const tokens = {
           ...currentDatabase.tokens,
         };
-        if(currentDatabase.hideAccessToken) {
+        if (currentDatabase.hideAccessToken) {
           tokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName;
         }
         if (tokens.refresh_token) {
@@ -399,17 +398,17 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       return;
     }
     case 'setNonce': {
-      let nonce = data.data.nonce;
+      const nonce = data.data.nonce;
       if (nonce) {
         currentDatabase.nonce = nonce;
       }
-      port.postMessage({configurationName});
+      port.postMessage({ configurationName });
       return;
     }
     case 'getNonce': {
       const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName;
       const nonce = currentDatabase.nonce ? keyNonce : null;
-      port.postMessage({configurationName, nonce});
+      port.postMessage({ configurationName, nonce });
       return;
     }
     default:

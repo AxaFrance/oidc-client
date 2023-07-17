@@ -1,7 +1,8 @@
-import { TrustedDomains, Database, OidcServerConfiguration, Tokens } from './../../types';
-import { describe, it, expect } from 'vitest';
-import { checkDomain, getCurrentDatabaseDomain } from '..';
+import { describe, expect, it } from 'vitest';
+
 import { openidWellknownUrlEndWith } from '../../constants';
+import { checkDomain, getCurrentDatabaseDomain } from '..';
+import { Database, OidcServerConfiguration, Tokens, TrustedDomains } from './../../types';
 
 describe('domains', () => {
   describe('can check domain matches', () => {
@@ -9,7 +10,7 @@ describe('domains', () => {
       const result = () =>
         checkDomain(
           ['https://securesite.com:3000'],
-          'https://securesite.com:3000'
+          'https://securesite.com:3000',
         );
       expect(result()).toBeUndefined();
     });
@@ -18,7 +19,7 @@ describe('domains', () => {
       const result = () =>
         checkDomain(
           [/^https:\/\/securesite\.com/],
-          'https://securesite.com:3000'
+          'https://securesite.com:3000',
         );
       expect(result()).toBeUndefined();
     });
@@ -27,7 +28,7 @@ describe('domains', () => {
       const result = () =>
         checkDomain(
           ['https://notsecuresite.com'],
-          'https://securesite.com:3000'
+          'https://securesite.com:3000',
         );
       expect(result).toThrowError();
     });
@@ -67,11 +68,10 @@ describe('domains', () => {
         default: {
           domains: ['https://domain'],
           showAccessToken: false,
-        }
+        },
       };
 
       expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toBe(db.default);
-
     });
 
     it('will test urls against accessTokenDomains list if it is present and ignore domains list', () => {
@@ -80,7 +80,7 @@ describe('domains', () => {
           domains: ['https://domain'],
           accessTokenDomains: ['https://myapi'],
           showAccessToken: false,
-        }
+        },
       };
 
       expect(getCurrentDatabaseDomain(db, 'https://myapi/test', trustedDomains)).toBe(db.default);
