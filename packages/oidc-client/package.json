@@ -2,8 +2,9 @@
   "name": "@axa-fr/vanilla-oidc",
   "version": "6.24.1",
   "private": false,
-  "main": "./dist/index.js",
-  "module": "dist/index.js",
+  "type": "module",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "description": "OpenID Connect & OAuth authentication using native javascript only, compatible with angular, react, vue, svelte, next, etc.",
   "files": [
@@ -18,13 +19,17 @@
     "type": "git",
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
   },
+  "dependencies": {},
+  "peerDependencies": {},
   "devDependencies": {
     "@axa-fr/oidc-client-service-worker": "workspace:*",
+    "base64-js": "^1.5.1",
     "cpy": "^10.1.0",
     "cpy-cli": "^5.0.0",
     "rimraf": "3.0.2",
-    "base64-js": "^1.5.1",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "vite": "^4.4.4",
+    "vite-plugin-dts": "^3.3.0"
   },
   "keywords": [
     "oidc",
@@ -37,7 +42,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "copy-service-worker": "cpy ./node_modules/@axa-fr/oidc-client-service-worker/dist/OidcTrustedDomains.js ./node_modules/@axa-fr/oidc-client-service-worker/dist/OidcServiceWorker.js ./dist",
-    "build": "tsc",
+    "build": "tsc && vite build",
     "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
     "postinstall": "node ./bin/post-install.mjs"
   },

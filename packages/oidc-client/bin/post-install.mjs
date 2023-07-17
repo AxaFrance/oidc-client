@@ -18,6 +18,7 @@ function copyProgress(progress) {
 //TODO: Fragile.. need to find a better way to get the path
 const srcDir = '../oidc-client-service-worker/dist/';
 const destinationDir = path.join(initPath, 'public');
+const FILE_EXISTS_CODE = 'EEXIST';
 
 await cpy([path.join(srcDir,'OidcServiceWorker.js')], destinationDir, {
   overwrite: true,
@@ -28,8 +29,7 @@ try {
     overwrite: false,
   }).on('progress', copyProgress);
 } catch (e) {
-  if (e.code === 'EEXIST') {
-    //file exists
+  if (e.code === FILE_EXISTS_CODE) {
     console.log(
       `✗ [oidc-client:skip] OidcTrustedDomains.js not copied, already exists in ${destinationDir}`
     );

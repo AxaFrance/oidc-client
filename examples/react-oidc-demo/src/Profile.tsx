@@ -1,5 +1,5 @@
 import React from 'react';
-import { OidcUserInfo, OidcSecure, OidcUserStatus, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc';
+import { type OidcUserInfo, OidcSecure, OidcUserStatus, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc';
 
 interface OidcUserRoleInfo extends OidcUserInfo{
     role?: string[];
