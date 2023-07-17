@@ -1,0 +1,141 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: React Oidc CI
+
+on:
+  push:
+    # branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  skip_ci:
+    runs-on: ubuntu-latest
+    outputs:
+      canSkip: ${{ steps.check.outputs.canSkip }}
+    steps:
+      - id: check
+        uses: Legorooj/skip-ci@main
+  tests:
+    runs-on: ubuntu-latest
+    if: needs.skip_ci.outputs.canSkip != 'true' && github.event.pull_request.head.repo.fork
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: pnpm i
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/react-oidc
+
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/react-oidc
+
+      - name: pnpm test
+        run: pnpm test -- --run
+        working-directory: ./packages/react-oidc
+
+      - name: pnpm install
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/oidc-client
+
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/oidc-client
+
+  build:
+    environment: react-oidc
+    runs-on: ubuntu-latest
+    if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GIT_TOKEN }}
+      
+      # - name: Bump version and push tag
+      #   id: tag_version
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: mathieudutour/github-tag-action@v6.0
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: npm version ${{ steps.tag_version.outputs.new_tag }}
+        if: github.ref == 'refs/heads/main'
+        run: npm version ${{ steps.tag_version.outputs.new_tag }}
+        working-directory: ./packages/react-oidc
+      
+      - name: pnpm i
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/react-oidc
+
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/react-oidc
+        
+      - name: pnpm test
+        run: pnpm test -- --run
+        working-directory: ./packages/react-oidc
+        
+      # - id: publish-react
+      #   uses: JS-DevTools/npm-publish@v1
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     token: ${{ secrets.NPM_TOKEN }}
+      #     package: ./packages/react-oidc/package.json
+          
+      - name: pnpm version ${{ steps.tag_version.outputs.new_tag }}
+        run: pnpm version ${{ steps.tag_version.outputs.new_tag }}
+        working-directory: ./packages/oidc-client
+
+      - name: pnpm install
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/oidc-client
+
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/oidc-client
+
+      # - id: publish-oidc-client
+      #   uses: JS-DevTools/npm-publish@v1
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     token: ${{ secrets.NPM_TOKEN }}
+      #     package: ./packages/oidc-client/package.json
+
+      # - name: SonarCloud Scan
+      #   uses: sonarsource/sonarcloud-github-action@master
+      #   if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.head.repo.fork
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   with:
+      #     args: >
+      #       -Dsonar.organization=axaguildev
+      #       -Dsonar.projectKey=AxaGuilDEv_react-oidc
+      #       -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
+      #       -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
+            
+      # - name: Commit updates package.json
+      #   uses: stefanzweifel/git-auto-commit-action@v4
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     commit_message: "[skip ci] Update version package.json"
+      #     commit_user_name: GitHub
+      #     commit_user_email: github-action@bot.com
+      #     commit_author: GitHub <github-action@bot.com>
+      #     push_options: '--force'
+
+      # - name: Create a GitHub release
+      #   uses: ncipollo/release-action@v1
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     tag: ${{ steps.tag_version.outputs.new_tag }}
+      #     name: Release ${{ steps.tag_version.outputs.new_tag }}
+      #     body: ${{ steps.tag_version.outputs.changelog }}
