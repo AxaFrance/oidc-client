@@ -24,7 +24,5 @@ examples/**/build/
 **/public/*.mjs
 **/public/*.mjs.map
 **/public/*.d.ts
-/packages/oidc-client-service-worker/public/OidcServiceWorker.js
-/packages/oidc-client-service-worker/public/OidcTrustedDomains.js
-/public/OidcServiceWorker.js
-/public/OidcTrustedDomains.js
+
+/public/*

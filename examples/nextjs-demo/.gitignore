@@ -18,6 +18,8 @@
 # misc
 .DS_Store
 
+public/OidcServiceWorker.js
+
 # debug
 npm-debug.log*
 yarn-debug.log*
