@@ -102,7 +102,7 @@ Works perfectly well with:
 ### Getting Started React using create-react-app
 
 ```sh
-pnpm install @axa-fr/react-oidc --save
+npm install @axa-fr/react-oidc --save
 
 # If you have a "public" folder, the 2 files will be created :
 # ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
