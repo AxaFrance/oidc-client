@@ -58,7 +58,7 @@ jobs:
       - name: Determine Alpha, Beta or Release
         id: which_tag
         run: |
-          last_commit_message=$(git log --format=%B -n 1)
+          last_commit_message=${{github.event.commits[0].message}}
           # Check if last comment and with "(alpha)"
           echo "TUTU"
           echo $last_commit_message
