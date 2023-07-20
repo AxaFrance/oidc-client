@@ -98,13 +98,13 @@ jobs:
           fi
           
           if [[ '${{ steps.which_tag.outputs.tag }}' = 'release' ]]; then
-            echo "new_version=${{ steps.tag_version.outputs.new_version }}" >> $GITHUB_OUTPUT
+            echo "new_version=$version" >> $GITHUB_OUTPUT
           fi
           if [[ '${{ steps.which_tag.outputs.tag }}' = 'alpha' ]]; then
-            echo "new_version=${{ steps.tag_version.outputs.new_version }}-alpha${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "new_version=$version-alpha${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
           if [[ '${{ steps.which_tag.outputs.tag }}' = 'beta' ]]; then
-            echo "new_version=${{ steps.tag_version.outputs.new_version }}-beta${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "new_version=$version-beta${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
       
       - uses: actions/setup-node@v2
