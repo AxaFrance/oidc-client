@@ -60,7 +60,8 @@ jobs:
       - name: Determine Alpha, Beta or Release
         id: which_tag
         run: |
-          last_commit_message=$(git log -1 --pretty=format:"%B" ${{ github.event.pull_request.head.sha }})
+          last_commit_message=$(curl -s "https://api.github.com/repos/AxaFrance/react-oidc/pulls/{{ github.event.number }}/commits" | jq -r '.[-1].commit.message')
+
           # Check if last comment and with "(alpha)", "(beta)" or "(release)"
           echo "TUTU"
           echo $last_commit_message
