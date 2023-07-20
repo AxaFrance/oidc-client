@@ -5,9 +5,9 @@ name: React Oidc CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   skip_ci:
@@ -50,25 +50,66 @@ jobs:
     environment: react-oidc
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
+    env:
+      commit_message: ${{ github.event.head_commit.message }}
     steps:
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.GIT_TOKEN }}
-      
+          
+      - name: Determine Alpha, Beta or Release
+        id: which_tag
+        run: |
+          last_commit_message=$(curl -s "https://api.github.com/repos/AxaFrance/react-oidc/pulls/${{ github.event.number }}/commits" | jq -r '.[-1].commit.message')
+
+          # Check if last comment and with "(alpha)", "(beta)" or "(release)"
+          echo "TUTU"
+          echo $last_commit_message
+          if [[ $last_commit_message == *alpha* ]]; then
+            echo "tag=alpha" >> $GITHUB_OUTPUT
+            echo "YOUHOUALPHA"
+          fi
+          if [[ $last_commit_message == *beta* ]]; then
+            echo "tag=beta" >> $GITHUB_OUTPUT
+            echo "YOUHOUALPHA1"
+          fi
+          if [[ $last_commit_message == *release* ]]; then
+            echo "tag=release" >> $GITHUB_OUTPUT
+            echo "YOUHOUALPD"
+          fi
+
       - name: Bump version and push tag
-        id: tag_version
-        if: github.ref == 'refs/heads/master'
+        id: tag_release
+        #if: steps.which_tag.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         uses: mathieudutour/github-tag-action@v6.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN  }}
+          dry_run: true
+      - name: Add tag to output step for main branch
+        id: tag
+        run: |
+          if [[ '${{ github.ref }}' = 'refs/heads/main' && steps.which_tag.outputs.tag = 'release' ]]; then
+            echo "new_version=${{ steps.tag_version.outputs.new_version }}" >> $GITHUB_OUTPUT
+          fi
+          if [[ '${{ github.ref }}' = 'refs/heads/main' && steps.which_tag.outputs.tag = 'alpha' ]]; then
+            echo "new_version=${{ steps.tag_version.outputs.new_version }}-alpha${{ github.run_number }}" >> $GITHUB_OUTPUT
+          fi
+          if [[ '${{ github.ref }}' = 'refs/heads/main' && steps.which_tag.outputs.tag = 'beta' ]]; then
+            echo "new_version=${{ steps.tag_version.outputs.new_version }}-beta${{ github.run_number }}" >> $GITHUB_OUTPUT
+          fi
       
       - uses: actions/setup-node@v2
         with:
           node-version: 18
 
-      - name: npm version ${{ steps.tag_version.outputs.new_tag }}
-        if: github.ref == 'refs/heads/master'
-        run: npm version ${{ steps.tag_version.outputs.new_tag }}
+      - name: npm version ${{ steps.tag.outputs.new_version }}
+        if: (steps.which_tag.outputs.tag == 'release' || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta')
+        run: npm version ${{ steps.tag.outputs.new_version }}
         working-directory: ./packages/react
       
       - name: npm ci
@@ -85,13 +126,14 @@ jobs:
         
       - id: publish-react
         uses: JS-DevTools/npm-publish@v1
-        if: github.ref == 'refs/heads/master'
+        if: (steps.which_tag.outputs.tag == 'release' || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta')
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/react/package.json
           
-      - name: npm version ${{ steps.tag_version.outputs.new_tag }}
-        run: npm version ${{ steps.tag_version.outputs.new_tag }}
+      - name: npm version ${{ steps.tag.outputs.new_version }}
+        if: (steps.which_tag.outputs.tag == 'release' || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta')
+        run: npm version ${{ steps.tag.outputs.new_version }}
         working-directory: ./packages/vanilla
 
       - name: npm ci
@@ -104,7 +146,7 @@ jobs:
 
       - id: publish-vanilla
         uses: JS-DevTools/npm-publish@v1
-        if: github.ref == 'refs/heads/master'
+        if: (steps.which_tag.outputs.tag == 'release' || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta')
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/vanilla/package.json
