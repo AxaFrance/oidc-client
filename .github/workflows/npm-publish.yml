@@ -50,6 +50,8 @@ jobs:
     environment: react-oidc
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
+    env:
+      commit_message: ${{ github.event.head_commit.message }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -57,10 +59,8 @@ jobs:
           
       - name: Determine Alpha, Beta or Release
         id: which_tag
-        env:
-          commit_message: ${{ github.event.head_commit.message }}
         run: |
-          last_commit_message="$commit_message"
+          last_commit_message=" ${{ env.commit_message }}"
           # Check if last comment and with "(alpha)", "(beta)" or "(release)"
           echo "TUTU"
           echo $last_commit_message
