@@ -47,7 +47,7 @@ jobs:
         working-directory: ./packages/vanilla
 
   build:
-    environment: react-oidc
+   # environment: react-oidc
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     env:
