@@ -91,6 +91,12 @@ jobs:
       - name: Add tag to output step for main branch
         id: tag
         run: |
+          if [[ '${{ github.ref }}' == 'refs/heads/main' ]]; then
+            version=${{ steps.tag_release.outputs.new_version }}
+          else
+            version=${{ steps.tag_version.outputs.new_version }}
+          fi
+          
           if [[ '${{ steps.which_tag.outputs.tag }}' = 'release' ]]; then
             echo "new_version=${{ steps.tag_version.outputs.new_version }}" >> $GITHUB_OUTPUT
           fi
