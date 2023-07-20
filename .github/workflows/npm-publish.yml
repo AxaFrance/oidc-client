@@ -58,16 +58,20 @@ jobs:
       - name: Determine Alpha, Beta or Release
         id: which_tag
         run: |
-          last_commit_message=$(curl -s "https://api.github.com/repos/AxaFrance/react-oidc/pulls/${{ github.event.number }}/commits" | jq -r '.[-1].commit.message')
+          if [[ ${{ github.ref }} == refs/pull* ]]; then
+            last_commit_message=$(curl -s "https://api.github.com/repos/AxaFrance/react-oidc/pulls/${{ github.event.number }}/commits" | jq -r '.[-1].commit.message')
+          else
+            last_commit_message=$(git log --format=%B -n 1)
+          fi
+          echo "last commit message is: $last_commit_message"
           # Check if last comment and with "(alpha)", "(beta)" or "(release)"
-          echo $last_commit_message
-          if [[ $last_commit_message == *alpha* ]]; then
+          if [[ $last_commit_message == *(alpha) ]]; then
             echo "tag=alpha" >> $GITHUB_OUTPUT
           fi
-          if [[ $last_commit_message == *beta* ]]; then
+          if [[ $last_commit_message == *(beta) ]]; then
             echo "tag=beta" >> $GITHUB_OUTPUT
           fi
-          if [[ $last_commit_message == *release* ]]; then
+          if [[ $last_commit_message == *(release) ]]; then
             echo "tag=release" >> $GITHUB_OUTPUT
           fi
 
