@@ -61,7 +61,7 @@ jobs:
           commit_message: ${{ github.event.head_commit.message }}
         run: |
           last_commit_message="$commit_message"
-          # Check if last comment and with "(alpha)"
+          # Check if last comment and with "(alpha)", "(beta)" or "(release)"
           echo "TUTU"
           echo $last_commit_message
           if [[ $last_commit_message == *alpha* ]]; then
