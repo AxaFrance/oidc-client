@@ -16,6 +16,26 @@ You are now ready to contribute!
 
 Please respect the following [PULL_REQUEST_TEMPLATE.md](./PULL_REQUEST_TEMPLATE.md)
 
+Packages are automaticaly published on npm when a PR is merged on main.
+
+Example of commit messages :
+
+
+- fix(oidc): my message (alpha) => will publish next patch as an alpha
+- fix(oidc): my message (beta) => will publish next patch as an beta
+- fix(oidc): my message (release) => will publish next patch release (with automatic git tag and release)
+
+
+- feat(oidc): my message (alpha) => will publish next minor as an alpha
+- feat(oidc): my message (beta) => will publish next minor as an beta
+- feat(oidc): my message (release) => will publish next minor release (with automatic git tag and release)
+
+
+- fix(oidc): my message containing BREACKING word (alpha) => will publish next major as an alpha
+- fix(oidc): my message containing BREACKING word (beta) => will publish next major as an beta
+- fix(oidc): my message containing BREACKING word (release) => will publish next major release (with automatic git tag and release)
+
+
 ## Issue
 
 Please respect the following [ISSUE_TEMPLATE.md](./ISSUE_TEMPLATE.md)
