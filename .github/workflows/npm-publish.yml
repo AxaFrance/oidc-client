@@ -65,13 +65,13 @@ jobs:
           fi
           echo "last commit message is: $last_commit_message"
           # Check if last comment and with "(alpha)", "(beta)" or "(release)"
-          if [[ $last_commit_message == *(alpha)* ]]; then
+          if [[ $last_commit_message == *(alpha)* || $last_commit_message == *(alpha) ]]; then
             echo "tag=alpha" >> $GITHUB_OUTPUT
           fi
-          if [[ $last_commit_message == *(beta)* ]]; then
+          if [[ $last_commit_message == *(beta)* || $last_commit_message == *(beta) ]]; then
             echo "tag=beta" >> $GITHUB_OUTPUT
           fi
-          if [[ $last_commit_message == *(release)* ]]; then
+          if [[ $last_commit_message == *(release)* || $last_commit_message == *(release) ]]; then
             echo "tag=release" >> $GITHUB_OUTPUT
           fi
 
