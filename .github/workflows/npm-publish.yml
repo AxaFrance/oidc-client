@@ -61,15 +61,15 @@ jobs:
           last_commit_message=$(git log --format=%B -n 1)
           # Check if last comment and with "(alpha)"
           echo "TUTU"
-          if [[ "$last_commit_message" == *"alpha"* ]]; then
+          if [[ "$last_commit_message" == *alpha* ]]; then
             echo "tag=alpha" >> $GITHUB_OUTPUT
             echo "YOUHOUALPHA"
           fi
-          if [[ "$last_commit_message" == *"beta"* ]]; then
+          if [[ "$last_commit_message" == *beta* ]]; then
             echo "tag=beta" >> $GITHUB_OUTPUT
             echo "YOUHOUALPHA1"
           fi
-          if [[ "$last_commit_message" == *"release"* ]]; then
+          if [[ "$last_commit_message" == *release* ]]; then
             echo "tag=release" >> $GITHUB_OUTPUT
             echo "YOUHOUALPD"
           fi
