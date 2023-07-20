@@ -79,6 +79,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN  }}
       - name: Bump version and push tag
         id: tag_version
+        if: steps.which_tag.ref == 'refs/heads/main' && (steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta')
         uses: mathieudutour/github-tag-action@v6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN  }}
