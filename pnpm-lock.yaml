@@ -177,34 +177,6 @@ importers:
         specifier: ^0.33.0
         version: 0.33.0(jsdom@22.1.0)
 
-  examples/react-vite-demo:
-    dependencies:
-      '@axa-fr/react-oidc':
-        specifier: workspace:*
-        version: link:../../packages/react-oidc
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.15
-        version: 18.2.15
-      '@types/react-dom':
-        specifier: ^18.2.7
-        version: 18.2.7
-      '@vitejs/plugin-react':
-        specifier: ^4.0.3
-        version: 4.0.3(vite@4.4.4)
-      typescript:
-        specifier: ^5.1.6
-        version: 5.1.6
-      vite:
-        specifier: ^4.4.4
-        version: 4.4.4(@types/node@18.11.9)
-
   packages/oidc-client:
     devDependencies:
       '@axa-fr/oidc-client-service-worker':
