@@ -38,18 +38,7 @@ const handleActivate = (event: ExtendableEvent) => {
 };
 
 let currentLoginCallbackConfigurationName: string | null = null;
-const database: Database = {
-  default: {
-    configurationName: 'default',
-    tokens: null,
-    status: null,
-    state: null,
-    codeVerifier: null,
-    nonce: null,
-    oidcServerConfiguration: null,
-    hideAccessToken: true,
-  },
-};
+const database: Database = {};
 
 const getCurrentDatabasesTokenEndpoint = (database: Database, url: string) => {
   const databases: OidcConfig[] = [];
