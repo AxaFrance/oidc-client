@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/vanilla-oidc",
-  "version": "6.25.0-alpha939",
+  "version": "6.25.1-alpha941",
   "private": false,
   "type": "module",
   "main": "./dist/index.umd.cjs",
