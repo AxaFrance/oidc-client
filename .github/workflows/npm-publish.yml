@@ -188,7 +188,7 @@ jobs:
           push_options: '--force'
           
       # oidc-client-service-worker
-      - id: publish-oidc-client
+      - id: publish-oidc-client-service-worker
         uses: JS-DevTools/npm-publish@v1
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         with:
