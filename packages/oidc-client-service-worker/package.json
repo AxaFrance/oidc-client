@@ -19,6 +19,10 @@
     "oauth2",
     "oauth"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+  },
   "scripts": {
     "copy": "cpy --flat ./src/OidcTrustedDomains.js ./dist/",
     "build": "tsc && vite build && pnpm run copy",
