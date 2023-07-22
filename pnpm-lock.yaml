@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -178,10 +182,11 @@ importers:
         version: 0.33.0(jsdom@22.1.0)
 
   packages/oidc-client:
-    devDependencies:
+    dependencies:
       '@axa-fr/oidc-client-service-worker':
         specifier: workspace:*
         version: link:../oidc-client-service-worker
+    devDependencies:
       '@testing-library/dom':
         specifier: ^9.3.1
         version: 9.3.1
@@ -299,6 +304,9 @@ importers:
       '@axa-fr/vanilla-oidc':
         specifier: workspace:*
         version: link:../oidc-client
+      base64-js:
+        specifier: 1.5.1
+        version: 1.5.1
       react-router-dom:
         specifier: ^6.0.0
         version: 6.14.1(react-dom@18.2.0)(react@18.2.0)
@@ -1251,6 +1259,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: false
     optional: true
@@ -1260,6 +1269,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: false
     optional: true
@@ -1269,6 +1279,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: false
     optional: true
@@ -1278,6 +1289,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: false
     optional: true
@@ -2170,7 +2182,6 @@ packages:
 
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
-    dev: true
 
   /big-integer@1.6.51:
     resolution: {integrity: sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==}

@@ -1,8 +1,8 @@
 {
   "name": "@axa-fr/oidc-client-service-worker",
-  "version": "6.16.1",
-  "private": true,
+  "version": "6.24.1",
   "type": "module",
+  "private": false,
   "main": "dist/OidcServiceWorker.js",
   "types": "dist/OidcServiceWorker.d.ts",
   "description": "OpenID Connect & OAuth authentication service worker",
@@ -19,6 +19,10 @@
     "oauth2",
     "oauth"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AxaGuilDEv/react-oidc.git"
+  },
   "scripts": {
     "copy": "cpy --flat ./src/OidcTrustedDomains.js ./dist/",
     "build": "tsc && vite build && pnpm run copy",
@@ -41,12 +45,16 @@
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "rimraf": "5.0.1", 
+    "rimraf": "5.0.1",
     "msw": "1.2.2",
     "typescript": "5.1.6",
     "vite": "^4.4.4",
     "vite-plugin-dts": "^3.3.0",
     "vitest": "^0.33.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "license": "MIT",
   "browserslist": {
