@@ -126,6 +126,25 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false          
+      
+      # oidc-client-service-worker    
+      - name: pnpm version ${{ steps.tag.outputs.new_version }}
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        run: pnpm version ${{ steps.tag.outputs.new_version }}
+        working-directory: ./packages/oidc-client-service-worker
+
+      - name: pnpm ci
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/oidc-client-service-worker
+
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/oidc-client-service-worker
+        
+      - name: pnpm test
+        run: pnpm test -- --run
+        working-directory: ./packages/oidc-client-service-worker
+        
       # oidc-client
       - name: pnpm version ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
@@ -167,8 +186,21 @@ jobs:
           commit_user_email: github-action@bot.com
           commit_author: GitHub <github-action@bot.com>
           push_options: '--force'
+          
+      # oidc-client-service-worker
+      - id: publish-oidc-client
+        uses: JS-DevTools/npm-publish@v1
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/oidc-client-service-worker/package.json
 
       # oidc-client
+      - name: replace workspace:* by ${{ steps.tag.outputs.new_version }}
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        run: sed -i 's/workspace:\*/${{ steps.tag.outputs.new_version }}/g' package.json
+        working-directory: ./packages/oidc-client
+        
       - id: publish-oidc-client
         uses: JS-DevTools/npm-publish@v1
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'

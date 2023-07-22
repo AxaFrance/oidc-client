@@ -182,10 +182,11 @@ importers:
         version: 0.33.0(jsdom@22.1.0)
 
   packages/oidc-client:
-    devDependencies:
+    dependencies:
       '@axa-fr/oidc-client-service-worker':
         specifier: workspace:*
         version: link:../oidc-client-service-worker
+    devDependencies:
       '@testing-library/dom':
         specifier: ^9.3.1
         version: 9.3.1
