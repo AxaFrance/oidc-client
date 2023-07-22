@@ -1,0 +1,8 @@
+build
+bin
+node_modules
+dist
+tsconfig.eslint.json
+vite.config.*
+public/OidcTrustedDomains.js
+public/OidcServiceWorker.js

@@ -300,8 +300,8 @@ More documentation :
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
 cd react-oidc/packages/react
-npm install
-npm start
+pnpm install
+pnpm start
 # then navigate to http://localhost:4200
 ```
 
@@ -310,8 +310,8 @@ npm start
 ```sh
 git clone https://github.com/AxaGuilDEv/react-oidc.git
 cd react-oidc/packages/nextjs-demo
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 # then navigate to http://localhost:3001
 ```
 

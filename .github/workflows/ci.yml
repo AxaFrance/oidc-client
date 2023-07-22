@@ -1,0 +1,57 @@
+# CI Intergration Build and Test
+
+name: CI
+
+on:
+  push:
+    # branches: [ main ]
+  pull_request:
+    # branches: [ main ]
+
+env:
+  PNPM_VERSION: 8.5.1
+  NODE_VERSION: 18
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      # oidc-client
+      - name: Install dependencies (oidc-client)
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/oidc-client
+
+      - name: pnpm prepare (oidc-client)
+        run: pnpm run prepare
+        working-directory: ./packages/oidc-client
+
+      - name: Run test (oidc-client)
+        run: pnpm test -- --run
+        working-directory: ./packages/oidc-client
+
+      #react-oidc
+      - name: Install dependencies (react-oidc)
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/react-oidc
+
+      - name: Run prepare (react-oidc)
+        run: pnpm run prepare
+        working-directory: ./packages/react-oidc
+
+      - name: Run test (react-oidc)
+        run: pnpm test -- --run
+        working-directory: ./packages/react-oidc

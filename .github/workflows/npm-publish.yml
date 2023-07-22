@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  PNPM_VERSION: 8.5.1
+  NODE_VERSION: 18
 jobs:
   skip_ci:
     runs-on: ubuntu-latest
@@ -24,27 +27,33 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: npm ci
-        run: npm ci
-        working-directory: ./packages/react
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false          
 
-      - name: npm prepare
-        run: npm run prepare
-        working-directory: ./packages/react
+      - name: pnpm i
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/react-oidc
 
-      - name: npm test
-        run: npm test -- --run
-        working-directory: ./packages/react
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/react-oidc
 
-      - name: npm ci
-        run: npm ci
-        working-directory: ./packages/vanilla
+      - name: pnpm test
+        run: pnpm test -- --run
+        working-directory: ./packages/react-oidc
 
-      - name: npm prepare
-        run: npm run prepare
-        working-directory: ./packages/vanilla
+      - name: pnpm install
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/oidc-client
+
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/oidc-client
 
   build:
     environment: react-oidc
@@ -110,51 +119,57 @@ jobs:
       
       - uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false          
 
       - name: npm version ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         run: npm version ${{ steps.tag.outputs.new_version }}
-        working-directory: ./packages/react
+        working-directory: ./packages/react-oidc
       
-      - name: npm ci
-        run: npm ci
-        working-directory: ./packages/react
+      - name: pnpm i
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/react-oidc
 
-      - name: npm prepare
-        run: npm run prepare
-        working-directory: ./packages/react
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/react-oidc
         
-      - name: npm test
-        run: npm test -- --run
-        working-directory: ./packages/react
+      - name: pnpm test
+        run: pnpm test -- --run
+        working-directory: ./packages/react-oidc
         
       - id: publish-react
         uses: JS-DevTools/npm-publish@v1
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         with:
           token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/react/package.json
+          package: ./packages/react-oidc/package.json
           
-      - name: npm version ${{ steps.tag.outputs.new_version }}
+      - name: pnpm version ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        run: npm version ${{ steps.tag.outputs.new_version }}
-        working-directory: ./packages/vanilla
+        run: pnpm version ${{ steps.tag.outputs.new_version }}
+        working-directory: ./packages/oidc-client
 
-      - name: npm ci
-        run: npm ci
-        working-directory: ./packages/vanilla
+      - name: pnpm ci
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/oidc-client
 
-      - name: npm prepare
-        run: npm run prepare
-        working-directory: ./packages/vanilla
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/oidc-client
 
-      - id: publish-vanilla
+      - id: publish-oidc-client
         uses: JS-DevTools/npm-publish@v1
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         with:
           token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/vanilla/package.json
+          package: ./packages/oidc-client/package.json
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master

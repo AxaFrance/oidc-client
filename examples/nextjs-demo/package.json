@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@axa-fr/react-oidc": "workspace:*",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}

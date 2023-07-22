@@ -1,0 +1,36 @@
+{
+  "name": "vanilla-demo",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@axa-fr/vanilla-oidc": "workspace:~",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "typescript": "^5.1.6",
+    "web-vitals": "^3.4.0"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "clean": "rimraf dist"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "cross-env": "^7.0.3",
+    "vite": "^4.4.4"
+  }
+}
