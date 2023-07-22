@@ -126,36 +126,31 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false          
-
-      - name: npm version ${{ steps.tag.outputs.new_version }}
-        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        run: npm version ${{ steps.tag.outputs.new_version }}
-        working-directory: ./packages/react-oidc
       
-      - name: pnpm i
+      # oidc-client-service-worker    
+      - name: pnpm version ${{ steps.tag.outputs.new_version }}
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        run: pnpm version ${{ steps.tag.outputs.new_version }}
+        working-directory: ./packages/oidc-client-service-worker
+
+      - name: pnpm ci
         run: pnpm i --frozen-lockfile
-        working-directory: ./packages/react-oidc
+        working-directory: ./packages/oidc-client-service-worker
 
       - name: pnpm prepare
         run: pnpm run prepare
-        working-directory: ./packages/react-oidc
+        working-directory: ./packages/oidc-client-service-worker
         
       - name: pnpm test
         run: pnpm test -- --run
-        working-directory: ./packages/react-oidc
+        working-directory: ./packages/oidc-client-service-worker
         
-      - id: publish-react
-        uses: JS-DevTools/npm-publish@v1
-        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/react-oidc/package.json
-          
+      # oidc-client
       - name: pnpm version ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         run: pnpm version ${{ steps.tag.outputs.new_version }}
         working-directory: ./packages/oidc-client
-
+        
       - name: pnpm ci
         run: pnpm i --frozen-lockfile
         working-directory: ./packages/oidc-client
@@ -163,13 +158,68 @@ jobs:
       - name: pnpm prepare
         run: pnpm run prepare
         working-directory: ./packages/oidc-client
+        
+      # React-oidc
+      - name: npm version ${{ steps.tag.outputs.new_version }}
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        run: npm version ${{ steps.tag.outputs.new_version }}
+        working-directory: ./packages/react-oidc
+        
+      - name: pnpm i
+        run: pnpm i --frozen-lockfile
+        working-directory: ./packages/react-oidc
 
+      - name: pnpm prepare
+        run: pnpm run prepare
+        working-directory: ./packages/react-oidc
+
+      - name: pnpm test
+        run: pnpm test -- --run
+        working-directory: ./packages/react-oidc
+        
+      - name: Commit updates package.json
+        uses: stefanzweifel/git-auto-commit-action@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          commit_message: "[skip ci] Update version package.json"
+          commit_user_name: GitHub
+          commit_user_email: github-action@bot.com
+          commit_author: GitHub <github-action@bot.com>
+          push_options: '--force'
+          
+      # oidc-client-service-worker
+      - id: publish-oidc-client-service-worker
+        uses: JS-DevTools/npm-publish@v1
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/oidc-client-service-worker/package.json
+
+      # oidc-client
+      - name: replace workspace:* by ${{ steps.tag.outputs.new_version }}
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        run: sed -i 's/workspace:\*/${{ steps.tag.outputs.new_version }}/g' package.json
+        working-directory: ./packages/oidc-client
+        
       - id: publish-oidc-client
         uses: JS-DevTools/npm-publish@v1
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/oidc-client/package.json
+          
+      # react-oidc
+      - name: replace workspace:* by ${{ steps.tag.outputs.new_version }}
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        run: sed -i 's/workspace:\*/${{ steps.tag.outputs.new_version }}/g' package.json
+        working-directory: ./packages/react-oidc
+      
+      - id: publish-react
+        uses: JS-DevTools/npm-publish@v1
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/react-oidc/package.json
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
@@ -183,16 +233,6 @@ jobs:
             -Dsonar.projectKey=AxaGuilDEv_react-oidc
             -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
             -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
-            
-      - name: Commit updates package.json
-        uses: stefanzweifel/git-auto-commit-action@v4
-        if: github.ref == 'refs/heads/main'
-        with:
-          commit_message: "[skip ci] Update version package.json"
-          commit_user_name: GitHub
-          commit_user_email: github-action@bot.com
-          commit_author: GitHub <github-action@bot.com>
-          push_options: '--force'
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
