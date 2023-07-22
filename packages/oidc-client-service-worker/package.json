@@ -1,7 +1,8 @@
 {
   "name": "@axa-fr/oidc-client-service-worker",
   "version": "6.25.2-alpha945",
-  "type": "module",
+  "type": "module",*
+  "private": false,
   "main": "dist/OidcServiceWorker.js",
   "types": "dist/OidcServiceWorker.d.ts",
   "description": "OpenID Connect & OAuth authentication service worker",
