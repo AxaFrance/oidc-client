@@ -56,7 +56,7 @@
     "build": "tsc && vite build",
     "test": "vitest --root . --coverage",
     "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
-    "postinstall": "node ./bin/post-install.mjs"
+    "postinstall": "npm install cpy@10.1.0 && node ./bin/post-install.mjs"
   },
   "license": "MIT",
   "publishConfig": {
