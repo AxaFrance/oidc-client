@@ -6,7 +6,7 @@ import fs from 'fs';
  *
  * Copy selected files to user's directory
  */
-const script_prefix= 'oidc-client';
+const script_prefix= 'react-oidc';
 
 const copyFile = async (src, dest, overwrite) => {
   if (!overwrite) {
