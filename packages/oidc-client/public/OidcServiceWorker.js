@@ -396,22 +396,24 @@ const handleFetch = async (event) => {
             integrity: clonedRequest.integrity
           }).then(hideTokens(currentDatabase));
         }
-        return void 0;
+        return fetch(originalRequest, {
+          body: actualBody,
+          method: clonedRequest.method,
+          headers: {
+            ...serializeHeaders(originalRequest.headers)
+          },
+          mode: clonedRequest.mode,
+          cache: clonedRequest.cache,
+          redirect: clonedRequest.redirect,
+          referrer: clonedRequest.referrer,
+          credentials: clonedRequest.credentials,
+          integrity: clonedRequest.integrity
+        });
       });
       response.then((r) => {
-        if (r !== void 0) {
-          resolve(r);
-        } else {
-          console.log("success undefined");
-          reject(new Error("Response is undefined inside a success"));
-        }
+        resolve(r);
       }).catch((err) => {
-        if (err !== void 0) {
-          reject(err);
-        } else {
-          console.log("error undefined");
-          reject(new Error("Response is undefined inside a error"));
-        }
+        reject(err);
       });
     });
     event.waitUntil(event.respondWith(maPromesse));
