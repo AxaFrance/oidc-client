@@ -45,18 +45,12 @@ try {
     },
   ];
   
-  /*for await (const f of files) {
+  for await (const file of files) {
     await copyFile(
       path.join(srcDir, f.fileName),
       path.join(destinationDir, f.fileName),
-      f.overwrite
+      file.overwrite
     );
-  }*/
-  for await (const f of files) {
-    if (fs.existsSync(srcDir)) {
-      fs.copyFileSync(srcDir, destinationDir);
-      console.log(`File copied successfully at ${destinationDir}`);
-    }
   }
 
 } catch (err) {
