@@ -11,6 +11,10 @@ try {
   const script_prefix= 'oidc-client';
   
   const copyFile = async (src, dest, overwrite) => {
+    if(!fileExists(src)) {
+        console.log(`[${script_prefix}:skip] file does not exist ${src}`);
+        return;
+    }
     if (!overwrite) {
       if (fileExists(dest)) {
         console.log(`[${script_prefix}:skip] file exists not overwriting ${dest}`);
@@ -50,5 +54,5 @@ try {
   }
 
 } catch (err) {
-  console.log(err);
+  console.warn(err);
 }
