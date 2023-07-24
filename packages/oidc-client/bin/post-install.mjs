@@ -47,8 +47,8 @@ try {
   
   for await (const file of files) {
     await copyFile(
-      path.join(srcDir, f.fileName),
-      path.join(destinationDir, f.fileName),
+      path.join(srcDir, file.fileName),
+      path.join(destinationDir, file.fileName),
       file.overwrite
     );
   }

@@ -54,10 +54,9 @@ jobs:
           skip_app_build: true
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/packages/react-oidc/build" # App source code path
-          app_build_command: "pnpm run build" # App build command - optional
+          app_location: "examples/react-oidc-demo" # App source code path
           api_location: "" # Api source code path - optional
-          output_location: "build" # Built app content directory - optional
+          output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
