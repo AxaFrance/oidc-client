@@ -239,24 +239,30 @@ const handleFetch = async (event: FetchEvent) => {
             integrity: clonedRequest.integrity,
           }).then(hideTokens(currentDatabase));
         }
-        return undefined;
+
+        // if showAccessToken=true, the token is already in the body
+        // of the request, and it does not need to be injected
+        // and we can simply clone the request
+        return fetch(originalRequest, {
+          body: actualBody,
+          method: clonedRequest.method,
+          headers: {
+            ...serializeHeaders(originalRequest.headers),
+          },
+          mode: clonedRequest.mode,
+          cache: clonedRequest.cache,
+          redirect: clonedRequest.redirect,
+          referrer: clonedRequest.referrer,
+          credentials: clonedRequest.credentials,
+          integrity: clonedRequest.integrity,
+        });
       });
       response
         .then((r) => {
-          if (r !== undefined) {
-            resolve(r);
-          } else {
-            console.log('success undefined');
-            reject(new Error('Response is undefined inside a success'));
-          }
+          resolve(r);
         })
         .catch((err) => {
-          if (err !== undefined) {
-            reject(err);
-          } else {
-            console.log('error undefined');
-            reject(new Error('Response is undefined inside a error'));
-          }
+          reject(err);
         });
     });
 
