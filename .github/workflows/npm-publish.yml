@@ -238,6 +238,6 @@ jobs:
         uses: ncipollo/release-action@v1
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          tag: ${{ steps.tag_release.outputs.new_tag }}
+          name: Release ${{ steps.tag_release.outputs.new_tag }}
+          body: ${{ steps.tag_release.outputs.changelog }}
