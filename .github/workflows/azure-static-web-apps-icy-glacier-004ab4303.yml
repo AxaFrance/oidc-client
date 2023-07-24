@@ -38,6 +38,8 @@ jobs:
           run_install: false
       - name: pnpm install
         run: pnpm i --frozen-lockfile
+      - name: pnpm install
+        run: pnpm i --frozen-lockfile
         working-directory: ./examples/react-oidc-demo
       - name: Build And Deploy
         id: builddeploy

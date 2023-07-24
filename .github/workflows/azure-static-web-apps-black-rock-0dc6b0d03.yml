@@ -38,10 +38,12 @@ jobs:
           run_install: false
       - name: pnpm install
         run: pnpm i --frozen-lockfile
-        working-directory: ./packages/react-oidc
+      - name: pnpm install
+        run: pnpm i --frozen-lockfile
+        working-directory: ./examples/react-oidc-demo
       - name: pnpm run build
         run: pnpm run build
-        working-directory: ./packages/react-oidc
+        working-directory: ./examples/react-oidc-demo
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
