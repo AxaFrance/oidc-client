@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "strict": true,
+    "allowJs": true,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true
+  }
+}

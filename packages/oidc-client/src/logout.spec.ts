@@ -1,6 +1,8 @@
-﻿import '@testing-library/jest-dom'
+﻿import '@testing-library/jest-dom';
+
+import { describe, expect, it, vi } from 'vitest';
+
 import { logoutAsync } from "./logout";
-import { describe, it, expect, vi } from 'vitest';
 
 describe('Logout test suite', () => {
 
@@ -17,7 +19,7 @@ describe('Logout test suite', () => {
             scope: 'openid profile email api offline_access',
             authority: 'http://api',
             refresh_time_before_tokens_expiration_in_second: 70,
-            logout_tokens_to_invalidate
+            logout_tokens_to_invalidate,
         };
 
         const fetch = (url, data) => {
@@ -29,7 +31,7 @@ describe('Logout test suite', () => {
             });
         };
 
-        const mockFetchFn = vi.fn().mockImplementation(fetch)
+        const mockFetchFn = vi.fn().mockImplementation(fetch);
         
         const oidc = { 
             configuration,
@@ -47,15 +49,15 @@ describe('Logout test suite', () => {
         const window = {
             location: {
                 href: "",
-                origin: "http://localhost:4200"
-            }
-        }
+                origin: "http://localhost:4200",
+            },
+        };
 
         await logoutAsync(oidc, oidcDatabase, mockFetchFn, window, console)("/logged_out");
         
         // @ts-ignore
 
-        const results =  mockFetchFn.mock.calls.map((call, index) => call[1].body)
+        const results =  mockFetchFn.mock.calls.map((call, index) => call[1].body);
     
         expect(results).toEqual(expectedResults);
         expect(window.location.href).toBe("http://api/connect/endsession?id_token_hint=abcd&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Flogged_out");

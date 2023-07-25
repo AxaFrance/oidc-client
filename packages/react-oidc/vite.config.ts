@@ -1,7 +1,8 @@
-﻿import { defineConfig } from 'vite';
+﻿import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+
 import pkg from './package.json';
 
 const dependencies = externalDependencies();
@@ -31,7 +32,7 @@ export default defineConfig({
     react(),
   ],
   resolve: {
-    preserveSymlinks: true, //https://github.com/vitejs/vite/issues/11657
+    preserveSymlinks: true, // https://github.com/vitejs/vite/issues/11657
   },
   test: {
     globals: true,
