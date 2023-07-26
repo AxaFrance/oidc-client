@@ -1,5 +1,6 @@
-﻿import {getValidTokenAsync, isTokensOidcValid} from "./parseTokens";
-import { describe, it, expect } from 'vitest';
+﻿import { describe, expect,it } from 'vitest';
+
+import {getValidTokenAsync, isTokensOidcValid} from "./parseTokens";
 
 describe('ParseTokens test Suite', () => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -15,10 +16,10 @@ describe('ParseTokens test Suite', () => {
                     idToken: 'youhou',
                     accessTokenPayload: null,
                     accessToken: 'youhou',
-                    expiresAt: expiresAt,
-                    issuedAt: issuedAt,
-                }
-            }
+                    expiresAt,
+                    issuedAt,
+                },
+            };
             const result = await getValidTokenAsync(oidc, 1, 1);
             expect(result.isTokensValid).toEqual(expectIsValidToken);
         });
@@ -39,8 +40,8 @@ describe('ParseTokens test Suite', () => {
     ])('isTokensOidcValid', (idTokenPayload, nonce, oidcServerConfiguration, expectIsValidToken, status) => {
         it('should isTokensOidcValid return ' + status, async () => {
             const oidc = {
-                idTokenPayload
-            }
+                idTokenPayload,
+            };
             const {isValid} = await isTokensOidcValid(oidc, nonce, oidcServerConfiguration);
             expect(isValid).toEqual(expectIsValidToken);
         });

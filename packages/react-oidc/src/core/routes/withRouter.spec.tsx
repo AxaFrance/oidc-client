@@ -1,5 +1,6 @@
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { CreateEvent, WindowInternal } from './withRouter';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('WithRouter test Suite', () => {
   const paramsMock = { bubbles: false, cancelable: false, detail: 'detail' };
@@ -13,7 +14,7 @@ describe('WithRouter test Suite', () => {
     const documentMock = {} as Document;
     const res = CreateEvent((windowMock as unknown) as WindowInternal, documentMock)(
       'event test',
-      paramsMock
+      paramsMock,
     );
     expect(res).toEqual({
       event: 'event test',
@@ -36,7 +37,7 @@ describe('WithRouter test Suite', () => {
     const typedDocumentMock = (documentMock as unknown) as Document;
     const res = CreateEvent((windowMock as unknown) as WindowInternal, typedDocumentMock)(
       'event test',
-      paramsMock
+      paramsMock,
     );
     expect(res).toEqual({ ...evtMock });
     expect(documentMock.createEvent).toHaveBeenCalledWith('CustomEvent');

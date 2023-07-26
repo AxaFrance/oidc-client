@@ -1,0 +1,13 @@
+**/*.d.ts
+packages/**/dist/**/*
+packages/**/public/**/*
+packages/**/coverage/**/*
+packages/**/fixtures/**/*
+node_modules
+# TODO Disable examples, we want to include it.
+examples/**/*
+public/**/*
+scripts/**/*
+.github
+.changeset
+vite.config.js

@@ -1,0 +1,11 @@
+# deep dirs
+**/dist
+**/node_modules
+**/fixtures
+
+# directories
+.github
+.changeset
+
+# files
+pnpm-lock.yaml

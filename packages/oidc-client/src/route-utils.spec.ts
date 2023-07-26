@@ -1,5 +1,6 @@
+import { describe, expect,it } from 'vitest';
+
 import { getPath } from './route-utils';
-import { describe, it, expect } from 'vitest';
 
 describe('Route test Suite', () => {
     it.each([['http://example.com/pathname', '/pathname'], 
@@ -8,7 +9,7 @@ describe('Route test Suite', () => {
       ['http://example.com:3000/pathname#hash?search=test', '/pathname#hash'], 
       ['capacitor://localhost/index.html', '/index.html'], 
       ['capacitor://localhost/pathname#hash?search=test', '/pathname#hash'], 
-      ['http://example.com:3000/', ''],])(
+      ['http://example.com:3000/', '']])(
         'getPath should return the full path of an url',
         (uri, expected) => {
     
