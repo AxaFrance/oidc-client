@@ -5,8 +5,11 @@ packages/**/coverage/**/*
 packages/**/fixtures/**/*
 node_modules
 # TODO Disable examples, we want to include it.
-examples/**/*
 public/**/*
+examples/**/static/**/*
+examples/**/dist/**/*
+examples/**/OidcTrustedDomains.js
+examples/**/OidcServiceWorker.js
 scripts/**/*
 .github
 .changeset

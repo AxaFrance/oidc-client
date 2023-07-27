@@ -1,7 +1,7 @@
+import { Fetch, OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken } from '@axa-fr/react-oidc';
 import React, { useReducer, useState } from 'react';
 
 import { configurationGoogle, configurationIdentityServer, configurationIdentityServerWithHash } from './configurations';
-import { Fetch, OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken } from '@axa-fr/react-oidc';
 import AuthenticatingError from './override/AuthenticateError.component';
 import Authenticating from './override/Authenticating.component';
 import { CallBackSuccess } from './override/Callback.component';

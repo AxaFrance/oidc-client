@@ -104,19 +104,19 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
             router.getCustomHistory().replaceState("/");
             // @ts-ignore
             window.logout = () =>  vanillaOidc.logoutAsync();
-            let tokens = vanillaOidc.tokens;
+            const tokens = vanillaOidc.tokens;
             // @ts-ignore
             element.innerHTML = `<div>
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
-        </div>`
+        </div>`;
         });
-        return
+        return;
     }
 
-    let tokens = vanillaOidc.tokens;
+    const tokens = vanillaOidc.tokens;
 
     if(tokens){
 
@@ -128,7 +128,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
-        </div>`
+        </div>`;
         
     }
     else {
@@ -139,13 +139,13 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <h2>Loading</h2>
         </div>`;
-            vanillaOidc.loginAsync("/")
+            vanillaOidc.loginAsync("/");
         };
         // @ts-ignore
         element.innerHTML = `<div>
             <h1>@axa-fr/vanilla-oidc demo</h1>
             <button onclick="window.login()">Login</button>
-        </div>`
+        </div>`;
     }
-})
+});
 

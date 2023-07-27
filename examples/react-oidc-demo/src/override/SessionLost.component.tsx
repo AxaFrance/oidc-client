@@ -1,6 +1,6 @@
+import { useOidc } from '@axa-fr/react-oidc';
 import { ComponentType } from 'react';
 
-import { useOidc } from '@axa-fr/react-oidc';
 import { style } from './style.js';
 
 export const SessionLost: ComponentType<any> = ({ configurationName }) => {

@@ -1,3 +1,4 @@
+import { OidcProvider, withOidcSecure } from '@axa-fr/react-oidc';
 import React, { useReducer } from 'react';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 
@@ -5,7 +6,6 @@ import { configurationIdentityServer } from './configurations.js';
 import { FetchUserHoc, FetchUserHook } from './FetchUser.js';
 import { Home } from './Home.js';
 import { MultiAuthContainer } from './MultiAuth.js';
-import { OidcProvider, withOidcSecure } from '@axa-fr/react-oidc';
 import { Profile, SecureProfile } from './Profile.js';
 
 const OidcSecureHoc = withOidcSecure(Profile);

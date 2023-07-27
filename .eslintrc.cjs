@@ -125,6 +125,14 @@ module.exports = {
       files: ['*.js', '*.jsx'],
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
+        'react/no-unknown-property':[
+          2, {
+            "ignore": [
+              "jsx",
+              "global"
+            ]
+          }
+        ]
       },
     },
     {
