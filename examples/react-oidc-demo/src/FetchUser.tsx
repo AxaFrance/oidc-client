@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { OidcSecure, useOidcFetch, withOidcFetch } from '@axa-fr/react-oidc';
+import React, { useEffect, useState } from 'react';
 
 const DisplayUserInfo = ({ fetch }) => {
     const [oidcUser, setOidcUser] = useState(null);

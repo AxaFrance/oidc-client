@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { useOidc } from '@axa-fr/react-oidc';
+import React from 'react';
 
 export const Home = () => {
     const { login, logout, renewTokens, isAuthenticated } = useOidc();
