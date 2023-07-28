@@ -547,7 +547,7 @@ render(<App />, document.getElementById("root"));
 
 ## How It Works
 
-These components encapsulate the use of "@axa-fr/vanilla-oidc" in order to hide workflow complexity.
+These components encapsulate the use of "@axa-fr/oidc-client" in order to hide workflow complexity.
 Internally, native History API is used to be router library agnostic.
 
 More information about OIDC

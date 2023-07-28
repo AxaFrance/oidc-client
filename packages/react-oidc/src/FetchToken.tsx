@@ -1,4 +1,4 @@
-import { Fetch, VanillaOidc } from '@axa-fr/vanilla-oidc';
+import { Fetch, VanillaOidc } from '@axa-fr/oidc-client';
 import { useCallback } from 'react';
 
 export interface ComponentWithOidcFetchProps {

@@ -42,7 +42,7 @@ The service worker catch **access_token** and **refresh_token** that will never 
 ### Getting Started
 
 ```sh
-npm install @axa-fr/vanilla-oidc --save
+npm install @axa-fr/oidc-client --save
 
 # If you have a "public" folder, the 2 files will be created :
 # ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
@@ -68,7 +68,7 @@ const trustedDomains = {
 The code of the demo :
 
 ```js
-import { VanillaOidc } from '@axa-fr/vanilla-oidc'
+import { VanillaOidc } from '@axa-fr/oidc-client'
 
 export const configuration = {
     client_id: 'interactive.public.short',
@@ -91,7 +91,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
             window.location.href = "/";
         });
         document.body.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <h2>Loading</h2>
         </div>`;
         return
@@ -104,7 +104,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         // @ts-ignore
         window.logout = () =>  vanillaOidc.logoutAsync();
         document.body.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
@@ -115,7 +115,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         // @ts-ignore
         window.login= () =>  vanillaOidc.loginAsync("/");
         document.body.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.login()">Login</button>
         </div>`
     }
