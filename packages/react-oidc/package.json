@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@axa-fr/oidc-client-service-worker": "workspace:*",
-    "@axa-fr/vanilla-oidc": "workspace:*",
+    "@axa-fr/oidc-client": "workspace:*",
     "base64-js": "1.5.1"
   },
   "peerDependencies": {

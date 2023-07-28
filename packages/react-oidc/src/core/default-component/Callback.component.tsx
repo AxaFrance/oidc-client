@@ -1,4 +1,4 @@
-import { VanillaOidc } from '@axa-fr/vanilla-oidc';
+import { VanillaOidc } from '@axa-fr/oidc-client';
 import { ComponentType, useEffect, useState } from 'react';
 
 import { getCustomHistory } from '../routes/withRouter.js';

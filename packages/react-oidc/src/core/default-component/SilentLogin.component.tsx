@@ -1,4 +1,4 @@
-import { getParseQueryStringFromLocation, VanillaOidc } from '@axa-fr/vanilla-oidc';
+import { getParseQueryStringFromLocation, VanillaOidc } from '@axa-fr/oidc-client';
 import { ComponentType, useEffect } from 'react';
 
 const SilentLogin: ComponentType<any> = ({ configurationName }) => {

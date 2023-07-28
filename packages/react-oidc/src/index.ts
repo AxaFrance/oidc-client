@@ -8,5 +8,5 @@ export type {
   Fetch,
   OidcConfiguration,
   StringMap,
-} from '@axa-fr/vanilla-oidc';
-export { type OidcUserInfo, TokenRenewMode } from '@axa-fr/vanilla-oidc';
+} from '@axa-fr/oidc-client';
+export { type OidcUserInfo, TokenRenewMode } from '@axa-fr/oidc-client';
