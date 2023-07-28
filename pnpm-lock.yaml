@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -82,7 +86,7 @@ importers:
 
   examples/oidc-client-demo:
     dependencies:
-      '@axa-fr/vanilla-oidc':
+      '@axa-fr/oidc-client':
         specifier: workspace:~
         version: link:../../packages/oidc-client
       '@testing-library/jest-dom':
@@ -112,16 +116,20 @@ importers:
         version: 4.4.4(@types/node@18.11.9)
 
   examples/react-oidc-demo:
-    devDependencies:
-      '@axa-fr/oidc-client-service-worker':
-        specifier: workspace:*
-        version: link:../../packages/oidc-client-service-worker
+    dependencies:
       '@axa-fr/react-oidc':
         specifier: workspace:*
         version: link:../../packages/react-oidc
-      '@axa-fr/vanilla-oidc':
-        specifier: workspace:*
-        version: link:../../packages/oidc-client
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      react-router-dom:
+        specifier: ^6.14.1
+        version: 6.14.1(react-dom@18.2.0)(react@18.2.0)
+    devDependencies:
       '@testing-library/jest-dom':
         specifier: 5.16.5
         version: 5.16.5
@@ -155,15 +163,6 @@ importers:
       msw:
         specifier: 1.2.2
         version: 1.2.2(typescript@5.1.6)
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-      react-router-dom:
-        specifier: ^6.14.1
-        version: 6.14.1(react-dom@18.2.0)(react@18.2.0)
       typescript:
         specifier: 5.1.6
         version: 5.1.6
@@ -252,12 +251,12 @@ importers:
 
   packages/react-oidc:
     dependencies:
+      '@axa-fr/oidc-client':
+        specifier: workspace:*
+        version: link:../oidc-client
       '@axa-fr/oidc-client-service-worker':
         specifier: workspace:*
         version: link:../oidc-client-service-worker
-      '@axa-fr/vanilla-oidc':
-        specifier: workspace:*
-        version: link:../oidc-client
       base64-js:
         specifier: 1.5.1
         version: 1.5.1
@@ -1186,6 +1185,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: false
     optional: true
@@ -1195,6 +1195,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: false
     optional: true
@@ -1204,6 +1205,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: false
     optional: true
@@ -1213,6 +1215,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: false
     optional: true
@@ -1291,7 +1294,7 @@ packages:
   /@remix-run/router@1.7.1:
     resolution: {integrity: sha512-bgVQM4ZJ2u2CM8k1ey70o1ePFXsEzYVZoWghh6WjM8p59jQ7HxzbHW4SbnWFG7V9ig9chLawQxDTZ3xzOF8MkQ==}
     engines: {node: '>=14'}
-    dev: true
+    dev: false
 
   /@rollup/pluginutils@5.0.2:
     resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
@@ -4990,7 +4993,7 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-router: 6.14.1(react@18.2.0)
-    dev: true
+    dev: false
 
   /react-router@6.14.1(react@18.2.0):
     resolution: {integrity: sha512-U4PfgvG55LdvbQjg5Y9QRWyVxIdO1LlpYT7x+tMAxd9/vmiPuJhIwdxZuIQLN/9e3O4KFDHYfR9gzGeYMasW8g==}
@@ -5000,7 +5003,7 @@ packages:
     dependencies:
       '@remix-run/router': 1.7.1
       react: 18.2.0
-    dev: true
+    dev: false
 
   /react@18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
@@ -6253,7 +6256,3 @@ packages:
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

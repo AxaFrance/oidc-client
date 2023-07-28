@@ -1,4 +1,4 @@
-import { VanillaOidc } from '@axa-fr/vanilla-oidc';
+import { VanillaOidc } from '@axa-fr/oidc-client';
 import { ComponentType, useEffect } from 'react';
 
 const SilentCallbackManager: ComponentType<any> = ({ configurationName }) => {

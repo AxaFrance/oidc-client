@@ -1,4 +1,4 @@
-import { VanillaOidc } from '@axa-fr/vanilla-oidc';
+import { VanillaOidc } from '@axa-fr/oidc-client';
 class Router
 {    getCustomHistory(){
         const generateKey = () =>
@@ -97,7 +97,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
     if(href.includes(configuration.redirect_uri)){
         // @ts-ignore
         element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <h2>Loading callback</h2>
         </div>`;
         vanillaOidc.loginCallbackAsync().then(()=>{
@@ -107,7 +107,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
             const tokens = vanillaOidc.tokens;
             // @ts-ignore
             element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
@@ -124,7 +124,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         window.logout = () =>  vanillaOidc.logoutAsync();
         // @ts-ignore
         element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
@@ -136,14 +136,14 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         window.login= () =>  {
             // @ts-ignore
             element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <h2>Loading</h2>
         </div>`;
             vanillaOidc.loginAsync("/");
         };
         // @ts-ignore
         element.innerHTML = `<div>
-            <h1>@axa-fr/vanilla-oidc demo</h1>
+            <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.login()">Login</button>
         </div>`;
     }

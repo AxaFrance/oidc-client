@@ -1,4 +1,4 @@
-import { getPath } from '@axa-fr/vanilla-oidc';
+import { getPath } from '@axa-fr/oidc-client';
 import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import CallbackComponent from '../default-component/Callback.component.js';

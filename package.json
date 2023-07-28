@@ -6,9 +6,8 @@
   "license": "MIT",
   "workspaces": [
     "packages/oidc-service-worker",
-    "packages/vanilla",
-    "packages/react",
-    "packages/vanilla-demo"
+    "packages/oidc-client",
+    "packages/react-oidc"
   ],
   "keywords": [
     "react",
