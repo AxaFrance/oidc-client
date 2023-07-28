@@ -153,9 +153,12 @@ jobs:
           cat package.json
         working-directory: ./packages/oidc-client
       
-      - name: npm version ${{ steps.tag.outputs.new_version }}
+      - name: pnpm version ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        run: npm version ${{ steps.tag.outputs.new_version }}
+        run: |
+          set -e
+          pnpm version ${{ steps.tag.outputs.new_version }} || true
+          cat package.json
         working-directory: ./packages/oidc-client
         
       - name: pnpm ci
@@ -169,12 +172,17 @@ jobs:
       # React-oidc
       - name: replace workspace:* by ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        run: sed -i 's/workspace:\*/${{ steps.tag.outputs.new_version }}/g' package.json
+        run: |
+          sed -i 's/workspace:\*/${{ steps.tag.outputs.new_version }}/g' package.json
+          cat package.json
         working-directory: ./packages/react-oidc
         
-      - name: npm version ${{ steps.tag.outputs.new_version }}
+      - name: pnpm version ${{ steps.tag.outputs.new_version }}
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        run: npm version ${{ steps.tag.outputs.new_version }}
+        run: |
+          set -e
+          pnpm version ${{ steps.tag.outputs.new_version }} || true
+          cat package.json
         working-directory: ./packages/react-oidc
         
       - name: pnpm i
@@ -217,6 +225,7 @@ jobs:
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         run: |
           sed -i 's/"@axa-fr\/oidc-client-service-worker": "[^"]*"/"@axa-fr\/oidc-client-service-worker": "workspace:*"/g' package.json
+          cat package.json
         working-directory: ./packages/oidc-client
         
       - name: replace ${{ steps.tag.outputs.new_version }} by workspace:*
@@ -224,6 +233,7 @@ jobs:
         run: |
           sed -i 's/"@axa-fr\/oidc-client-service-worker": "[^"]*"/"@axa-fr\/oidc-client-service-worker": "workspace:*"/g' package.json
           sed -i 's/"@axa-fr\/oidc-client": "[^"]*"/"@axa-fr\/oidc-client": "workspace:*"/g' package.json
+          cat package.json
         working-directory: ./packages/react-oidc
           
       - name: Commit updates package.json
@@ -236,10 +246,6 @@ jobs:
           commit_author: GitHub <github-action@bot.com>
           push_options: '--force'
       
-      
-      
-      
-
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
