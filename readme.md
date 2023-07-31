@@ -24,9 +24,9 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
 - Packages
   - [`@axa-fr/oidc-client`](./packages/oidc-client#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Foidc-client.svg)](https://badge.fury.io/js/%40axa-fr%2Foidc-client)
   - [`@axa-fr/react-oidc`](./packages/react-oidc#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc)
-  - `@axa-fr/svelte-oidc`
-  - `@axa-fr/vue-oidc`
-  - `@axa-fr/angular-oidc`
+  - `@axa-fr/svelte-oidc` : we are looking for contributor
+  - `@axa-fr/vue-oidc` : we are looking for contributor
+  - `@axa-fr/angular-oidc` : we are looking for contributor
 - [Migrations](#migrations)
 - [Contribute](#contribute)
 
