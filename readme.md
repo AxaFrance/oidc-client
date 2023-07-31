@@ -1,12 +1,12 @@
 # @axa-fr/oidc-client
 
-[![Continuous Integration](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml)
+[![Continuous Integration](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
-@axa-fr/oidc-client the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
-@axa-fr/oidc-client is a pure javascript library. It works with any JavaScript framework or library.
+**@axa-fr/oidc-client** the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
+**@axa-fr/oidc-client** is a pure javascript library. It works with any JavaScript framework or library.
 
-We provide a wrapper for **React** (compatible next.js) and we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
+We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) and we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
 
 - Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
@@ -24,7 +24,6 @@ We provide a wrapper for **React** (compatible next.js) and we expect soon to pr
 - Packages
   - [`@axa-fr/react-oidc`](./packages/react-oidc#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc)
   - [`@axa-fr/oidc-client`](./packages/oidc-client#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Foidc-client.svg)](https://badge.fury.io/js/%40axa-fr%2Foidc-client)
-  - [`@axa-fr/vanilla-oidc`](./packages/oidc-client#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fvanilla-oidc) **Deprecated in v6: has been renamed to @axa-fr/oidc-client**
 - [Migrations](#migrations)
 - [Contribute](#contribute)
 
@@ -69,7 +68,7 @@ Works perfectly well with:
      alt="@axa-fr/oidc-client is one of the securest way to Authenticate."
       />
   <br>
-  @axa-fr/react-oidc is one of the securest way to Authenticate.
+  @axa-fr/oidc-client is one of the securest way to Authenticate.
 </p>
 
 <p align="center">
@@ -129,22 +128,22 @@ More documentation :
 ## Run The Demos
 
 ```sh
-git clone https://github.com/AxaGuilDEv/oidc-client.git
+git clone https://github.com/AxaFrance/oidc-client.git
 
 # oidc client demo
-cd react-oidc/examples/oidc-client-demo
+cd oidc-client/examples/oidc-client-demo
 pnpm install
 pnpm start
 # then navigate to http://localhost:5174
 
 # react vite demo
-cd react-oidc/examples/react-oidc-demo
+cd oidc-client/examples/react-oidc-demo
 pnpm install
 pnpm start
 # then navigate to http://localhost:4200
 
 # react NextJS demo
-cd react-oidc/examples/nextjs-demo
+cd oidc-client/examples/nextjs-demo
 pnpm install
 pnpm run dev
 # then navigate to http://localhost:3001
@@ -174,6 +173,7 @@ We think that @axa-fr/oidc-client is a good choice for the following reasons :
 - Migrating from v3 to v5 [`guide`](./MIGRATION_GUIDE_V3_TO_V5.md)
 - Migrating from v4 to v5 [`guide`](./MIGRATION_GUIDE_V4_TO_V5.md)
 - Migrating from v5 to v6 [`guide`](./MIGRATION_GUIDE_V5_TO_V6.md)
+- Migrating from v6 to v7 [`guide`](./MIGRATION_GUIDE_V6_TO_V7.md)
 
 ## Contribute
 

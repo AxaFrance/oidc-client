@@ -1,4 +1,4 @@
-import { VanillaOidc } from '@axa-fr/oidc-client';
+import { OidcClient } from '@axa-fr/oidc-client';
 class Router
 {    getCustomHistory(){
         const generateKey = () =>
@@ -88,7 +88,7 @@ export const configuration = {
 
 const href = window.location.href;
 
-const vanillaOidc = VanillaOidc.getOrCreate(() => fetch)(configuration);
+const vanillaOidc = OidcClient.getOrCreate(() => fetch)(configuration);
 
 console.log(href);
 

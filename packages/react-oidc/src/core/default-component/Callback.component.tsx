@@ -1,4 +1,4 @@
-import { VanillaOidc } from '@axa-fr/oidc-client';
+import { OidcClient } from '@axa-fr/oidc-client';
 import { ComponentType, useEffect, useState } from 'react';
 
 import { getCustomHistory } from '../routes/withRouter.js';
@@ -16,7 +16,7 @@ const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, c
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
-      const getOidc = VanillaOidc.get;
+      const getOidc = OidcClient.get;
       try {
         const { callbackPath } = await getOidc(configurationName).loginCallbackAsync();
         const history = (withCustomHistory) ? withCustomHistory() : getCustomHistory();

@@ -7,4 +7,4 @@ export type {
   OidcConfiguration,
   StringMap,
 } from './types.js';
-export { type OidcUserInfo, VanillaOidc } from './vanillaOidc.js';
+export { type OidcUserInfo, OidcClient } from './oidcClient.js';

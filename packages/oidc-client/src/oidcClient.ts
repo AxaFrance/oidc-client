@@ -6,7 +6,7 @@ export interface EventSubscriber {
     (name: string, data:any);
 }
 
-export class VanillaOidc {
+export class OidcClient {
     private _oidc: Oidc;
     constructor(oidc: Oidc) {
         this._oidc = oidc;
@@ -24,12 +24,12 @@ export class VanillaOidc {
         this._oidc.publishEvent(eventName, data);
     }
 
-    static getOrCreate = (getFetch : () => Fetch) => (configuration:OidcConfiguration, name = 'default'): VanillaOidc => {
-        return new VanillaOidc(Oidc.getOrCreate(getFetch)(configuration, name));
+    static getOrCreate = (getFetch : () => Fetch) => (configuration:OidcConfiguration, name = 'default'): OidcClient => {
+        return new OidcClient(Oidc.getOrCreate(getFetch)(configuration, name));
     };
 
-    static get(name = 'default'):VanillaOidc {
-        return new VanillaOidc(Oidc.get(name));
+    static get(name = 'default'):OidcClient {
+        return new OidcClient(Oidc.get(name));
     }
 
     static eventNames = Oidc.eventNames;

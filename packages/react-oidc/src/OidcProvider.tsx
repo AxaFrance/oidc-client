@@ -1,4 +1,4 @@
-import { Fetch, getFetchDefault, OidcConfiguration, VanillaOidc } from '@axa-fr/oidc-client';
+import { Fetch, getFetchDefault, OidcConfiguration, OidcClient } from '@axa-fr/oidc-client';
 import { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import AuthenticatingError from './core/default-component/AuthenticateError.component.js';
@@ -8,7 +8,7 @@ import OidcRoutes from './core/routes/OidcRoutes.js';
 import { CustomHistory } from './core/routes/withRouter.js';
 
 export type oidcContext = {
-    (name?: string): VanillaOidc;
+    (name?: string): OidcClient;
 };
 
 const defaultEventState = { name: '', data: null };
@@ -38,7 +38,7 @@ export type OidcSessionProps = {
 
 const OidcSession: FC<PropsWithChildren<OidcSessionProps>> = ({ loadingComponent, children, configurationName }) => {
     const [isLoading, setIsLoading] = useState(true);
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         let isMounted = true;
@@ -94,7 +94,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     getFetch = null,
 }) => {
     const getOidc = (configurationName = 'default') => {
-        return VanillaOidc.getOrCreate(getFetch ?? getFetchDefault)(configuration, configurationName);
+        return OidcClient.getOrCreate(getFetch ?? getFetchDefault)(configuration, configurationName);
     };
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const [loading, setLoading] = useState(true);
@@ -117,30 +117,30 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     useEffect(() => {
         const oidc = getOidc(configurationName);
         const newSubscriptionId = oidc.subscribeEvents((name, data) => {
-            if (name === VanillaOidc.eventNames.refreshTokensAsync_error || name === VanillaOidc.eventNames.syncTokensAsync_error) {
+            if (name === OidcClient.eventNames.refreshTokensAsync_error || name === OidcClient.eventNames.syncTokensAsync_error) {
                 if (onSessionLost != null) {
                     onSessionLost();
                     return;
                 }
                 setEvent({ name, data });
-            } else if (name === VanillaOidc.eventNames.logout_from_another_tab) {
+            } else if (name === OidcClient.eventNames.logout_from_another_tab) {
                 if (onLogoutFromAnotherTab != null) {
                     onLogoutFromAnotherTab();
                     return;
                 }
                 setEvent({ name, data });
-            } else if (name === VanillaOidc.eventNames.logout_from_same_tab) {
+            } else if (name === OidcClient.eventNames.logout_from_same_tab) {
                 if (onLogoutFromSameTab != null) {
                     onLogoutFromSameTab();
                 }
                 // setEvent({name, data});
-            } else if (name === VanillaOidc.eventNames.loginAsync_begin ||
-                name === VanillaOidc.eventNames.loginCallbackAsync_end ||
-                name === VanillaOidc.eventNames.loginAsync_error ||
-                name === VanillaOidc.eventNames.loginCallbackAsync_error
+            } else if (name === OidcClient.eventNames.loginAsync_begin ||
+                name === OidcClient.eventNames.loginCallbackAsync_end ||
+                name === OidcClient.eventNames.loginAsync_error ||
+                name === OidcClient.eventNames.loginCallbackAsync_error
             ) {
                 setEvent({ name, data });
-            } else if (name === VanillaOidc.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
+            } else if (name === OidcClient.eventNames.service_worker_not_supported_by_browser && configuration.service_worker_only === true) {
                 setEvent({ name, data });
             }
         });
@@ -165,22 +165,22 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     const oidc = getOidc(configurationName);
     const eventName = event.name;
     switch (eventName) {
-        case VanillaOidc.eventNames.service_worker_not_supported_by_browser:
+        case OidcClient.eventNames.service_worker_not_supported_by_browser:
             return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <ServiceWorkerNotSupportedComponent configurationName={configurationName} />
             </Switch>);
-        case VanillaOidc.eventNames.loginAsync_begin:
+        case OidcClient.eventNames.loginAsync_begin:
             return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <AuthenticatingComponent configurationName={configurationName} />
             </Switch>);
-        case VanillaOidc.eventNames.loginAsync_error:
-        case VanillaOidc.eventNames.loginCallbackAsync_error:
+        case OidcClient.eventNames.loginAsync_error:
+        case OidcClient.eventNames.loginCallbackAsync_error:
             return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <AuthenticatingErrorComponent configurationName={configurationName} />
             </Switch>);
-        case VanillaOidc.eventNames.refreshTokensAsync_error:
-        case VanillaOidc.eventNames.syncTokensAsync_error:
-        case VanillaOidc.eventNames.logout_from_another_tab:
+        case OidcClient.eventNames.refreshTokensAsync_error:
+        case OidcClient.eventNames.syncTokensAsync_error:
+        case OidcClient.eventNames.logout_from_another_tab:
             return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
                 <SessionLostComponent configurationName={configurationName} />
             </Switch>);

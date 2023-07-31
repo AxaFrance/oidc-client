@@ -1,4 +1,4 @@
-import { StringMap, VanillaOidc } from '@axa-fr/oidc-client';
+import { StringMap, OidcClient } from '@axa-fr/oidc-client';
 import { FC, PropsWithChildren, useEffect } from 'react';
 
 export type OidcSecureProps = {
@@ -8,7 +8,7 @@ export type OidcSecureProps = {
 };
 
 export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({ children, callbackPath = null, extras = null, configurationName = 'default' }) => {
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
         if (!oidc.tokens) {

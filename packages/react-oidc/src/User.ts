@@ -1,4 +1,4 @@
-import { type OidcUserInfo, VanillaOidc } from '@axa-fr/oidc-client';
+import { type OidcUserInfo, OidcClient } from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
 
 export enum OidcUserStatus {
@@ -17,7 +17,7 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
     const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: null, status: OidcUserStatus.Unauthenticated });
     const [oidcUserId, setOidcUserId] = useState<string>('');
 
-    const oidc = VanillaOidc.get(configurationName);
+    const oidc = OidcClient.get(configurationName);
     useEffect(() => {
         let isMounted = true;
         if (oidc && oidc.tokens) {

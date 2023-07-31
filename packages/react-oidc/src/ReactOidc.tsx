@@ -1,4 +1,4 @@
-import { StringMap, VanillaOidc } from '@axa-fr/oidc-client';
+import { StringMap, OidcClient } from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
 
 const defaultConfigurationName = 'default';
@@ -17,7 +17,7 @@ const defaultIsAuthenticated = (getOidc: GetOidcFn, configurationName: string) =
 };
 
 export const useOidc = (configurationName = defaultConfigurationName) => {
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(defaultIsAuthenticated(getOidc, configurationName));
 
     useEffect(() => {
@@ -26,7 +26,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
         setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-            if (name === VanillaOidc.eventNames.logout_from_another_tab || name === VanillaOidc.eventNames.logout_from_same_tab || name === VanillaOidc.eventNames.token_aquired) {
+            if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab || name === OidcClient.eventNames.token_aquired) {
                 if (isMounted) {
                     setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
                 }
@@ -65,7 +65,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
 const accessTokenInitialState = { accessToken: null, accessTokenPayload: null };
 
 const initTokens = (configurationName: string) => {
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
     if (oidc.tokens) {
         const tokens = oidc.tokens;
@@ -83,7 +83,7 @@ export type OidcAccessToken = {
 }
 
 export const useOidcAccessToken = (configurationName = defaultConfigurationName) => {
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const [state, setAccessToken] = useState<OidcAccessToken>(initTokens(configurationName));
 
     useEffect(() => {
@@ -95,12 +95,12 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-            if (name === VanillaOidc.eventNames.token_renewed ||
-                name === VanillaOidc.eventNames.token_aquired ||
-                name === VanillaOidc.eventNames.logout_from_another_tab ||
-                name === VanillaOidc.eventNames.logout_from_same_tab ||
-                name === VanillaOidc.eventNames.refreshTokensAsync_error ||
-                name === VanillaOidc.eventNames.syncTokensAsync_error) {
+            if (name === OidcClient.eventNames.token_renewed ||
+                name === OidcClient.eventNames.token_aquired ||
+                name === OidcClient.eventNames.logout_from_another_tab ||
+                name === OidcClient.eventNames.logout_from_same_tab ||
+                name === OidcClient.eventNames.refreshTokensAsync_error ||
+                name === OidcClient.eventNames.syncTokensAsync_error) {
                 if (isMounted) {
                     const tokens = oidc.tokens;
                     setAccessToken(tokens != null ? { accessToken: tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload } : accessTokenInitialState);
@@ -119,7 +119,7 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
 const idTokenInitialState = { idToken: null, idTokenPayload: null };
 
 const initIdToken = (configurationName: string) => {
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
     if (oidc.tokens) {
         const tokens = oidc.tokens;
@@ -134,7 +134,7 @@ export type OidcIdToken = {
 }
 
 export const useOidcIdToken = (configurationName = defaultConfigurationName) => {
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const [state, setIDToken] = useState<OidcIdToken>(initIdToken(configurationName));
 
     useEffect(() => {
@@ -146,12 +146,12 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-            if (name === VanillaOidc.eventNames.token_renewed ||
-                name === VanillaOidc.eventNames.token_aquired ||
-                name === VanillaOidc.eventNames.logout_from_another_tab ||
-                name === VanillaOidc.eventNames.logout_from_same_tab ||
-                name === VanillaOidc.eventNames.refreshTokensAsync_error ||
-                name === VanillaOidc.eventNames.syncTokensAsync_error) {
+            if (name === OidcClient.eventNames.token_renewed ||
+                name === OidcClient.eventNames.token_aquired ||
+                name === OidcClient.eventNames.logout_from_another_tab ||
+                name === OidcClient.eventNames.logout_from_same_tab ||
+                name === OidcClient.eventNames.refreshTokensAsync_error ||
+                name === OidcClient.eventNames.syncTokensAsync_error) {
                 if (isMounted) {
                     const tokens = oidc.tokens;
                     setIDToken(tokens != null ? { idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload } : idTokenInitialState);

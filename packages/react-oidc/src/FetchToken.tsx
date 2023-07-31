@@ -1,4 +1,4 @@
-import { Fetch, VanillaOidc } from '@axa-fr/oidc-client';
+import { Fetch, OidcClient } from '@axa-fr/oidc-client';
 import { useCallback } from 'react';
 
 export interface ComponentWithOidcFetchProps {
@@ -7,7 +7,7 @@ export interface ComponentWithOidcFetchProps {
 
 const defaultConfigurationName = 'default';
 
-const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => VanillaOidc | null) => async (...params: Parameters<Fetch>) => {
+const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => OidcClient | null) => async (...params: Parameters<Fetch>) => {
   const [url, options, ...rest] = params;
   const optionTmp = options ? { ...options } : { method: 'GET' };
 
@@ -45,7 +45,7 @@ export const withOidcFetch = (fetch: Fetch = null, configurationName = defaultCo
 
 export const useOidcFetch = (fetch: Fetch = null, configurationName = defaultConfigurationName) => {
   const previousFetch = fetch || window.fetch;
-  const getOidc = VanillaOidc.get;
+  const getOidc = OidcClient.get;
 
   const memoizedFetchCallback = useCallback(
     (input: RequestInfo | URL, init?: RequestInit) => {
