@@ -8,7 +8,7 @@
 
 We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) and we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
 
-- Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/
+- Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
 <p align="center">
@@ -165,13 +165,6 @@ More information about OIDC
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
 - [English : Increase the security and simplicity of your information system with OpenID Connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
 
-## Why OIDC at Client side instead of BFF (Backend for Frontend) ?
-
-We think that @axa-fr/oidc-client is a good choice for the following reasons :
-- Secure by default with the use of the Service Worker. OIDC at Server Side from a BFF can be secure but with a bad configuration it can be very insecure. With OIDC Client you reuse the OIDC Server configuration which generally is well configured by OIDC security experts, so secure.
-- With OIDC at Server side, It is more difficult to fine grain the scope of the token. With OIDC at Client side you can acquire a new token with a new scope for specific scenario (multiple authentication). You can fine tune token lifetime and scope for each scenario.
-- Sometime your Web Application does not need a server, OIDC at client side is a good choice because you do not need to spend money for a server juste for Authentication. For example for a payment, you can retrieve only an access_token valid 2 minutes without any refresh_token.
-- OIDC at Client side can be also a good choice for a fast time to market. You can start with OIDC at Client side and then migrate to OIDC at Server side if you need it. The two solutions are compatible.
 
 ## Migrations
 
