@@ -133,20 +133,23 @@ More documentation :
 ```sh
 git clone https://github.com/AxaFrance/oidc-client.git
 
+cd oidc-client
+pnpm install
+
 # oidc client demo
-cd oidc-client/examples/oidc-client-demo
+cd examples/oidc-client-demo
 pnpm install
 pnpm start
 # then navigate to http://localhost:5174
 
 # react vite demo
-cd oidc-client/examples/react-oidc-demo
+cd examples/react-oidc-demo
 pnpm install
 pnpm start
 # then navigate to http://localhost:4200
 
 # react NextJS demo
-cd oidc-client/examples/nextjs-demo
+cd examples/nextjs-demo
 pnpm install
 pnpm run dev
 # then navigate to http://localhost:3001

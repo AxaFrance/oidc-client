@@ -1,14 +1,32 @@
-# Contributing to @axa-fr/react-oidc
+# Contributing to @axa-fr/oidc-client
 
-First, ensure you have the [latest `npm`](https://docs.npmjs.com/).
+First, ensure you have the [latest `pnpm`](https://pnpm.io/).
 
 To get started with the repository:
 
 ```sh
-git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd react-oidc/packages/react
-npm install
-npm start
+git clone https://github.com/AxaFrance/oidc-client.git
+
+cd oidc-client
+pnpm install
+
+# oidc client demo
+cd examples/oidc-client-demo
+pnpm install
+pnpm start
+# then navigate to http://localhost:5174
+
+# react vite demo
+cd examples/react-oidc-demo
+pnpm install
+pnpm start
+# then navigate to http://localhost:4200
+
+# react NextJS demo
+cd examples/nextjs-demo
+pnpm install
+pnpm run dev
+# then navigate to http://localhost:3001
 ```
 You are now ready to contribute!
 
@@ -16,7 +34,7 @@ You are now ready to contribute!
 
 Please respect the following [PULL_REQUEST_TEMPLATE.md](./PULL_REQUEST_TEMPLATE.md)
 
-Packages are automaticaly published on npm when a PR is merged on main.
+Packages are automatically published on npm when a PR is merged on main.
 
 Example of commit messages :
 

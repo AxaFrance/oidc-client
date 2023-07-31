@@ -300,9 +300,10 @@ export class OidcClient {
 
 ```sh
 git clone https://github.com/AxaFrance/oidc-client.git
+cd oidc-client
 
 # oidc client demo
-cd oidc-client/examples/oidc-client-demo
+cd /examples/oidc-client-demo
 pnpm install
 pnpm start
 # then navigate to http://localhost:5174

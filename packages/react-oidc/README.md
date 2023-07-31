@@ -76,9 +76,11 @@ trustedDomains.config_show_access_token = { domains : ["https://demo.duendesoftw
 
 ```sh
 git clone https://github.com/AxaFrance/oidc-client.git
-cd oidc-client/packages/react
-npm install
-npm start
+cd oidc-client
+pnpm install
+cd /examples/react-oidc-demo
+pnpm install
+pnpm start
 # then navigate to http://localhost:4200
 ```
 
