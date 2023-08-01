@@ -1,11 +1,43 @@
 ﻿
 # FAQ (Frequently Asked Questions)
 
-## How work silent signing ?
+## Condition to make silent signing work 
+
+Third party cookies are blocked by default on Safari. 
+They will be on all browsers very soon.
+Today, silent sigin work on safari only if OIDC provider is on the same domain than client application. 
+Third party cookies are blocked. They will be on all browsers very soon.
+
+Example of domain that work:
+- https://oidc-provider.axa.fr
+- https://my-app.axa.fr
+
+Silent Signing use cookies with your OIDC provider to restore the session and retrieve tokens.
+It open in background an IFrame to a specific page to your OIDC provider.
+
+## Make single logout work
+
+Same contraint for Single Logout that for "silent signing".
+*Single logout allow your to disconnect from multiple OIDC Client session in one action event if your are connected on different application.
+
+## Make Monitor Session work
+
+Same constraint for "monitorSession" that for "silent signing".
+
+Monitor session allow you to be notified when your session is expired or when you are disconnected from your OIDC provider.
+
+## Tokens are always refreshed in background every seconds
+
+@axa-fr/oidc-client refresh automatically tokens in  background.
+It refresh token before its expiration to have always a valid token.
+
+If your tokens sessions Lifetime is too short, it will refresh it very often.
+It start refreshing 70 seconds before expiration.
+
+So set a session validity upper from 3 minutes is a good idea.
 
 ## Hard-reload in browser unregister ServiceWorker
 https://github.com/AxaFrance/react-oidc/issues/1098
-
 
 ## window.crypto.subtle is unavailable
 https://github.com/AxaFrance/react-oidc/issues/1028
