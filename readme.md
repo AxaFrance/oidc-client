@@ -3,13 +3,6 @@
 [![Continuous Integration](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
-- **@axa-fr/oidc-client** the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
-- **@axa-fr/oidc-client** is a pure javascript library. It works with any JavaScript framework or library.
-- **@axa-fr/react-oidc** is for **React** (compatible next.js, etc.), we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
-
-Demos: 
-- Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
-- Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
 <p align="center">
     <img src="./docs/img/introduction.gif"
@@ -33,7 +26,16 @@ Demos:
 
 ## About
 
-@axa-fr/oidc-client is:
+**@axa-fr/oidc-client** the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
+**@axa-fr/oidc-client** is a pure javascript library. It works with any JavaScript framework or library.
+**@axa-fr/react-oidc** is for **React** (compatible next.js, etc.), we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
+
+Demos:
+- Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
+- Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
+
+
+**@axa-fr/oidc-client** is:
 
 - **Secure** :
   - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSS attacks)
