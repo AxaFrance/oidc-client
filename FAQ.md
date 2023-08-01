@@ -15,12 +15,12 @@ Example of domain that work:
 Silent Signing use cookies with your OIDC provider to restore the session and retrieve tokens.
 It open in background an IFrame to a specific page to your OIDC provider.
 
-## Make single logout work
+## Condition to  single logout work
 
 Same contraint for Single Logout that for "silent signing".
 *Single logout allow your to disconnect from multiple OIDC Client session in one action event if your are connected on different application.
 
-## Make Monitor Session work
+## Condition to  Monitor Session work
 
 Same constraint for "monitorSession" that for "silent signing".
 
@@ -32,14 +32,23 @@ Monitor session allow you to be notified when your session is expired or when yo
 It refresh token before its expiration to have always a valid token.
 
 If your tokens sessions Lifetime is too short, it will refresh it very often.
-It start refreshing 70 seconds before expiration.
+It start refreshing 120 seconds before expiration.
 
 So set a session validity upper from 3 minutes is a good idea.
+
+By default @axa-fr/oidc-client take the shortest lifetime between access_token and id_token.
+You can use the option "token_renew_mode" to change this behavior.
+
+ - **token_renew_mode**: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
 
 ## Hard-reload in browser unregister ServiceWorker
 https://github.com/AxaFrance/react-oidc/issues/1098
 
-## window.crypto.subtle is unavailable
+## window.crypto.subtle is unavailable over HTTP
+
+The library does not work over HTTP. You need to use HTTPS.
+We think it is quite easy to setup nowadays event on local development.
+
 https://github.com/AxaFrance/react-oidc/issues/1028
 
 ## Why OIDC at Client side instead of BFF (Backend for Frontend) ?

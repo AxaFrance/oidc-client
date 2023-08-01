@@ -162,12 +162,9 @@ const configuration = {
     service_worker_convert_all_requests_to_cors: Boolean, // force all requests that service worker upgrades to have 'cors' mode. This allows setting an authentication token on requests initiated by HTML parsing (e.g., img tags, download links, etc.).
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
-    withCustomHistory: Function, // Override history modification, return an instance with replaceState(url, stateHistory) implemented (like History.replaceState())
     authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in seconds of the openid well-known URL, default is 1 hour
     authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in milliseconds of the openid well-known URL, default is 10 seconds, then an error is thrown
     monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
-    onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user with the same subject is logged out from another tab when session_monitor is active
-    onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user is logged out from the same tab when session_monitor is active
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
 };
