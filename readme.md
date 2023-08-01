@@ -49,14 +49,6 @@ Demos:
   - Work with Service Worker (more secure) and without for older browser (less secure). 
   - You can disable Service Worker if you want (but less secure) and just use SessionStorage or LocalStorage mode.
 
-<p align="center">
-    <img src="./docs/img/schema_pcke_client_side_with_service_worker.png"
-     alt="Schema Authorization Code Grant with pcke flow on the using service worker"
-      />
-  <br>
-  The service worker catch <b>access_token</b> and <b>refresh_token</b> that will never be accessible to the client.
-</p>
-
 Works perfectly well with:
 
 - [Auth0](https://auth0.com/)
@@ -67,37 +59,8 @@ Works perfectly well with:
 - [Keycloak](https://www.keycloak.org/)
 - etc., all OIDC providers
 
-<p align="center">
-    <img src="./docs/img/react-oidc-secure.PNG"
-     alt="@axa-fr/oidc-client is one of the securest way to Authenticate."
-      />
-  <br>
-  @axa-fr/oidc-client is one of the securest way to Authenticate.
-</p>
 
-<p align="center">
-    <img src="./docs/img/react-oidc-lifetime.PNG"
-     alt="Service Worker lifetime drawback. "
-      />
-  <br>
-  Service Worker lifetime drawback.
-</p>
 
-<p align="center">
-    <img src="./docs/img/react-oidc-silent.PNG"
-     alt="Silent-Signing constraints. "
-      />
-  <br>
-  Silent-Signing constraints.
-</p>
-
-<p align="center">
-    <img src="./docs/img/react-oidc-cost.PNG"
-     alt="@axa-fr/oidc-client is the simplest and cheapest."
-      />
-  <br>
-  @axa-fr/oidc-client is the simplest and cheapest.
-</p>
 
 ## Getting Started
 
@@ -158,10 +121,19 @@ pnpm run dev
 
 ## How It Works
 
+<p align="center">
+    <img src="./docs/img/schema_pcke_client_side_with_service_worker.png"
+     alt="Schema Authorization Code Grant with pcke flow on the using service worker"
+      />
+  <br>
+  The service worker catch <b>access_token</b> and <b>refresh_token</b> that will never be accessible to the client.
+</p>
+
+
 These components encapsulate the use of "`@axa-fr/oidc-client`" in order to hide workflow complexity.
 Internally for "`@axa-fr/react-oidc`", native History API is used to be router library agnostic.
 
-More information about OIDC
+More information about OIDC :
 
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
 - [English : Increase the security and simplicity of your information system with OpenID Connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)

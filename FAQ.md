@@ -50,3 +50,26 @@ We think that @axa-fr/oidc-client is a good choice for the following reasons :
 - Sometime your Web Application does not need a server, OIDC at client side is a good choice because you do not need to spend money for a server juste for Authentication. For example for a payment, you can retrieve only an access_token valid 2 minutes without any refresh_token.
 - OIDC at Client side can be also a good choice for a fast time to market. You can start with OIDC at Client side and then migrate to OIDC at Server side if you need it. The two solutions are compatible.
 
+<p align="center">
+    <img src="./docs/img/react-oidc-secure.PNG"
+     alt="@axa-fr/oidc-client is one of the securest way to Authenticate."
+      />
+  <br>
+  @axa-fr/oidc-client is one of the securest way to Authenticate.
+</p>
+
+<p align="center">
+    <img src="./docs/img/react-oidc-lifetime.PNG"
+     alt="Service Worker lifetime drawback. "
+      />
+  <br>
+  Service Worker lifetime drawback.
+</p>
+
+<p align="center">
+    <img src="./docs/img/react-oidc-cost.PNG"
+     alt="@axa-fr/oidc-client is the simplest and cheapest."
+      />
+  <br>
+  @axa-fr/oidc-client is the simplest and cheapest.
+</p>
