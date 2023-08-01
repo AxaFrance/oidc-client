@@ -1,10 +1,10 @@
-import { getParseQueryStringFromLocation, VanillaOidc } from '@axa-fr/oidc-client';
+import { getParseQueryStringFromLocation, OidcClient } from '@axa-fr/oidc-client';
 import { ComponentType, useEffect } from 'react';
 
 const SilentLogin: ComponentType<any> = ({ configurationName }) => {
     const queryParams = getParseQueryStringFromLocation(window.location.href);
 
-    const getOidc = VanillaOidc.get;
+    const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
 
     let extras = null;

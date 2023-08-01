@@ -1,4 +1,4 @@
-﻿# @axa-fr/vanilla-oidc
+﻿# @axa-fr/oidc-client
 
 [![Continuous Integration](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Corevage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
@@ -16,23 +16,21 @@ Try the demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
 ## About
 
-@axa-fr/vanilla-oidc is a pure OIDC client library agnostic to any framework. It is used by @axa-fr/react-oidc and can be used by any framework.
-
-It is a real alternative to existing oidc-client libraries.
+@axa-fr/oidc-client is:
 
 - **Secure** :
-    - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSRF attacks)
-    - OIDC using client side Code Credential Grant with PKCE only
-- **Lightweight**
-- **Simple** :
-    - refresh_token and access_token are auto refreshed in background
-    - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure `OidcTrustedDomains.js` file
-- **No cookies problem** : You can disable silent signin (that internally use an iframe). For your information, your OIDC server should be in the same domain of your website in order to be able to send OIDC server cookies from your website via an internal IFRAME, else, you may encounter COOKIES problem.
+  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSS attacks)
+  - OIDC using client side Code Credential Grant with pkce only
+- **Lightweight** : Unpacked Size on npm is **274 kB**
+- **Simple**
+  - refresh_token and access_token are auto refreshed in background
+  - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
 - **Multiple Authentication** :
-    - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
-    - You can authenticate to multiple different providers inside the same SPA (single page application) website
+  - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
+  - You can authenticate to multiple different providers inside the same SPA (single page application) website
 - **Flexible** :
-    - Work with Service Worker (more secure) and without for older browser (less secure)
+  - Work with Service Worker (more secure) and without for older browser (less secure).
+  - You can disable Service Worker if you want (but less secure) and just use SessionStorage or LocalStorage mode.
 
 ![](https://github.com/AxaGuilDEv/react-oidc/blob/master/docs/img/schema_pcke_client_side_with_service_worker.png?raw=true)
 
@@ -61,64 +59,75 @@ The only file you should edit is "OidcTrustedDomains.js".
 
 // Domains used by OIDC server must be also declared here
 const trustedDomains = {
-  default: ["https://demo.duendesoftware.com", "https://www.myapi.com/users"],
+  default: {
+    oidcDomains :["https://demo.duendesoftware.com"], 
+    accessTokenDomains : ["https://www.myapi.com/users"]
+  },
+};
+
+// Service worker will continue to give access token to the JavaScript client
+// Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
+// scenarios which require it. For example, to send it via websocket connection.
+trustedDomains.config_show_access_token = {
+  oidcDomains :["https://demo.duendesoftware.com"],
+  accessTokenDomains : ["https://www.myapi.com/users"],
+  showAccessToken: true
 };
 ```
 
 The code of the demo :
 
 ```js
-import { VanillaOidc } from '@axa-fr/oidc-client'
+import {OidcClient} from '@axa-fr/oidc-client'
 
 export const configuration = {
-    client_id: 'interactive.public.short',
-    redirect_uri: window.location.origin + '/#/authentication/callback',
-    silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
-    scope: 'openid profile email api offline_access',
-    authority: 'https://demo.duendesoftware.com',
-    service_worker_relative_url:'/OidcServiceWorker.js',
-    service_worker_only: false,
+  client_id: 'interactive.public.short',
+  redirect_uri: window.location.origin + '/#/authentication/callback',
+  silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.duendesoftware.com',
+  service_worker_relative_url: '/OidcServiceWorker.js',
+  service_worker_only: false,
 };
 
 const href = window.location.href;
-const vanillaOidc = VanillaOidc.getOrCreate(() => fetch)(configuration);
+const oidcClient = OidcClient.getOrCreate(() => fetch)(configuration);
 
 console.log(href);
 
-vanillaOidc.tryKeepExistingSessionAsync().then(() => {
-    if(href.includes(configuration.redirect_uri)){
-        vanillaOidc.loginCallbackAsync().then(()=>{
-            window.location.href = "/";
-        });
-        document.body.innerHTML = `<div>
+oidcClient.tryKeepExistingSessionAsync().then(() => {
+  if (href.includes(configuration.redirect_uri)) {
+    oidcClient.loginCallbackAsync().then(() => {
+      window.location.href = "/";
+    });
+    document.body.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
             <h2>Loading</h2>
         </div>`;
-        return
-    }
+    return
+  }
 
-    let tokens = vanillaOidc.tokens;
+  let tokens = oidcClient.tokens;
 
-    if(tokens){
+  if (tokens) {
 
-        // @ts-ignore
-        window.logout = () =>  vanillaOidc.logoutAsync();
-        document.body.innerHTML = `<div>
+    // @ts-ignore
+    window.logout = () => oidcClient.logoutAsync();
+    document.body.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
-            <pre>${JSON.stringify(tokens,null,'\t')}</pre>
+            <pre>${JSON.stringify(tokens, null, '\t')}</pre>
         </div>`
-        
-    }
-    else {
-        // @ts-ignore
-        window.login= () =>  vanillaOidc.loginAsync("/");
-        document.body.innerHTML = `<div>
+
+  } else {
+    // @ts-ignore
+    window.login = () => oidcClient.loginAsync("/");
+    document.body.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.login()">Login</button>
         </div>`
-    }
+  }
 })
 
 
@@ -127,50 +136,178 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
 ## Configuration
 
 ```javascript
-const configuration: {
-    client_id: PropTypes.string.isRequired, // oidc client id
-    redirect_uri: PropTypes.string.isRequired, // oidc redirect url
-    silent_redirect_uri: PropTypes.string, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
-    silent_login_uri: PropTypes.string, // Optional, route that trigger the signin
-    silent_login_timeout: PropTypes.number, // Optional default is 12000 milliseconds
-    scope: PropTypes.string.isRequired, // oidc scope (you need to set "offline_access")
-    authority: PropTypes.string.isRequired,
-    storage: Storage, // Default sessionStorage, you can set localStorage but it is less secure to XSS attacks
-    authority_configuration: PropTypes.shape({
-      // Optional for providers that does not implement OIDC server auto discovery via a .wellknowurl
-      authorization_endpoint: PropTypes.string,
-      token_endpoint: PropTypes.string,
-      userinfo_endpoint: PropTypes.string,
-      end_session_endpoint: PropTypes.string,
-      revocation_endpoint: PropTypes.string,
-      check_session_iframe: PropTypes.string,
-      issuer: PropTypes.string,
-    }),
-    refresh_time_before_tokens_expiration_in_second: PropTypes.number, // default is 120 seconds
-    service_worker_relative_url: PropTypes.string,
-    service_worker_only: PropTypes.boolean, // default false
-    service_worker_convert_all_requests_to_cors: PropTypes.boolean, // force all requests that servie worker upgrades to have 'cors' mode. This allows setting authentication token on requests initialted by html parsing(e.g. img tags, download links etc).
-    extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server (more info: https://github.com/openid/AppAuth-JS)
-    token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that are send to the oidc server during token request (more info: https://github.com/openid/AppAuth-JS)
-    withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState())
-    authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in second of openid wellknowurl, default is 1 hour
-    authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in millisecond of openid wellknowurl, default is 10 seconds, then error is throwed
-    monitor_session: PropTypes.boolean, // Add OpenId monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
-    onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user with the same subject is logged out from another tab when session_monitor is active
-    onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user is logged out from same tab when session_monitor is active
-    token_renew_mode: PropTypes.string, // Optional, update tokens base on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid" , "id_token_invalid"
-    logout_tokens_to_invalidate : Array<string> // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
-  };
+
+const configuration = {
+    client_id: String.isRequired, // oidc client id
+    redirect_uri: String.isRequired, // oidc redirect url
+    silent_redirect_uri: String, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
+    silent_login_uri: String, // Optional, route that triggers the signin
+    silent_login_timeout: Number, // Optional, default is 12000 milliseconds
+    scope: String.isRequired, // oidc scope (you need to set "offline_access")
+    authority: String.isRequired,
+    storage: Storage, // Default sessionStorage, you can set localStorage, but it is less secure against XSS attacks
+    authority_configuration: {
+      // Optional for providers that do not implement OIDC server auto-discovery via a .wellknown URL
+      authorization_endpoint: String,
+      token_endpoint: String,
+      userinfo_endpoint: String,
+      end_session_endpoint: String,
+      revocation_endpoint: String,
+      check_session_iframe: String,
+      issuer: String,
+    },
+    refresh_time_before_tokens_expiration_in_second: Number, // default is 120 seconds
+    service_worker_relative_url: String,
+    service_worker_only: Boolean, // default false
+    service_worker_convert_all_requests_to_cors: Boolean, // force all requests that service worker upgrades to have 'cors' mode. This allows setting an authentication token on requests initiated by HTML parsing (e.g., img tags, download links, etc.).
+    extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
+    token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
+    authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in seconds of the openid well-known URL, default is 1 hour
+    authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in milliseconds of the openid well-known URL, default is 10 seconds, then an error is thrown
+    monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
+    token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
+    logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
+};
+```
+
+## API
+
+```javascript
+/**
+ * OidcClient is a class that acts as a wrapper around the `Oidc` object. It provides methods to handle event subscriptions, logins, logouts, token renewals, user information, etc.
+ */
+export class OidcClient {
+  /**
+   * Creates an instance of OidcClient using a provided `Oidc` object.
+   * @param oidc The instance of the underlying Oidc object to use.
+   */
+  constructor(oidc: Oidc);
+
+  /**
+   * Subscribes a function to events emitted by the underlying Oidc object.
+   * @param func The function to be called when an event is emitted.
+   * @returns A string that identifies the subscription and can be used to unsubscribe later.
+   */
+  subscribeEvents(func: EventSubscriber): string;
+
+  /**
+   * Removes a subscription to a specified event.
+   * @param id The identifier of the subscription to remove, obtained during the initial subscription.
+   */
+  removeEventSubscription(id: string): void;
+
+  /**
+   * Publishes an event with the specified name and associated data.
+   * @param eventName The name of the event to publish.
+   * @param data The data associated with the event.
+   */
+  publishEvent(eventName: string, data: any): void;
+
+  /**
+   * Creates a new instance of OidcClient using a fetch retrieval function `getFetch`, with a given OIDC configuration and an optional name.
+   * @param getFetch The function to retrieve the `Fetch` object.
+   * @param configuration The OIDC configuration to use for creating the OidcClient instance.
+   * @param name The optional name for the created OidcClient instance.
+   * @returns A new instance of OidcClient with the specified configuration.
+   */
+  static getOrCreate(getFetch: () => Fetch)(configuration: OidcConfiguration, name?: string): OidcClient;
+
+  /**
+   * Retrieves an existing OidcClient instance with the specified name, or creates a new instance if it does not exist.
+   * @param name The name of the OidcClient instance to retrieve.
+   * @returns The existing OidcClient instance or a new instance with the specified name.
+   */
+  static get(name?: string): OidcClient;
+
+  /**
+   * The names of the events supported by the Oidc class.
+   */
+  static eventNames: Oidc.eventNames;
+
+  /**
+   * Attempts to keep the existing user session by calling the function of the underlying Oidc object.
+   * @returns A promise resolved with `true` if the user session was kept, otherwise `false`.
+   */
+  tryKeepExistingSessionAsync(): Promise<boolean>;
+
+  /**
+   * Starts the OIDC login process with specified options.
+   * @param callbackPath The callback path for authentication.
+   * @param extras Additional parameters to send to the OIDC server during the login request.
+   * @param isSilentSignin Indicates if the login is silent.
+   * @param scope The OIDC scope for the login request.
+   * @param silentLoginOnly Indicates if only silent login is allowed.
+   * @returns A promise resolved with the login information, or rejected with an error.
+   */
+  loginAsync(callbackPath?: string, extras?: StringMap, isSilentSignin?: boolean, scope?: string, silentLoginOnly?: boolean): Promise<unknown>;
+
+  /**
+   * Starts the OIDC logout process with specified options.
+   * @param callbackPathOrUrl The callback path or URL to use after logout.
+   * @param extras Additional parameters to send to the OIDC server during the logout request.
+   * @returns A promise resolved when the logout is completed.
+   */
+  logoutAsync(callbackPathOrUrl?: string | null | undefined, extras?: StringMap): Promise<void>;
+
+  /**
+   * Performs the silent login process and retrieves user information.
+   * @returns A promise resolved when the silent login process is completed.
+   */
+  silentLoginCallbackAsync(): Promise<void>;
+
+  /**
+   * Renews the user's OIDC tokens.
+   * @param extras Additional parameters to send to the OIDC server during the token renewal request.
+   * @returns A promise resolved when the token renewal is completed.
+   */
+  renewTokensAsync(extras?: StringMap): Promise<void>;
+
+  /**
+   * Performs the callback process after a successful login and automatically renews tokens.
+   * @returns A promise resolved with the callback information, or rejected with an error.
+   */
+  loginCallbackAsync(): Promise<LoginCallback>;
+
+  /**
+   * Retrieves the current OIDC tokens for the user.
+   */
+  get tokens(): Tokens;
+
+  /**
+   * Retrieves the current OIDC configuration used by the OidcClient instance.
+   */
+  get configuration(): OidcConfiguration;
+
+  /**
+   * Retrieves the valid OIDC token for the user.
+   * @param waitMs The maximum wait time in milliseconds to obtain a valid token.
+   * @param numberWait The number of attempts to obtain a valid token.
+   * @returns A promise resolved with the valid token, or rejected with an error.
+   */
+  async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken>;
+
+  /**
+   * Retrieves OIDC user information.
+   * @param noCache Indicates whether user information should be retrieved bypassing the cache.
+   * @returns A promise resolved with the user information, or rejected with an error.
+   */
+  async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false): Promise<T>;
+}
+
 ```
 
 ## Run The Demo
 
 ```sh
-git clone https://github.com/AxaGuilDEv/react-oidc.git
-cd react-oidc/packages/vanilla-demo
-npm install
-npm start
-# then navigate to http://localhost:3000
+git clone https://github.com/AxaFrance/oidc-client.git
+cd oidc-client
+
+# oidc client demo
+cd /examples/oidc-client-demo
+pnpm install
+pnpm start
+# then navigate to http://localhost:5174
+
 ```
 
 ## How It Works
@@ -185,7 +322,7 @@ More information about OIDC
 
 ## Hash route
 
-`vanilla-oidc` work also with hash route.
+`@axa-fr/oidc-client` work also with hash route.
 
 ```javascript
 export const configurationIdentityServerWithHash = {
@@ -200,10 +337,3 @@ export const configurationIdentityServerWithHash = {
   service_worker_only: false,
 };
 ```
-
-## Service Worker Support
-
-- Firefox : tested on Firefox 98.0.2
-- Chrome/Edge : tested on version upper to 90
-- Opera : tested on version upper to 80
-- Safari : tested on Safari/605.1.15
