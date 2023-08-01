@@ -59,7 +59,19 @@ The only file you should edit is "OidcTrustedDomains.js".
 
 // Domains used by OIDC server must be also declared here
 const trustedDomains = {
-  default: ["https://demo.duendesoftware.com", "https://www.myapi.com/users"],
+  default: {
+    oidcDomains :["https://demo.duendesoftware.com"], 
+    accessTokenDomains : ["https://www.myapi.com/users"]
+  },
+};
+
+// Service worker will continue to give access token to the JavaScript client
+// Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
+// scenarios which require it. For example, to send it via websocket connection.
+trustedDomains.config_show_access_token = {
+  oidcDomains :["https://demo.duendesoftware.com"],
+  accessTokenDomains : ["https://www.myapi.com/users"],
+  showAccessToken: true
 };
 ```
 
@@ -126,14 +138,6 @@ oidcClient.tryKeepExistingSessionAsync().then(() => {
 ```javascript
 
 const configuration = {
-  loadingComponent: ReactComponent, // you can inject your own loading component
-  sessionLostComponent: ReactComponent, // you can inject your own session lost component
-  authenticating: ReactComponent, // you can inject your own authenticating component
-  authenticatingErrorComponent: ReactComponent,
-  callbackSuccessComponent: ReactComponent, // you can inject your own call back success component
-  serviceWorkerNotSupportedComponent: ReactComponent, // you can inject your page that explains you require a more modern browser
-  onSessionLost: Function, // If set, "sessionLostComponent" is not displayed, and onSessionLost callback is called instead
-  configuration: {
     client_id: String.isRequired, // oidc client id
     redirect_uri: String.isRequired, // oidc redirect url
     silent_redirect_uri: String, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
@@ -166,7 +170,6 @@ const configuration = {
     onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user is logged out from the same tab when session_monitor is active
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
-  }.isRequired,
 };
 ```
 

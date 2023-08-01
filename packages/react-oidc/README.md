@@ -70,13 +70,20 @@ The only file you should edit is "OidcTrustedDomains.js".
 
 // Domains used by OIDC server must be also declared here
 const trustedDomains = {
-  default: ["https://demo.duendesoftware.com", "https://www.myapi.com/users"],
+  default: {
+    oidcDomains :["https://demo.duendesoftware.com"],
+    accessTokenDomains : ["https://www.myapi.com/users"]
+  },
 };
 
 // Service worker will continue to give access token to the JavaScript client
 // Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
 // scenarios which require it. For example, to send it via websocket connection.
-trustedDomains.config_show_access_token = { domains : ["https://demo.duendesoftware.com"], showAccessToken: true };
+trustedDomains.config_show_access_token = { 
+    oidcDomains :["https://demo.duendesoftware.com"],
+    accessTokenDomains : ["https://www.myapi.com/users"], 
+    showAccessToken: true 
+};
 
 ```
 

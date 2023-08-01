@@ -3,11 +3,11 @@
 [![Continuous Integration](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
-**@axa-fr/oidc-client** the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
-**@axa-fr/oidc-client** is a pure javascript library. It works with any JavaScript framework or library.
+- **@axa-fr/oidc-client** the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
+- **@axa-fr/oidc-client** is a pure javascript library. It works with any JavaScript framework or library.
+- **@axa-fr/react-oidc** is for **React** (compatible next.js, etc.), we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
 
-We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) and we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
-
+Demos: 
 - Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
@@ -27,6 +27,7 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
   - `@axa-fr/svelte-oidc` : we are looking for contributor
   - `@axa-fr/vue-oidc` : we are looking for contributor
   - `@axa-fr/angular-oidc` : we are looking for contributor
+- [FAQ](#FAQ)
 - [Migrations](#migrations)
 - [Contribute](#contribute)
 
@@ -92,10 +93,10 @@ Works perfectly well with:
 
 <p align="center">
     <img src="./docs/img/react-oidc-cost.PNG"
-     alt="@axa-fr/react-oidc is the simplest and cheapest."
+     alt="@axa-fr/oidc-client is the simplest and cheapest."
       />
   <br>
-  @axa-fr/react-oidc is the simplest and cheapest.
+  @axa-fr/oidc-client is the simplest and cheapest.
 </p>
 
 ## Getting Started
@@ -165,6 +166,9 @@ More information about OIDC
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
 - [English : Increase the security and simplicity of your information system with OpenID Connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
 
+## FAQ
+
+-  Frequented Asked Question [`FAQ`](./FAQ.md)
 
 ## Migrations
 
