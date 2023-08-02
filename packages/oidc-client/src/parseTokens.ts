@@ -51,6 +51,7 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
         return null;
     }
     let accessTokenPayload;
+    const expireIn = typeof tokens.expiresIn == "string" ? parseInt(tokens.expiresIn, 10) : tokens.expiresIn;
 
     if (!tokens.issuedAt) {
         const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -65,7 +66,7 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
     const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : extractTokenPayload(tokens.idToken);
 
     const idTokenExpireAt = (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp : Number.MAX_VALUE;
-    const accessTokenExpiresAt = (accessTokenPayload && accessTokenPayload.exp) ? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
+    const accessTokenExpiresAt = (accessTokenPayload && accessTokenPayload.exp) ? accessTokenPayload.exp : tokens.issuedAt + expireIn;
 
     let expiresAt;
 
