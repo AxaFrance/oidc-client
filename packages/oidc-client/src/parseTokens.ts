@@ -74,7 +74,8 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
     if(tokens.expiresAt)
     {
         expiresAt = tokens.expiresAt;
-    } else{
+    } 
+    else {
         if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
             expiresAt = accessTokenExpiresAt;
         } else if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
