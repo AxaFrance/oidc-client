@@ -1,6 +1,7 @@
 import { parseOriginalTokens } from './parseTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
+import codeVersion from './version.js';
 
 export const getOperatingSystem = (navigator) => {
     const nVer = navigator.appVersion;
@@ -219,6 +220,14 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             },
             configurationName,
         });
+        
+        // @ts-ignore
+        if(result.version !== codeVersion) {
+            await registration.unregister();
+            await sleepAsync(2000);
+            window.location.reload();
+        }
+        
         // @ts-ignore
         return { tokens: parseOriginalTokens(result.tokens, null, oidcConfiguration.token_renew_mode), status: result.status };
     };
@@ -244,7 +253,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         sessionStorage['oidc.nonce'] = nonce.nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
-  const getNonceAsync = async () => {
+    const getNonceAsync = async () => {
         // @ts-ignore
         const result = await sendMessageAsync(registration)({ type: 'getNonce', data: null, configurationName });
         // @ts-ignore
