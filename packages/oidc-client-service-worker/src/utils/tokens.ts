@@ -96,6 +96,8 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   if (!tokens.issued_at) {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
     tokens.issued_at = currentTimeUnixSecond;
+  } else if (typeof tokens.issued_at == "string") {
+    tokens.issued_at = parseInt(tokens.issued_at, 10);
   }
 
   const accessTokenPayload = extractTokenPayload(tokens.access_token);
@@ -124,6 +126,8 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
         TOKEN.REFRESH_TOKEN + '_' + configurationName;
   }
 
+  const expireIn = typeof tokens.expires_in == "string" ? parseInt(tokens.expires_in, 10) : tokens.expires_in;
+
   const idTokenExpiresAt =
       _idTokenPayload && _idTokenPayload.exp
           ? _idTokenPayload.exp
@@ -131,7 +135,7 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   const accessTokenExpiresAt =
       accessTokenPayload && accessTokenPayload.exp
           ? accessTokenPayload.exp
-          : tokens.issued_at + tokens.expires_in;
+          : tokens.issued_at + expireIn;
 
   let expiresAt: number;
   const tokenRenewMode = (

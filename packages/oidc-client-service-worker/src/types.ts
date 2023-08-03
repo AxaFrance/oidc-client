@@ -86,14 +86,14 @@ export type AccessTokenPayload = {
 }
 
 export type Tokens = {
-    issued_at: number;
+    issued_at: number | string;
     access_token: string;
     accessTokenPayload: AccessTokenPayload | null;
     id_token: null | string;
     idTokenPayload: IdTokenPayload;
     refresh_token?: string;
     expiresAt: number;
-    expires_in: number;
+    expires_in: number | string;
 };
 
 export type Database = {
