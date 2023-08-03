@@ -50,7 +50,7 @@
     "build": "tsc && vite build",
     "test": "vitest --root . --coverage",
     "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
-    "postinstall": "node ./bin/post-install.mjs"
+    "postinstall": "echo \\033[0;31m WARNING keep sink OidcServiceWorker.js version file \\033[0m"
   },
   "license": "MIT",
   "publishConfig": {

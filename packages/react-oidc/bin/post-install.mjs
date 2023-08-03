@@ -29,9 +29,9 @@ try {
     return !!fs.existsSync(path);
   };
 
-  const initPath = process.env.INIT_CWD;
+  const initPath = process.env.INIT_CWD || process.cwd();
 
-  const srcDir = '../oidc-client-service-worker/dist/';
+  const srcDir = process.env.INIT_CWD !== undefined ? '../oidc-client-service-worker/dist/' : './node_modules/@axa-fr/oidc-client-service-worker/dist/';
   const destinationDir = path.join(initPath, 'public');
 
   const files = [
