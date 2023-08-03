@@ -44,7 +44,7 @@ class TokenBuilder {
     return this;
   }
 
-  public WithNonExpiredToken(): TokenBuilder {
+  public withNonExpiredToken(): TokenBuilder {
     this.withExpiresAt(currentTimeUnixSeconds() + 60);
     this.withExpiresIn(currentTimeUnixSeconds() + 60);
     this.withIssuedAt(currentTimeUnixSeconds() - 60);
@@ -56,12 +56,12 @@ class TokenBuilder {
     return this;
   }
 
-  public withIssuedAt(issued_at: number): TokenBuilder {
+  public withIssuedAt(issued_at: number | string): TokenBuilder {
     this.tokens.issued_at = issued_at;
     return this;
   }
 
-  public withExpiresIn(expires_in: number): TokenBuilder {
+  public withExpiresIn(expires_in: number | string): TokenBuilder {
     this.tokens.expires_in = expires_in;
     return this;
   }
@@ -136,7 +136,7 @@ class OidcConfigBuilder {
 
   public withTestingDefault(): OidcConfigBuilder {
     this.oidcConfig.configurationName = 'test';
-    this.oidcConfig.tokens = new TokenBuilder().WithNonExpiredToken().build();
+    this.oidcConfig.tokens = new TokenBuilder().withNonExpiredToken().build();
     this.oidcConfig.status = 'NOT_CONNECTED';
     this.oidcConfig.state = 'state';
     this.oidcConfig.codeVerifier = 'codeVerifier';

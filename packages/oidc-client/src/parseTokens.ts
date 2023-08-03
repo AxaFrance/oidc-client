@@ -51,10 +51,13 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
         return null;
     }
     let accessTokenPayload;
+    const expireIn = typeof tokens.expiresIn == "string" ? parseInt(tokens.expiresIn, 10) : tokens.expiresIn;
 
     if (!tokens.issuedAt) {
         const currentTimeUnixSecond = new Date().getTime() / 1000;
         tokens.issuedAt = currentTimeUnixSecond;
+    } else if (typeof tokens.issuedAt == "string") {
+        tokens.issuedAt = parseInt(tokens.issuedAt, 10);
     }
 
     if (tokens.accessTokenPayload !== undefined) {
@@ -65,18 +68,23 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
     const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : extractTokenPayload(tokens.idToken);
 
     const idTokenExpireAt = (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp : Number.MAX_VALUE;
-    const accessTokenExpiresAt = (accessTokenPayload && accessTokenPayload.exp) ? accessTokenPayload.exp : tokens.issuedAt + tokens.expiresIn;
+    const accessTokenExpiresAt = (accessTokenPayload && accessTokenPayload.exp) ? accessTokenPayload.exp : tokens.issuedAt + expireIn;
 
     let expiresAt;
-
-    if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
-        expiresAt = accessTokenExpiresAt;
-    } else if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
-        expiresAt = idTokenExpireAt;
-    } else {
-        expiresAt = idTokenExpireAt < accessTokenExpiresAt ? idTokenExpireAt : accessTokenExpiresAt;
+    if(tokens.expiresAt)
+    {
+        expiresAt = tokens.expiresAt;
+    } 
+    else {
+        if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
+            expiresAt = accessTokenExpiresAt;
+        } else if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
+            expiresAt = idTokenExpireAt;
+        } else {
+            expiresAt = idTokenExpireAt < accessTokenExpiresAt ? idTokenExpireAt : accessTokenExpiresAt;
+        }
     }
-
+    
     const newTokens = { ...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt };
     // When refresh_token is not rotated we reuse ald refresh_token
     if (oldTokens != null && 'refreshToken' in oldTokens && !('refreshToken' in tokens)) {

@@ -21,7 +21,7 @@ describe('tokens', () => {
     });
 
     it('can check non-expired token', () => {
-      const token = new TokenBuilder().WithNonExpiredToken().build();
+      const token = new TokenBuilder().withNonExpiredToken().build();
       expect(isTokensValid(token)).toBeTruthy();
     });
 
@@ -53,7 +53,7 @@ describe('tokens', () => {
   describe('isTokensOidcValid', () => {
     it('can validate valid token', () => {
       const token = new TokenBuilder()
-        .WithNonExpiredToken()
+        .withNonExpiredToken()
         .withIdTokenPayload({
           iss: oidcServerConfig.issuer,
           exp: 0,
@@ -69,9 +69,9 @@ describe('tokens', () => {
 
   describe('_hideTokens', () => {
     it.each([
-      { hideAccessToken: true, expectedAccessToken: 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_test' },
-      { hideAccessToken: false, expectedAccessToken: 'test_access_token' },
-    ])('accesstoken will be hide $hideAccessToken result should be $expectedAccessToken', ({ hideAccessToken, expectedAccessToken }) => {
+      { hideAccessToken: true, expectedAccessToken: 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_test', issued_at: "0", expires_in: "2" },
+      { hideAccessToken: false, expectedAccessToken: 'test_access_token', issued_at: 0, expires_in: 2  },
+    ])('accesstoken will be hide $hideAccessToken result should be $expectedAccessToken', ({ hideAccessToken, expectedAccessToken, issued_at, expires_in }) => {
       const token = new TokenBuilder()
           .withIdTokenPayload({
             iss: oidcServerConfig.issuer,
@@ -79,12 +79,15 @@ describe('tokens', () => {
             iat: 0,
             nonce: null,
           })
-          .WithNonExpiredToken()
+          .withNonExpiredToken()
           .withAccessToken('test_access_token')
+          .withExpiresIn(expires_in)
+          .withIssuedAt(issued_at)
           .build();
       const oidcConfiguration = new OidcConfigBuilder().withTestingDefault().withHideAccessToken(hideAccessToken).build();
       const secureTokens = _hideTokens(token, oidcConfiguration, 'test');
       expect(secureTokens.access_token).toBe(expectedAccessToken);
+      expect(typeof secureTokens.expiresAt).toBe("number");
     });
   });
 });

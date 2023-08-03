@@ -1,4 +1,3 @@
-﻿
 # FAQ (Frequently Asked Questions)
 
 ## Condition to make silent signing work 
