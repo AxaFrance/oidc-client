@@ -4,7 +4,7 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "postinstall": "node .\\node_modules\\@axa-fr\\react-oidc\\bin\\copy-service-worker-files.mjs public"
+    "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
   "dependencies": {
     "@axa-fr/react-oidc": "workspace:*",
