@@ -108,13 +108,13 @@ WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should a
 ```sh
   "scripts": {
     ...
-    "postinstall": "node .\\node_modules\\@axa-fr\\oidc-client\\bin\\copy-service-worker-files.mjs public"
+    "postinstall": "node .\\node_modules\\@axa-fr\\react-oidc\\bin\\copy-service-worker-files.mjs public"
   },
 ```
 
 More documentation :
 
-- [`@axa-fr/react-oidc`](./packages/react#readme)
+- [`@axa-fr/react-oidc`](./packages/react-oidc#readme)
 
 ## Run The Demos
 

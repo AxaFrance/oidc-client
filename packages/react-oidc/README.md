@@ -65,7 +65,7 @@ WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should a
 ```sh
   "scripts": {
     ...
-    "postinstall": "node .\\node_modules\\@axa-fr\\oidc-client\\bin\\copy-service-worker-files.mjs public"
+    "postinstall": "node .\\node_modules\\@axa-fr\\react-oidc\\bin\\copy-service-worker-files.mjs public"
   },
 ```
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
