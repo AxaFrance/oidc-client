@@ -2,6 +2,8 @@ export type Fetch = typeof window.fetch;
 
 export type LogoutToken = 'access_token' | 'refresh_token';
 
+export type ServiceWorkerUpdateRequireCallback = (registration:any, stopKeepAlive:Function) => Promise<void>;
+
 export type OidcConfiguration = {
     client_id: string;
     redirect_uri: string;
@@ -18,6 +20,7 @@ export type OidcConfiguration = {
     service_worker_relative_url?:string;
     service_worker_only?:boolean;
     service_worker_convert_all_requests_to_cors?:boolean;
+    service_worker_update_require_callback?:ServiceWorkerUpdateRequireCallback;
     extras?:StringMap;
     token_request_extras?:StringMap;
     storage?: Storage;
