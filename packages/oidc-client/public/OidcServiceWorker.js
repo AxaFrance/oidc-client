@@ -12,6 +12,7 @@ const TokenRenewMode = {
   id_token_invalid: "id_token_invalid"
 };
 const openidWellknownUrlEndWith = "/.well-known/openid-configuration";
+const version = "7.1.0";
 function checkDomain(domains, endpoint) {
   if (!endpoint) {
     return;
@@ -486,7 +487,8 @@ const handleMessage = (event) => {
         port.postMessage({
           tokens: null,
           status: currentDatabase.status,
-          configurationName
+          configurationName,
+          version
         });
       } else {
         const tokens = {
@@ -504,7 +506,8 @@ const handleMessage = (event) => {
         port.postMessage({
           tokens,
           status: currentDatabase.status,
-          configurationName
+          configurationName,
+          version
         });
       }
       return;
