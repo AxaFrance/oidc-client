@@ -32,7 +32,7 @@ try {
 
   const initPath = process.cwd();
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const srcDir = path.join(__dirname, "..", './node_modules/@axa-fr/oidc-client-service-worker/dist/' ) ;
+  const srcDir = path.join(__dirname, "..", 'node_modules', '@axa-fr' ,'oidc-client-service-worker', 'dist') ;
   const destinationFolder = process.argv.length >= 3 ? process.argv[2] : 'public';
   const destinationDir = path.join(initPath, destinationFolder);
 
