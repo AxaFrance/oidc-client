@@ -14,7 +14,8 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "postinstall": "node .\\node_modules\\@axa-fr\\oidc-client\\bin\\copy-service-worker-files.mjs public"
   },
   "browserslist": {
     "production": [

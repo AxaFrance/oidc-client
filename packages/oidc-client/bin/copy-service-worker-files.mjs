@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 try {
   
@@ -29,10 +30,14 @@ try {
     return !!fs.existsSync(path);
   };
 
-  const initPath = process.env.INIT_CWD || process.cwd();
+  const initPath = process.cwd();
+  
 
-  const srcDir = process.env.INIT_CWD !== undefined ? '../oidc-client-service-worker/dist/' : './node_modules/@axa-fr/oidc-client-service-worker/dist/';
-  const destinationDir = path.join(initPath, 'public');
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const srcDir = path.join(__dirname, "..", './node_modules/@axa-fr/oidc-client-service-worker/dist/' ) ;
+
+  const destinationFolder = process.argv.length >= 3 ? process.argv[2] : 'public';
+  const destinationDir = path.join(initPath, destinationFolder);
   
   const files = [
     {
