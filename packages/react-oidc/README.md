@@ -174,6 +174,7 @@ const configuration = {
     refresh_time_before_tokens_expiration_in_second: Number, // default is 120 seconds
     service_worker_relative_url: String,
     service_worker_only: Boolean, // default false
+    service_worker_update_require_callback: (registration:any, stopKeepAlive:Function) => Promise<void>, // callback called when service worker need to be updated, you can take the control of the update process
     service_worker_convert_all_requests_to_cors: Boolean, // force all requests that service worker upgrades to have 'cors' mode. This allows setting an authentication token on requests initiated by HTML parsing (e.g., img tags, download links, etc.).
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)

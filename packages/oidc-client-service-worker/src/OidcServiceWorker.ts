@@ -1,4 +1,5 @@
 import { acceptAnyDomainToken, scriptFilename, TOKEN } from './constants';
+import version from './version';
 import {
   Database,
   MessageEventData,
@@ -347,6 +348,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
           tokens: null,
           status: currentDatabase.status,
           configurationName,
+          version
         });
       } else {
         const tokens = {
@@ -370,6 +372,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
           tokens,
           status: currentDatabase.status,
           configurationName,
+          version
         });
       }
       return;

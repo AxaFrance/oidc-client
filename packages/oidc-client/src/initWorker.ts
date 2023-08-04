@@ -1,6 +1,7 @@
 import { parseOriginalTokens } from './parseTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
+import codeVersion from './version.js';
 
 export const getOperatingSystem = (navigator) => {
     const nVer = navigator.appVersion;
@@ -107,14 +108,22 @@ export const sleepAsync = (milliseconds) => {
     return new Promise(resolve => timer.setTimeout(resolve, milliseconds));
 };
 
+let keepAliveController ;
 const keepAlive = () => {
     try {
         const operatingSystem = getOperatingSystem(navigator);
         const minSleepSeconds = operatingSystem.os === 'Android' ? 240 : 150;
-        const promise = fetch(`/OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`);
+        keepAliveController = new AbortController();
+        const promise = fetch(`/OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`, { signal: keepAliveController.signal });
         promise.catch(error => { console.log(error); });
         sleepAsync(minSleepSeconds * 1000).then(keepAlive);
     } catch (error) { console.log(error); }
+};
+
+const stopKeepAlive = () => {
+    if(keepAliveController) {
+        keepAliveController.abort();
+    }
 };
 
 const isServiceWorkerProxyActiveAsync = () => {
@@ -183,26 +192,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     } catch (err) {
         return null;
     }
-
-    const unregisterAsync = async () => {
-        return await registration.unregister();
-    };
-
-    registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        newWorker.addEventListener('statechange', () => {
-            switch (newWorker.state) {
-                case 'installed':
-                    if (navigator.serviceWorker.controller) {
-                        registration.unregister().then(() => {
-                            window.location.reload();
-                        });
-                    }
-                    break;
-            }
-        });
-    });
-
+    
     const clearAsync = async (status) => {
         return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
     };
@@ -219,6 +209,25 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
             },
             configurationName,
         });
+        
+        // @ts-ignore
+        const serviceWorkerVersion = result.version;
+        if(serviceWorkerVersion !== codeVersion) {
+            console.warn(`Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`);
+            
+            if(oidcConfiguration.service_worker_update_require_callback)
+            {
+                await oidcConfiguration.service_worker_update_require_callback(registration, stopKeepAlive);  
+            } else {
+                stopKeepAlive();
+                await registration.update();
+                const isSuccess = await registration.unregister();
+                console.log(`Service worker unregistering ${isSuccess}`)
+                await sleepAsync(2000);
+                window.location.reload();
+            }
+        }
+        
         // @ts-ignore
         return { tokens: parseOriginalTokens(result.tokens, null, oidcConfiguration.token_renew_mode), status: result.status };
     };
@@ -244,7 +253,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         sessionStorage['oidc.nonce'] = nonce.nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
-  const getNonceAsync = async () => {
+    const getNonceAsync = async () => {
         // @ts-ignore
         const result = await sendMessageAsync(registration)({ type: 'getNonce', data: null, configurationName });
         // @ts-ignore
@@ -310,7 +319,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         getSessionStateAsync,
         setNonceAsync,
         getNonceAsync,
-        unregisterAsync,
         setLoginParams,
         getLoginParams,
         getStateAsync,
