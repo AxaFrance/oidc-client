@@ -107,10 +107,11 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         const params = getParseQueryStringFromLocation(window.location.toString());
 
         if (params.iss && params.iss !== oidcServerConfiguration.issuer) {
-            throw new Error('issuer not valid');
+            console.error();
+            throw new Error(`issuer not valid (expected: ${oidcServerConfiguration.issuer}, received: ${params.iss})`);
         }
         if (params.state && params.state !== state) {
-            throw new Error('state not valid');
+            throw new Error(`state not valid (expected: ${state}, received: ${params.state})`);
         }
 
         const data = {
