@@ -4,8 +4,10 @@
 
 Third party cookies are blocked by default on Safari. 
 They will be on all browsers very soon.
-Today, silent sigin work on safari only if OIDC provider is on the same domain than client application. 
+Today, silent signing work on safari only if OIDC provider is on the same domain than client application. 
 Third party cookies are blocked. They will be on all browsers very soon.
+
+The only way to be sure to have silent signing working on all browsers, you need to have your OIDC provider on the same domain than your client application.
 
 Example of domain that work:
 - https://oidc-provider.axa.fr
@@ -14,12 +16,12 @@ Example of domain that work:
 Silent Signing use cookies with your OIDC provider to restore the session and retrieve tokens.
 It open in background an IFrame to a specific page to your OIDC provider.
 
-## Condition to  single logout work
+## Condition to make Single Logout to work
 
-Same contraint for Single Logout that for "silent signing".
+Same constraint for Single Logout that for "silent signing".
 *Single logout allow your to disconnect from multiple OIDC Client session in one action event if your are connected on different application.
 
-## Condition to  Monitor Session work
+## Condition to make Monitor Session to work
 
 Same constraint for "monitorSession" that for "silent signing".
 
