@@ -3,6 +3,8 @@ export type DomainDetails = {
     oidcDomains?: Domain[];
     accessTokenDomains?: Domain[];
     showAccessToken: boolean;
+    convertAllRequestsToCorsExceptNavigate?: boolean,
+    setAccessTokenToNavigateRequests?: boolean,
 }
 
 export type Domain = string | RegExp;
@@ -21,7 +23,6 @@ export type OidcServerConfiguration = {
 
 export type OidcConfiguration = {
     token_renew_mode: string;
-    service_worker_convert_all_requests_to_cors: boolean;
 }
 
 // Uncertain why the Headers interface in lib.webworker.d.ts does not have a keys() function, so extending
@@ -65,6 +66,8 @@ export type OidcConfig = {
     sessionState?: string | null;
     items?: MessageData;
     hideAccessToken: boolean;
+    convertAllRequestsToCorsExceptNavigate: boolean,
+    setAccessTokenToNavigateRequests: boolean,
 }
 
 export type IdTokenPayload = {

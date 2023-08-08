@@ -92,7 +92,9 @@ const trustedDomains = {
 trustedDomains.config_show_access_token = { 
     oidcDomains :["https://demo.duendesoftware.com"],
     accessTokenDomains : ["https://www.myapi.com/users"], 
-    showAccessToken: true 
+    showAccessToken: true,
+  // convertAllRequestsToCorsExceptNavigate: false, // default value is false
+  // setAccessTokenToNavigateRequests: true, // default value is true
 };
 
 ```
@@ -185,7 +187,6 @@ const configuration = {
     service_worker_relative_url: String,
     service_worker_only: Boolean, // default false
     service_worker_update_require_callback: (registration:any, stopKeepAlive:Function) => Promise<void>, // callback called when service worker need to be updated, you can take the control of the update process
-    service_worker_convert_all_requests_to_cors: Boolean, // force all requests that service worker upgrades to have 'cors' mode. This allows setting an authentication token on requests initiated by HTML parsing (e.g., img tags, download links, etc.).
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
     withCustomHistory: Function, // Override history modification, return an instance with replaceState(url, stateHistory) implemented (like History.replaceState())

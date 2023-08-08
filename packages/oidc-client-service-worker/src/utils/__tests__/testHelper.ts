@@ -96,7 +96,6 @@ class TokenBuilder {
 class OidcConfigurationBuilder {
   private oidcConfiguration: OidcConfiguration = {
     token_renew_mode: 'offline',
-    service_worker_convert_all_requests_to_cors: true,
   };
 
   public withTokenRenewMode(
@@ -105,15 +104,7 @@ class OidcConfigurationBuilder {
     this.oidcConfiguration.token_renew_mode = token_renew_mode;
     return this;
   }
-
-  public withServiceWorkerConvertAllRequestsToCors(
-    service_worker_convert_all_requests_to_cors: boolean,
-  ): OidcConfigurationBuilder {
-    this.oidcConfiguration.service_worker_convert_all_requests_to_cors =
-      service_worker_convert_all_requests_to_cors;
-    return this;
-  }
-
+  
   public build(): OidcConfiguration {
     return this.oidcConfiguration;
   }
@@ -132,6 +123,8 @@ class OidcConfigBuilder {
     sessionState: null,
     items: undefined,
     hideAccessToken: true,
+    convertAllRequestsToCorsExceptNavigate: false,
+    setAccessTokenToNavigateRequests: true,
   };
 
   public withTestingDefault(): OidcConfigBuilder {

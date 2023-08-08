@@ -4,9 +4,7 @@ import {
   Database,
   MessageEventData,
   OidcConfig,
-  OidcConfiguration,
   TrustedDomains,
-  // TrustedDomainsShowAccessToken,
 } from './types';
 import {
   checkDomain,
@@ -39,18 +37,7 @@ const handleActivate = (event: ExtendableEvent) => {
 };
 
 let currentLoginCallbackConfigurationName: string | null = null;
-const database: Database = {
-  default: {
-    configurationName: 'default',
-    tokens: null,
-    status: null,
-    state: null,
-    codeVerifier: null,
-    nonce: null,
-    oidcServerConfiguration: null,
-    hideAccessToken: true,
-  },
-};
+const database: Database = {};
 
 const getCurrentDatabasesTokenEndpoint = (database: Database, url: string) => {
   const databases: OidcConfig[] = [];
@@ -112,29 +99,37 @@ const handleFetch = async (event: FetchEvent) => {
     ) {
       await sleep(200);
     }
-    const newRequest =
-      originalRequest.mode === 'navigate'
-        ? new Request(originalRequest, {
-            headers: {
-              ...serializeHeaders(originalRequest.headers),
-              authorization:
-                'Bearer ' +
-                currentDatabaseForRequestAccessToken.tokens.access_token,
-            },
-          })
-        : new Request(originalRequest, {
-            headers: {
-              ...serializeHeaders(originalRequest.headers),
-              authorization:
-                'Bearer ' +
-                currentDatabaseForRequestAccessToken.tokens.access_token,
-            },
-            mode: (
-              currentDatabaseForRequestAccessToken.oidcConfiguration as OidcConfiguration
-            ).service_worker_convert_all_requests_to_cors
-              ? 'cors'
-              : originalRequest.mode,
-          });
+    
+    let requestMode = originalRequest.mode;
+    
+    if(originalRequest.mode !== "navigate" && currentDatabaseForRequestAccessToken.convertAllRequestsToCorsExceptNavigate) {
+      requestMode = "cors";
+    } 
+    
+    let headers: { [p: string]: string };
+    if(originalRequest.mode == "navigate" &&  !currentDatabaseForRequestAccessToken.setAccessTokenToNavigateRequests ) {
+      headers = {
+        ...serializeHeaders(originalRequest.headers),
+      }
+    } else{
+      headers = {
+        ...serializeHeaders(originalRequest.headers),
+        authorization: 'Bearer ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+      }
+    }
+    let init: RequestInit;
+    if(originalRequest.mode === "navigate"){
+      init = {
+        headers: headers,
+      }
+    } else{
+        init = {
+            headers: headers,
+            mode: requestMode,
+        }
+    }
+    
+    const newRequest = new Request(originalRequest, init);
 
     // @ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
     event.waitUntil(event.respondWith(fetch(newRequest)));
@@ -272,11 +267,6 @@ const handleFetch = async (event: FetchEvent) => {
   }
 };
 
-type TrustedDomainsShowAccessToken = {
-  [key: string]: boolean;
-}
-
-const trustedDomainsShowAccessToken: TrustedDomainsShowAccessToken = {};
 
 const handleMessage = (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
@@ -287,10 +277,10 @@ const handleMessage = (event: ExtendableMessageEvent) => {
     trustedDomains = {};
   }
   if (!currentDatabase) {
-    if (trustedDomainsShowAccessToken[configurationName] === undefined) {
-      const trustedDomain = trustedDomains[configurationName];
-      trustedDomainsShowAccessToken[configurationName] = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
-    }
+    const trustedDomain = trustedDomains[configurationName];
+    const showAccessToken = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
+    const doNotSetAccessTokenToNavigateRequests = Array.isArray(trustedDomain) ? true : trustedDomain.setAccessTokenToNavigateRequests;
+    const convertAllRequestsToCorsExceptNavigate = Array.isArray(trustedDomain) ? false : trustedDomain.convertAllRequestsToCorsExceptNavigate;
     database[configurationName] = {
       tokens: null,
       state: null,
@@ -300,7 +290,9 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       nonce: null,
       status: null,
       configurationName,
-      hideAccessToken: !trustedDomainsShowAccessToken[configurationName],
+      hideAccessToken: !showAccessToken,
+      setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests || true,
+      convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate || false,
     };
     currentDatabase = database[configurationName];
 
