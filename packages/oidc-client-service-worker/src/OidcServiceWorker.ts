@@ -110,12 +110,12 @@ const handleFetch = async (event: FetchEvent) => {
     if(originalRequest.mode == "navigate" &&  !currentDatabaseForRequestAccessToken.setAccessTokenToNavigateRequests ) {
       headers = {
         ...serializeHeaders(originalRequest.headers),
+        authorization: 'Bearer ' + currentDatabaseForRequestAccessToken.tokens.access_token,
       }
     } else{
-        headers = {
-            ...serializeHeaders(originalRequest.headers),
-            authorization: 'Bearer ' + currentDatabaseForRequestAccessToken.tokens.access_token,
-        }
+      headers = {
+        ...serializeHeaders(originalRequest.headers),
+      }
     }
     let init: RequestInit;
     if(originalRequest.mode === "navigate"){
