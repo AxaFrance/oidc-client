@@ -5,7 +5,7 @@
 
 
 <p align="center">
-    <img src="./docs/img/introduction.gif"
+    <img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/introduction.gif"
      alt="Sample React Oicd"
       />
 </p>
@@ -60,8 +60,6 @@ Works perfectly well with:
 - AWS
 - [Keycloak](https://www.keycloak.org/)
 - etc., all OIDC providers
-
-
 
 
 ## Getting Started
@@ -146,7 +144,7 @@ pnpm run dev
 ## How It Works
 
 <p align="center">
-    <img src="./docs/img/schema_pcke_client_side_with_service_worker.png"
+    <img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/schema_pcke_client_side_with_service_worker.png"
      alt="Schema Authorization Code Grant with pcke flow on the using service worker"
       />
   <br>

@@ -19,7 +19,8 @@ It open in background an IFrame to a specific page to your OIDC provider.
 ## Condition to make Single Logout to work
 
 Same constraint for Single Logout that for "silent signing".
-*Single logout allow your to disconnect from multiple OIDC Client session in one action event if your are connected on different application.
+
+Single logout allow your to disconnect from multiple OIDC Client session in one action event if your are connected on different application.
 
 ## Condition to make Monitor Session to work
 

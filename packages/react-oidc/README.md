@@ -12,7 +12,7 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
 <p align="center">
-    <img src="https://github.com/AxaFrance/react-oidc/blob/master/docs/img/introduction.gif?raw=true"
+    <img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/introduction.gif"
      alt="Sample React Oicd"
       />
 </p>
