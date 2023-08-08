@@ -28,6 +28,27 @@ Same constraint for "monitorSession" that for "silent signing".
 
 Monitor session allow you to be notified when your session is expired or when you are disconnected from your OIDC provider.
 
+## Does Service Worker is mandatory ?
+
+Service Worker can be disable. 
+You can use classic mode without Service Worker.
+
+Just comment "service_worker_relative_url" like bellow:
+
+````javascript
+export const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: window.location.origin + '/#/authentication/callback',
+  silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.duendesoftware.com',
+  // service_worker_relative_url: '/OidcServiceWorker.js',
+  service_worker_only: false,
+};
+````
+
+If your Service Worker file is already registered on your browser, your need to unregister it. For example from chrome dev tool. 
+
 ## Tokens are always refreshed in background every seconds
 
 @axa-fr/oidc-client refresh automatically tokens in  background.
