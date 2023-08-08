@@ -21,7 +21,7 @@ trustedDomains.config_show_access_token = {
     domains: ['https://demo.duendesoftware.com'], 
     showAccessToken: true,
     // convertAllRequestsToCorsExceptNavigate: false,
-    // doNotSetAccessTokenToNavigateRequests: true,
+    // setAccessTokenToNavigateRequests: true,
 };
 
 // This example defines domains used by OIDC server separately from domains to which access tokens will be injected.
