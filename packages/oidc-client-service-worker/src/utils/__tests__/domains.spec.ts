@@ -49,6 +49,8 @@ describe('domains', () => {
         nonce: null,
         oidcServerConfiguration: {} as OidcServerConfiguration,
         hideAccessToken: true,
+        convertAllRequestsToCorsExceptNavigate: false,
+        setAccessTokenToNavigateRequests: true,
       },
     };
 
