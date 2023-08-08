@@ -49,6 +49,14 @@ export const configuration = {
 
 If your Service Worker file is already registered on your browser, your need to unregister it. For example from chrome dev tool. 
 
+## What does OidcKeepAliveServiceWorker actually do?
+
+ServiceWorker keep alive is a kind of hack to keep alive the Service Worker as longer as possible.
+It is important because tokens are kept in memory inside the Service Worker.
+Tokens sessions is link to the Service Worker lifetime.
+
+https://github.com/AxaFrance/oidc-client/issues/1068
+
 ## Tokens are always refreshed in background every seconds
 
 @axa-fr/oidc-client refresh automatically tokens in  background.
