@@ -18,7 +18,6 @@ export type OidcProviderProps = {
     sessionLostComponent?: ComponentType<any>;
     authenticatingComponent?: ComponentType<any>;
     authenticatingErrorComponent?: ComponentType<any>;
-    loadingComponent?: ComponentType<any>;
     serviceWorkerNotSupportedComponent?: ComponentType<any>;
     configurationName?: string;
     configuration?: OidcConfiguration;
@@ -33,39 +32,18 @@ export type OidcProviderProps = {
 
 export type OidcSessionProps = {
     configurationName: string;
-    loadingComponent: PropsWithChildren<any>;
 };
 
-const OidcSession: FC<PropsWithChildren<OidcSessionProps>> = ({ loadingComponent, children, configurationName }) => {
-    const [isLoading, setIsLoading] = useState(true);
+const OidcSession: FC<PropsWithChildren<OidcSessionProps>> = ({ children, configurationName }) => {
     const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
-        let isMounted = true;
         if (oidc) {
-            oidc.tryKeepExistingSessionAsync().then(() => {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            });
+            oidc.tryKeepExistingSessionAsync();
         }
-        return () => {
-            isMounted = false;
-        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configurationName]);
-    const LoadingComponent = loadingComponent;
-    return (
-        <>
-            {isLoading
-                ? (
-                    <LoadingComponent configurationName={configurationName} />
-                )
-                : (
-                    <>{children}</>
-                )}
-        </>
-    );
+    return <>{children}</>;
 };
 
 const Switch = ({ isLoading, loadingComponent, children, configurationName }) => {
@@ -82,7 +60,6 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     configurationName = 'default',
     callbackSuccessComponent = CallBackSuccess,
     authenticatingComponent = Authenticating,
-    loadingComponent = Loading,
     serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
     authenticatingErrorComponent = AuthenticatingError,
     sessionLostComponent = SessionLost,
@@ -157,7 +134,6 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
 
     const SessionLostComponent = sessionLostComponent;
     const AuthenticatingComponent = authenticatingComponent;
-    const LoadingComponent = loadingComponent;
     const ServiceWorkerNotSupportedComponent = serviceWorkerNotSupportedComponent;
     const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
@@ -166,27 +142,27 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     const eventName = event.name;
     switch (eventName) {
         case OidcClient.eventNames.service_worker_not_supported_by_browser:
-            return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
+            return (
                 <ServiceWorkerNotSupportedComponent configurationName={configurationName} />
-            </Switch>);
+            );
         case OidcClient.eventNames.loginAsync_begin:
-            return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
+            return (
                 <AuthenticatingComponent configurationName={configurationName} />
-            </Switch>);
+            );
         case OidcClient.eventNames.loginAsync_error:
         case OidcClient.eventNames.loginCallbackAsync_error:
-            return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
+            return (
                 <AuthenticatingErrorComponent configurationName={configurationName} />
-            </Switch>);
+            );
         case OidcClient.eventNames.refreshTokensAsync_error:
         case OidcClient.eventNames.syncTokensAsync_error:
         case OidcClient.eventNames.logout_from_another_tab:
-            return (<Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
+            return (
                 <SessionLostComponent configurationName={configurationName} />
-            </Switch>);
+            );
         default:
             return (
-                <Switch loadingComponent={LoadingComponent} isLoading={isLoading} configurationName={configurationName}>
+                
                     <OidcRoutes redirect_uri={oidc.configuration.redirect_uri}
                         silent_redirect_uri={oidc.configuration.silent_redirect_uri}
                         silent_login_uri={oidc.configuration.silent_login_uri}
@@ -195,11 +171,10 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
                         authenticatingComponent={authenticatingComponent}
                         configurationName={configurationName}
                         withCustomHistory={withCustomHistory}>
-                        <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>
+                        <OidcSession configurationName={configurationName}>
                             {children}
                         </OidcSession>
                     </OidcRoutes>
-                </Switch>
             );
     }
 };

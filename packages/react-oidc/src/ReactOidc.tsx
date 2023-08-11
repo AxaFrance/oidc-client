@@ -26,7 +26,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
         setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-            if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab || name === OidcClient.eventNames.token_aquired) {
+            if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab || name === OidcClient.eventNames.token_aquired || name == OidcClient.eventNames.tryKeepExistingSessionAsync_end) {
                 if (isMounted) {
                     setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
                 }
@@ -100,7 +100,9 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
                 name === OidcClient.eventNames.logout_from_another_tab ||
                 name === OidcClient.eventNames.logout_from_same_tab ||
                 name === OidcClient.eventNames.refreshTokensAsync_error ||
-                name === OidcClient.eventNames.syncTokensAsync_error) {
+                name === OidcClient.eventNames.syncTokensAsync_error ||
+                name == OidcClient.eventNames.tryKeepExistingSessionAsync_end
+            ) {
                 if (isMounted) {
                     const tokens = oidc.tokens;
                     setAccessToken(tokens != null ? { accessToken: tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload } : accessTokenInitialState);
@@ -151,7 +153,8 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
                 name === OidcClient.eventNames.logout_from_another_tab ||
                 name === OidcClient.eventNames.logout_from_same_tab ||
                 name === OidcClient.eventNames.refreshTokensAsync_error ||
-                name === OidcClient.eventNames.syncTokensAsync_error) {
+                name === OidcClient.eventNames.syncTokensAsync_error ||
+                name == OidcClient.eventNames.tryKeepExistingSessionAsync_end) {
                 if (isMounted) {
                     const tokens = oidc.tokens;
                     setIDToken(tokens != null ? { idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload } : idTokenInitialState);

@@ -289,7 +289,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
         this.tryKeepExistingSessionPromise = funcAsync();
         return this.tryKeepExistingSessionPromise.then((result) => {
-            this.tryKeepExistingSessionPromise = null;
+            // this.tryKeepExistingSessionPromise = null;
             return result;
         });
     }
