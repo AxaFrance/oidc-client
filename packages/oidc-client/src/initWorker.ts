@@ -165,7 +165,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return null;
     }
     const { name, version } = getBrowser();
-    if (name === 'chrome' && parseInt(version) < 90) {
+    if (name === 'chrome' && parseInt(version) <= 70) {
         return null;
     }
     if (name === 'opera') {
