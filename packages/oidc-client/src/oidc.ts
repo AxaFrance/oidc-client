@@ -161,14 +161,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     _silentLoginCallbackFromIFrame() {
         if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
-            window.top.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({ tokens: this.tokens, sessionState: queryParams.session_state })}`, window.location.origin);
+            window.parent.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({ tokens: this.tokens, sessionState: queryParams.session_state })}`, window.location.origin);
         }
     }
 
     _silentLoginErrorCallbackFromIFrame() {
         if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
             const queryParams = getParseQueryStringFromLocation(window.location.href);
-            window.top.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({ error: queryParams.error })}`, window.location.origin);
+            window.parent.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({ error: queryParams.error })}`, window.location.origin);
         }
     }
 
