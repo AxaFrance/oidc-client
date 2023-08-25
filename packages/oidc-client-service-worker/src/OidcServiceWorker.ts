@@ -262,8 +262,7 @@ const handleFetch = async (event: FetchEvent) => {
         });
     });
 
-    // @ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
-    event.waitUntil(event.respondWith(maPromesse));
+    event.respondWith(maPromesse);
   }
 };
 
