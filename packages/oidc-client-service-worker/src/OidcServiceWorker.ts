@@ -131,8 +131,7 @@ const handleFetch = async (event: FetchEvent) => {
     
     const newRequest = new Request(originalRequest, init);
 
-    // @ts-ignore -- TODO: review, waitUntil takes a promise, this returns a void
-    event.waitUntil(event.respondWith(fetch(newRequest)));
+    event.respondWith(fetch(newRequest));
 
     return;
   }
