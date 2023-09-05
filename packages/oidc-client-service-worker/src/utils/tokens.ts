@@ -1,6 +1,13 @@
 /* eslint-disable simple-import-sort/exports */
 import { TOKEN, TokenRenewMode } from '../constants';
-import { OidcConfig, OidcConfiguration, OidcServerConfiguration, Tokens } from '../types';
+import {
+  AccessTokenPayload,
+  IdTokenPayload,
+  OidcConfig,
+  OidcConfiguration,
+  OidcServerConfiguration,
+  Tokens
+} from '../types';
 import { countLetter } from './strings';
 
 function parseJwt(token: string) {
@@ -92,6 +99,22 @@ const isTokensOidcValid = (
   return { isValid: true, reason: '' };
 };
 
+function extractedIssueAt(tokens: Tokens, accessTokenPayload: AccessTokenPayload | null, _idTokenPayload : IdTokenPayload)  {
+  if (!tokens.issued_at) {
+    if (accessTokenPayload && accessTokenPayload.iat) {
+      return accessTokenPayload.iat;
+    } else if (_idTokenPayload && _idTokenPayload.iat) {
+      return _idTokenPayload.iat;
+    } else {
+      const currentTimeUnixSecond = new Date().getTime() / 1000;
+      return currentTimeUnixSecond;
+    }
+  } else if (typeof tokens.issued_at == "string") {
+    return parseInt(tokens.issued_at, 10);
+  }
+  return tokens.issued_at;
+}
+
 function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configurationName: string) {
   if (!tokens.issued_at) {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -125,6 +148,8 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
     secureTokens.refresh_token =
         TOKEN.REFRESH_TOKEN + '_' + configurationName;
   }
+
+  tokens.issued_at = extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload);
 
   const expireIn = typeof tokens.expires_in == "string" ? parseInt(tokens.expires_in, 10) : tokens.expires_in;
 

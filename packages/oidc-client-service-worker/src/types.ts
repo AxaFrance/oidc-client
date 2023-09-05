@@ -86,6 +86,7 @@ export type IdTokenPayload = {
 export type AccessTokenPayload = {
     exp: number;
     sub: string;
+    iat: number;
 }
 
 export type Tokens = {

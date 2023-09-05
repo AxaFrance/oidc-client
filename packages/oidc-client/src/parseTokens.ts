@@ -1,4 +1,4 @@
-import { sleepAsync } from './initWorker.js';
+import {sleepAsync} from './initWorker.js';
 
 const b64DecodeUnicode = (str) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
@@ -46,20 +46,29 @@ export const TokenRenewMode = {
     id_token_invalid: 'id_token_invalid',
 };
 
+function extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload) {
+    if (!tokens.issuedAt) {
+        if (accessTokenPayload && accessTokenPayload.iat) {
+            return accessTokenPayload.iat;
+        } else if (_idTokenPayload && _idTokenPayload.iat) {
+            return _idTokenPayload.iat;
+        } else {
+            const currentTimeUnixSecond = new Date().getTime() / 1000;
+            return currentTimeUnixSecond;
+        }
+    } else if (typeof tokens.issuedAt == "string") {
+        return parseInt(tokens.issuedAt, 10);
+    }
+    return tokens.issuedAt;
+}
+
 export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Tokens => {
     if (!tokens) {
         return null;
     }
     let accessTokenPayload;
     const expireIn = typeof tokens.expiresIn == "string" ? parseInt(tokens.expiresIn, 10) : tokens.expiresIn;
-
-    if (!tokens.issuedAt) {
-        const currentTimeUnixSecond = new Date().getTime() / 1000;
-        tokens.issuedAt = currentTimeUnixSecond;
-    } else if (typeof tokens.issuedAt == "string") {
-        tokens.issuedAt = parseInt(tokens.issuedAt, 10);
-    }
-
+    
     if (tokens.accessTokenPayload !== undefined) {
         accessTokenPayload = tokens.accessTokenPayload;
     } else {
@@ -70,6 +79,8 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
     const idTokenExpireAt = (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp : Number.MAX_VALUE;
     const accessTokenExpiresAt = (accessTokenPayload && accessTokenPayload.exp) ? accessTokenPayload.exp : tokens.issuedAt + expireIn;
 
+    tokens.issuedAt = extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload);
+    
     let expiresAt;
     if(tokens.expiresAt)
     {
@@ -133,7 +144,10 @@ export const parseOriginalTokens = (tokens, oldTokens, tokenRenewMode: string) =
 
 export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond, expiresAt) => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
-    return Math.round(((expiresAt - refreshTimeBeforeTokensExpirationInSecond) - currentTimeUnixSecond));
+    
+    const timeLeftSecond = expiresAt - currentTimeUnixSecond;
+    
+    return Math.round(timeLeftSecond - refreshTimeBeforeTokensExpirationInSecond);
 };
 
 export const isTokensValid = (tokens) => {
