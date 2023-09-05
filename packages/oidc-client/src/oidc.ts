@@ -329,6 +329,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             if (!serviceWorker) {
                 const session = initSession(this.configurationName, this.configuration.storage);
                 session.setTokens(parsedTokens);
+            } else {
+                // @ts-ignore
+                if(!parsedTokens.fromServiceWorker){
+                    throw Error('security issue, parsedTokens.fromServiceWorker is not defined');
+                }
             }
             this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
             // @ts-ignore

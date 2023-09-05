@@ -127,6 +127,11 @@ export const parseOriginalTokens = (tokens, oldTokens, tokenRenewMode: string) =
         // @ts-ignore
         data.idTokenPayload = tokens.idTokenPayload;
     }
+    
+    if(tokens.fromServiceWorker !== undefined) {
+        // @ts-ignore
+        data.fromServiceWorker = tokens.fromServiceWorker;
+    }
 
     return setTokens(data, oldTokens, tokenRenewMode);
 };
