@@ -183,7 +183,7 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   }
 
   currentDatabaseElement.status = 'LOGGED_IN';
-  return secureTokens;
+  return { ...secureTokens, fromServiceWorker: true };
 }
 
 function hideTokens(currentDatabaseElement: OidcConfig) {
