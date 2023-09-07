@@ -289,8 +289,8 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       status: null,
       configurationName,
       hideAccessToken: !showAccessToken,
-      setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests || true,
-      convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate || false,
+      setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests ?? true,
+      convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate ?? false,
     };
     currentDatabase = database[configurationName];
 
