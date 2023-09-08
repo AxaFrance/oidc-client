@@ -44,6 +44,9 @@ jobs:
       - name: pnpm run build
         run: pnpm run build
         working-directory: ./examples/oidc-client-demo
+      - name: copy web.config
+        run: cp web.config dist/
+        working-directory: ./examples/oidc-client-demo
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
