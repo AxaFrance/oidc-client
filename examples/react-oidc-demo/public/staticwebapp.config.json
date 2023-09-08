@@ -4,6 +4,6 @@
         "exclude": ["*.{svg,png,jpg,gif}","*.{css,scss}","*.js"]
     },
     "globalHeaders": {
-        "content-security-policy": "default-src self https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+        "content-security-policy": "default-src 'self'; https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
     }
 }
