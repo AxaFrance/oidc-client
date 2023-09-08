@@ -4,6 +4,6 @@
         "exclude": ["*.{svg,png,jpg,gif}","*.{css,scss}","*.js"]
     },
     "globalHeaders": {
-        "content-security-policy": "default-src 'self'; script-src 'self'; connect-src https://demo.duendesoftware.com/"
+        "content-security-policy": "script-src 'self'; connect-src https://demo.duendesoftware.com/"
     }
 }
