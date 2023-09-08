@@ -45,7 +45,10 @@ jobs:
         run: pnpm run build
         working-directory: ./examples/react-oidc-demo
       - name: copy web.config
-        run: cp web.config dist/
+        run: |
+          cp web.config dist/
+          cd dist
+          ls -la
         working-directory: ./examples/react-oidc-demo
       - name: Build And Deploy
         id: builddeploy
