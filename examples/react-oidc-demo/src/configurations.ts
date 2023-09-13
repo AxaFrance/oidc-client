@@ -1,11 +1,11 @@
 import { TokenRenewMode } from '@axa-fr/react-oidc';
 
 export const configurationIdentityServer = {
-    client_id: 'interactive.public.short',
+    client_id: 'm2m.dpop',
     redirect_uri: window.location.origin + '/authentication/callback',
     silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
     // silent_login_uri: window.location.origin + '/authentication/silent-login',
-    scope: 'openid profile email api offline_access',
+    scope: 'api',
     authority: 'https://demo.duendesoftware.com',
     // authority_time_cache_wellknowurl_in_second: 60* 60,
     refresh_time_before_tokens_expiration_in_second: 40,
