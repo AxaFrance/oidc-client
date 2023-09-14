@@ -105,3 +105,25 @@ We think that @axa-fr/oidc-client is a good choice for the following reasons :
   <br>
   @axa-fr/oidc-client is the simplest and cheapest.
 </p>
+
+
+## Good Security Practices : does a Hacker can unregister the Service Worker and retrieve tokens via an Iframe ?
+
+If you follow these 2 practices, it is impossible to retrieve tokens via an Iframe call and Service Worker unregistration.
+
+1 - Configure the CSP (Content Security Policy) correctly  (server side).
+example:
+
+````bash
+server: {
+    headers: {
+      "Content-Security-Policy": "script-src 'self';",
+    },
+  }
+````
+
+This will make impossible to inject dynamic script into an iframe.
+
+2 - Set up <OidcProvider> for **react** or your redirect callback for **oidc-client** at your beginning of your script of your application. 
+It should be configured before any fetch call to any services.
+This will prevent from any XSS attacks.
