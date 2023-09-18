@@ -319,6 +319,12 @@ export class OidcClient {
    * @returns A promise resolved with the user information, or rejected with an error.
    */
   async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false): Promise<T>;
+
+  /**
+   * Generate Demonstration of proof of possession.
+   * @returns A promise resolved with the proof of possession.
+   */
+  async generateProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string>;
 }
 
 ```
