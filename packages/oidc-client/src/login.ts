@@ -47,14 +47,14 @@ export const defaultLoginAsync = (window, configurationName:string, configuratio
             const oidcServerConfiguration = await initAsync(configuration.authority, configuration.authority_configuration);
             let storage;
             if (serviceWorker) {
-                serviceWorker.setLoginParams(configurationName, { callbackPath: url, extras: originExtras });
+                serviceWorker.setLoginParams({ callbackPath: url, extras: originExtras });
                 await serviceWorker.initAsync(oidcServerConfiguration, 'loginAsync', configuration);
                 await serviceWorker.setNonceAsync(nonce);
                 serviceWorker.startKeepAliveServiceWorker();
                 storage = serviceWorker;
             } else {
                 const session = initSession(configurationName, configuration.storage ?? sessionStorage);
-                session.setLoginParams(configurationName, { callbackPath: url, extras: originExtras });
+                session.setLoginParams({ callbackPath: url, extras: originExtras });
                 await session.setNonceAsync(nonce);
                 storage = session;
             }
@@ -96,7 +96,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             await serviceWorker.initAsync(oidcServerConfiguration, 'loginCallbackAsync', configuration);
             await serviceWorker.setSessionStateAsync(sessionState);
             nonceData = await serviceWorker.getNonceAsync();
-            getLoginParams = serviceWorker.getLoginParams(oidc.configurationName);
+            getLoginParams = serviceWorker.getLoginParams();
             state = await serviceWorker.getStateAsync();
             serviceWorker.startKeepAliveServiceWorker();
             storage = serviceWorker;
@@ -104,7 +104,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
             await session.setSessionStateAsync(sessionState);
             nonceData = await session.getNonceAsync();
-            getLoginParams = session.getLoginParams(oidc.configurationName);
+            getLoginParams = session.getLoginParams();
             state = await session.getStateAsync();
             storage = session;
         }
@@ -180,11 +180,12 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         if(demonstratingProofOfPossessionNonce) {
             if (serviceWorker) {
                 await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
-                loginParams = serviceWorker.getLoginParams(oidc.configurationName);
+                loginParams = serviceWorker.getLoginParams();
+                console.log(loginParams)
                 await serviceWorker.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);
             } else {
                 const session = initSession(oidc.configurationName, configuration.storage);
-                loginParams = session.getLoginParams(oidc.configurationName);
+                loginParams = session.getLoginParams();
                 await session.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);
             }
         }

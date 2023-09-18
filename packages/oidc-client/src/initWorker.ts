@@ -265,11 +265,20 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return { nonce };
     };
 
-    let getLoginParamsCache = null;
-    const setLoginParams = (configurationName:string, data) => {
-        getLoginParamsCache = data;
+    let getLoginParamsCache = {};
+    const setLoginParams = (data) => {
+        getLoginParamsCache[configurationName] = data;
         localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
     };
+
+    const getLoginParams = () => {
+        const dataString = localStorage[`oidc.login.${configurationName}`];
+        if (!getLoginParamsCache[configurationName]) {
+            getLoginParamsCache[configurationName] = JSON.parse(dataString);
+        }
+        return getLoginParamsCache[configurationName];
+    };
+
 
     const setDemonstratingProofOfPossessionNonce = (dpopNonce: string) => {
         localStorage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
@@ -287,13 +296,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return JSON.parse(localStorage[`oidc.jwk.${configurationName}`]);
     };
     
-    const getLoginParams = (configurationName) => {
-        const dataString = localStorage[`oidc.login.${configurationName}`];
-        if (!getLoginParamsCache) {
-            getLoginParamsCache = JSON.parse(dataString);
-        }
-        return getLoginParamsCache;
-    };
 
     const getStateAsync = async () => {
         const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });

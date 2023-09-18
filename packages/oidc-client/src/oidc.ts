@@ -252,7 +252,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     if (tokens) {
                         // @ts-ignore
                         this.tokens = setTokens(tokens, null, configuration.token_renew_mode);
-                        const getLoginParams = session.getLoginParams(this.configurationName);
+                        const getLoginParams = session.getLoginParams();
                         // @ts-ignore
                         this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
                         const sessionState = await session.getSessionStateAsync();
@@ -366,10 +366,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 let loginParams;
                 const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                 if (serviceWorker) {
-                    loginParams = serviceWorker.getLoginParams(this.configurationName);
+                    loginParams = serviceWorker.getLoginParams();
                 } else {
                     const session = initSession(this.configurationName, configuration.storage);
-                    loginParams = session.getLoginParams(this.configurationName);
+                    loginParams = session.getLoginParams();
                 }
                 const silent_token_response = await silentLoginAsync({
                     ...loginParams.extras,
