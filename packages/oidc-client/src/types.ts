@@ -27,6 +27,7 @@ export type OidcConfiguration = {
     monitor_session?: boolean;
     token_renew_mode?: string;
     logout_tokens_to_invalidate?:Array<LogoutToken>;
+    proof_of_possession?:boolean;
 };
 
 export interface StringMap {

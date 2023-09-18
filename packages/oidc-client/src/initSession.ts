@@ -26,12 +26,28 @@ export const initSession = (configurationName, storage = sessionStorage) => {
     };
 
     const setNonceAsync = (nonce) => {
-        localStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
+        storage[`oidc.nonce.${configurationName}`] = nonce.nonce;
+    };
+
+    const setJwkAsync = (jwk) => {
+        storage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
+    };
+
+    const getJwkAsync = () => {
+        return JSON.parse(storage[`oidc.jwk.${configurationName}`]);
     };
 
     const getNonceAsync = async () => {
         // @ts-ignore
-        return { nonce: localStorage[`oidc.nonce.${configurationName}`] };
+        return { nonce: storage[`oidc.nonce.${configurationName}`] };
+    };
+
+    const setDpopNonce = (dpopNonce:string) => {
+        storage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
+    };
+
+    const getDpopNonce = (dpopNonce: string) => {
+        return storage[`oidc.dpop_nonce.${configurationName}`];
     };
 
     const getTokens = () => {
@@ -85,5 +101,9 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         setStateAsync,
         getCodeVerifierAsync,
         setCodeVerifierAsync,
+        setDpopNonce,
+        getDpopNonce,
+        setJwkAsync,
+        getJwkAsync,
     };
 };

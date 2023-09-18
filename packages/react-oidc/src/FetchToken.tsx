@@ -27,7 +27,13 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => OidcCl
     headers.set('Accept', 'application/json');
   }
   if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`);
+    if(oidc.configuration.proof_of_possession){
+        const dpop = await oidc.generateProofOfPossessionAsync(accessToken, url.toString(), optionTmp.method);
+        headers.set('Authorization', `PoP ${accessToken}`);
+        headers.set('DPoP', dpop);
+    } else{
+      headers.set('Authorization', `Bearer ${accessToken}`);
+    }
     if (!optionTmp.credentials) {
       optionTmp.credentials = 'same-origin';
     }

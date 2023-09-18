@@ -250,7 +250,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const setNonceAsync = (nonce) => {
-        sessionStorage['oidc.nonce'] = nonce.nonce;
+        sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
     const getNonceAsync = async () => {
@@ -259,7 +259,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         // @ts-ignore
         let nonce = result.nonce;
         if (!nonce) {
-            nonce = sessionStorage['oidc.nonce'];
+            nonce = sessionStorage[`oidc.nonce.${configurationName}`];
             console.warn('nonce not found in service worker, using sessionStorage');
         }
         return { nonce };
@@ -270,6 +270,23 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         getLoginParamsCache = data;
         localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
     };
+
+    const setDpopNonce = (dpopNonce: string) => {
+        localStorage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
+    };
+
+    const getDpopNonce = (dpopNonce: string) => {
+        return localStorage[`oidc.dpop_nonce.${configurationName}`];
+    };
+
+    const setJwkAsync = (jwk) => {
+        localStorage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
+    };
+
+    const getJwkAsync = () => {
+        return JSON.parse(localStorage[`oidc.jwk.${configurationName}`]);
+    };
+    
     const getLoginParams = (configurationName) => {
         const dataString = localStorage[`oidc.login.${configurationName}`];
         if (!getLoginParamsCache) {
@@ -325,5 +342,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         setStateAsync,
         getCodeVerifierAsync,
         setCodeVerifierAsync,
+        setDpopNonce,
+        getDpopNonce,
+        setJwkAsync,
+        getJwkAsync,
     };
 };

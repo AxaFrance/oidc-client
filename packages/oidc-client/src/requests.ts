@@ -105,10 +105,10 @@ const guid = function () {
     // Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
     // y could be 1000, 1001, 1010, 1011 since most significant two bits needs to be 10
     // y values are 8, 9, A, B
-    var guidHolder = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-    var hex = '0123456789abcdef';
-    var r = 0;
-    var guidResponse = "";
+    const guidHolder = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+    const hex = '0123456789abcdef';
+    let r = 0;
+    let guidResponse = "";
     for (var i = 0; i < 36; i++) {
         if (guidHolder[i] !== '-' && guidHolder[i] !== '4') {
             // each x and y needs to be random
@@ -130,39 +130,45 @@ const guid = function () {
     return guidResponse;
 };
 
-const generateJwtAsync = (method, url) => {
-    
 
+export const generateJwkAsync = () => {
+    // @ts-ignore
+    return EC.generate().then(function(jwk) {
+        console.info('Private Key:', JSON.stringify(jwk));
+        // @ts-ignore
+        console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
+        return jwk; 
+    });
+}
+
+export const generateJwtDpopAsync = (jwk, method = 'POST', url: string, extrasClaims={}) => {
+    
     const claims = {
         // https://www.rfc-editor.org/rfc/rfc9449.html#name-concept
         jit: btoa(guid()),
         htm: method,
         htu: url,
         iat: Math.round(Date.now() / 1000),
-        // 
-        // ath: 'hash o',
+        ...extrasClaims,
     };
-    
     // @ts-ignore
-    return EC.generate().then(function(jwk) {
-        console.info('Private Key:', JSON.stringify(jwk));
+    return JWK.thumbprint(jwk).then(function(kid) {
         // @ts-ignore
-        console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
-    
-        // @ts-ignore
-        return JWK.thumbprint(jwk).then(function(kid) {
-            // @ts-ignore
-            return JWT.sign(jwk, { /*kid: kid*/ }, claims).then(function(jwt) {
-                console.info('JWT:', jwt);
-                return jwt;
-            });
+        return JWT.sign(jwk, { /*kid: kid*/ }, claims).then(function(jwt) {
+            console.info('JWT:', jwt);
+            return jwt;
         });
     });
-
 }
 
 
-export const performTokenRequestAsync = (fetch:Fetch) => async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs = 10000) => {
+export const performTokenRequestAsync = (fetch:Fetch) => async (url:string, 
+                                                                details, 
+                                                                extras, 
+                                                                oldTokens,
+                                                                headersExtras = {},
+                                                                tokenRenewMode: string, 
+                                                                timeoutMs = 10000) => {
     for (const [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
@@ -181,7 +187,7 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url, details, ex
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            
+            ...headersExtras
         },
         body: formBodyString,
     }, timeoutMs);
@@ -189,9 +195,15 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url, details, ex
         return { success: false, status: response.status };
     }
     const tokens = await response.json();
+
+    let dPoPNonce = null;
+    if( response.headers.has(popNonceResponseHeader)){
+        dPoPNonce = response.headers.get(popNonceResponseHeader);
+    }
     return {
         success: true,
         data: parseOriginalTokens(tokens, oldTokens, tokenRenewMode),
+        dPoPNonce: dPoPNonce,
     };
 };
 
@@ -217,22 +229,26 @@ export const performAuthorizationRequestAsync = (storage: any) => async (url, ex
     window.location.href = `${url}${queryString}`;
 };
 
-export const performFirstTokenRequestAsync = (storage:any) => async (url, extras, tokenRenewMode: string, timeoutMs = 10000) => {
-    extras = extras ? { ...extras } : {};
-    extras.code_verifier = await storage.getCodeVerifierAsync();
+const popNonceResponseHeader = "DPoP-Nonce";
+export const performFirstTokenRequestAsync = (storage:any) => async (url, 
+                                                                     formBodyExtras, 
+                                                                     headersExtras, 
+                                                                     tokenRenewMode: string, 
+                                                                     timeoutMs = 10000) => {
+    formBodyExtras = formBodyExtras ? { ...formBodyExtras } : {};
+    formBodyExtras.code_verifier = await storage.getCodeVerifierAsync();
     const formBody = [];
-    for (const property in extras) {
+    for (const property in formBodyExtras) {
         const encodedKey = encodeURIComponent(property);
-        const encodedValue = encodeURIComponent(extras[property]);
+        const encodedValue = encodeURIComponent(formBodyExtras[property]);
         formBody.push(`${encodedKey}=${encodedValue}`);
     }
     const formBodyString = formBody.join('&');
-    const DPoP = await generateJwtAsync('POST', url);
     const response = await internalFetch(fetch)(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            'DPoP': DPoP,
+            ...headersExtras,
         },
         body: formBodyString,
     }, timeoutMs);
@@ -240,12 +256,17 @@ export const performFirstTokenRequestAsync = (storage:any) => async (url, extras
     if (response.status !== 200) {
         return { success: false, status: response.status };
     }
+    let dPoPNonce = null;
+    if( response.headers.has(popNonceResponseHeader)){
+        dPoPNonce = response.headers.get(popNonceResponseHeader);
+    }
     const tokens = await response.json();
     return {
         success: true,
         data: {
-            state: extras.state,
+            state: formBodyExtras.state,
             tokens: parseOriginalTokens(tokens, null, tokenRenewMode),
-            },
+            dPoPNonce: dPoPNonce,
+        },
     };
 };
