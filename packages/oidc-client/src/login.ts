@@ -4,13 +4,12 @@ import {initSession} from './initSession.js';
 import {initWorkerAsync} from './initWorker.js';
 import {isTokensOidcValid} from './parseTokens.js';
 import {
-    generateJwkAsync,
-    generateJwtDemonstratingProofOfPossessionAsync,
     performAuthorizationRequestAsync,
     performFirstTokenRequestAsync
 } from './requests.js';
 import {getParseQueryStringFromLocation} from './route-utils.js';
 import {OidcConfiguration, StringMap} from './types.js';
+import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const defaultLoginAsync = (window, configurationName:string, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {

@@ -7,13 +7,14 @@ import {defaultLoginAsync, loginCallbackAsync} from './login.js';
 import {destroyAsync, logoutAsync} from './logout.js';
 import {computeTimeLeft, isTokensOidcValid, setTokens, TokenRenewMode, Tokens,} from './parseTokens.js';
 import {autoRenewTokens, renewTokensAndStartTimerAsync} from './renewTokens.js';
-import {fetchFromIssuer, generateJwtDemonstratingProofOfPossessionAsync, performTokenRequestAsync} from './requests.js';
+import {fetchFromIssuer, performTokenRequestAsync} from './requests.js';
 import {getParseQueryStringFromLocation} from './route-utils.js';
 import defaultSilentLoginAsync, {_silentLoginAsync} from './silentLogin.js';
 import timer from './timer.js';
 import {AuthorityConfiguration, Fetch, OidcConfiguration, StringMap} from './types.js';
 import {userInfoAsync} from './user.js';
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
+import {generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
 
 export const getFetchDefault = () => {
     return fetch;
