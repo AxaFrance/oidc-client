@@ -5,7 +5,7 @@ import {initWorkerAsync} from './initWorker.js';
 import {isTokensOidcValid} from './parseTokens.js';
 import {
     generateJwkAsync,
-    generateJwtDpopAsync,
+    generateJwtDemonstratingProofOfPossessionAsync,
     performAuthorizationRequestAsync,
     performFirstTokenRequestAsync
 } from './requests.js';
@@ -146,12 +146,12 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         if(configuration.proof_of_possession) {
             const jwk = generateJwkAsync();
             if (serviceWorker) {
-                await serviceWorker.setJwkAsync(jwk);
+                await serviceWorker.setDemonstratingProofOfPossessionJwkAsync(jwk);
             } else {
                 const session = initSession(oidc.configurationName, configuration.storage);
-                await session.setJwkAsync(jwk);
+                await session.setDemonstratingProofOfPossessionJwkAsync(jwk);
             }
-            headersExtras['DPoP'] = await generateJwtDpopAsync(jwk, 'POST', url);
+            headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(jwk, 'POST', url);
         }
 
         const tokenResponse = await performFirstTokenRequestAsync(storage)(url, 
@@ -166,7 +166,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
 
         let loginParams;
         const formattedTokens = tokenResponse.data.tokens;
-        const dPoPNonce = tokenResponse.data.dPoPNonce;
+        const demonstratingProofOfPossessionNonce = tokenResponse.data.demonstratingProofOfPossessionNonce;
 
         // @ts-ignore
         if (tokenResponse.data.state !== extras.state) {
@@ -177,14 +177,16 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             throw new Error(`Tokens are not OpenID valid, reason: ${reason}`);
         }
 
-        if (serviceWorker) {
-            await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
-            loginParams = serviceWorker.getLoginParams(oidc.configurationName);
-            await serviceWorker.setNonceAsync(dPoPNonce);
-        } else {
-            const session = initSession(oidc.configurationName, configuration.storage);
-            loginParams = session.getLoginParams(oidc.configurationName);
-            await session.setNonceAsync(dPoPNonce);
+        if(demonstratingProofOfPossessionNonce) {
+            if (serviceWorker) {
+                await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
+                loginParams = serviceWorker.getLoginParams(oidc.configurationName);
+                await serviceWorker.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);
+            } else {
+                const session = initSession(oidc.configurationName, configuration.storage);
+                loginParams = session.getLoginParams(oidc.configurationName);
+                await session.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);
+            }
         }
 
         await oidc.startCheckSessionAsync(oidcServerConfiguration.checkSessionIframe, clientId, sessionState, isSilentSignin);

@@ -271,19 +271,19 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
     };
 
-    const setDpopNonce = (dpopNonce: string) => {
+    const setDemonstratingProofOfPossessionNonce = (dpopNonce: string) => {
         localStorage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
     };
 
-    const getDpopNonce = (dpopNonce: string) => {
+    const getDemonstratingProofOfPossessionNonce = () => {
         return localStorage[`oidc.dpop_nonce.${configurationName}`];
     };
 
-    const setJwkAsync = (jwk) => {
+    const setDemonstratingProofOfPossessionJwkAsync = (jwk) => {
         localStorage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
     };
 
-    const getJwkAsync = () => {
+    const getDemonstratingProofOfPossessionJwkAsync = () => {
         return JSON.parse(localStorage[`oidc.jwk.${configurationName}`]);
     };
     
@@ -342,9 +342,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         setStateAsync,
         getCodeVerifierAsync,
         setCodeVerifierAsync,
-        setDpopNonce,
-        getDpopNonce,
-        setJwkAsync,
-        getJwkAsync,
+        setDemonstratingProofOfPossessionNonce,
+        getDemonstratingProofOfPossessionNonce,
+        setDemonstratingProofOfPossessionJwkAsync,
+        getDemonstratingProofOfPossessionJwkAsync,
     };
 };

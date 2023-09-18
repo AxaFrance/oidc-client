@@ -29,11 +29,11 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         storage[`oidc.nonce.${configurationName}`] = nonce.nonce;
     };
 
-    const setJwkAsync = (jwk) => {
+    const setDemonstratingProofOfPossessionJwkAsync = (jwk) => {
         storage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
     };
 
-    const getJwkAsync = () => {
+    const getDemonstratingProofOfPossessionJwkAsync = () => {
         return JSON.parse(storage[`oidc.jwk.${configurationName}`]);
     };
 
@@ -42,11 +42,11 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return { nonce: storage[`oidc.nonce.${configurationName}`] };
     };
 
-    const setDpopNonce = (dpopNonce:string) => {
+    const setDemonstratingProofOfPossessionNonce = (dpopNonce:string) => {
         storage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
     };
 
-    const getDpopNonce = (dpopNonce: string) => {
+    const getDemonstratingProofOfPossessionNonce = () => {
         return storage[`oidc.dpop_nonce.${configurationName}`];
     };
 
@@ -101,9 +101,9 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         setStateAsync,
         getCodeVerifierAsync,
         setCodeVerifierAsync,
-        setDpopNonce,
-        getDpopNonce,
-        setJwkAsync,
-        getJwkAsync,
+        setDemonstratingProofOfPossessionNonce,
+        getDemonstratingProofOfPossessionNonce,
+        setDemonstratingProofOfPossessionJwkAsync,
+        getDemonstratingProofOfPossessionJwkAsync,
     };
 };

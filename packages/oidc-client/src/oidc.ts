@@ -7,7 +7,7 @@ import {defaultLoginAsync, loginCallbackAsync} from './login.js';
 import {destroyAsync, logoutAsync} from './logout.js';
 import {computeTimeLeft, isTokensOidcValid, setTokens, TokenRenewMode, Tokens,} from './parseTokens.js';
 import {autoRenewTokens, renewTokensAndStartTimerAsync} from './renewTokens.js';
-import {fetchFromIssuer, generateJwtDpopAsync, performTokenRequestAsync} from './requests.js';
+import {fetchFromIssuer, generateJwtDemonstratingProofOfPossessionAsync, performTokenRequestAsync} from './requests.js';
 import {getParseQueryStringFromLocation} from './route-utils.js';
 import defaultSilentLoginAsync, {_silentLoginAsync} from './silentLogin.js';
 import timer from './timer.js';
@@ -96,7 +96,7 @@ export class Oidc {
           refresh_time_before_tokens_expiration_in_second,
           silent_login_timeout: configuration.silent_login_timeout ?? 12000,
           token_renew_mode: configuration.token_renew_mode ?? TokenRenewMode.access_token_or_id_token_invalid,
-          proof_of_possession: configuration.proof_of_possession ?? false,
+          demonstrating_proof_of_possession: configuration.demonstrating_proof_of_possession ?? false,
           authority_timeout_wellknowurl_in_millisecond: configuration.authority_timeout_wellknowurl_in_millisecond ?? 10000,
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
       };
@@ -451,7 +451,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const timeoutMs = document.hidden ? 10000 : 30000 * 10;
                         const url = oidcServerConfiguration.token_endpoint;
                         const headersExtras = {};
-                        if(configuration.proof_of_possession) {
+                        if(configuration.demonstrating_proof_of_possession) {
                             headersExtras['DPoP'] = await this.generateProofOfPossessionAsync(tokens.accessToken, url, 'POST');
                         }
                         const tokenResponse = await performTokenRequestAsync(this.getFetch())(url, 
@@ -470,13 +470,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 return { tokens: null, status: 'SESSION_LOST' };
                             }
                             updateTokens(tokenResponse.data);
-                            if(tokenResponse.dPoPNonce) {
+                            if(tokenResponse.demonstratingProofOfPossessionNonce) {
                                 const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
                                 if(serviceWorker){
-                                    await serviceWorker.setNonceAsync(tokenResponse.dPoPNonce);
+                                    await serviceWorker.setDemonstratingProofOfPossessionNonce(tokenResponse.demonstratingProofOfPossessionNonce);
                                 } else {
                                     const session = initSession(this.configurationName, configuration.storage);
-                                    await session.setNonceAsync(tokenResponse.dPoPNonce);
+                                    await session.setDemonstratingProofOfPossessionNonce(tokenResponse.demonstratingProofOfPossessionNonce);
                                 }
                             }
                             this.publishEvent(eventNames.refreshTokensAsync_end, { success: tokenResponse.success });
@@ -506,22 +506,22 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),};
 
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
-        let dpopNonce = null;
+        let demonstratingProofOfPossessionNonce:string = null;
         let jwk;
         if (serviceWorker) {
-            dpopNonce = await serviceWorker.getNonceAsync();
-            jwk = await serviceWorker.getJwkAsync();
+            demonstratingProofOfPossessionNonce = await serviceWorker.getDemonstratingProofOfPossessionNonce();
+            jwk = await serviceWorker.getDemonstratingProofOfPossessionJwkAsync();
         } else {
             const session = initSession(this.configurationName, configuration.storage);
-            jwk = await session.getJwkAsync();
-            dpopNonce = await session.getNonceAsync();
+            jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
+            demonstratingProofOfPossessionNonce = await session.getDemonstratingProofOfPossessionNonce();
         }
 
-        if (dpopNonce) {
-            claimsExtras['nonce'] = dpopNonce.nonce;
+        if (demonstratingProofOfPossessionNonce) {
+            claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;
         }
 
-        return await generateJwtDpopAsync(jwk, method, url, claimsExtras);
+        return await generateJwtDemonstratingProofOfPossessionAsync(jwk, method, url, claimsExtras);
     }
 
     async syncTokensInfoAsync(configuration, configurationName, currentTokens, forceRefresh = false) {

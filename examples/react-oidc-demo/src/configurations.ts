@@ -1,7 +1,7 @@
 import { TokenRenewMode } from '@axa-fr/react-oidc';
 
 export const configurationIdentityServer = {
-    client_id: 'm2m.dpop',
+    client_id: 'interactive.public.short',
     redirect_uri: window.location.origin + '/authentication/callback',
     silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
     // silent_login_uri: window.location.origin + '/authentication/silent-login',
@@ -16,6 +16,7 @@ export const configurationIdentityServer = {
     // monitor_session: true,
     extras: { youhou_demo: 'youhou' },
     token_renew_mode: TokenRenewMode.access_token_invalid,
+    demonstrating_proof_of_possession: false,
 };
 
 export const configurationIdentityServer1 = {

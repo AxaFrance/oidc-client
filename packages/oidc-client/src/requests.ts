@@ -141,7 +141,7 @@ export const generateJwkAsync = () => {
     });
 }
 
-export const generateJwtDpopAsync = (jwk, method = 'POST', url: string, extrasClaims={}) => {
+export const generateJwtDemonstratingProofOfPossessionAsync = (jwk, method = 'POST', url: string, extrasClaims={}) => {
     
     const claims = {
         // https://www.rfc-editor.org/rfc/rfc9449.html#name-concept
@@ -161,6 +161,12 @@ export const generateJwtDpopAsync = (jwk, method = 'POST', url: string, extrasCl
     });
 }
 
+type PerformTokenRequestResponse = {
+    success: boolean;
+    status?: number;
+    data?: any;
+    demonstratingProofOfPossessionNonce?: string;
+}
 
 export const performTokenRequestAsync = (fetch:Fetch) => async (url:string, 
                                                                 details, 
@@ -168,7 +174,7 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url:string,
                                                                 oldTokens,
                                                                 headersExtras = {},
                                                                 tokenRenewMode: string, 
-                                                                timeoutMs = 10000) => {
+                                                                timeoutMs = 10000):Promise<PerformTokenRequestResponse> => {
     for (const [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
@@ -192,18 +198,18 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url:string,
         body: formBodyString,
     }, timeoutMs);
     if (response.status !== 200) {
-        return { success: false, status: response.status };
+        return { success: false, status: response.status, demonstratingProofOfPossessionNonce:null };
     }
     const tokens = await response.json();
 
-    let dPoPNonce = null;
-    if( response.headers.has(popNonceResponseHeader)){
-        dPoPNonce = response.headers.get(popNonceResponseHeader);
+    let demonstratingProofOfPossessionNonce = null;
+    if( response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)){
+        demonstratingProofOfPossessionNonce = response.headers.get(demonstratingProofOfPossessionNonceResponseHeader);
     }
     return {
         success: true,
         data: parseOriginalTokens(tokens, oldTokens, tokenRenewMode),
-        dPoPNonce: dPoPNonce,
+        demonstratingProofOfPossessionNonce: demonstratingProofOfPossessionNonce,
     };
 };
 
@@ -229,7 +235,7 @@ export const performAuthorizationRequestAsync = (storage: any) => async (url, ex
     window.location.href = `${url}${queryString}`;
 };
 
-const popNonceResponseHeader = "DPoP-Nonce";
+const demonstratingProofOfPossessionNonceResponseHeader = "DPoP-Nonce";
 export const performFirstTokenRequestAsync = (storage:any) => async (url, 
                                                                      formBodyExtras, 
                                                                      headersExtras, 
@@ -256,9 +262,9 @@ export const performFirstTokenRequestAsync = (storage:any) => async (url,
     if (response.status !== 200) {
         return { success: false, status: response.status };
     }
-    let dPoPNonce = null;
-    if( response.headers.has(popNonceResponseHeader)){
-        dPoPNonce = response.headers.get(popNonceResponseHeader);
+    let demonstratingProofOfPossessionNonce:string= null;
+    if( response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)){
+        demonstratingProofOfPossessionNonce = response.headers.get(demonstratingProofOfPossessionNonceResponseHeader);
     }
     const tokens = await response.json();
     return {
@@ -266,7 +272,7 @@ export const performFirstTokenRequestAsync = (storage:any) => async (url,
         data: {
             state: formBodyExtras.state,
             tokens: parseOriginalTokens(tokens, null, tokenRenewMode),
-            dPoPNonce: dPoPNonce,
+            demonstratingProofOfPossessionNonce,
         },
     };
 };
