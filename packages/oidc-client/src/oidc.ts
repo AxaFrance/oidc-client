@@ -449,7 +449,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         };
                         const oidcServerConfiguration = await this.initAsync(authority, configuration.authority_configuration);
                         const timeoutMs = document.hidden ? 10000 : 30000 * 10;
-                        const url = oidcServerConfiguration.token_endpoint;
+                        const url = oidcServerConfiguration.tokenEndpoint;
                         const headersExtras = {};
                         if(configuration.demonstrating_proof_of_possession) {
                             headersExtras['DPoP'] = await this.generateProofOfPossessionAsync(tokens.accessToken, url, 'POST');

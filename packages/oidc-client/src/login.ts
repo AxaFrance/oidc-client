@@ -176,16 +176,17 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         if (!isValid) {
             throw new Error(`Tokens are not OpenID valid, reason: ${reason}`);
         }
-
-        if(demonstratingProofOfPossessionNonce) {
-            if (serviceWorker) {
-                await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
-                loginParams = serviceWorker.getLoginParams();
-                console.log(loginParams)
+        
+        if (serviceWorker) {
+            await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
+            loginParams = serviceWorker.getLoginParams();
+            if(demonstratingProofOfPossessionNonce) {
                 await serviceWorker.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);
-            } else {
-                const session = initSession(oidc.configurationName, configuration.storage);
-                loginParams = session.getLoginParams();
+            }
+        } else {
+            const session = initSession(oidc.configurationName, configuration.storage);
+            loginParams = session.getLoginParams();
+            if(demonstratingProofOfPossessionNonce) {
                 await session.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);
             }
         }
