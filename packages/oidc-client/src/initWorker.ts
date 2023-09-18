@@ -296,7 +296,6 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return JSON.parse(localStorage[`oidc.jwk.${configurationName}`]);
     };
     
-
     const getStateAsync = async () => {
         const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
         // @ts-ignore

@@ -143,8 +143,8 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         
         const url = oidcServerConfiguration.tokenEndpoint;
         const headersExtras = {};
-        if(configuration.proof_of_possession) {
-            const jwk = generateJwkAsync();
+        if(configuration.demonstrating_proof_of_possession) {
+            const jwk = await generateJwkAsync();
             if (serviceWorker) {
                 await serviceWorker.setDemonstratingProofOfPossessionJwkAsync(jwk);
             } else {
