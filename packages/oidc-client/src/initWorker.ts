@@ -250,7 +250,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const setNonceAsync = (nonce) => {
-        sessionStorage['oidc.nonce'] = nonce.nonce;
+        sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
     const getNonceAsync = async () => {
@@ -259,25 +259,43 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         // @ts-ignore
         let nonce = result.nonce;
         if (!nonce) {
-            nonce = sessionStorage['oidc.nonce'];
+            nonce = sessionStorage[`oidc.nonce.${configurationName}`];
             console.warn('nonce not found in service worker, using sessionStorage');
         }
         return { nonce };
     };
 
-    let getLoginParamsCache = null;
-    const setLoginParams = (configurationName:string, data) => {
-        getLoginParamsCache = data;
+    let getLoginParamsCache = {};
+    const setLoginParams = (data) => {
+        getLoginParamsCache[configurationName] = data;
         localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
     };
-    const getLoginParams = (configurationName) => {
+
+    const getLoginParams = () => {
         const dataString = localStorage[`oidc.login.${configurationName}`];
-        if (!getLoginParamsCache) {
-            getLoginParamsCache = JSON.parse(dataString);
+        if (!getLoginParamsCache[configurationName]) {
+            getLoginParamsCache[configurationName] = JSON.parse(dataString);
         }
-        return getLoginParamsCache;
+        return getLoginParamsCache[configurationName];
     };
 
+
+    const setDemonstratingProofOfPossessionNonce = (dpopNonce: string) => {
+        localStorage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
+    };
+
+    const getDemonstratingProofOfPossessionNonce = () => {
+        return localStorage[`oidc.dpop_nonce.${configurationName}`];
+    };
+
+    const setDemonstratingProofOfPossessionJwkAsync = (jwk) => {
+        localStorage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
+    };
+
+    const getDemonstratingProofOfPossessionJwkAsync = () => {
+        return JSON.parse(localStorage[`oidc.jwk.${configurationName}`]);
+    };
+    
     const getStateAsync = async () => {
         const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
         // @ts-ignore
@@ -325,5 +343,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         setStateAsync,
         getCodeVerifierAsync,
         setCodeVerifierAsync,
+        setDemonstratingProofOfPossessionNonce,
+        getDemonstratingProofOfPossessionNonce,
+        setDemonstratingProofOfPossessionJwkAsync,
+        getDemonstratingProofOfPossessionJwkAsync,
     };
 };

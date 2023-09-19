@@ -3,6 +3,7 @@ import { deriveChallengeAsync, generateRandom } from './crypto.js';
 import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
 import { Fetch, StringMap } from './types.js';
+import EC, {JWK, JWT} from './jwt';
 
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer = (fetch) => async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage, timeoutMs = 10000):
@@ -83,7 +84,21 @@ export const performRevocationRequestAsync = (fetch) => async (url, token, token
     };
 };
 
-export const performTokenRequestAsync = (fetch:Fetch) => async (url, details, extras, oldTokens, tokenRenewMode: string, timeoutMs = 10000) => {
+
+type PerformTokenRequestResponse = {
+    success: boolean;
+    status?: number;
+    data?: any;
+    demonstratingProofOfPossessionNonce?: string;
+}
+
+export const performTokenRequestAsync = (fetch:Fetch) => async (url:string, 
+                                                                details, 
+                                                                extras, 
+                                                                oldTokens,
+                                                                headersExtras = {},
+                                                                tokenRenewMode: string, 
+                                                                timeoutMs = 10000):Promise<PerformTokenRequestResponse> => {
     for (const [key, value] of Object.entries(extras)) {
         if (details[key] === undefined) {
             details[key] = value;
@@ -97,21 +112,28 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url, details, ex
         formBody.push(`${encodedKey}=${encodedValue}`);
     }
     const formBodyString = formBody.join('&');
-
+    
     const response = await internalFetch(fetch)(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            ...headersExtras
         },
         body: formBodyString,
     }, timeoutMs);
     if (response.status !== 200) {
-        return { success: false, status: response.status };
+        return { success: false, status: response.status, demonstratingProofOfPossessionNonce:null };
     }
     const tokens = await response.json();
+
+    let demonstratingProofOfPossessionNonce = null;
+    if( response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)){
+        demonstratingProofOfPossessionNonce = response.headers.get(demonstratingProofOfPossessionNonceResponseHeader);
+    }
     return {
         success: true,
         data: parseOriginalTokens(tokens, oldTokens, tokenRenewMode),
+        demonstratingProofOfPossessionNonce: demonstratingProofOfPossessionNonce,
     };
 };
 
@@ -137,13 +159,18 @@ export const performAuthorizationRequestAsync = (storage: any) => async (url, ex
     window.location.href = `${url}${queryString}`;
 };
 
-export const performFirstTokenRequestAsync = (storage:any) => async (url, extras, tokenRenewMode: string, timeoutMs = 10000) => {
-    extras = extras ? { ...extras } : {};
-    extras.code_verifier = await storage.getCodeVerifierAsync();
+const demonstratingProofOfPossessionNonceResponseHeader = "DPoP-Nonce";
+export const performFirstTokenRequestAsync = (storage:any) => async (url, 
+                                                                     formBodyExtras, 
+                                                                     headersExtras, 
+                                                                     tokenRenewMode: string, 
+                                                                     timeoutMs = 10000) => {
+    formBodyExtras = formBodyExtras ? { ...formBodyExtras } : {};
+    formBodyExtras.code_verifier = await storage.getCodeVerifierAsync();
     const formBody = [];
-    for (const property in extras) {
+    for (const property in formBodyExtras) {
         const encodedKey = encodeURIComponent(property);
-        const encodedValue = encodeURIComponent(extras[property]);
+        const encodedValue = encodeURIComponent(formBodyExtras[property]);
         formBody.push(`${encodedKey}=${encodedValue}`);
     }
     const formBodyString = formBody.join('&');
@@ -151,6 +178,7 @@ export const performFirstTokenRequestAsync = (storage:any) => async (url, extras
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            ...headersExtras,
         },
         body: formBodyString,
     }, timeoutMs);
@@ -158,12 +186,17 @@ export const performFirstTokenRequestAsync = (storage:any) => async (url, extras
     if (response.status !== 200) {
         return { success: false, status: response.status };
     }
+    let demonstratingProofOfPossessionNonce:string= null;
+    if( response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)){
+        demonstratingProofOfPossessionNonce = response.headers.get(demonstratingProofOfPossessionNonceResponseHeader);
+    }
     const tokens = await response.json();
     return {
         success: true,
         data: {
-            state: extras.state,
+            state: formBodyExtras.state,
             tokens: parseOriginalTokens(tokens, null, tokenRenewMode),
-            },
+            demonstratingProofOfPossessionNonce,
+        },
     };
 };

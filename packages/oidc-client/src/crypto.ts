@@ -44,7 +44,16 @@ export function textEncodeLite(str: string) {
   }
   return bufView;
 }
-  export const deriveChallengeAsync = (code: string): Promise<string> => {
+
+export function base64urlOfHashOfASCIIEncodingAsync(code: string):Promise<string> {
+  return new Promise((resolve, reject) => {
+    crypto.subtle.digest('SHA-256', textEncodeLite(code)).then(buffer => {
+      return resolve(urlSafe(new Uint8Array(buffer)));
+    }, error => reject(error));
+  });
+}
+
+export const deriveChallengeAsync = (code: string): Promise<string> => {
     if (code.length < 43 || code.length > 128) {
       return Promise.reject(new Error('Invalid code length.'));
     }
@@ -53,9 +62,5 @@ export function textEncodeLite(str: string) {
       return Promise.reject(new Error('window.crypto.subtle is unavailable.'));
     }
 
-    return new Promise((resolve, reject) => {
-      crypto.subtle.digest('SHA-256', textEncodeLite(code)).then(buffer => {
-        return resolve(urlSafe(new Uint8Array(buffer)));
-      }, error => reject(error));
-    });
+    return base64urlOfHashOfASCIIEncodingAsync(code);
 };

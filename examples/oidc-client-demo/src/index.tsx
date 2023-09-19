@@ -1,4 +1,5 @@
 import { OidcClient } from '@axa-fr/oidc-client';
+
 class Router
 {    getCustomHistory(){
         const generateKey = () =>

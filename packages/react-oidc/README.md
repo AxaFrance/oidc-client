@@ -31,7 +31,8 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
 @axa-fr/react is:
 
 - **Secure** :
-  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSS attacks)
+  - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
+  - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
   - OIDC using client side Code Credential Grant with pkce only
 - **Lightweight** : Unpacked Size on npm is **274 kB**
 - **Simple**
@@ -141,6 +142,7 @@ const configuration = {
   authority: "https://demo.duendesoftware.com",
   service_worker_relative_url: "/OidcServiceWorker.js", // just comment that line to disable service worker mode
   service_worker_only: false,
+  demonstrating_proof_of_possession: true, // demonstrating proof of possession will work only if access_token is accessible from the client (This is because WebCrypto API is not available inside a Service Worker)
 };
 
 const App = () => (
@@ -197,6 +199,7 @@ const configuration = {
     onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user is logged out from the same tab when session_monitor is active
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
+    demonstrating_proof_of_possession: Boolean, // Optional, default is false, if true, the the Demonstrating Proof of Possession will be activated //https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access
   }.isRequired,
 };
 

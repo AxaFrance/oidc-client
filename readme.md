@@ -38,7 +38,8 @@ Demos:
 **@axa-fr/oidc-client** is:
 
 - **Secure** :
-  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSS attacks)
+  - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
+  - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
   - OIDC using client side Code Credential Grant with pkce only
 - **Lightweight** : Unpacked Size on npm is **274 kB**
 - **Simple**
