@@ -28,9 +28,9 @@ const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => OidcCl
   }
   if (accessToken) {
     if(oidc.configuration.demonstrating_proof_of_possession){
-        const dpop = await oidc.generateProofOfPossessionAsync(accessToken, url.toString(), optionTmp.method);
+        const demonstrationOdProofOfPossession = await oidc.generateDemonstrationOfProofOfPossessionAsync(accessToken, url.toString(), optionTmp.method);
         headers.set('Authorization', `PoP ${accessToken}`);
-        headers.set('DPoP', dpop);
+        headers.set('DPoP', demonstrationOdProofOfPossession);
     } else{
       headers.set('Authorization', `Bearer ${accessToken}`);
     }

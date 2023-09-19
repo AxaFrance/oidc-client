@@ -176,6 +176,16 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             throw new Error(`Tokens are not OpenID valid, reason: ${reason}`);
         }
         
+        if(serviceWorker){
+            if(formattedTokens.refreshToken && !formattedTokens.refreshToken.includes("SECURED_BY_OIDC_SERVICE_WORKER")) {
+                throw new Error("Refresh token should be hidden by service worker");
+            }
+
+            if(demonstratingProofOfPossessionNonce && formattedTokens.accessToken && formattedTokens.accessToken.includes("SECURED_BY_OIDC_SERVICE_WORKER")) {
+                throw new Error("Demonstration of proof of possession require Access token not hidden by service worker");
+            }
+        }
+        
         if (serviceWorker) {
             await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
             loginParams = serviceWorker.getLoginParams();

@@ -322,9 +322,12 @@ export class OidcClient {
 
   /**
    * Generate Demonstration of proof of possession.
+   * @param accessToken The access token to use.
+   * @param url The url to use.
+   * @param method The method to use.
    * @returns A promise resolved with the proof of possession.
    */
-  async generateProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string>;
+  async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string>;
 }
 
 ```

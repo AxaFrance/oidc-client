@@ -453,7 +453,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                         const url = oidcServerConfiguration.tokenEndpoint;
                         const headersExtras = {};
                         if(configuration.demonstrating_proof_of_possession) {
-                            headersExtras['DPoP'] = await this.generateProofOfPossessionAsync(tokens.accessToken, url, 'POST');
+                            headersExtras['DPoP'] = await this.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, 'POST');
                         }
                         const tokenResponse = await performTokenRequestAsync(this.getFetch())(url, 
                             details, 
@@ -501,7 +501,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             }
      }
 
-    async generateProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string> {
+    async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string> {
 
         const configuration = this.configuration;
         const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),};
