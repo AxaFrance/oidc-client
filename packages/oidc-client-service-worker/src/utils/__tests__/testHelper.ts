@@ -125,6 +125,8 @@ class OidcConfigBuilder {
     hideAccessToken: true,
     convertAllRequestsToCorsExceptNavigate: false,
     setAccessTokenToNavigateRequests: true,
+    demonstratingProofOfPossessionNonce: null,
+    demonstratingProofOfPossessionJwkJson: null,
   };
 
   public withTestingDefault(): OidcConfigBuilder {

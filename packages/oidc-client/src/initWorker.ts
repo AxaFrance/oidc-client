@@ -146,7 +146,7 @@ export const excludeOs = (operatingSystem) => {
     return false;
 };
 
-const sendMessageAsync = (registration) => (data) => {
+const sendMessageAsync = (registration) => (data) : Promise<any> => {
     return new Promise(function(resolve, reject) {
         const messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function (event) {
@@ -279,21 +279,26 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         return getLoginParamsCache[configurationName];
     };
 
-
-    const setDemonstratingProofOfPossessionNonce = (dpopNonce: string) => {
-        localStorage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
+    const setDemonstratingProofOfPossessionNonce = (demonstratingProofOfPossessionNonce: string) => {
+        sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionNonce', data: { demonstratingProofOfPossessionNonce }, configurationName });
     };
 
-    const getDemonstratingProofOfPossessionNonce = () => {
-        return localStorage[`oidc.dpop_nonce.${configurationName}`];
+    const getDemonstratingProofOfPossessionNonce = async () => {
+        const result = await sendMessageAsync(registration)({type: 'getDemonstratingProofOfPossessionNonce', data: null, configurationName});
+        return result.demonstratingProofOfPossessionNonce;
     };
 
-    const setDemonstratingProofOfPossessionJwkAsync = (jwk) => {
-        localStorage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
+    const setDemonstratingProofOfPossessionJwkAsync = (demonstratingProofOfPossessionJwk:string) => {
+        const demonstratingProofOfPossessionJwkJson = JSON.stringify(demonstratingProofOfPossessionJwk);
+        sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionJwk', data: { demonstratingProofOfPossessionJwkJson }, configurationName });
     };
 
-    const getDemonstratingProofOfPossessionJwkAsync = () => {
-        return JSON.parse(localStorage[`oidc.jwk.${configurationName}`]);
+    const getDemonstratingProofOfPossessionJwkAsync = async () => {
+        const result = await sendMessageAsync(registration)({type: 'getDemonstratingProofOfPossessionJwk', data: null, configurationName});
+        if(!result.demonstratingProofOfPossessionJwkJson) {
+            return null;
+        }
+        return JSON.parse(result.demonstratingProofOfPossessionJwkJson);
     };
     
     const getStateAsync = async () => {
