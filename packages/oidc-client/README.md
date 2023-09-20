@@ -113,7 +113,7 @@ export const configuration = {
   authority: 'https://demo.duendesoftware.com',
   service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
-  demonstrating_proof_of_possession: true, // demonstrating proof of possession will work only if access_token is accessible from the client (This is because WebCrypto API is not available inside a Service Worker)
+  demonstrating_proof_of_possession: false, // demonstrating proof of possession will work only if access_token is accessible from the client (This is because WebCrypto API is not available inside a Service Worker)
 };
 
 const href = window.location.href;

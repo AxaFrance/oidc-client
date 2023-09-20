@@ -51,6 +51,8 @@ describe('domains', () => {
         hideAccessToken: true,
         convertAllRequestsToCorsExceptNavigate: false,
         setAccessTokenToNavigateRequests: true,
+        demonstratingProofOfPossessionNonce: null,
+        demonstratingProofOfPossessionJwkJson: null,
       },
     };
 

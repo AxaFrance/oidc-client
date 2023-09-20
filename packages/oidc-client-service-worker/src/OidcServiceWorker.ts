@@ -291,6 +291,8 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       hideAccessToken: !showAccessToken,
       setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests ?? true,
       convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate ?? false,
+      demonstratingProofOfPossessionNonce: null,
+      demonstratingProofOfPossessionJwkJson: null,
     };
     currentDatabase = database[configurationName];
 
@@ -367,6 +369,22 @@ const handleMessage = (event: ExtendableMessageEvent) => {
       }
       return;
     }
+    case 'setDemonstratingProofOfPossessionNonce':
+      currentDatabase.demonstratingProofOfPossessionNonce = data.data.demonstratingProofOfPossessionNonce;
+      port.postMessage({ configurationName });
+      return;
+    case 'getDemonstratingProofOfPossessionNonce': 
+      const demonstratingProofOfPossessionNonce = currentDatabase.demonstratingProofOfPossessionNonce;
+      port.postMessage({ configurationName, demonstratingProofOfPossessionNonce });
+      return;
+    case 'setDemonstratingProofOfPossessionJwk':
+      currentDatabase.demonstratingProofOfPossessionJwkJson = data.data.demonstratingProofOfPossessionJwkJson;
+      port.postMessage({ configurationName });
+      return;
+    case 'getDemonstratingProofOfPossessionJwk':
+      const demonstratingProofOfPossessionJwkJson = currentDatabase.demonstratingProofOfPossessionJwkJson;
+      port.postMessage({ configurationName, demonstratingProofOfPossessionJwkJson });
+      return;  
     case 'setState':
       currentDatabase.state = data.data.state;
       port.postMessage({ configurationName });
