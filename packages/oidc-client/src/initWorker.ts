@@ -189,6 +189,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
 
     try {
         await navigator.serviceWorker.ready;
+        if (!navigator.serviceWorker.controller)
+            await sendMessageAsync(registration)({ type: 'claim' });
     } catch (err) {
         return null;
     }
