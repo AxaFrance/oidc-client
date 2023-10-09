@@ -427,10 +427,6 @@ const trustedDomainsShowAccessToken = {};
 const handleMessage = (event) => {
   const port = event.ports[0];
   const data = event.data;
-  if (event.data.type === "claim") {
-    _self.clients.claim().then(() => port.postMessage({}));
-    return;
-  }
   const configurationName = data.configurationName;
   let currentDatabase = database[configurationName];
   if (trustedDomains == null) {

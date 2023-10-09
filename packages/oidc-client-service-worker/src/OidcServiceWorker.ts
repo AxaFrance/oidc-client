@@ -283,6 +283,10 @@ const handleFetch = async (event: FetchEvent) => {
 const handleMessage = (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
+  if (event.data.type === "claim") {
+    _self.clients.claim().then(() => port.postMessage({}));
+    return;
+  }
   const configurationName = data.configurationName;
   let currentDatabase = database[configurationName];
   if (trustedDomains == null) {
