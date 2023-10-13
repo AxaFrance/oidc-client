@@ -2,31 +2,30 @@
 
 ## Condition to make silent signing work 
 
-Third party cookies are blocked by default on Safari. 
-They will be on all browsers very soon.
-Today, silent signing work on safari only if OIDC provider is on the same domain than client application. 
-Third party cookies are blocked. They will be on all browsers very soon.
+Third-party cookies are blocked by default on Safari and will be blocked on all browsers soon.
+Today, silent signing works on Safari only if the OIDC provider and the client application are on the same domain.
 
-The only way to be sure to have silent signing working on all browsers, you need to have your OIDC provider on the same domain than your client application.
+To guarantee that silent signing functions on all browsers, place your OIDC provider on the same domain as your client application.
 
-Example of domain that work:
-- https://oidc-provider.axa.fr
-- https://my-app.axa.fr
+Example domains that work:
 
-Silent Signing use cookies with your OIDC provider to restore the session and retrieve tokens.
-It open in background an IFrame to a specific page to your OIDC provider.
+https://oidc-provider.axa.fr
+https://my-app.axa.fr
+
+Silent signing uses cookies from your OIDC provider to restore the session and retrieve tokens.
+It opens an IFrame in the background, directed to a specific page on your OIDC provider.
 
 ## Condition to make Single Logout to work
 
-Same constraint for Single Logout that for "silent signing".
+The same domain constraint for "silent signing" applies to Single Logout.  
 
-Single logout allow your to disconnect from multiple OIDC Client session in one action event if your are connected on different application.
+Single Logout allows you to disconnect from multiple OIDC Client sessions in one action, even if you are connected to different applications.
 
 ## Condition to make Monitor Session to work
 
-Same constraint for "monitorSession" that for "silent signing".
+Same domain constraint for "silent signing" applies to "monitorSession".  
 
-Monitor session allow you to be notified when your session is expired or when you are disconnected from your OIDC provider.
+Monitor session notifies you when your session expires or when you are disconnected from your OIDC provider.
 
 ## Does Service Worker is mandatory ?
 
@@ -51,16 +50,16 @@ If your Service Worker file is already registered on your browser, your need to 
 
 ## Tokens are always refreshed in background every seconds
 
-@axa-fr/oidc-client refresh automatically tokens in  background.
-It refresh token before its expiration to have always a valid token.
+The @axa-fr/oidc-client automatically refreshes tokens in the background.  
+It refreshes tokens before expiration to maintain valid tokens at all times.  
 
-If your tokens sessions Lifetime is too short, it will refresh it very often.
-It start refreshing 120 seconds before expiration.
+If your token session lifetime is too short, frequent refreshes will occur.  
+Token refreshing starts 120 seconds before expiration.  
 
-So set a session validity upper from 3 minutes is a good idea.
+Setting a session validity longer than 3 minutes is advisable.  
 
-By default @axa-fr/oidc-client take the shortest lifetime between access_token and id_token.
-You can use the option "token_renew_mode" to change this behavior.
+By default, @axa-fr/oidc-client chooses the shorter lifetime between access_token and id_token.  
+Use the "token_renew_mode" option to change this behavior.
 
  - **token_renew_mode**: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
 
@@ -69,18 +68,19 @@ https://github.com/AxaFrance/react-oidc/issues/1098
 
 ## window.crypto.subtle is unavailable over HTTP
 
-The library does not work over HTTP. You need to use HTTPS.
-We think it is quite easy to setup nowadays event on local development.
+The library doesn't work over HTTP. Use HTTPS.
+Setting up HTTPS is relatively easy, even for local development.
 
 https://github.com/AxaFrance/react-oidc/issues/1028
 
 ## Why OIDC at Client side instead of BFF (Backend for Frontend) ?
 
-We think that @axa-fr/oidc-client is a good choice for the following reasons :
-- Secure by default with the use of the Service Worker. OIDC at Server Side from a BFF can be secure but with a bad configuration it can be very insecure. With OIDC Client you reuse the OIDC Server configuration which generally is well configured by OIDC security experts, so secure.
-- With OIDC at Server side, It is more difficult to fine grain the scope of the token. With OIDC at Client side you can acquire a new token with a new scope for specific scenario (multiple authentication). You can fine tune token lifetime and scope for each scenario.
-- Sometime your Web Application does not need a server, OIDC at client side is a good choice because you do not need to spend money for a server juste for Authentication. For example for a payment, you can retrieve only an access_token valid 2 minutes without any refresh_token.
-- OIDC at Client side can be also a good choice for a fast time to market. You can start with OIDC at Client side and then migrate to OIDC at Server side if you need it. The two solutions are compatible.
+We recommend @axa-fr/oidc-client for these reasons:
+
+Secure by default: Uses Service Worker. Server-side OIDC can be insecure if poorly configured. Client-side reuses server-side configurations, usually set by experts.
+Fine-grained scope control: Easier to tailor token scope and lifetime for specific scenarios when using client-side OIDC.
+No server needed: Client-side OIDC eliminates the need for a separate authentication server, saving money.
+Quick time-to-market: Start with client-side OIDC, migrate to server-side if needed. Both are compatible.
 
 <p align="center">
     <img src="./docs/img/react-oidc-secure.PNG"
@@ -109,10 +109,10 @@ We think that @axa-fr/oidc-client is a good choice for the following reasons :
 
 ## Good Security Practices : does a Hacker can unregister the Service Worker and retrieve tokens via an Iframe ?
 
-If you follow these 2 practices, it is impossible to retrieve tokens via an Iframe call and Service Worker unregistration.
+To block token retrieval via an Iframe call and prevent Service Worker unregistration, comply with these practices:
 
-1 - Configure the CSP (Content Security Policy) correctly  (server side).
-example:
+1 - Correctly configure the CSP (Content Security Policy) on the server side.  
+Example: 
 
 ````bash
 server: {
@@ -122,8 +122,8 @@ server: {
   }
 ````
 
-This will make impossible to inject dynamic script into an iframe.
+This blocks dynamic script injection into an iframe.  
 
-2 - Set up <OidcProvider> for **react** or your redirect callback for **oidc-client** at your beginning of your script of your application. 
-It should be configured before any fetch call to any services.
-This will prevent from any XSS attacks.
+2 - Initialize `<OidcProvider>` for **React** or the redirect callback for **oidc-client** at the start of your application script.  
+Configure it before making any fetch calls to services.  
+This guards against XSS attacks.
