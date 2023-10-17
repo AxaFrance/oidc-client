@@ -3,7 +3,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { logoutAsync } from "./logout";
-import {OidcLocation} from "./location";
+import {ILOidcLocation, OidcLocation} from "./location";
 
 describe('Logout test suite', () => {
 
@@ -53,14 +53,22 @@ describe('Logout test suite', () => {
                 origin: "http://localhost:4200",
             },
         };
+        
+        let finalUrl = "";
+        class OidcLocationMock implements ILOidcLocation{
+            open(url: string): void {
+                finalUrl = url;
+            }
+            
+        }
 
-        await logoutAsync(oidc, oidcDatabase, mockFetchFn, window, console, new OidcLocation())("/logged_out");
+        await logoutAsync(oidc, oidcDatabase, mockFetchFn, window, console, new OidcLocationMock())("/logged_out");
         
         // @ts-ignore
 
         const results =  mockFetchFn.mock.calls.map((call, index) => call[1].body);
     
         expect(results).toEqual(expectedResults);
-        expect(window.location.href).toBe("http://api/connect/endsession?id_token_hint=abcd&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Flogged_out");
+        expect(finalUrl).toBe("http://api/connect/endsession?id_token_hint=abcd&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Flogged_out");
     });
 });

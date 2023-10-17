@@ -1,7 +1,7 @@
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
-import {ILOidcLocation} from "./location";
+import {ILOidcLocation, OidcLocation} from "./location";
 
 export interface EventSubscriber {
     (name: string, data:any);
@@ -25,7 +25,7 @@ export class OidcClient {
         this._oidc.publishEvent(eventName, data);
     }
 
-    static getOrCreate = (getFetch : () => Fetch, location:ILOidcLocation) => (configuration:OidcConfiguration, name = 'default'): OidcClient => {
+    static getOrCreate = (getFetch : () => Fetch, location:ILOidcLocation= new OidcLocation()) => (configuration:OidcConfiguration, name = 'default'): OidcClient => {
         return new OidcClient(Oidc.getOrCreate(getFetch, location)(configuration, name));
     };
 
