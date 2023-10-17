@@ -15,6 +15,9 @@ import {AuthorityConfiguration, Fetch, OidcConfiguration, StringMap} from './typ
 import {userInfoAsync} from './user.js';
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 import {generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import {ILOidcLocation, OidcLocation} from "./location";
+
+
 
 export const getFetchDefault = () => {
     return fetch;
@@ -24,6 +27,8 @@ export interface OidcAuthorizationServiceConfigurationJson {
     check_session_iframe?: string;
     issuer:string;
 }
+
+
 
 export class OidcAuthorizationServiceConfiguration {
     private checkSessionIframe: string;
@@ -46,11 +51,11 @@ export class OidcAuthorizationServiceConfiguration {
 }
 
 const oidcDatabase = {};
-const oidcFactory = (getFetch : () => Fetch) => (configuration: OidcConfiguration, name = 'default') => {
+const oidcFactory = (getFetch : () => Fetch, location: ILOidcLocation = new OidcLocation()) => (configuration: OidcConfiguration, name = 'default') => {
     if (oidcDatabase[name]) {
         return oidcDatabase[name];
     }
-    oidcDatabase[name] = new Oidc(configuration, name, getFetch);
+    oidcDatabase[name] = new Oidc(configuration, name, getFetch, location);
     return oidcDatabase[name];
 };
 export type LoginCallback = {
@@ -81,7 +86,8 @@ export class Oidc {
     public configurationName: string;
     private checkSessionIFrame: CheckSessionIFrame;
     private getFetch: () => Fetch;
-    constructor(configuration:OidcConfiguration, configurationName = 'default', getFetch : () => Fetch) {
+    private location: ILOidcLocation;
+    constructor(configuration:OidcConfiguration, configurationName = 'default', getFetch : () => Fetch, location: ILOidcLocation = new OidcLocation()) {
       let silent_login_uri = configuration.silent_login_uri;
       if (configuration.silent_redirect_uri && !configuration.silent_login_uri) {
           silent_login_uri = `${configuration.silent_redirect_uri.replace('-callback', '').replace('callback', '')}-login`;
@@ -101,6 +107,7 @@ export class Oidc {
           authority_timeout_wellknowurl_in_millisecond: configuration.authority_timeout_wellknowurl_in_millisecond ?? 10000,
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
       };
+      this.location = location ?? new OidcLocation();
       this.getFetch = getFetch ?? getFetchDefault;
       this.configurationName = configurationName;
       this.tokens = null;
@@ -137,8 +144,8 @@ export class Oidc {
         });
     }
 
-    static getOrCreate = (getFetch : () => Fetch) => (configuration, name = 'default') => {
-        return oidcFactory(getFetch)(configuration, name);
+    static getOrCreate = (getFetch : () => Fetch, location:ILOidcLocation) => (configuration, name = 'default') => {
+        return oidcFactory(getFetch, location)(configuration, name);
     };
 
     static get(name = 'default') {
@@ -300,7 +307,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (silentLoginOnly) {
             return defaultSilentLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this)(extras, scope);
         }
-        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this.initAsync.bind(this))(callbackPath, extras, isSilentSignin, scope);
+        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this.initAsync.bind(this), this.location)(callbackPath, extras, isSilentSignin, scope);
         return this.loginPromise.then(result => {
             this.loginPromise = null;
             return result;
@@ -641,7 +648,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.logoutPromise) {
             return this.logoutPromise;
         }
-        this.logoutPromise = logoutAsync(this, oidcDatabase, this.getFetch(), window, console)(callbackPathOrUrl, extras);
+        this.logoutPromise = logoutAsync(this, oidcDatabase, this.getFetch(), window, console, this.location)(callbackPathOrUrl, extras);
         return this.logoutPromise.then(result => {
             this.logoutPromise = null;
             return result;

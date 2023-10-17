@@ -3,6 +3,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { logoutAsync } from "./logout";
+import {OidcLocation} from "./location";
 
 describe('Logout test suite', () => {
 
@@ -53,7 +54,7 @@ describe('Logout test suite', () => {
             },
         };
 
-        await logoutAsync(oidc, oidcDatabase, mockFetchFn, window, console)("/logged_out");
+        await logoutAsync(oidc, oidcDatabase, mockFetchFn, window, console, new OidcLocation())("/logged_out");
         
         // @ts-ignore
 

@@ -10,9 +10,10 @@ import {
 import {getParseQueryStringFromLocation} from './route-utils.js';
 import {OidcConfiguration, StringMap} from './types.js';
 import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import {ILOidcLocation} from "./location";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const defaultLoginAsync = (window, configurationName:string, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {
+export const defaultLoginAsync = (window, configurationName:string, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function, oidcLocation: ILOidcLocation) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {
     const originExtras = extras;
     extras = { ...extras };
     const loginLocalAsync = async () => {
@@ -66,7 +67,7 @@ export const defaultLoginAsync = (window, configurationName:string, configuratio
                 response_type: 'code',
                 ...extraFinal,
             };
-            await performAuthorizationRequestAsync(storage)(oidcServerConfiguration.authorizationEndpoint, extraInternal);
+            await performAuthorizationRequestAsync(storage, oidcLocation)(oidcServerConfiguration.authorizationEndpoint, extraInternal);
         } catch (exception) {
             publishEvent(eventNames.loginAsync_error, exception);
             throw exception;

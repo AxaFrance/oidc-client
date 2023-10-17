@@ -3,6 +3,7 @@ import { initWorkerAsync } from './initWorker.js';
 import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
+import {ILOidcLocation} from "./location";
 
 export const oidcLogoutTokens = {
     access_token: 'access_token',
@@ -26,7 +27,7 @@ export const destroyAsync = (oidc) => async (status) => {
     oidc.userInfo = null;
 };
 
-export const logoutAsync = (oidc, oidcDatabase, fetch, window, console) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
+export const logoutAsync = (oidc, oidcDatabase, fetch, window, console, oicLocation:ILOidcLocation) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
     const configuration = oidc.configuration;
     const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     if (callbackPathOrUrl && (typeof callbackPathOrUrl !== 'string')) {
@@ -94,7 +95,7 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, window, console) => async
                 queryString += `${key}=${encodeURIComponent(value)}`;
             }
         }
-        window.location.href = `${oidcServerConfiguration.endSessionEndpoint}${queryString}`;
+        oicLocation.open(`${oidcServerConfiguration.endSessionEndpoint}${queryString}`);
     } else {
         window.location.reload();
     }
