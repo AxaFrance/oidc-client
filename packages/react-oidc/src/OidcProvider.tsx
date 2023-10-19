@@ -196,7 +196,8 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
                         callbackErrorComponent={authenticatingErrorComponent}
                         authenticatingComponent={authenticatingComponent}
                         configurationName={configurationName}
-                        withCustomHistory={withCustomHistory}>
+                        withCustomHistory={withCustomHistory}
+                        location={location ?? new OidcLocation()}>
                         <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>
                             {children}
                         </OidcSession>
