@@ -4,6 +4,7 @@ import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
 import { Fetch, StringMap } from './types.js';
 import EC, {JWK, JWT} from './jwt';
+import {ILOidcLocation} from "./location";
 
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer = (fetch) => async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage, timeoutMs = 10000):
@@ -137,7 +138,7 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url:string,
     };
 };
 
-export const performAuthorizationRequestAsync = (storage: any) => async (url, extras: StringMap) => {
+export const performAuthorizationRequestAsync = (storage: any, oidcLocation: ILOidcLocation) => async (url, extras: StringMap) => {
     extras = extras ? { ...extras } : {};
     const codeVerifier = generateRandom(128);
     const codeChallenge = await deriveChallengeAsync(codeVerifier);
@@ -156,7 +157,7 @@ export const performAuthorizationRequestAsync = (storage: any) => async (url, ex
             queryString += `${key}=${encodeURIComponent(value)}`;
         }
     }
-    window.location.href = `${url}${queryString}`;
+    oidcLocation.open(`${url}${queryString}`);
 };
 
 const demonstratingProofOfPossessionNonceResponseHeader = "DPoP-Nonce";

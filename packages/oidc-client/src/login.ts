@@ -10,14 +10,14 @@ import {
 import {getParseQueryStringFromLocation} from './route-utils.js';
 import {OidcConfiguration, StringMap} from './types.js';
 import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import {ILOidcLocation} from "./location";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const defaultLoginAsync = (window, configurationName:string, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {
+export const defaultLoginAsync = (configurationName:string, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function, oidcLocation: ILOidcLocation) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {
     const originExtras = extras;
     extras = { ...extras };
     const loginLocalAsync = async () => {
-        const location = window.location;
-        const url = callbackPath || location.pathname + (location.search || '') + (location.hash || '');
+        const url = callbackPath || oidcLocation.getPath();
 
         if (!('state' in extras)) {
             extras.state = generateRandom(16);
@@ -66,7 +66,7 @@ export const defaultLoginAsync = (window, configurationName:string, configuratio
                 response_type: 'code',
                 ...extraFinal,
             };
-            await performAuthorizationRequestAsync(storage)(oidcServerConfiguration.authorizationEndpoint, extraInternal);
+            await performAuthorizationRequestAsync(storage, oidcLocation)(oidcServerConfiguration.authorizationEndpoint, extraInternal);
         } catch (exception) {
             publishEvent(eventNames.loginAsync_error, exception);
             throw exception;
@@ -84,7 +84,8 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         const authority = configuration.authority;
         const tokenRequestTimeout = configuration.token_request_timeout;
         const oidcServerConfiguration = await oidc.initAsync(authority, configuration.authority_configuration);
-        const queryParams = getParseQueryStringFromLocation(window.location.href);
+        const href = oidc.location.getCurrentHref();
+        const queryParams = getParseQueryStringFromLocation(href);
         const sessionState = queryParams.session_state;
         const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, oidc.configurationName);
         let storage;
@@ -108,7 +109,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
             storage = session;
         }
 
-        const params = getParseQueryStringFromLocation(window.location.toString());
+        const params = getParseQueryStringFromLocation(href);
 
         if (params.iss && params.iss !== oidcServerConfiguration.issuer) {
             console.error();
