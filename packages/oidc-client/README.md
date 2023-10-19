@@ -117,7 +117,13 @@ export const configuration = {
 };
 
 const href = window.location.href;
-const oidcClient = OidcClient.getOrCreate(() => fetch)(configuration);
+const oidcClient = OidcClient.getOrCreate()(configuration);
+
+// You can inject you own fetch (default Fetch Interface) function and location object (respecting IOidcLocation interface)
+// import {OidcLocation} from '@axa-fr/oidc-client'
+// const oidcClient = OidcClient.getOrCreate(() => fetch, new OidcLocation())(configuration);
+
+
 
 console.log(href);
 
