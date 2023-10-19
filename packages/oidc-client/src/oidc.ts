@@ -2,7 +2,7 @@ import {startCheckSessionAsync as defaultStartCheckSessionAsync} from './checkSe
 import {CheckSessionIFrame} from './checkSessionIFrame.js';
 import {eventNames} from './events.js';
 import {initSession} from './initSession.js';
-import {initWorkerAsync, sleepAsync} from './initWorker.js';
+import {defaultServiceWorkerUpdateRequireCallback, initWorkerAsync, sleepAsync} from './initWorker.js';
 import {defaultLoginAsync, loginCallbackAsync} from './login.js';
 import {destroyAsync, logoutAsync} from './logout.js';
 import {computeTimeLeft, isTokensOidcValid, setTokens, TokenRenewMode, Tokens,} from './parseTokens.js';
@@ -96,6 +96,9 @@ export class Oidc {
       if (refresh_time_before_tokens_expiration_in_second > 60) {
           refresh_time_before_tokens_expiration_in_second = refresh_time_before_tokens_expiration_in_second - Math.floor(Math.random() * 40);
       }
+      this.location = location ?? new OidcLocation();
+      const service_worker_update_require_callback = configuration.service_worker_update_require_callback ?? defaultServiceWorkerUpdateRequireCallback(this.location);
+      
       this.configuration = {
           ...configuration,
           silent_login_uri,
@@ -106,8 +109,9 @@ export class Oidc {
           demonstrating_proof_of_possession: configuration.demonstrating_proof_of_possession ?? false,
           authority_timeout_wellknowurl_in_millisecond: configuration.authority_timeout_wellknowurl_in_millisecond ?? 10000,
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
+          service_worker_update_require_callback,
       };
-      this.location = location ?? new OidcLocation();
+      
       this.getFetch = getFetch ?? getFetchDefault;
       this.configurationName = configurationName;
       this.tokens = null;
@@ -161,15 +165,17 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     _silentLoginCallbackFromIFrame() {
         if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
-            const queryParams = getParseQueryStringFromLocation(window.location.href);
-            window.parent.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({ tokens: this.tokens, sessionState: queryParams.session_state })}`, window.location.origin);
+            const location = this.location;
+            const queryParams = getParseQueryStringFromLocation(location.getCurrentHref());
+            window.parent.postMessage(`${this.configurationName}_oidc_tokens:${JSON.stringify({ tokens: this.tokens, sessionState: queryParams.session_state })}`, location.getOrigin());
         }
     }
 
     _silentLoginErrorCallbackFromIFrame() {
         if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
-            const queryParams = getParseQueryStringFromLocation(window.location.href);
-            window.parent.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({ error: queryParams.error })}`, window.location.origin);
+            const location = this.location;
+            const queryParams = getParseQueryStringFromLocation(location.getCurrentHref());
+            window.parent.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({ error: queryParams.error })}`, location.getOrigin());
         }
     }
 
@@ -307,7 +313,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (silentLoginOnly) {
             return defaultSilentLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this)(extras, scope);
         }
-        this.loginPromise = defaultLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this.initAsync.bind(this), this.location)(callbackPath, extras, isSilentSignin, scope);
+        this.loginPromise = defaultLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this), this.initAsync.bind(this), this.location)(callbackPath, extras, isSilentSignin, scope);
         return this.loginPromise.then(result => {
             this.loginPromise = null;
             return result;
@@ -648,7 +654,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.logoutPromise) {
             return this.logoutPromise;
         }
-        this.logoutPromise = logoutAsync(this, oidcDatabase, this.getFetch(), window, console, this.location)(callbackPathOrUrl, extras);
+        this.logoutPromise = logoutAsync(this, oidcDatabase, this.getFetch(), console, this.location)(callbackPathOrUrl, extras);
         return this.logoutPromise.then(result => {
             this.logoutPromise = null;
             return result;

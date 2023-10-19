@@ -2,6 +2,7 @@ import { parseOriginalTokens } from './parseTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
 import codeVersion from './version.js';
+import {ILOidcLocation} from "./location";
 
 export const getOperatingSystem = (navigator) => {
     const nVer = navigator.appVersion;
@@ -136,6 +137,16 @@ const isServiceWorkerProxyActiveAsync = () => {
     }).catch(error => { console.log(error); });
 };
 
+export const defaultServiceWorkerUpdateRequireCallback = (location:ILOidcLocation) => async (registration: any, stopKeepAlive: Function) => {
+    stopKeepAlive();
+    await registration.update();
+    const isSuccess = await registration.unregister();
+    console.log(`Service worker unregistering ${isSuccess}`)
+    await sleepAsync(2000);
+    location.reload();
+}
+    
+
 export const excludeOs = (operatingSystem) => {
     if (operatingSystem.os === 'iOS' && operatingSystem.osVersion.startsWith('12')) {
         return true;
@@ -214,18 +225,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         const serviceWorkerVersion = result.version;
         if(serviceWorkerVersion !== codeVersion) {
             console.warn(`Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`);
-            
-            if(oidcConfiguration.service_worker_update_require_callback)
-            {
-                await oidcConfiguration.service_worker_update_require_callback(registration, stopKeepAlive);  
-            } else {
-                stopKeepAlive();
-                await registration.update();
-                const isSuccess = await registration.unregister();
-                console.log(`Service worker unregistering ${isSuccess}`)
-                await sleepAsync(2000);
-                window.location.reload();
-            }
+            await oidcConfiguration.service_worker_update_require_callback(registration, stopKeepAlive);
         }
         
         // @ts-ignore

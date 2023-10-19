@@ -46,23 +46,31 @@ describe('Logout test suite', () => {
         };
         
         const oidcDatabase = {default: () => oidc};
-        
-        const window = {
-            location: {
-                href: "",
-                origin: "http://localhost:4200",
-            },
-        };
-        
+                
         let finalUrl = "";
         class OidcLocationMock implements ILOidcLocation{
             open(url: string): void {
                 finalUrl = url;
             }
+
+            getCurrentHref(): string {
+                return "";
+            }
+
+            getPath(): string {
+                return "";
+            }
+
+            reload(): void {
+            }
+
+            getOrigin(): string {
+                return "http://localhost:4200";
+            }
             
         }
 
-        await logoutAsync(oidc, oidcDatabase, mockFetchFn, window, console, new OidcLocationMock())("/logged_out");
+        await logoutAsync(oidc, oidcDatabase, mockFetchFn, console, new OidcLocationMock())("/logged_out");
         
         // @ts-ignore
 
