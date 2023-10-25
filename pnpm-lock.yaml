@@ -94,7 +94,7 @@ importers:
         version: 5.17.0
       '@testing-library/user-event':
         specifier: ^13.5.0
-        version: 13.5.0(@testing-library/dom@9.3.1)
+        version: 13.5.0(@testing-library/dom@9.3.3)
       '@types/jest':
         specifier: ^27.5.2
         version: 27.5.2
@@ -138,7 +138,7 @@ importers:
         version: 13.3.0(react-dom@18.2.0)(react@18.2.0)
       '@testing-library/user-event':
         specifier: 14.4.3
-        version: 14.4.3(@testing-library/dom@9.3.1)
+        version: 14.4.3(@testing-library/dom@9.3.3)
       '@types/react':
         specifier: ^18.2.15
         version: 18.2.17
@@ -183,8 +183,8 @@ importers:
         version: link:../oidc-client-service-worker
     devDependencies:
       '@testing-library/dom':
-        specifier: ^9.3.1
-        version: 9.3.1
+        specifier: ^9.3.3
+        version: 9.3.3
       '@testing-library/jest-dom':
         specifier: ^5.16.5
         version: 5.17.0
@@ -269,7 +269,7 @@ importers:
         version: 13.3.0(react-dom@18.2.0)(react@18.2.0)
       '@testing-library/user-event':
         specifier: 14.4.3
-        version: 14.4.3(@testing-library/dom@9.3.1)
+        version: 14.4.3(@testing-library/dom@9.3.3)
       '@types/react':
         specifier: ^18.2.15
         version: 18.2.17
@@ -1363,8 +1363,8 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@testing-library/dom@9.3.1:
-    resolution: {integrity: sha512-0DGPd9AR3+iDTjGoMpxIkAsUihHZ3Ai6CneU6bRRrffXMgzCdlNk43jTrD2/5LT6CBb3MWTP8v510JzYtahD2w==}
+  /@testing-library/dom@9.3.3:
+    resolution: {integrity: sha512-fB0R+fa3AUqbLHWyxXa2kGVtf1Fe1ZZFr0Zp6AIbIAzXb2mKbEXl+PCQNUOaq5lbTab5tfctfXRNsWXxa2f7Aw==}
     engines: {node: '>=14'}
     dependencies:
       '@babel/code-frame': 7.22.5
@@ -1419,23 +1419,23 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: true
 
-  /@testing-library/user-event@13.5.0(@testing-library/dom@9.3.1):
+  /@testing-library/user-event@13.5.0(@testing-library/dom@9.3.3):
     resolution: {integrity: sha512-5Kwtbo3Y/NowpkbRuSepbyMFkZmHgD+vPzYB/RJ4oxt5Gj/avFFBYjhw27cqSVPVw/3a67NK1PbiIr9k4Gwmdg==}
     engines: {node: '>=10', npm: '>=6'}
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
     dependencies:
       '@babel/runtime': 7.22.6
-      '@testing-library/dom': 9.3.1
+      '@testing-library/dom': 9.3.3
     dev: false
 
-  /@testing-library/user-event@14.4.3(@testing-library/dom@9.3.1):
+  /@testing-library/user-event@14.4.3(@testing-library/dom@9.3.3):
     resolution: {integrity: sha512-kCUc5MEwaEMakkO5x7aoD+DLi02ehmEM2QCGWvNqAS1dV/fAvORWEjnjsEIvml59M7Y5kCkWN6fCCyPOe8OL6Q==}
     engines: {node: '>=12', npm: '>=6'}
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
     dependencies:
-      '@testing-library/dom': 9.3.1
+      '@testing-library/dom': 9.3.3
     dev: true
 
   /@tootallnate/once@2.0.0:
@@ -3773,7 +3773,7 @@ packages:
     engines: {node: '>=12.0.0'}
     dependencies:
       ansi-escapes: 4.3.2
-      chalk: 4.1.1
+      chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-width: 3.0.0
       external-editor: 3.1.0
@@ -4277,7 +4277,7 @@ packages:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
     engines: {node: '>=10'}
     dependencies:
-      chalk: 4.1.1
+      chalk: 4.1.2
       is-unicode-supported: 0.1.0
     dev: true
 
@@ -4738,7 +4738,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       bl: 4.1.0
-      chalk: 4.1.1
+      chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-spinners: 2.9.0
       is-interactive: 1.0.0
