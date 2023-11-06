@@ -2,6 +2,7 @@ import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
 import {ILOidcLocation, OidcLocation} from "./location";
+import {fetchWithTokens} from "./fetch";
 
 export interface EventSubscriber {
     (name: string, data:any);
@@ -72,6 +73,10 @@ export class OidcClient {
 
     async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken> {
         return getValidTokenAsync(this._oidc, waitMs, numberWait);
+    }
+    
+    getFetchWithTokens(fetch: Fetch): Fetch {
+        return fetchWithTokens(fetch, this);
     }
 
     async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false):Promise<T> {
