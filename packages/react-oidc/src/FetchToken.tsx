@@ -8,38 +8,9 @@ export interface ComponentWithOidcFetchProps {
 const defaultConfigurationName = 'default';
 
 const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => OidcClient | null) => async (...params: Parameters<Fetch>) => {
-  const [url, options, ...rest] = params;
-  const optionTmp = options ? { ...options } : { method: 'GET' };
-
-  let headers = new Headers();
-  if (optionTmp.headers) {
-    headers = !(optionTmp.headers instanceof Headers)
-      ? new Headers(optionTmp.headers)
-      : optionTmp.headers;
-  }
   const oidc = getOidcWithConfigurationName();
-
-  // @ts-ignore
-  const getValidToken = await oidc.getValidTokenAsync();
-  const accessToken = getValidToken?.tokens?.accessToken;
-
-  if (!headers.has('Accept')) {
-    headers.set('Accept', 'application/json');
-  }
-  if (accessToken) {
-    if(oidc.configuration.demonstrating_proof_of_possession){
-        const demonstrationOdProofOfPossession = await oidc.generateDemonstrationOfProofOfPossessionAsync(accessToken, url.toString(), optionTmp.method);
-        headers.set('Authorization', `PoP ${accessToken}`);
-        headers.set('DPoP', demonstrationOdProofOfPossession);
-    } else{
-      headers.set('Authorization', `Bearer ${accessToken}`);
-    }
-    if (!optionTmp.credentials) {
-      optionTmp.credentials = 'same-origin';
-    }
-  }
-  const newOptions = { ...optionTmp, headers };
-  return await fetch(url, newOptions, ...rest);
+  const newFetch = oidc.fetchWithTokens(fetch);
+  return await newFetch(...params);
 };
 
 export const withOidcFetch = (fetch: Fetch = null, configurationName = defaultConfigurationName) => (
@@ -57,6 +28,7 @@ export const useOidcFetch = (fetch: Fetch = null, configurationName = defaultCon
     (input: RequestInfo | URL, init?: RequestInit) => {
       const getOidcWithConfigurationName = () => getOidc(configurationName);
       const newFetch = fetchWithToken(previousFetch, getOidcWithConfigurationName);
+      console.log('newFetch', input)
       return newFetch(input, init);
     },
     [previousFetch, configurationName],

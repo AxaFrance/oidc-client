@@ -19,7 +19,8 @@ export const userInfoAsync = (oidc) => async (noCache = false) => {
         return null;
     }
 
-    const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
+    const configuration = oidc.configuration;
+    const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     const url = oidcServerConfiguration.userInfoEndpoint;
     const fetchUserInfo = async (accessToken) => {
         const res = await fetch(url, {

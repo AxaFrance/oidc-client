@@ -119,6 +119,9 @@ export const configuration = {
 const href = window.location.href;
 const oidcClient = OidcClient.getOrCreate()(configuration);
 
+// Use the fetch bellow to inject access_token and DPOP tokens automatically
+const oidcFetch = oidcClient.fetchWithTokens(fetch);
+
 // You can inject you own fetch (default Fetch Interface) function and location object (respecting IOidcLocation interface)
 // import {OidcLocation} from '@axa-fr/oidc-client'
 // const oidcClient = OidcClient.getOrCreate(() => fetch, new OidcLocation())(configuration);
@@ -318,6 +321,13 @@ export class OidcClient {
    * @returns A promise resolved with the valid token, or rejected with an error.
    */
   async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken>;
+
+  /**
+   * Retrieves a new fetch function that inject bearer tokens (also DPOP tokens).
+   * @param fetch The current fetch function to use
+   * @returns Fetch A new fectch function that inject bearer tokens (also DPOP tokens).
+   */
+  getFetchWithTokens(fetch: Fetch): Fetch;
 
   /**
    * Retrieves OIDC user information.
