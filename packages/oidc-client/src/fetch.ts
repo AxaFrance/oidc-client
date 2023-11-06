@@ -4,7 +4,6 @@ import {OidcClient} from "./oidcClient";
 export const fetchWithTokens = (fetch: Fetch, oidcClient: OidcClient | null) => async (...params: Parameters<Fetch>) => {
     const [url, options, ...rest] = params;
     const optionTmp = options ? { ...options } : { method: 'GET' };
-
     let headers = new Headers();
     if (optionTmp.headers) {
         headers = !(optionTmp.headers instanceof Headers)
