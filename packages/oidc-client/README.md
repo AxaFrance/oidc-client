@@ -120,7 +120,7 @@ const href = window.location.href;
 const oidcClient = OidcClient.getOrCreate()(configuration);
 
 // Use the fetch bellow to inject access_token and DPOP tokens automatically
-const oidcFetch = oidcClient.getFetchWithTokens(fetch);
+const oidcFetch = oidcClient.fetchWithTokens(fetch);
 
 // You can inject you own fetch (default Fetch Interface) function and location object (respecting IOidcLocation interface)
 // import {OidcLocation} from '@axa-fr/oidc-client'

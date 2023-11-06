@@ -75,7 +75,7 @@ export class OidcClient {
         return getValidTokenAsync(this._oidc, waitMs, numberWait);
     }
     
-    getFetchWithTokens(fetch: Fetch): Fetch {
+    fetchWithTokens(fetch: Fetch): Fetch {
         return fetchWithTokens(fetch, this);
     }
 

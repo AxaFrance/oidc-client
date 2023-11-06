@@ -9,7 +9,7 @@ const defaultConfigurationName = 'default';
 
 const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => OidcClient | null) => async (...params: Parameters<Fetch>) => {
   const oidc = getOidcWithConfigurationName();
-  const newFetch = oidc.getFetchWithTokens(fetch);
+  const newFetch = oidc.fetchWithTokens(fetch);
   return await newFetch(...params);
 };
 
