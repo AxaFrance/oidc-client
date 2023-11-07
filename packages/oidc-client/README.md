@@ -327,7 +327,7 @@ export class OidcClient {
    * @param fetch The current fetch function to use
    * @returns Fetch A new fectch function that inject bearer tokens (also DPOP tokens).
    */
-  getFetchWithTokens(fetch: Fetch): Fetch;
+  fetchWithTokens(fetch: Fetch): Fetch;
 
   /**
    * Retrieves OIDC user information.
