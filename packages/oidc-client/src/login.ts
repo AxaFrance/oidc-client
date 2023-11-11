@@ -42,7 +42,7 @@ export const defaultLoginAsync = (configurationName:string, configuration:OidcCo
                 extraFinal.nonce = generateRandom(12);
             }
             const nonce = { nonce: extraFinal.nonce };
-            const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
+            const serviceWorker = await initWorkerAsync(configuration, configurationName);
             const oidcServerConfiguration = await initAsync(configuration.authority, configuration.authority_configuration);
             let storage;
             if (serviceWorker) {
@@ -87,7 +87,7 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         const href = oidc.location.getCurrentHref();
         const queryParams = getParseQueryStringFromLocation(href);
         const sessionState = queryParams.session_state;
-        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, oidc.configurationName);
+        const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
         let storage;
         let nonceData;
         let getLoginParams;
