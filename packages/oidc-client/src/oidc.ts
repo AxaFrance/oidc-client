@@ -16,6 +16,7 @@ import {userInfoAsync} from './user.js';
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 import {generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
 import {ILOidcLocation, OidcLocation} from "./location";
+import {activateServiceWorker} from "./initWorkerOption";
 
 
 
@@ -110,6 +111,7 @@ export class Oidc {
           authority_timeout_wellknowurl_in_millisecond: configuration.authority_timeout_wellknowurl_in_millisecond ?? 10000,
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
           service_worker_update_require_callback,
+          service_worker_activate: configuration.service_worker_activate ?? activateServiceWorker,
       };
       
       this.getFetch = getFetch ?? getFetchDefault;
@@ -207,7 +209,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 });
             }
 
-            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+            const serviceWorker = await initWorkerAsync(this.configuration, this.configurationName);
             const storage = serviceWorker ? window.localStorage : null;
             return await fetchFromIssuer(this.getFetch())(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage, this.configuration.authority_timeout_wellknowurl_in_millisecond);
         };
@@ -232,7 +234,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             try {
                 const configuration = this.configuration;
                 const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-                serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                serviceWorker = await initWorkerAsync(configuration, this.configurationName);
                 if (serviceWorker) {
                     const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'tryKeepExistingSessionAsync', configuration);
                     if (tokens) {
@@ -332,7 +334,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             const parsedTokens = response.tokens;
             // @ts-ignore
             this.tokens = parsedTokens;
-            const serviceWorker = await initWorkerAsync(this.configuration.service_worker_relative_url, this.configurationName);
+            const serviceWorker = await initWorkerAsync(this.configuration, this.configurationName);
             if (!serviceWorker) {
                 const session = initSession(this.configurationName, this.configuration.storage);
                 session.setTokens(parsedTokens);
@@ -378,7 +380,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const localsilentLoginAsync = async () => {
             try {
                 let loginParams;
-                const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
                 if (serviceWorker) {
                     loginParams = serviceWorker.getLoginParams();
                 } else {
@@ -485,7 +487,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                             }
                             updateTokens(tokenResponse.data);
                             if(tokenResponse.demonstratingProofOfPossessionNonce) {
-                                const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+                                const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
                                 if(serviceWorker){
                                     await serviceWorker.setDemonstratingProofOfPossessionNonce(tokenResponse.demonstratingProofOfPossessionNonce);
                                 } else {
@@ -519,7 +521,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const configuration = this.configuration;
         const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),};
 
-        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, this.configurationName);
+        const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
         let demonstratingProofOfPossessionNonce:string = null;
         let jwk;
         if (serviceWorker) {
@@ -547,7 +549,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
         let nonce = nullNonce;
         const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        const serviceWorker = await initWorkerAsync(configuration.service_worker_relative_url, configurationName);
+        const serviceWorker = await initWorkerAsync(configuration, configurationName);
         if (serviceWorker) {
             const { status, tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
             if (status === 'LOGGED_OUT') {
