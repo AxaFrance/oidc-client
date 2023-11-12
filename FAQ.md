@@ -63,9 +63,6 @@ Use the "token_renew_mode" option to change this behavior.
 
  - **token_renew_mode**: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
 
-## Hard-reload in browser unregister ServiceWorker
-https://github.com/AxaFrance/react-oidc/issues/1098
-
 ## window.crypto.subtle is unavailable over HTTP
 
 The library doesn't work over HTTP. Use HTTPS.
