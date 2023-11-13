@@ -46,12 +46,12 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOi
         const revocationEndpoint = oidcServerConfiguration.revocationEndpoint;
         if (revocationEndpoint) {
             const promises = [];
-            const accessToken = oidc.tokens.accessToken;
+            const accessToken = oidc.tokens ? oidc.tokens.accessToken : null;
             if (accessToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.access_token)) {
                 const revokeAccessTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
                 promises.push(revokeAccessTokenPromise);
             }
-            const refreshToken = oidc.tokens.refreshToken;
+            const refreshToken = oidc.tokens ? oidc.tokens.refreshToken : null;
             if (refreshToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.refresh_token)) {
                 const revokeRefreshTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
                 promises.push(revokeRefreshTokenPromise);
