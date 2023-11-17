@@ -157,8 +157,8 @@ export const initWorkerAsync = async(configuration, configurationName) => {
         return getLoginParamsCache[configurationName];
     };
 
-    const setDemonstratingProofOfPossessionNonce = (demonstratingProofOfPossessionNonce: string) => {
-        sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionNonce', data: { demonstratingProofOfPossessionNonce }, configurationName });
+    const setDemonstratingProofOfPossessionNonce = async (demonstratingProofOfPossessionNonce: string) => {
+        await sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionNonce', data: { demonstratingProofOfPossessionNonce }, configurationName });
     };
 
     const getDemonstratingProofOfPossessionNonce = async () => {
@@ -166,7 +166,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
         return result.demonstratingProofOfPossessionNonce;
     };
 
-    const setDemonstratingProofOfPossessionJwkAsync = (demonstratingProofOfPossessionJwk:string) => {
+    const setDemonstratingProofOfPossessionJwkAsync = async (demonstratingProofOfPossessionJwk:string) => {
         const demonstratingProofOfPossessionJwkJson = JSON.stringify(demonstratingProofOfPossessionJwk);
         sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionJwk', data: { demonstratingProofOfPossessionJwkJson }, configurationName });
     };

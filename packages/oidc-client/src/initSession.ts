@@ -42,7 +42,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return { nonce: storage[`oidc.nonce.${configurationName}`] };
     };
 
-    const setDemonstratingProofOfPossessionNonce = (dpopNonce:string) => {
+    const setDemonstratingProofOfPossessionNonce = async (dpopNonce:string) => {
         storage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
     };
 
