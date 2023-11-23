@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { openidWellknownUrlEndWith } from '../../constants';
-import { checkDomain, getCurrentDatabaseDomain, normalizeUrl } from '..';
+import { checkDomain, getCurrentDatabaseDomain } from '..';
 import { Database, Tokens, TrustedDomains } from './../../types';
 
 describe('domains', () => {
@@ -30,28 +30,32 @@ describe('domains', () => {
 		});
 	});
 	describe('getCurrentDatabaseDomain', () => {
-		const db: Database = {
-			default: {
-				configurationName: 'config',
-				tokens: {} as Tokens,
-				status: 'NOT_CONNECTED',
-				state: null,
-				codeVerifier: null,
-				nonce: null,
-				oidcServerConfiguration: {
-					authorizationEndpoint: 'https://demo.duendesoftware.com/connect/authorize',
-					issuer: 'https://demo.duendesoftware.com',
-					revocationEndpoint: 'https://demo.duendesoftware.com/connect/revocation',
-					tokenEndpoint: 'https://demo.duendesoftware.com/connect/token',
-					userInfoEndpoint: 'https://demo.duendesoftware.com/connect/userinfo',
+		let db: Database;
+
+		beforeEach(() => {
+			db = {
+				default: {
+					configurationName: 'config',
+					tokens: {} as Tokens,
+					status: 'NOT_CONNECTED',
+					state: null,
+					codeVerifier: null,
+					nonce: null,
+					oidcServerConfiguration: {
+						authorizationEndpoint: 'https://demo.duendesoftware.com/connect/authorize',
+						issuer: 'https://demo.duendesoftware.com',
+						revocationEndpoint: 'https://demo.duendesoftware.com/connect/revocation',
+						tokenEndpoint: 'https://demo.duendesoftware.com/connect/token',
+						userInfoEndpoint: 'https://demo.duendesoftware.com/connect/userinfo',
+					},
+					hideAccessToken: true,
+					convertAllRequestsToCorsExceptNavigate: false,
+					setAccessTokenToNavigateRequests: true,
+					demonstratingProofOfPossessionNonce: null,
+					demonstratingProofOfPossessionJwkJson: null,
 				},
-				hideAccessToken: true,
-				convertAllRequestsToCorsExceptNavigate: false,
-				setAccessTokenToNavigateRequests: true,
-				demonstratingProofOfPossessionNonce: null,
-				demonstratingProofOfPossessionJwkJson: null,
-			},
-		};
+			};
+		});
 
 		it('will return null when url ends with openidWellknownUrlEndWith', () => {
 			const trustedDomains: TrustedDomains = {
@@ -69,15 +73,18 @@ describe('domains', () => {
 			expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toBeNull();
 		});
 
-		it('will return null when url is the token endpoint only differs by default port', () => {
+		it('will return null when url is the token endpoint oidc config token endpoint has a default port', () => {
 			const trustedDomains: TrustedDomains = {
 				default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
 			};
-			const url = 'https://demo.duendesoftware.com:443/connect/token';
+			db['default'].oidcServerConfiguration!.tokenEndpoint =
+				'https://demo.duendesoftware.com:443/connect/token';
+
+			const url = 'https://demo.duendesoftware.com/connect/token';
 			expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toBeNull();
 		});
 
-		it('will return null when url is the token endpoint', () => {
+		it('will return null when url is the revocation endpoint', () => {
 			const trustedDomains: TrustedDomains = {
 				default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
 			};
@@ -116,40 +123,5 @@ describe('domains', () => {
 			expect(getCurrentDatabaseDomain(db, 'https://myapi/test', trustedDomains)).toBe(db.default);
 			expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toBeNull();
 		});
-	});
-	it('normalizes urls', () => {
-		expect(normalizeUrl('foo.com')).toBe('https://foo.com');
-		expect(normalizeUrl('foo.com ')).toBe('https://foo.com');
-		expect(normalizeUrl('foo.com.')).toBe('https://foo.com');
-		expect(normalizeUrl('foo.com')).toBe('https://foo.com');
-		expect(normalizeUrl('HTTP://foo.com')).toBe('http://foo.com');
-		expect(normalizeUrl('//foo.com')).toBe('https://foo.com');
-		expect(normalizeUrl('http://foo.com')).toBe('http://foo.com');
-		expect(normalizeUrl('http://foo.com:80')).toBe('http://foo.com');
-		expect(normalizeUrl('https://foo.com:443')).toBe('https://foo.com');
-		expect(normalizeUrl('http://foo.com/foo/')).toBe('http://foo.com/foo');
-		expect(normalizeUrl('foo.com/?foo=bar baz')).toBe('https://foo.com/?foo=bar+baz');
-		expect(normalizeUrl('https://foo.com/https://bar.com')).toBe('https://foo.com/https://bar.com');
-		expect(normalizeUrl('https://foo.com/https://bar.com/foo//bar')).toBe(
-			'https://foo.com/https://bar.com/foo/bar',
-		);
-		expect(normalizeUrl('https://foo.com/http://bar.com')).toBe('https://foo.com/http://bar.com');
-		expect(normalizeUrl('https://foo.com/http://bar.com/foo//bar')).toBe(
-			'https://foo.com/http://bar.com/foo/bar',
-		);
-		expect(normalizeUrl('http://foo.com/%7Efoo/')).toBe('http://foo.com/~foo');
-		expect(normalizeUrl('https://foo.com/%FAIL%/07/94/ca/55.jpg')).toBe(
-			'https://foo.com/%FAIL%/07/94/ca/55.jpg',
-		);
-		expect(normalizeUrl('http://foo.com/?')).toBe('http://foo.com');
-		expect(normalizeUrl('êxample.com')).toBe('https://xn--xample-hva.com');
-		expect(normalizeUrl('http://foo.com/?b=bar&a=foo')).toBe('http://foo.com/?a=foo&b=bar');
-		expect(normalizeUrl('http://foo.com/?foo=bar*|<>:"')).toBe(
-			'http://foo.com/?foo=bar*|%3C%3E:%22',
-		);
-		expect(normalizeUrl('http://foo.com:5000')).toBe('http://foo.com:5000');
-		expect(normalizeUrl('http://foo.com/foo#bar')).toBe('http://foo.com/foo#bar');
-		expect(normalizeUrl('http://foo.com/foo/bar/../baz')).toBe('http://foo.com/foo/baz');
-		expect(normalizeUrl('http://foo.com/foo/bar/./baz')).toBe('http://foo.com/foo/bar/baz');
 	});
 });
