@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.12.3
+
+- [59a9c46](https://github.com/AxaFrance/oidc-client/commit/59a9c468b4fa9eb9694b1f3921eb545daf1f58f8) - fix(ci): exclude author GitHub from changelog (release), 2023-11-29 by *Guillaume Chervet*
+
+
 ## v7.12.2
 
 - [cd575e7](https://github.com/AxaFrance/oidc-client/commit/cd575e716f4fbcb1ba09a76a1530a3ae23f08599) - fix(ci): last clean and test (release), 2023-11-29 by *Guillaume Chervet*
@@ -334,11 +339,5 @@
 
 - [27ba555](https://github.com/AxaFrance/oidc-client/commit/27ba555288f614cf8da7b1be01f3936e1bc1a56e) - Merge bdebcb00841e592e87cab9a6bec9ae683fb30e32 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
 - [bdebcb0](https://github.com/AxaFrance/oidc-client/commit/bdebcb00841e592e87cab9a6bec9ae683fb30e32) - fix(ci): test (alpha), 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.12
-
-- [35b7f96](https://github.com/AxaFrance/oidc-client/commit/35b7f9605aebfd93d7ef18fe20306b9e7ae53e4b) - Merge ca81becd76688d17bf0959908ffb194614fe29c4 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
-- [ca81bec](https://github.com/AxaFrance/oidc-client/commit/ca81becd76688d17bf0959908ffb194614fe29c4) - fix(ci): test (alpha), 2023-07-20 by *Guillaume Chervet*
 
 
