@@ -9,4 +9,4 @@ export type {
   OidcConfiguration,
   StringMap,
 } from '@axa-fr/oidc-client';
-export { type OidcUserInfo, TokenRenewMode } from '@axa-fr/oidc-client';
+export { type OidcUserInfo, TokenRenewMode, OidcClient } from '@axa-fr/oidc-client';
