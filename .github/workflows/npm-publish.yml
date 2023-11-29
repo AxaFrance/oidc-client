@@ -60,9 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GIT_TOKEN }}
+          fetch-depth: 0
           
       - name: Determine Alpha, Beta or Release
         id: which_tag
@@ -248,6 +249,13 @@ jobs:
           sed -i 's/"@axa-fr\/oidc-client": "[^"]*"/"@axa-fr\/oidc-client": "workspace:*"/g' package.json
           cat package.json
         working-directory: ./packages/react-oidc
+        
+      - name: Auto generate changelog
+        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
+        run: |
+          chmod +x ./bin/generate-changelog.sh
+          ./bin/generate-changelog.sh
+        
           
       - name: Commit updates package.json
         uses: stefanzweifel/git-auto-commit-action@v4

@@ -1,489 +1,378 @@
-### Changelog
-All notable changes to this project will be documented in this file.
+# Changelog
 
-#### [v3.1.7](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.6...v3.1.7)
-> 17 June 2021
-- feat: add signinSilent to useReactOidc and AuthenticationContext [`#578`](https://github.com/AxaGuilDEv/react-oidc/pull/578) by Olivier YOUF
-- ci: add dependabot config file and change prefix to `build(npm)` [`#561`](https://github.com/AxaGuilDEv/react-oidc/pull/561) by Olivier YOUF
-- feat:unload userManager when unnmount oidc provider [`#547`](https://github.com/AxaGuilDEv/react-oidc/pull/547) by Olivier YOUF
-- feat(context-fetch/fetch-core): removing recompose [`#530`](https://github.com/AxaGuilDEv/react-oidc/pull/530) by Olivier YOUF
-- chore(deps): bump example dependencies [`80ccc10`](https://github.com/AxaGuilDEv/react-oidc/commit/80ccc10c5cb33df891365c896b81b8eb1d5e46c5) by Julien Foratier 
-- fix: create usermanager before rendering + some refacto [`16cb26d`](https://github.com/AxaGuilDEv/react-oidc/commit/16cb26d057e50037b7ee04f32319f02a92ae72cd) by Amine JELTI 
-- chore(release): publish v3.1.7 ***NO_CI*** [`8b5cb40`](https://github.com/AxaGuilDEv/react-oidc/commit/8b5cb405d5735bacd24318c9fe0de1736b98712e) by Build-CI 
-- chore(deps): [security] bump handlebars from 4.4.2 to 4.7.6 [`c785f2d`](https://github.com/AxaGuilDEv/react-oidc/commit/c785f2d6cd92d9380c0c3ec99e01bb61f7ec2fcd) by dependabot-preview[bot] 
-- chore(deps): [security] bump ini from 1.3.5 to 1.3.8 [`c978517`](https://github.com/AxaGuilDEv/react-oidc/commit/c9785176ccd4c1cd3777f8e6e12e3535a37e7aa6) by dependabot-preview[bot] 
-- fix(examples): replace https://demo.identityserver.io deprecated configuration [`ebe9e79`](https://github.com/AxaGuilDEv/react-oidc/commit/ebe9e79465f52323626b2ac94b333e8d51987999) by Julien Foratier 
-- docs(changelog) update to new 3.1.6 [`8cfbc7c`](https://github.com/AxaGuilDEv/react-oidc/commit/8cfbc7c6111444a156c5bddcad253c0366e6f38c) by Build-CI 
-- chore(deps): [security] bump lodash from 4.17.15 to 4.17.20 [`124a9ca`](https://github.com/AxaGuilDEv/react-oidc/commit/124a9ca777135382695f2873253f076bf4f7434a) by dependabot-preview[bot] 
+## v7.10.11
 
-#### [v3.1.6](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.5...v3.1.6)
-> 13 October 2020
-- feat(context): Allowing hooking into the oidc-client events in the AuthenticationProvider [`#415`](https://github.com/AxaGuilDEv/react-oidc/issues/415) by Michael Wolfenden
-- chore(release): publish v3.1.6 ***NO_CI*** [`9c1a618`](https://github.com/AxaGuilDEv/react-oidc/commit/9c1a6186d4f804d6ddcf50819602653d50f05df3) by Build-CI 
-- docs(changelog) update to new 3.1.5 [`02ad255`](https://github.com/AxaGuilDEv/react-oidc/commit/02ad25574978464cb67123d4b695a62a15704960) by Build-CI 
-- feat(logger): remove debug overriddenConfiguration [`f23bebd`](https://github.com/AxaGuilDEv/react-oidc/commit/f23bebdd64de6082d183bead17553174919d515a) by Arnaud Foraison 
-- fix(example): add hook dependency [`b491c02`](https://github.com/AxaGuilDEv/react-oidc/commit/b491c02757775052d1605b2922fa13e25acf7128) by Arnaud Foraison 
+- [4460d89](https://github.com/AxaFrance/oidc-client/commit/4460d893d74258dd2052674ee29694037c372247) - Update generate-changelog.sh (release), 2023-11-29 by *Guillaume Chervet*
+- [69eadc6](https://github.com/AxaFrance/oidc-client/commit/69eadc60c92bc799d0a2d65bd6b841f98bd7d78c) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
-#### [v3.1.5](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.4...v3.1.5)
-> 8 September 2020
-- Add prop-types as dependency [`#507`](https://github.com/AxaGuilDEv/react-oidc/pull/507) by Olivier YOUF
-- fix(core): keep location.hash in the url used to redirect after login [`#515`](https://github.com/AxaGuilDEv/react-oidc/pull/515) by jreimbold-t1
-- fix: move prop-types from peer to dependencies [`a53a189`](https://github.com/AxaGuilDEv/react-oidc/commit/a53a189b08b70ee705bb06fd0d8eee4184a2558b) by Arnaud Foraison 
-- chore(release): publish v3.1.5 ***NO_CI*** [`0a24a04`](https://github.com/AxaGuilDEv/react-oidc/commit/0a24a04741b5d6ac28d0cd4d6346beeda01e79a8) by Build-CI 
-- docs(changelog) update to new 3.1.4 [`b43b45d`](https://github.com/AxaGuilDEv/react-oidc/commit/b43b45dab5b2ae6f46cce62e3061e23ab388b61e) by Build-CI 
 
-#### [v3.1.4](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.3...v3.1.4)
-> 14 July 2020
-- fix(context): made type for AuthenticationProviderProps partial [`#473`](https://github.com/AxaGuilDEv/react-oidc/pull/473) by Olivier YOUF
-- chore(release): publish v3.1.4 ***NO_CI*** [`aea9407`](https://github.com/AxaGuilDEv/react-oidc/commit/aea940793fbb9ecf4cc87a0d870e4b9e7d2e5156) by Build-CI 
-- docs(changelog) update to new 3.1.3 [`c3043c4`](https://github.com/AxaGuilDEv/react-oidc/commit/c3043c4078b24906e35b4a15062a1995e79683af) by Build-CI 
+## v7.10.10
 
-#### [v3.1.3](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.2...v3.1.3)
-> 16 June 2020
-- style: remove overwritten property jsx-filename-extension [`#468`](https://github.com/AxaGuilDEv/react-oidc/pull/468) by Olivier YOUF
-- fix(Vanilla): return type callback with signinSilent [`#469`](https://github.com/AxaGuilDEv/react-oidc/pull/469) by Olivier YOUF
-- feat(react-oidc-redux): Adding Redux Authenticating component [`#463`](https://github.com/AxaGuilDEv/react-oidc/pull/463) by Olivier YOUF
-- Fix types for AuthenticationProvider and withOidcUser [`#457`](https://github.com/AxaGuilDEv/react-oidc/pull/457) by Olivier YOUF
-- chore(release): publish v3.1.3 ***NO_CI*** [`5b4db53`](https://github.com/AxaGuilDEv/react-oidc/commit/5b4db533b3edaa60b273dd05dd822b6687793165) by Build-CI 
-- Replace Pick with Omit [`7f160b7`](https://github.com/AxaGuilDEv/react-oidc/commit/7f160b708bb51dd43389571fd6f0d8e66b5cd2f8) by Vincent Ricard 
-- docs(changelog) update to new 3.1.2 [`faa73a7`](https://github.com/AxaGuilDEv/react-oidc/commit/faa73a7c9cc015ac4dd10289819d06d071ef7ca7) by Build-CI 
+- [83f0c10](https://github.com/AxaFrance/oidc-client/commit/83f0c1092c48987eb8ad149100f3b44b4e7bc50b) - Update npm-publish.yml (release), 2023-11-29 by *Guillaume Chervet*
 
-#### [v3.1.2](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.1...v3.1.2)
-> 11 June 2020
-- fix(context): Renrender children aftersilent signin [`#464`](https://github.com/AxaGuilDEv/react-oidc/pull/464) by Olivier YOUF
-- chore(release): publish v3.1.2 ***NO_CI*** [`6dbcbc8`](https://github.com/AxaGuilDEv/react-oidc/commit/6dbcbc860df7ee6697983d1024950312a2c8eea4) by Build-CI 
-- Add usage example to demo [`e3bb8b0`](https://github.com/AxaGuilDEv/react-oidc/commit/e3bb8b03e13048f99672050946bb2379dde417a4) by Viet VO 
-- Fix types for AuthenticationProvider and withOidcUser [`5004289`](https://github.com/AxaGuilDEv/react-oidc/commit/50042890bc070bd87a99c0c730acfc47678e0d8a) by Vincent Ricard 
-- Add readme [`be2bb57`](https://github.com/AxaGuilDEv/react-oidc/commit/be2bb5783ae702d65dbc90b38cf41bcf55002415) by Viet VO 
-- Add config option to OidcSecure [`7881742`](https://github.com/AxaGuilDEv/react-oidc/commit/7881742d81fda72571d88642da13a5fd6d188139) by Viet VO 
-- PR: change to authenticating [`bf06f9e`](https://github.com/AxaGuilDEv/react-oidc/commit/bf06f9e5f25e8d6343849f176ed5e1ecfb54b158) by Viet VO 
-- fix(Vanilla): return type callback with signinSilent [`3d4f8af`](https://github.com/AxaGuilDEv/react-oidc/commit/3d4f8af68901a39d6a9e4c958cf6c6e24c5c5ab5) by Hamza HAMIDI 
-- style: remove overwritten property jsx-filename-extension [`5dee604`](https://github.com/AxaGuilDEv/react-oidc/commit/5dee604e9bb16edad8a0c87c3c29d2fa98fc870f) by Hamza Hamidi 
-- docs(changelog) update to new 3.1.1 [`dd8b685`](https://github.com/AxaGuilDEv/react-oidc/commit/dd8b685650d08c2d2a480e7406b5d2f09c0ddc50) by Build-CI 
-- remove useMemo [`4cbf8f2`](https://github.com/AxaGuilDEv/react-oidc/commit/4cbf8f2df93271544f09f28008b199bfea07b391) by Viet VO 
 
-#### [v3.1.1](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.1-alpha.0...v3.1.1)
-> 25 May 2020
-- chore(release): publish v3.1.1 ***NO_CI*** [`1500b7e`](https://github.com/AxaGuilDEv/react-oidc/commit/1500b7e28914afb913ea4fc3e6b87ee707999fc3) by Build-CI 
-- docs(changelog) update to new 3.1.1-alpha.0 [`90ea0c9`](https://github.com/AxaGuilDEv/react-oidc/commit/90ea0c954531093f6f7a5cd221cf4d986468fd7c) by Build-CI 
+## v7.10.9
 
-#### [v3.1.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.1.0-alpha.0...v3.1.1-alpha.0)
-> 20 May 2020
-- fix(context): Memoize the child component [`#451`](https://github.com/AxaGuilDEv/react-oidc/pull/451) by Olivier YOUF
-- chore(release): publish v3.1.1-alpha.0 ***NO_CI*** [`dc8ee89`](https://github.com/AxaGuilDEv/react-oidc/commit/dc8ee8944258e33430be309cb09d5c55f71fc13b) by Build-CI 
-- docs(changelog) update to new 3.1.0-alpha.0 [`6a33c46`](https://github.com/AxaGuilDEv/react-oidc/commit/6a33c46beaa3f32c56c516811d6961362e761b20) by Build-CI 
+- [da29bee](https://github.com/AxaFrance/oidc-client/commit/da29beef9bf3a6993ca862b258254cd894977a74) - Update generate-changelog.sh (release), 2023-11-29 by *Guillaume Chervet*
+- [e1230bb](https://github.com/AxaFrance/oidc-client/commit/e1230bb4f1cfb57fea4998da768bd3b7676e78da) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
-#### [v3.1.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.8...v3.1.0-alpha.0)
-> 12 May 2020
-- fix: add logout action [`#439`](https://github.com/AxaGuilDEv/react-oidc/pull/439) by Olivier YOUF
-- refactor(context): Refactor/containers providers [`#432`](https://github.com/AxaGuilDEv/react-oidc/pull/432) by Olivier YOUF
-- Typescript migration [`#410`](https://github.com/AxaGuilDEv/react-oidc/pull/410) by Olivier YOUF
-- Remove all occurences of 'triggerAuthFlow' [`#425`](https://github.com/AxaGuilDEv/react-oidc/pull/425) by Olivier YOUF
-- Overrides the react-redux dependency [`#424`](https://github.com/AxaGuilDEv/react-oidc/pull/424) by Olivier YOUF
-- Fix minor typos in docs [`#414`](https://github.com/AxaGuilDEv/react-oidc/pull/414) by Tommi Laukkanen
-- Remove all occurences of 'triggerAuthFlow' [`#392`](https://github.com/AxaGuilDEv/react-oidc/issues/392) by Vincent Ricard
-- Upgrade Jest [`7281ee1`](https://github.com/AxaGuilDEv/react-oidc/commit/7281ee1e5a7d3f19f6381a427ce5bfa4332829ef) by Vincent Ricard 
-- Migration of packages/core [`9f518a5`](https://github.com/AxaGuilDEv/react-oidc/commit/9f518a50f7867a702d4174e764d169de9b21a5c6) by Vincent Ricard 
-- Format code with prettier and fix lint errors [`52ae362`](https://github.com/AxaGuilDEv/react-oidc/commit/52ae362769572e29155403695d8bb5de26ea4c26) by Vincent Ricard 
-- WIP [`b123a42`](https://github.com/AxaGuilDEv/react-oidc/commit/b123a4206ec4b7b134714d8f9e70434682a01c99) by Vincent Ricard 
-- WIP context package [`0fa40e9`](https://github.com/AxaGuilDEv/react-oidc/commit/0fa40e99a3d42ebdcf472bbd6d0ba7cca55c25c7) by Vincent Ricard 
-- WIP redux package [`b251bcc`](https://github.com/AxaGuilDEv/react-oidc/commit/b251bcc452a1362e54463d3f4c86b9f883c973f2) by Vincent Ricard 
-- Rename OidcHistory into ReactOidcHistory [`760c77f`](https://github.com/AxaGuilDEv/react-oidc/commit/760c77f511536eaf49f7e1e3b702a741c0723d36) by Vincent Ricard 
-- chore(release): publish v3.1.0-alpha.0 ***NO_CI*** [`892f3cb`](https://github.com/AxaGuilDEv/react-oidc/commit/892f3cb98ab452f11823af8ed44fb16897f14ecb) by Build-CI 
-- chore(release): publish v3.0.9-alpha.0 ***NO_CI*** [`61c8884`](https://github.com/AxaGuilDEv/react-oidc/commit/61c8884393c0df5ae37b0c8b113cb92a942602aa) by Build-CI 
-- WIP [`0282c3c`](https://github.com/AxaGuilDEv/react-oidc/commit/0282c3c81cfb1ecc4be57408f3dd6e7a2bc72fe7) by Vincent Ricard 
-- Fix some tests [`6a7b09c`](https://github.com/AxaGuilDEv/react-oidc/commit/6a7b09c90d47203eb5cfe5bafb71e3371def176f) by Vincent Ricard 
-- docs(changelog) update to new 3.0.9-alpha.0 [`08a6938`](https://github.com/AxaGuilDEv/react-oidc/commit/08a69388c8177bc87335cb741330811db6d2aca2) by Build-CI 
-- Add specific type ofr UserStore [`1b44db5`](https://github.com/AxaGuilDEv/react-oidc/commit/1b44db5d9a9c433b27571e73335bfc18fec4f97f) by Vincent Ricard 
-- WIP redux-fetch package [`a8bed40`](https://github.com/AxaGuilDEv/react-oidc/commit/a8bed40cead711a707ae1dfdb5ca36e77a43935d) by Vincent Ricard 
-- WIP context-fetch package [`fd6f8f2`](https://github.com/AxaGuilDEv/react-oidc/commit/fd6f8f2872c12f6d4abdec36f0915524b64cab17) by Vincent Ricard 
-- docs(changelog) update to new 3.0.8 [`f28c0ed`](https://github.com/AxaGuilDEv/react-oidc/commit/f28c0ede0d3bba884085b1269b94eee3a223e50e) by Build-CI 
-- Revert a useless modification in fetch-core/package.json [`fa101b8`](https://github.com/AxaGuilDEv/react-oidc/commit/fa101b865ba386cdef4ebf1479ab357ce8e0288c) by Vincent Ricard 
 
-#### [v3.0.8](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.7...v3.0.8)
-> 14 February 2020
-- fix(options): options can be overrided [`#399`](https://github.com/AxaGuilDEv/react-oidc/pull/399) by Guillaume Chervet
-- fix(fetchToken): options override [`#398`](https://github.com/AxaGuilDEv/react-oidc/pull/398) by Guillaume Chervet
-- chore(release): publish v3.0.8 ***NO_CI*** [`ecccc47`](https://github.com/AxaGuilDEv/react-oidc/commit/ecccc47cb9ee65cccbb23aac53e215ced26d4914) by Build-CI 
-- docs(changelog) update to new 3.0.7 [`1c2e599`](https://github.com/AxaGuilDEv/react-oidc/commit/1c2e599cc9eeffc287b05b6c2671b270c28ad91e) by Build-CI 
+## v7.10.8
 
-#### [v3.0.7](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.6...v3.0.7)
-> 7 February 2020
-- chore(deps-dev): bump concurrently from 4.1.2 to 5.1.0 [`#393`](https://github.com/AxaGuilDEv/react-oidc/pull/393) by dependabot-preview[bot]
-- refactor(log): Replace console.log by oidcLog [`#386`](https://github.com/AxaGuilDEv/react-oidc/pull/386) by Cockedey Sébastien
-- chore(release): publish v3.0.7 ***NO_CI*** [`9bdbb89`](https://github.com/AxaGuilDEv/react-oidc/commit/9bdbb8976b173d1fbc8da12e1a623aca61c39d6c) by Build-CI 
-- docs(changelog) update to new 3.0.6 [`46055a6`](https://github.com/AxaGuilDEv/react-oidc/commit/46055a654246bb678e745abb5b57717049850d82) by Build-CI 
+- [9bbfaa8](https://github.com/AxaFrance/oidc-client/commit/9bbfaa8dc34271692a278178539862e19fd76b6c) - Update generate-changelog.sh (release), 2023-11-29 by *Guillaume Chervet*
+- [09ece5b](https://github.com/AxaFrance/oidc-client/commit/09ece5bea1128ad24847036521aac2f27f7df261) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
-#### [v3.0.6](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.6-alpha.0...v3.0.6)
-> 7 January 2020
-- feat(components): add bem to default components [`#384`](https://github.com/AxaGuilDEv/react-oidc/pull/384) by Guillaume Chervet
-- chore(release): publish v3.0.6 ***NO_CI*** [`db79cce`](https://github.com/AxaGuilDEv/react-oidc/commit/db79ccec24ddca89f7eb55a84a9684e409c8e548) by Build-CI 
-- docs(changelog) update to new 3.0.6-alpha.0 [`c55f2ed`](https://github.com/AxaGuilDEv/react-oidc/commit/c55f2ed5538e1dd4bd9f9f0ae0d25fdeb1421984) by Build-CI 
 
-#### [v3.0.6-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.5-alpha.0...v3.0.6-alpha.0)
-> 5 January 2020
-- fix(SessionLost): complete re-auth automaticaly first time display [`#373`](https://github.com/AxaGuilDEv/react-oidc/pull/373) by Guillaume Chervet
-- chore(deps-dev): bump eslint-plugin-react-hooks from 1.7.0 to 2.3.0 [`#363`](https://github.com/AxaGuilDEv/react-oidc/pull/363) by dependabot-preview[bot]
-- chore(deps-dev): bump redux from 4.0.4 to 4.0.5 [`#372`](https://github.com/AxaGuilDEv/react-oidc/pull/372) by dependabot-preview[bot]
-- chore(deps-dev): bump @babel/cli from 7.7.4 to 7.7.7 [`#369`](https://github.com/AxaGuilDEv/react-oidc/pull/369) by dependabot-preview[bot]
-- chore(deps-dev): bump oidc-client from 1.9.1 to 1.10.1 [`#366`](https://github.com/AxaGuilDEv/react-oidc/pull/366) by dependabot-preview[bot]
-- chore(deps-dev): bump auto-changelog from 1.16.1 to 1.16.2 [`#367`](https://github.com/AxaGuilDEv/react-oidc/pull/367) by dependabot-preview[bot]
-- chore(deps-dev): bump eslint-plugin-import from 2.18.2 to 2.19.1 [`#364`](https://github.com/AxaGuilDEv/react-oidc/pull/364) by dependabot-preview[bot]
-- chore(deps-dev): bump @testing-library/jest-dom from 4.1.0 to 4.2.4 [`#368`](https://github.com/AxaGuilDEv/react-oidc/pull/368) by dependabot-preview[bot]
-- chore(deps): bump @typescript-eslint/parser from 2.3.2 to 2.14.0 [`#371`](https://github.com/AxaGuilDEv/react-oidc/pull/371) by dependabot-preview[bot]
-- chore(deps-dev): bump inquirer from 6.5.2 to 7.0.1 [`#365`](https://github.com/AxaGuilDEv/react-oidc/pull/365) by dependabot-preview[bot]
-- chore(release): publish v3.0.6-alpha.0 ***NO_CI*** [`c871a60`](https://github.com/AxaGuilDEv/react-oidc/commit/c871a60adc3a6a8bbe816e5298e6056563e5b531) by Build-CI 
-- docs(changelog) update to new 3.0.5-alpha.0 [`96a24a9`](https://github.com/AxaGuilDEv/react-oidc/commit/96a24a95d62b1b829958c5769ac0617ccab18cca) by Build-CI 
+## v7.10.7
 
-#### [v3.0.5-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.4-alpha.0...v3.0.5-alpha.0)
-> 3 January 2020
-- chore(deps-dev): bump @testing-library/react from 8.0.9 to 9.4.0 [`#358`](https://github.com/AxaGuilDEv/react-oidc/pull/358) by dependabot-preview[bot]
-- chore(deps): [security] bump lodash.template from 4.4.0 to 4.5.0 [`#230`](https://github.com/AxaGuilDEv/react-oidc/pull/230) by dependabot-preview[bot]
-- Can set the JWT in memory [`#354`](https://github.com/AxaGuilDEv/react-oidc/pull/354) by Olivier YOUF
-- fix(all): F5 always re-auth and manage session lost [`#319`](https://github.com/AxaGuilDEv/react-oidc/pull/319) by Olivier YOUF
-- chore(deps): bump enzyme-adapter-react-16 from 1.14.0 to 1.15.2 [`#359`](https://github.com/AxaGuilDEv/react-oidc/pull/359) by dependabot-preview[bot]
-- chore(deps-dev): bump eslint-plugin-prettier from 3.1.1 to 3.1.2 [`#357`](https://github.com/AxaGuilDEv/react-oidc/pull/357) by dependabot-preview[bot]
-- chore(deps-dev): bump redux-oidc from 3.1.5 to 3.1.7 [`#336`](https://github.com/AxaGuilDEv/react-oidc/pull/336) by dependabot-preview[bot]
-- chore(deps-dev): bump typescript from 3.6.3 to 3.7.4 [`#361`](https://github.com/AxaGuilDEv/react-oidc/pull/361) by dependabot-preview[bot]
-- chore(deps-dev): bump @babel/preset-react from 7.0.0 to 7.7.4 [`#347`](https://github.com/AxaGuilDEv/react-oidc/pull/347) by dependabot-preview[bot]
-- chore(deps): [security] bump https-proxy-agent from 2.2.2 to 2.2.4 [`#345`](https://github.com/AxaGuilDEv/react-oidc/pull/345) by dependabot-preview[bot]
-- chore(deps-dev): bump lint-staged from 8.2.1 to 9.5.0 [`#348`](https://github.com/AxaGuilDEv/react-oidc/pull/348) by dependabot-preview[bot]
-- chore(deps-dev): bump react-redux from 5.1.1 to 7.1.3 [`#334`](https://github.com/AxaGuilDEv/react-oidc/pull/334) by dependabot-preview[bot]
-- chore(deps-dev): bump eslint-plugin-jest from 22.17.0 to 23.2.0 [`#362`](https://github.com/AxaGuilDEv/react-oidc/pull/362) by dependabot-preview[bot]
-- feat(context): Add events in useReactOidc hook [`#343`](https://github.com/AxaGuilDEv/react-oidc/pull/343) by Olivier YOUF
-- chore(release): publish v3.0.5-alpha.0 ***NO_CI*** [`6fa041a`](https://github.com/AxaGuilDEv/react-oidc/commit/6fa041af0e1f1fcb9216fd6ed7a287e7fdc73ed6) by Build-CI 
-- fix(sessionlost) typo [`dd69fe6`](https://github.com/AxaGuilDEv/react-oidc/commit/dd69fe67acda1d6f2b7b1933cafa67f3c6133839) by guillaume chervet 
-- fix(sessionlost) typo [`2d8427f`](https://github.com/AxaGuilDEv/react-oidc/commit/2d8427ffd81f39dc65f9ecf26bc65b4244013607) by guillaume chervet 
-- refactor(auth) refresh branch and clean things [`59dedc1`](https://github.com/AxaGuilDEv/react-oidc/commit/59dedc11c7fc10a246ff8c915fa0583be981ab52) by guillaume chervet 
-- docs(changelog) update to new 3.0.4-alpha.0 [`b201e35`](https://github.com/AxaGuilDEv/react-oidc/commit/b201e3563ff1caf9bf940dde2210ef2bfc39ace0) by Build-CI 
+- [82ed281](https://github.com/AxaFrance/oidc-client/commit/82ed28183d4efea9c1835f4eed9a25c254ecd8a5) - Update generate-changelog.sh (release) (#1203), 2023-11-29 by *Guillaume Chervet*
+- [f41eafd](https://github.com/AxaFrance/oidc-client/commit/f41eafd59c1cd6b04f889db18d1e9db72e96d7af) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
-#### [v3.0.4-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.3-alpha.0...v3.0.4-alpha.0)
-> 18 November 2019
-- fix(context): avoid errors on console with custom callback [`#341`](https://github.com/AxaGuilDEv/react-oidc/pull/341) by Olivier YOUF
-- fix(context): Fix silent crash [`#340`](https://github.com/AxaGuilDEv/react-oidc/pull/340) by Olivier YOUF
-- doc(oidc-metadata): add document about metadata [`#330`](https://github.com/AxaGuilDEv/react-oidc/pull/330) by Guillaume Chervet
-- chore(release): publish v3.0.4-alpha.0 ***NO_CI*** [`f8d7557`](https://github.com/AxaGuilDEv/react-oidc/commit/f8d755783d2b4cfbee0cdaabe6f27178d3200080) by Build-CI 
-- docs(changelog) update to new 3.0.3-alpha.0 [`6b0fc09`](https://github.com/AxaGuilDEv/react-oidc/commit/6b0fc0961c90ec3200e3995482fe748d1fbe5e1d) by Build-CI 
 
-#### [v3.0.3-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.2-alpha.0...v3.0.3-alpha.0)
-> 5 November 2019
-- fix(redux) oidcSecure hoc was not working [`#331`](https://github.com/AxaGuilDEv/react-oidc/pull/331) by Guillaume Chervet
-- wip [`e5d41f8`](https://github.com/AxaGuilDEv/react-oidc/commit/e5d41f82a1b7d7e1608e84aad4482a5f4ac5fefc) by guillaume chervet 
-- wip [`d03101d`](https://github.com/AxaGuilDEv/react-oidc/commit/d03101d730d6cbecc3a4ee191bfde97137060cdf) by guillaume chervet 
-- chore(release): publish v3.0.3-alpha.0 ***NO_CI*** [`9b8de3b`](https://github.com/AxaGuilDEv/react-oidc/commit/9b8de3bf60b0d5d58caf12513be1bd742d2936df) by Build-CI 
-- maj [`b2d63e8`](https://github.com/AxaGuilDEv/react-oidc/commit/b2d63e8c92e0526abe1ba242759c1716f56bdac6) by guillaume chervet 
-- wip [`5613367`](https://github.com/AxaGuilDEv/react-oidc/commit/5613367e95de9aa5399b9ccdacd268e5d0ef4516) by guillaume chervet 
-- docs(changelog) update to new 3.0.2-alpha.0 [`5f22a9f`](https://github.com/AxaGuilDEv/react-oidc/commit/5f22a9fe09da0b803abd0c7698638acdfe6620f9) by Build-CI 
+## v7.10.6
 
-#### [v3.0.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.1-alpha.0...v3.0.2-alpha.0)
-> 15 October 2019
-- Fix component prop type validation to use elementType [`#321`](https://github.com/AxaGuilDEv/react-oidc/pull/321) by Henri Koskenranta
-- fix(router) : Add some polyfills for IE [`#314`](https://github.com/AxaGuilDEv/react-oidc/pull/314) by Olivier YOUF
-- chore(mergify) add sonar rules [`#313`](https://github.com/AxaGuilDEv/react-oidc/pull/313) by Guillaume Chervet
-- refactor(context) : remove callback OR in core [`#310`](https://github.com/AxaGuilDEv/react-oidc/pull/310) by Olivier YOUF
-- chore(deps-dev): bump cross-env from 5.2.0 to 6.0.0 [`#306`](https://github.com/AxaGuilDEv/react-oidc/pull/306) by dependabot-preview[bot]
-- chore(deps-dev): bump redux from 4.0.1 to 4.0.4 [`#243`](https://github.com/AxaGuilDEv/react-oidc/pull/243) by dependabot-preview[bot]
-- fix(all) F5 always re-auth and manage session lost [`ee0c13f`](https://github.com/AxaGuilDEv/react-oidc/commit/ee0c13f437244fad58fa352da9a1a35f8e3eb3f7) by guillaume chervet 
-- wip [`b2a7185`](https://github.com/AxaGuilDEv/react-oidc/commit/b2a71851d0cb91653e1d77e2fe037aa2114e9037) by guillaume chervet 
-- chore(release): publish v3.0.2-alpha.0 ***NO_CI*** [`1e74a2c`](https://github.com/AxaGuilDEv/react-oidc/commit/1e74a2cdf751debd3e5fe6bb84c55d0850b27ba8) by Build-CI 
-- docs(changelog) update to new 3.0.1-alpha.0 [`75b21af`](https://github.com/AxaGuilDEv/react-oidc/commit/75b21af75f890f3b08c46847dcb7ab7fd52df1ef) by Build-CI 
-- wip [`e20c897`](https://github.com/AxaGuilDEv/react-oidc/commit/e20c8975f80f71ac7a6b4eaebf44025744359d93) by guillaume chervet 
+- [a51e099](https://github.com/AxaFrance/oidc-client/commit/a51e099cb0d1f9fc2734d0fc73eb3bfefc77caf1) - Update generate-changelog.sh (release), 2023-11-29 by *Guillaume Chervet*
+- [34f9291](https://github.com/AxaFrance/oidc-client/commit/34f9291104c3911f6a9e33dc23d5373bdc867ba2) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
-#### [v3.0.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v3.0.0-alpha.0...v3.0.1-alpha.0)
-> 25 September 2019
-- feat(all) Add callback component [`#303`](https://github.com/AxaGuilDEv/react-oidc/pull/303) by Madebymaurice
-- doc(package) add better keword and update licence [`#304`](https://github.com/AxaGuilDEv/react-oidc/pull/304) by Guillaume Chervet
-- docs: fixed a typo on AuthenticationProvider [`#295`](https://github.com/AxaGuilDEv/react-oidc/pull/295) by Jean-Lou Piermé
-- fix(sample:redux) typo to get the condition working [`#292`](https://github.com/AxaGuilDEv/react-oidc/pull/292) by Markus Lasermann
-- chore(release): publish v3.0.1-alpha.0 ***NO_CI*** [`3a6de2e`](https://github.com/AxaGuilDEv/react-oidc/commit/3a6de2ef2af3a7a51ee191a0c003907ba7fbcd7e) by Build-CI 
-- docs(changelog) update to new 3.0.0-alpha.0 [`1953c47`](https://github.com/AxaGuilDEv/react-oidc/commit/1953c479773b6181a3e0acf308e63bdc4d12cf8b) by Build-CI 
 
-#### [v3.0.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.8...v3.0.0-alpha.0)
-> 2 September 2019
-- feat(router) Agnostic router [`#290`](https://github.com/AxaGuilDEv/react-oidc/pull/290) by Arnaud Foraison
-- fix(licence)set correct entity name [`#285`](https://github.com/AxaGuilDEv/react-oidc/pull/285) by Guillaume Chervet
-- chore(release): publish v3.0.0-alpha.0 ***NO_CI*** [`6192d98`](https://github.com/AxaGuilDEv/react-oidc/commit/6192d98c63cd30ee2b69561bd78c4c313353dff7) by Build-CI 
-- docs(changelog) update to new 2.0.8 [`db610e3`](https://github.com/AxaGuilDEv/react-oidc/commit/db610e36a5874fc05ee3130eb116223b8122aa29) by Build-CI 
+## v7.10.5
 
-#### [v2.0.8](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.7...v2.0.8)
-> 20 August 2019
-- fix(redux) F5 always re-auth [`#278`](https://github.com/AxaGuilDEv/react-oidc/pull/278) by Guillaume Chervet
-- fix(redux) sample react route problem [`#277`](https://github.com/AxaGuilDEv/react-oidc/pull/277) by Guillaume Chervet
-- chore(release): publish v2.0.8 ***NO_CI*** [`ebe2d7d`](https://github.com/AxaGuilDEv/react-oidc/commit/ebe2d7de2a76557b0bd95110afdf7b63192ead46) by Build-CI 
-- docs(changelog) update to new 2.0.7 [`5264289`](https://github.com/AxaGuilDEv/react-oidc/commit/5264289a48a6c0fd863757cf57b3e4bec89a6fe1) by Build-CI 
+- [c1f7494](https://github.com/AxaFrance/oidc-client/commit/c1f7494aaa58f50d22fe51d763b32f3914a515ed) - fix (release), 2023-11-29 by *Guillaume Chervet*
+- [7e3af1f](https://github.com/AxaFrance/oidc-client/commit/7e3af1f9b0ffcf9714333b445577c04595a9135f) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
-#### [v2.0.7](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.6...v2.0.7)
-> 13 August 2019
-- fix(redux) workflow [`#271`](https://github.com/AxaGuilDEv/react-oidc/pull/271) by Guillaume Chervet
-- chore(release): publish v2.0.7 ***NO_CI*** [`a45f630`](https://github.com/AxaGuilDEv/react-oidc/commit/a45f6300cac5f37efc9fdbdf76f7c97107a49b2f) by Build-CI 
-- docs(changelog) update to new 2.0.6 [`356afab`](https://github.com/AxaGuilDEv/react-oidc/commit/356afab343cd06f9535feb3a64fdf9675a84b8f2) by Build-CI 
 
-#### [v2.0.6](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.5...v2.0.6)
-> 9 August 2019
-- fix(redux) workflow  [`#266`](https://github.com/AxaGuilDEv/react-oidc/pull/266) by Guillaume Chervet
-- chore(release): publish v2.0.6 ***NO_CI*** [`a55b16e`](https://github.com/AxaGuilDEv/react-oidc/commit/a55b16edadb67903e51db9e359d7f260107c4a39) by Build-CI 
-- docs(changelog) update to new 2.0.5 [`44cc13b`](https://github.com/AxaGuilDEv/react-oidc/commit/44cc13b9b33de9184fd87cb3beae48aea33837a7) by Build-CI 
+## v7.10.4
 
-#### [v2.0.5](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.4...v2.0.5)
-> 5 August 2019
-- fix(redux) incorrect properties [`#262`](https://github.com/AxaGuilDEv/react-oidc/pull/262) by Guillaume Chervet
-- chore(release): publish v2.0.5 ***NO_CI*** [`fff2d20`](https://github.com/AxaGuilDEv/react-oidc/commit/fff2d20ae08b5a0f5af84452db2376280df70f55) by Build-CI 
-- docs(changelog) update to new 2.0.4 [`a43242b`](https://github.com/AxaGuilDEv/react-oidc/commit/a43242b6cc33d096e9c85303f8d63c8d6be7ad07) by Build-CI 
+- [edb89b3](https://github.com/AxaFrance/oidc-client/commit/edb89b390eefce93dbaa02c813d388bbaf1088e2) - fix (release), 2023-11-29 by *Guillaume Chervet*
 
-#### [v2.0.4](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.3...v2.0.4)
-> 5 August 2019
-- fix(redux) upgrade react router version [`#261`](https://github.com/AxaGuilDEv/react-oidc/pull/261) by Guillaume Chervet
-- chore(release): publish v2.0.4 ***NO_CI*** [`2b63d3e`](https://github.com/AxaGuilDEv/react-oidc/commit/2b63d3ee4a925b045c1a711b2a92cace4448d3b0) by Build-CI 
-- docs(changelog) update to new 2.0.3 [`dba7b1d`](https://github.com/AxaGuilDEv/react-oidc/commit/dba7b1d899ab58c7351ffe065e0ad4b01fb3ef21) by Build-CI 
 
-#### [v2.0.3](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2...v2.0.3)
-> 2 August 2019
-- fix(redux) token renew [`#260`](https://github.com/AxaGuilDEv/react-oidc/pull/260) by Guillaume Chervet
-- fix(redux) token renew [`#260`](https://github.com/AxaGuilDEv/react-oidc/pull/260) by Guillaume Chervet
-- chore(build) add and regenerate package.lock [`ef392f1`](https://github.com/AxaGuilDEv/react-oidc/commit/ef392f1c2294a150444dc370531ba17f46d30701) by guillaume chervet 
-- chore(package) fix package version [`0a2a2bf`](https://github.com/AxaGuilDEv/react-oidc/commit/0a2a2bf84740fac0586cdd137ae5cf47102957ac) by guillaume chervet 
-- chore(release): publish v2.0.3 ***NO_CI*** [`bcac2f4`](https://github.com/AxaGuilDEv/react-oidc/commit/bcac2f4e37e6bc280fed9e6690224d552f8ee229) by Build-CI 
-- docs(changelog) update to new 2.0.2 [`ff075a4`](https://github.com/AxaGuilDEv/react-oidc/commit/ff075a4b400a074d376a4c07f4a751e6914f6cb4) by Build-CI 
+## v7.10.3
 
-#### [v2.0.2](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.2-alpha.0...v2.0.2)
-> 30 July 2019
-- fix(redux) token renew [`#258`](https://github.com/AxaGuilDEv/react-oidc/pull/258) by Guillaume Chervet
-- chore(release): publish v2.0.2 ***NO_CI*** [`8e50a29`](https://github.com/AxaGuilDEv/react-oidc/commit/8e50a29d6302b3c0487dd5102fe115458760705a) by Build-CI 
-- docs(changelog) update to new 2.0.2-alpha.0 [`df80867`](https://github.com/AxaGuilDEv/react-oidc/commit/df808675ee9d524f15d2c1f493d8cfe5a36d926e) by Build-CI 
+- [15f1414](https://github.com/AxaFrance/oidc-client/commit/15f1414d8699b9f35cfa977a204ae7bfb73cbbea) - fix(ci): update (release), 2023-11-29 by *Guillaume Chervet*
+- [742c643](https://github.com/AxaFrance/oidc-client/commit/742c6430518c9cc64e0735e2203d659ab2098dc8) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
-#### [v2.0.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.1-alpha.0...v2.0.2-alpha.0)
-> 25 July 2019
-- doc : add optionnal parameter for post logout uri redirect [`#253`](https://github.com/AxaGuilDEv/react-oidc/pull/253) by Olivier YOUF
-- chore(release): publish v2.0.2-alpha.0 ***NO_CI*** [`3c1230a`](https://github.com/AxaGuilDEv/react-oidc/commit/3c1230ab6b950a100ba58190f4f9781ed06af82f) by Build-CI 
-- docs(changelog) update to new 2.0.1-alpha.0 [`c7c32a2`](https://github.com/AxaGuilDEv/react-oidc/commit/c7c32a21992e8f907671788f4d49a3af7a76fcd6) by Build-CI 
 
-#### [v2.0.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v2.0.0-alpha.0...v2.0.1-alpha.0)
-> 15 July 2019
-- Fix/infiniteloop [`#238`](https://github.com/AxaGuilDEv/react-oidc/pull/238) by Olivier YOUF
-- fix(infiniteLoop) : package upgrade [`e98e7d6`](https://github.com/AxaGuilDEv/react-oidc/commit/e98e7d6febdc820dc66122db43d443a8eb3d7d26) by Olivier YOUF 
-- fix(infiniteLoop) : change hooks to avoid infinite loop [`2168254`](https://github.com/AxaGuilDEv/react-oidc/commit/21682540fdf9a71e178942ee31b711a1f2c1575d) by Olivier YOUF 
-- chore(release): publish v2.0.1-alpha.0 ***NO_CI*** [`d906ddf`](https://github.com/AxaGuilDEv/react-oidc/commit/d906ddf3b2d269a362604e0a1418699bd4d10371) by Build-CI 
-- docs(changelog) update to new 2.0.0-alpha.0 [`2b07917`](https://github.com/AxaGuilDEv/react-oidc/commit/2b0791737eaf7c42b96ba77900d1bf10aa6a1e09) by Build-CI 
+## v7.10.2
 
-#### [v2.0.0-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.3...v2.0.0-alpha.0)
-> 11 July 2019
-- fix(packages) : rebuild packages for package lock [`#229`](https://github.com/AxaGuilDEv/react-oidc/pull/229) by Olivier YOUF
-- Feature/hooks [`#225`](https://github.com/AxaGuilDEv/react-oidc/pull/225) by Olivier YOUF
-- fix(packages) : resolves missing scripts [`043a66e`](https://github.com/AxaGuilDEv/react-oidc/commit/043a66eee2f3862e1a0ab5b4155fd2475206fa35) by Olivier YOUF 
-- upgrading React Context + Hooks [`dafe353`](https://github.com/AxaGuilDEv/react-oidc/commit/dafe353e93456cbb2d4feba5f20cbc563029e50c) by Olivier YOUF 
-- babel 7 migration [`d4a8b09`](https://github.com/AxaGuilDEv/react-oidc/commit/d4a8b099fb5f1cf47a57f418b93f12f9afd04efb) by Olivier YOUF 
-- refacto : Package managament & dependency [`d8e8d39`](https://github.com/AxaGuilDEv/react-oidc/commit/d8e8d394cfcad14bc2bec0b58a13d440aa9a6702) by Olivier YOUF 
-- fix(lint) : fix lint return and deps [`c275ea3`](https://github.com/AxaGuilDEv/react-oidc/commit/c275ea3daaff745b691f083788c0155f6c89bb3c) by Olivier YOUF 
-- fix : fix isEnabled flag [`fe5779c`](https://github.com/AxaGuilDEv/react-oidc/commit/fe5779c5d47986223cafab81ca09bfb3f5b7a83b) by Olivier YOUF 
-- PR remarks [`8b6ed4d`](https://github.com/AxaGuilDEv/react-oidc/commit/8b6ed4d3e3a1a0600d9d7011a551c07c500f82cf) by Olivier YOUF 
-- feat : new hooks function to get oidc props [`e7c4530`](https://github.com/AxaGuilDEv/react-oidc/commit/e7c45303167c37b5322955f1274e6cf90bd698cf) by Olivier YOUF 
-- chore(release): publish v2.0.0-alpha.0 ***NO_CI*** [`06e5a77`](https://github.com/AxaGuilDEv/react-oidc/commit/06e5a7743225a652142defc6dd658fa9c45f8d26) by Build-CI 
-- refacto(packags) : bump babel [`fcf3169`](https://github.com/AxaGuilDEv/react-oidc/commit/fcf31694c9235da8c9d0b6d5d11f226efb65af43) by Olivier YOUF 
-- docs(changelog) update to new 1.3.3 [`eea8716`](https://github.com/AxaGuilDEv/react-oidc/commit/eea8716a1b2e8ac098c0f388682f1e1f166f22ca) by Build-CI 
-- override conf for example [`c6342f5`](https://github.com/AxaGuilDEv/react-oidc/commit/c6342f57d2952676d96b0990099c2741c63ac736) by Olivier YOUF 
+- [99ca1c3](https://github.com/AxaFrance/oidc-client/commit/99ca1c3b022109a3c0712d0cafb436ee6eab20d0) - fix(ci): test (release), 2023-11-29 by *Guillaume Chervet*
 
-#### [v1.3.3](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.3-alpha.0...v1.3.3)
-> 4 April 2019
-- chore(release): publish v1.3.3 ***NO_CI*** [`3e011c2`](https://github.com/AxaGuilDEv/react-oidc/commit/3e011c2ca20c48a0b3e308c8e42ba96fd30b4ef8) by Build-CI 
-- docs(changelog) update to new 1.3.3-alpha.0 [`e8b9de0`](https://github.com/AxaGuilDEv/react-oidc/commit/e8b9de0754c9c1df227f70912fd5b5acf67a4134) by Build-CI 
 
-#### [v1.3.3-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.2-alpha.0...v1.3.3-alpha.0)
-> 1 April 2019
-- Fetch Core : Fix for header props [`#182`](https://github.com/AxaGuilDEv/react-oidc/pull/182) by Olivier YOUF
-- chore(release): publish v1.3.3-alpha.0 ***NO_CI*** [`1d9d9e3`](https://github.com/AxaGuilDEv/react-oidc/commit/1d9d9e3ecf855f56e961743d04533c1408bbbeb5) by Build-CI 
-- docs(changelog) update to new 1.3.2-alpha.0 [`100e4be`](https://github.com/AxaGuilDEv/react-oidc/commit/100e4be4321359fdb628bf52c93adae612576564) by Build-CI 
-- fix headers [`01dd579`](https://github.com/AxaGuilDEv/react-oidc/commit/01dd579c63401c99b097726b73658bfa84db7767) by Olivier YOUF 
+## v7.10.1
 
-#### [v1.3.2-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.1-alpha.0...v1.3.2-alpha.0)
-> 27 March 2019
-- Few changes for multiple Auth requests and callbacks issue [`#180`](https://github.com/AxaGuilDEv/react-oidc/pull/180) by Olivier YOUF
-- fix callback double tap [`35f5609`](https://github.com/AxaGuilDEv/react-oidc/commit/35f56093d6e0aedca493aabde779bef58f49d59d) by Olivier YOUF 
-- fix : flag for waiting auth [`89b32c0`](https://github.com/AxaGuilDEv/react-oidc/commit/89b32c0a411957d1e514602d72b52ddb25b5de97) by Olivier YOUF 
-- Fix : package changes [`b8692f2`](https://github.com/AxaGuilDEv/react-oidc/commit/b8692f29f4fae45fb64e74d1d89fa7cf10f2fc05) by Olivier YOUF 
-- chore(release): publish v1.3.2-alpha.0 ***NO_CI*** [`d814ada`](https://github.com/AxaGuilDEv/react-oidc/commit/d814ada43b9e826d3a5aa9317e4b8f7dcff0671f) by Build-CI 
-- wip : callback [`01af436`](https://github.com/AxaGuilDEv/react-oidc/commit/01af43636e2fc5cb99a08aa154b415857493956b) by Olivier YOUF 
-- docs(changelog) update to new 1.3.1-alpha.0 [`17c8683`](https://github.com/AxaGuilDEv/react-oidc/commit/17c86839884e63cf8c05459839f869f0ef55e019) by Build-CI 
+- [ff1f841](https://github.com/AxaFrance/oidc-client/commit/ff1f841044101b99d8d896828015d732a383e437) - fix(ci): ammend (release), 2023-11-29 by *Guillaume Chervet*
+- [a194c5b](https://github.com/AxaFrance/oidc-client/commit/a194c5bf7addede93cc56319bafaf07fd73243ad) - fix(ci): autochangelog, 2023-11-29 by *Guillaume Chervet*
 
-#### [v1.3.1-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.3.0...v1.3.1-alpha.0)
-> 14 March 2019
-- Fix(context) component should wait user loading [`#170`](https://github.com/AxaGuilDEv/react-oidc/pull/170) by Guillaume Chervet
-- fix(tweet) set up good changelog link [`#169`](https://github.com/AxaGuilDEv/react-oidc/pull/169) by Guillaume Chervet
-- docs(changelog) update to new 1.3.0 [`02de519`](https://github.com/AxaGuilDEv/react-oidc/commit/02de5196b3e7907acfeb631ee27fdea7ed15968a) by Build-CI 
-- chore(release): publish v1.3.1-alpha.0 ***NO_CI*** [`32d880f`](https://github.com/AxaGuilDEv/react-oidc/commit/32d880fb06a6b916d87e90d8f4c6b1d338969d06) by Build-CI 
 
-#### [v1.3.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.2.1...v1.3.0)
-> 12 March 2019
-- fix(context) no state found in storage [`#168`](https://github.com/AxaGuilDEv/react-oidc/pull/168) by Guillaume Chervet
-- docs(changelog) update to new 1.2.1 [`4eed1e9`](https://github.com/AxaGuilDEv/react-oidc/commit/4eed1e91ad3ed5dce05827444334a598f747844c) by Guillaume Chervet 
-- chore(release): publish v1.3.0 ***NO_CI*** [`517804b`](https://github.com/AxaGuilDEv/react-oidc/commit/517804b569c31e2e6a43f32f0aac2ff960291988) by Build-CI 
+## v7.10.0
 
-#### [v1.2.1](https://github.com/AxaGuilDEv/react-oidc/compare/v1.2.0...v1.2.1)
-> 8 March 2019
-- feature(context/routes) allow to configure callbacks [`#164`](https://github.com/AxaGuilDEv/react-oidc/pull/164) by Guillaume Chervet
-- feature(vanilla) vanilla lib usefull for demo or debug or migration of old js application [`#160`](https://github.com/AxaGuilDEv/react-oidc/pull/160) by Guillaume Chervet
-- chore(changelog) set up auto changelog and auto tweet [`#153`](https://github.com/AxaGuilDEv/react-oidc/pull/153) by Guillaume Chervet
-- chore(release): publish v1.2.1 ***NO_CI*** [`fbb0339`](https://github.com/AxaGuilDEv/react-oidc/commit/fbb0339dad91dda54d2828c7d5a4ffa5cd071a6e) by Build-CI 
+- [3d1af45](https://github.com/AxaFrance/oidc-client/commit/3d1af45133e41c981c4a35c4b19298a3b0f1d555) - feat(ci): add auto changelog (release), 2023-11-29 by *Guillaume Chervet*
+- [56bde67](https://github.com/AxaFrance/oidc-client/commit/56bde67566f8203e9d62ae6e8b722c86a7b63cae) - doc(readme): Update README.md, 2023-11-27 by *Guillaume Chervet*
+- [790da5a](https://github.com/AxaFrance/oidc-client/commit/790da5a60cc7fb07ca82feb994c8d12ff3e01b69) - [skip ci] Update version package.json, 2023-11-24 by *GitHub*
 
-#### [v1.2.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.6...v1.2.0)
-> 24 February 2019
-- English - change all instances of "authentified" to be "authenticated" [`#151`](https://github.com/AxaGuilDEv/react-oidc/pull/151) by Paul Hammond
-- chore(release): publish v1.2.0 ***NO_CI*** [`5f491b7`](https://github.com/AxaGuilDEv/react-oidc/commit/5f491b75962664904720b3404ce80a27ed9967a6) by Build-CI 
 
-#### [v1.1.6](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.5...v1.1.6)
-> 24 February 2019
-- Customise authenticating component [context] [`#150`](https://github.com/AxaGuilDEv/react-oidc/pull/150) by Paul Hammond
-- lock down version of jest [`#149`](https://github.com/AxaGuilDEv/react-oidc/pull/149) by Paul Hammond
-- chore(deps-dev): bump enzyme from 3.7.0 to 3.8.0 [`#112`](https://github.com/AxaGuilDEv/react-oidc/pull/112) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-jsx-a11y from 6.1.2 to 6.2.0 [`#113`](https://github.com/AxaGuilDEv/react-oidc/pull/113) by dependabot[bot]
-- chore(deps-dev): bump codacy-coverage from 3.3.0 to 3.4.0 [`#116`](https://github.com/AxaGuilDEv/react-oidc/pull/116) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-import from 2.14.0 to 2.16.0 [`#117`](https://github.com/AxaGuilDEv/react-oidc/pull/117) by dependabot[bot]
-- chore(deps-dev): bump prettier from 1.16.1 to 1.16.4 [`#122`](https://github.com/AxaGuilDEv/react-oidc/pull/122) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-jest from 22.1.2 to 22.2.2 [`#126`](https://github.com/AxaGuilDEv/react-oidc/pull/126) by dependabot[bot]
-- feat : adding enable prop in Provider [`#125`](https://github.com/AxaGuilDEv/react-oidc/pull/125) by Olivier YOUF
-- chore(release): publish v1.1.6 ***NO_CI*** [`6f573cd`](https://github.com/AxaGuilDEv/react-oidc/commit/6f573cd08e1e39143c661553645fdc62adebd3d8) by Build-CI 
+## v7.9.3
 
-#### [v1.1.5](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.5-alpha.0...v1.1.5)
-> 1 February 2019
-- chore(deps-dev): bump eslint-config-prettier from 3.3.0 to 4.0.0 [`#111`](https://github.com/AxaGuilDEv/react-oidc/pull/111) by dependabot[bot]
-- chore(deps-dev): bump prettier from 1.16.0 to 1.16.1 [`#110`](https://github.com/AxaGuilDEv/react-oidc/pull/110) by dependabot[bot]
-- chore(deps-dev): bump jest from 23.6.0 to 24.0.0 [`#118`](https://github.com/AxaGuilDEv/react-oidc/pull/118) by dependabot[bot]
-- Fix: Add react-router to dependencies [`#120`](https://github.com/AxaGuilDEv/react-oidc/pull/120) by Hamza Hamidi
-- chore: remove react-redux dependency [`#119`](https://github.com/AxaGuilDEv/react-oidc/pull/119) by rpetigny
-- chore(deps-dev): bump expect from 23.6.0 to 24.0.0 [`#106`](https://github.com/AxaGuilDEv/react-oidc/pull/106) by dependabot[bot]
-- chore(deps-dev): bump lerna from 3.5.0 to 3.10.7 [`#107`](https://github.com/AxaGuilDEv/react-oidc/pull/107) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-jest from 22.1.2 to 22.1.3 [`#108`](https://github.com/AxaGuilDEv/react-oidc/pull/108) by dependabot[bot]
-- chore(deps-dev): bump enzyme-adapter-react-16 from 1.7.1 to 1.8.0 [`#109`](https://github.com/AxaGuilDEv/react-oidc/pull/109) by dependabot[bot]
-- chore(deps): bump react-dom from 16.6.3 to 16.7.0 [`#95`](https://github.com/AxaGuilDEv/react-oidc/pull/95) by dependabot[bot]
-- chore(deps): bump oidc-client from 1.5.4 to 1.6.1 [`#96`](https://github.com/AxaGuilDEv/react-oidc/pull/96) by dependabot[bot]
-- chore(deps): bump react from 16.6.3 to 16.7.0 [`#97`](https://github.com/AxaGuilDEv/react-oidc/pull/97) by dependabot[bot]
-- chore(deps-dev): bump tslint from 5.11.0 to 5.12.1 [`#99`](https://github.com/AxaGuilDEv/react-oidc/pull/99) by dependabot[bot]
-- chore(deps-dev): bump eslint from 5.11.1 to 5.12.1 [`#100`](https://github.com/AxaGuilDEv/react-oidc/pull/100) by dependabot[bot]
-- chore(deps-dev): bump prettier from 1.15.3 to 1.16.0 [`#101`](https://github.com/AxaGuilDEv/react-oidc/pull/101) by dependabot[bot]
-- chore(deps-dev): bump babel-plugin-macros from 2.4.4 to 2.4.5 [`#93`](https://github.com/AxaGuilDEv/react-oidc/pull/93) by dependabot[bot]
-- chore(deps-dev): bump typescript from 3.2.2 to 3.2.4 [`#102`](https://github.com/AxaGuilDEv/react-oidc/pull/102) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-react from 7.12.3 to 7.12.4 [`#103`](https://github.com/AxaGuilDEv/react-oidc/pull/103) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-prettier from 3.0.0 to 3.0.1 [`#88`](https://github.com/AxaGuilDEv/react-oidc/pull/88) by dependabot[bot]
-- chore(deps-dev): bump react-scripts from 2.1.1 to 2.1.3 [`#90`](https://github.com/AxaGuilDEv/react-oidc/pull/90) by dependabot[bot]
-- chore(deps-dev): bump babel-plugin-macros from 2.4.2 to 2.4.4 [`#85`](https://github.com/AxaGuilDEv/react-oidc/pull/85) by mergify[bot]
-- chore(deps-dev): bump chalk from 2.4.1 to 2.4.2 [`#86`](https://github.com/AxaGuilDEv/react-oidc/pull/86) by mergify[bot]
-- chore(deps-dev): bump eslint-plugin-react from 7.11.1 to 7.12.3 [`#87`](https://github.com/AxaGuilDEv/react-oidc/pull/87) by mergify[bot]
-- Fix example link [`#89`](https://github.com/AxaGuilDEv/react-oidc/pull/89) by Seth
-- fix(redux) oidc default props [`#84`](https://github.com/AxaGuilDEv/react-oidc/pull/84) by julienbirgand
-- chore(release): publish v1.1.5 ***NO_CI*** [`e21bbbc`](https://github.com/AxaGuilDEv/react-oidc/commit/e21bbbcadfec1fe70cc64d0b33c84910a9e8add1) by Build-CI 
+- [a80844c](https://github.com/AxaFrance/oidc-client/commit/a80844c2668066b083009043f1dd94fa196e1f18) - fix(service-worker): make sure URL is normalized when comparing with token endpoint and revocation endpoint (#1198) (release), 2023-11-24 by *meesvandongen*
+- [bf19dd0](https://github.com/AxaFrance/oidc-client/commit/bf19dd0cc975ea4524b0f68f9315625b3789801b) - fix(oidc-client): tokens refresh conflict multiple tabs (alpha), 2023-11-17 by *Guillaume Chervet*
+- [216adc7](https://github.com/AxaFrance/oidc-client/commit/216adc79007264915747edf3ff07171cac456759) - [skip ci] Update version package.json, 2023-11-17 by *GitHub*
 
-#### [v1.1.5-alpha.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.1.0...v1.1.5-alpha.0)
-> 4 January 2019
--  chore(pipeline-azure) branch variable was a bad one [`#83`](https://github.com/AxaGuilDEv/react-oidc/pull/83) by mergify[bot]
-- fix : Context Fetch&gt;oidcUser transmission [`#80`](https://github.com/AxaGuilDEv/react-oidc/pull/80) by Olivier YOUF
-- fix token expired event [`#81`](https://github.com/AxaGuilDEv/react-oidc/pull/81) by mergify[bot]
-- chore(deps-dev): bump eslint from 5.9.0 to 5.11.1 [`#82`](https://github.com/AxaGuilDEv/react-oidc/pull/82) by mergify[bot]
-- chore(deps-dev): bump @angular/compiler from 7.1.0 to 7.1.4 [`#75`](https://github.com/AxaGuilDEv/react-oidc/pull/75) by mergify[bot]
-- chore(deps-dev): bump typescript from 3.2.1 to 3.2.2 [`#63`](https://github.com/AxaGuilDEv/react-oidc/pull/63) by dependabot[bot]
-- chore(deps-dev): bump @angular/core from 7.1.0 to 7.1.3 [`#65`](https://github.com/AxaGuilDEv/react-oidc/pull/65) by mergify[bot]
-- chore(deps-dev): bump tslint-config-prettier from 1.16.0 to 1.17.0 [`#64`](https://github.com/AxaGuilDEv/react-oidc/pull/64) by mergify[bot]
-- chore(deps-dev): bump regenerator-runtime from 0.12.1 to 0.13.1 [`#67`](https://github.com/AxaGuilDEv/react-oidc/pull/67) by mergify[bot]
-- chore(deps-dev): bump babel-eslint from 8.2.6 to 10.0.1 [`#69`](https://github.com/AxaGuilDEv/react-oidc/pull/69) by mergify[bot]
-- chore(deps-dev): bump inquirer from 6.2.0 to 6.2.1 [`#68`](https://github.com/AxaGuilDEv/react-oidc/pull/68) by mergify[bot]
-- chore(deps-dev): bump react-test-renderer from 16.6.3 to 16.7.0 [`#70`](https://github.com/AxaGuilDEv/react-oidc/pull/70) by mergify[bot]
-- chore(deps-dev): bump enzyme-adapter-react-16 from 1.7.0 to 1.7.1 [`#71`](https://github.com/AxaGuilDEv/react-oidc/pull/71) by mergify[bot]
-- chore(deps-dev): bump eslint-plugin-jest from 22.0.1 to 22.1.2 [`#76`](https://github.com/AxaGuilDEv/react-oidc/pull/76) by mergify[bot]
-- docs(readme) add keyword [`#79`](https://github.com/AxaGuilDEv/react-oidc/pull/79) by Guillaume Chervet
-- chore(ci) remove travis and codeclimate [`#73`](https://github.com/AxaGuilDEv/react-oidc/pull/73) by Guillaume Chervet
-- chore(deps-dev): bump lint-staged from 7.3.0 to 8.1.0 [`#74`](https://github.com/AxaGuilDEv/react-oidc/pull/74) by dependabot[bot]
-- chore(ci) add azureDevops build + sonar [`#72`](https://github.com/AxaGuilDEv/react-oidc/pull/72) by Guillaume Chervet
-- chore(deps-dev): bump react-scripts from 1.1.5 to 2.1.1 [`#57`](https://github.com/AxaGuilDEv/react-oidc/pull/57) by dependabot[bot]
-- chore(deps-dev): bump typescript from 3.1.6 to 3.2.1 [`#59`](https://github.com/AxaGuilDEv/react-oidc/pull/59) by dependabot[bot]
-- chore(deps-dev): bump react-test-renderer from 16.6.1 to 16.6.3 [`#60`](https://github.com/AxaGuilDEv/react-oidc/pull/60) by dependabot[bot]
-- chore(deps-dev): bump prettier from 1.15.1 to 1.15.3 [`#61`](https://github.com/AxaGuilDEv/react-oidc/pull/61) by dependabot[bot]
-- doc(readme) small fix for demo to internship [`#62`](https://github.com/AxaGuilDEv/react-oidc/pull/62) by Guillaume Chervet
-- chore(azurepipeline) configure lerna to publish [`#58`](https://github.com/AxaGuilDEv/react-oidc/pull/58) by Guillaume Chervet
-- chore(deps-dev): bump lerna from 3.4.3 to 3.5.0 [`#55`](https://github.com/AxaGuilDEv/react-oidc/pull/55) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-json from 1.2.1 to 1.3.2 [`#54`](https://github.com/AxaGuilDEv/react-oidc/pull/54) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-prettier from 2.7.0 to 3.0.0 [`#56`](https://github.com/AxaGuilDEv/react-oidc/pull/56) by dependabot[bot]
-- chore(deps-dev): bump @angular/compiler from 7.0.4 to 7.1.0 [`#52`](https://github.com/AxaGuilDEv/react-oidc/pull/52) by dependabot[bot]
-- chore(deps-dev): bump codacy-coverage from 3.2.0 to 3.3.0 [`#53`](https://github.com/AxaGuilDEv/react-oidc/pull/53) by dependabot[bot]
-- chore(deps-dev): bump @angular/core from 7.0.3 to 7.1.0 [`#46`](https://github.com/AxaGuilDEv/react-oidc/pull/46) by dependabot[bot]
-- chore(deps-dev): bump eslint from 5.8.0 to 5.9.0 [`#48`](https://github.com/AxaGuilDEv/react-oidc/pull/48) by dependabot[bot]
-- chore(deps-dev): bump shelljs from 0.8.2 to 0.8.3 [`#49`](https://github.com/AxaGuilDEv/react-oidc/pull/49) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-jest from 22.0.0 to 22.0.1 [`#50`](https://github.com/AxaGuilDEv/react-oidc/pull/50) by dependabot[bot]
-- chore(deps-dev): bump eslint-config-prettier from 3.1.0 to 3.3.0 [`#47`](https://github.com/AxaGuilDEv/react-oidc/pull/47) by dependabot[bot]
-- chore(deps): bump react-dom from 16.6.1 to 16.6.3 [`#44`](https://github.com/AxaGuilDEv/react-oidc/pull/44) by dependabot[bot]
-- chore(deps): bump rxjs from 6.3.2 to 6.3.3 [`#45`](https://github.com/AxaGuilDEv/react-oidc/pull/45) by dependabot[bot]
-- chore(deps): bump react from 16.6.1 to 16.6.3 [`#43`](https://github.com/AxaGuilDEv/react-oidc/pull/43) by dependabot[bot]
-- chore(deps): bump react-redux from 5.0.7 to 5.1.1 [`#38`](https://github.com/AxaGuilDEv/react-oidc/pull/38) by dependabot[bot]
-- chore(deps-dev): bump @angular/compiler from 7.0.3 to 7.0.4 [`#42`](https://github.com/AxaGuilDEv/react-oidc/pull/42) by dependabot[bot]
-- chore(deps-dev): bump tslint-config-prettier from 1.15.0 to 1.16.0 [`#40`](https://github.com/AxaGuilDEv/react-oidc/pull/40) by dependabot[bot]
-- doc(redux): update code example and add more informations [`#41`](https://github.com/AxaGuilDEv/react-oidc/pull/41) by Benoit Fontaine
-- doc(context) add more explanation [`#37`](https://github.com/AxaGuilDEv/react-oidc/pull/37) by Guillaume Chervet
-- chore(deps): [security] bump merge from 1.2.0 to 1.2.1 [`#39`](https://github.com/AxaGuilDEv/react-oidc/pull/39) by dependabot[bot]
-- Set up CI with Azure Pipelines [`#31`](https://github.com/AxaGuilDEv/react-oidc/pull/31) by Cyril Lakech
-- chore(deps-dev): bump tslint-plugin-prettier from 1.3.0 to 2.0.1 [`#34`](https://github.com/AxaGuilDEv/react-oidc/pull/34) by dependabot[bot]
-- chore(deps-dev): bump eslint-config-prettier from 2.10.0 to 3.1.0 [`#36`](https://github.com/AxaGuilDEv/react-oidc/pull/36) by dependabot[bot]
-- chore(deps-dev): bump eslint-plugin-jest from 21.27.2 to 22.0.0 [`#35`](https://github.com/AxaGuilDEv/react-oidc/pull/35) by dependabot[bot]
-- fix oidcUser transmission [`0ae83e1`](https://github.com/AxaGuilDEv/react-oidc/commit/0ae83e1e9e4d71683c190a32fb87a91b307539cc) by Olivier YOUF 
-- chore(release): publish v1.1.5-alpha.0 ***NO_CI*** [`41536de`](https://github.com/AxaGuilDEv/react-oidc/commit/41536de22955b5f7f6b5b0dc758554a7f1deff20) by Build-CI 
-- WIP [`b866401`](https://github.com/AxaGuilDEv/react-oidc/commit/b86640100253030ccc1386d198f9910f86c052a4) by Guillaume Chervet 
-- WIP [`cad214b`](https://github.com/AxaGuilDEv/react-oidc/commit/cad214b48575a759f9245bcf2651d78dba4435e6) by Guillaume Chervet 
-- WIP [`d36dd3d`](https://github.com/AxaGuilDEv/react-oidc/commit/d36dd3d1463b0a4f6c9b6f8f6be74707552b139f) by Guillaume Chervet 
-- it works! [`b58a355`](https://github.com/AxaGuilDEv/react-oidc/commit/b58a355821a53cb0229acc1a1a69d724655e9f77) by Guillaume Chervet 
-- WIP [`fd2c87a`](https://github.com/AxaGuilDEv/react-oidc/commit/fd2c87a4b8b67914526bdef213719c08d49cbd54) by Guillaume Chervet 
-- chore(pipeline-azure) bug during publish [`0f0935a`](https://github.com/AxaGuilDEv/react-oidc/commit/0f0935a84f5065c1b3beabbb0b4acdc04346bf1d) by Guillaume Chervet 
-- WIP [`7c238f5`](https://github.com/AxaGuilDEv/react-oidc/commit/7c238f59ed3221910ced2631bed5092a9a56d71d) by Guillaume Chervet 
-- WIP [`4d04233`](https://github.com/AxaGuilDEv/react-oidc/commit/4d04233963fe77e803626ed0752dfe66474f8e71) by Guillaume Chervet 
-- WIP [`1a2fdbd`](https://github.com/AxaGuilDEv/react-oidc/commit/1a2fdbd0b2fc8f9d611248c02987fc524c77ea94) by Guillaume Chervet 
-- it works! [`adb3ecf`](https://github.com/AxaGuilDEv/react-oidc/commit/adb3ecf6f64e626209dd18bc6b0949c321af3347) by Guillaume Chervet 
-- WIP [`0836ecd`](https://github.com/AxaGuilDEv/react-oidc/commit/0836ecdfe1a0ff9846621a78e44b3cacb9184436) by Guillaume Chervet 
 
-#### [v1.1.0](https://github.com/AxaGuilDEv/react-oidc/compare/v1.0.2...v1.1.0)
-> 9 November 2018
-- fix(publish) missing attribute to publish to npm [`36a05fa`](https://github.com/AxaGuilDEv/react-oidc/commit/36a05faf92e6f09a2fec01756ad9b15cb44253ac) by Guillaume Chervet 
-- chore(release): publish v1.1.0 [ci skip] [`cc39e30`](https://github.com/AxaGuilDEv/react-oidc/commit/cc39e30840195b6d00591f72bef879e671a6a0f6) by Travis CI User 
+## v7.9.2
 
-#### [v1.0.2](https://github.com/AxaGuilDEv/react-oidc/compare/v1.0.1...v1.0.2)
-> 31 October 2018
-- feat: add fetch observable hoc [`7ef055c`](https://github.com/AxaGuilDEv/react-oidc/commit/7ef055cb555d2937c2fcac175ab6294ef0fe9662) by Thierno Barry 
-- chore(release): publish v1.0.2 [ci skip] [`689b36c`](https://github.com/AxaGuilDEv/react-oidc/commit/689b36c1820e07ab1bc4b8542c4914f3081fed54) by Travis CI User 
-- chore: remove codacy that return 404 errors [`52724bb`](https://github.com/AxaGuilDEv/react-oidc/commit/52724bb7171a1e117f893580a6df54bcacf6d584) by Cyril Lakech 
+- [5085e05](https://github.com/AxaFrance/oidc-client/commit/5085e05beb4c7a88fad1df61e11213b68672e7d9) - fix(sevice-worker): add URL normalization for getCurrentDatabaseDomain endpoints comparison (release) (#1196), 2023-11-17 by *meesvandongen*
+- [77361cf](https://github.com/AxaFrance/oidc-client/commit/77361cfb1c8f2f0eed9c38ba15e32f3bbe0f4095) - [skip ci] Update version package.json, 2023-11-13 by *GitHub*
 
-#### [v1.0.1](https://github.com/AxaGuilDEv/react-oidc/compare/v1.0.0...v1.0.1)
-> 4 October 2018
-- replacing includes by indexof [`#25`](https://github.com/AxaGuilDEv/react-oidc/pull/25) by mergify[bot]
-- chore(release): publish v1.0.1 [ci skip] [`7cfb06c`](https://github.com/AxaGuilDEv/react-oidc/commit/7cfb06ce706187d79fccf9fbcebf28e5f1c28e9b) by Travis CI User 
 
-### [v1.0.0](https://github.com/AxaGuilDEv/react-oidc/compare/v0.0.1...v1.0.0)
-> 3 October 2018
-- doc: add npm version badge [`#23`](https://github.com/AxaGuilDEv/react-oidc/pull/23) by mergify[bot]
-- chore(release): publish v1.0.0 [ci skip] [`728051b`](https://github.com/AxaGuilDEv/react-oidc/commit/728051b8b5db2eba1c7d2f922d9c466c7eba62ea) by Travis CI User 
+## v7.9.1
 
-#### [v0.0.1](https://github.com/AxaGuilDEv/react-oidc/compare/v0.0.1-alpha.11...v0.0.1)
-> 3 October 2018
-- Mergify initial configuration [`#22`](https://github.com/AxaGuilDEv/react-oidc/pull/22) by mergify[bot]
-- chore(release): publish v0.0.1 [ci skip] [`94cbf05`](https://github.com/AxaGuilDEv/react-oidc/commit/94cbf05bf38ad190f0025d3ddee3bb584d42cc01) by Travis CI User 
+- [7e0cb29](https://github.com/AxaFrance/oidc-client/commit/7e0cb297587e314451321c3ddd1b0e5f7e7e6c0e) - fix(logout): okta tokens null (release) (#1188), 2023-11-13 by *Guillaume Chervet*
+- [2413503](https://github.com/AxaFrance/oidc-client/commit/24135038510ada4b9eecffae1494693ef9347a07) - [skip ci] Update version package.json, 2023-11-12 by *GitHub*
 
-#### [v0.0.1-alpha.11](https://github.com/AxaGuilDEv/react-oidc/compare/v0.0.1-alpha.10...v0.0.1-alpha.11)
-> 3 October 2018
-- chore: exclude tests from codeclimate analysis [`#14`](https://github.com/AxaGuilDEv/react-oidc/pull/14) by Cyril Lakech
-- chore(build) add user variable for releasing a specific version to npm [`#20`](https://github.com/AxaGuilDEv/react-oidc/pull/20) by Guillaume Chervet
-- fix : recompose branch test in the consumer and add doc about dev [`#21`](https://github.com/AxaGuilDEv/react-oidc/pull/21) by youf-olivier
-- chore(release): publish v0.0.1-alpha.11 [ci skip] [`82d326a`](https://github.com/AxaGuilDEv/react-oidc/commit/82d326a0abc8c89516c010e731f911cc27da29c6) by Travis CI User 
 
-#### [v0.0.1-alpha.10](https://github.com/AxaGuilDEv/react-oidc/compare/v0.0.1-alpha.9...v0.0.1-alpha.10)
-> 1 October 2018
-- chore: setup test coverage with codacy [`#17`](https://github.com/AxaGuilDEv/react-oidc/pull/17) by Cyril Lakech
-- chore(release): publish v0.0.1-alpha.10 [ci skip] [`612031e`](https://github.com/AxaGuilDEv/react-oidc/commit/612031ea55e145672dd5c2d8fd078479cff5f706) by Travis CI User 
+## v7.9.0
 
-#### v0.0.1-alpha.9
-> 1 October 2018
-- wip chore: setup publishing to npm [`#19`](https://github.com/AxaGuilDEv/react-oidc/pull/19) by Cyril Lakech
-- chore: do not share codeclimate token [`#16`](https://github.com/AxaGuilDEv/react-oidc/pull/16) by Guillaume Chervet
-- Add a Codacy badge to readme.md [`#15`](https://github.com/AxaGuilDEv/react-oidc/pull/15) by Guillaume Chervet
-- chore: setup coverage with codeclimate [`#13`](https://github.com/AxaGuilDEv/react-oidc/pull/13) by youf-olivier
-- chore: add coverage badge [`#12`](https://github.com/AxaGuilDEv/react-oidc/pull/12) by Guillaume Chervet
-- chore(packages) add require attributes to publish inside npm in publi… [`#11`](https://github.com/AxaGuilDEv/react-oidc/pull/11) by Cyril Lakech
-- refactor: simplify oidc service authenticateUser [`#10`](https://github.com/AxaGuilDEv/react-oidc/pull/10) by Guillaume Chervet
-- chore: add codeclimate badge [`#8`](https://github.com/AxaGuilDEv/react-oidc/pull/8) by Guillaume Chervet
-- init [`8d1518e`](https://github.com/AxaGuilDEv/react-oidc/commit/8d1518edc28882b83f207e8dc19d3c805f5ce96d) by Olivier Youf 
-- chore(release): publish v0.0.1-alpha.9 [ci skip] [`df4adb5`](https://github.com/AxaGuilDEv/react-oidc/commit/df4adb51f25be9f6b49f46ad9c7620e6b91fc259) by Travis CI User 
-- chore(packages) add require attributes to publish inside npm in public with a scope [`bb6f22f`](https://github.com/AxaGuilDEv/react-oidc/commit/bb6f22fe4a2c93156ad5848e1e9e221f5d7f2e57) by Guillaume Chervet 
-- chore: add license [`3d2ba13`](https://github.com/AxaGuilDEv/react-oidc/commit/3d2ba1328685a2aec3b5d158db9047870ed236c4) by Cyril Lakech 
-- Add Codacy badge [`400b938`](https://github.com/AxaGuilDEv/react-oidc/commit/400b93878c0b55b831de63b5bd01de82ac6d389c) by The Codacy Badger 
+- [b08cd59](https://github.com/AxaFrance/oidc-client/commit/b08cd594d2427170cde835dcff97d5be396952e6) - doc(FAQ): Update FAQ.md (release), 2023-11-12 by *Guillaume Chervet*
+- [c54c7b9](https://github.com/AxaFrance/oidc-client/commit/c54c7b9f3447c0474b460649eb315c13f5f8b1da) - fix(service-worker): Reclaming all clients from SW after hard reload (#1149), 2023-11-12 by *VladimirPlatonenko*
+- [dbcfec4](https://github.com/AxaFrance/oidc-client/commit/dbcfec46798b2137154dd33f31bf842f6b7730b8) - feat(oidc-client): enhance service worker flexibility (alpha) (#1180), 2023-11-12 by *Guillaume Chervet*
+- [9549b9a](https://github.com/AxaFrance/oidc-client/commit/9549b9ae613d3cf357cb4b760fc8cc9e0af80c44) - doc(oidc-client): typo in method name, 2023-11-07 by *Guillaume Chervet*
+- [1a12a19](https://github.com/AxaFrance/oidc-client/commit/1a12a19a54924f0941a960b47fca8b4c169256a0) - [skip ci] Update version package.json, 2023-11-06 by *GitHub*
+
+
+## v7.8.0
+
+- [1684abb](https://github.com/AxaFrance/oidc-client/commit/1684abba7d982ecbd2f30610eb140e2ce4549814) - feat(oidc-client): move fetch to oidc-client (#1175) (release), 2023-11-06 by *Guillaume Chervet*
+- [b4cee5a](https://github.com/AxaFrance/oidc-client/commit/b4cee5aec8365ba2b000742001c717f1d543011b) - [skip ci] Update version package.json, 2023-10-29 by *GitHub*
+
+
+## v7.7.3
+
+- [ac7f37b](https://github.com/AxaFrance/oidc-client/commit/ac7f37be28883edbe539eff02d0a6a054b2aab14) - build(npm): bump msw from 1.2.2 to 2.0.0 (#1165), 2023-10-29 by *dependabot[bot]*
+- [1b4bc07](https://github.com/AxaFrance/oidc-client/commit/1b4bc0782c39a8f797de224f74073d4860672cb6) - [skip ci] Update version package.json, 2023-10-25 by *GitHub*
+
+
+## v7.7.2
+
+- [41ecf9e](https://github.com/AxaFrance/oidc-client/commit/41ecf9e1752f291f0d8f96a979ab393f5aaeb885) - build(npm): bump @testing-library/dom from 9.3.1 to 9.3.3 (#1161), 2023-10-25 by *dependabot[bot]*
+
+
+## v7.7.1
+
+- [07d266b](https://github.com/AxaFrance/oidc-client/commit/07d266b32b275038176a407036a338624d2bed47) - build(npm): bump next from 13.4.12 to 13.5.6 (#1158), 2023-10-25 by *dependabot[bot]*
+- [03a6570](https://github.com/AxaFrance/oidc-client/commit/03a6570bb09a98686e67f17b57ee7f7b1849db2c) - [skip ci] Update version package.json, 2023-10-19 by *GitHub*
+
+
+## v7.7.0
+
+- [ec5ba27](https://github.com/AxaFrance/oidc-client/commit/ec5ba27f463c513e4d476621f684d0dcccd34470) - feat(oidc): make location injectable (release) (#1155), 2023-10-19 by *Guillaume Chervet*
+- [8f24b11](https://github.com/AxaFrance/oidc-client/commit/8f24b119613fef5d7214826528bdb04c931a1986) - doc(faq): Update FAQ.md (#1151), 2023-10-13 by *Mateusz Popielarz*
+- [4f9b3c0](https://github.com/AxaFrance/oidc-client/commit/4f9b3c0b767d4b955223febcc833e6ff47e997ef) - [skip ci] Update version package.json, 2023-09-21 by *GitHub*
+
+
+## v7.6.0
+
+- [3e0e554](https://github.com/AxaFrance/oidc-client/commit/3e0e5546ec756b4a9ddad695e4e2368c5721175f) - feat(service-worker): add to trusted type (#1142) (release), 2023-09-21 by *Guillaume Chervet*
+- [79b3889](https://github.com/AxaFrance/oidc-client/commit/79b3889a3441b5bf95f980db7c2ae6aed60da8da) - [skip ci] Update version package.json, 2023-09-20 by *GitHub*
+
+
+## v7.5.1
+
+- [60d9c4e](https://github.com/AxaFrance/oidc-client/commit/60d9c4e68622f81ecceaf480de21d4646ae909f1) - fix(oidc): clean link with service worker (#1141) (release), 2023-09-20 by *Guillaume Chervet*
+- [2e5b856](https://github.com/AxaFrance/oidc-client/commit/2e5b85670e7929a0b216fe695999a8cddcd2d3a8) - [skip ci] Update version package.json, 2023-09-19 by *GitHub*
+
+
+## v7.5.0
+
+- [ff7ac6a](https://github.com/AxaFrance/oidc-client/commit/ff7ac6ae7defbd84067b4084222430ef07f15713) - feat(oidc): add dpop (#1139) (release), 2023-09-19 by *Guillaume Chervet*
+- [1980813](https://github.com/AxaFrance/oidc-client/commit/1980813234a63e13353b8e5623982e714b42ac12) - feat(demo): hack iframe unregister serviceworker (#1137), 2023-09-14 by *Guillaume Chervet*
+- [8165fab](https://github.com/AxaFrance/oidc-client/commit/8165fab52b89ce20946378c5173783ef06f014ef) - [skip ci] Update version package.json, 2023-09-07 by *GitHub*
+
+
+## v7.4.1
+
+- [6941766](https://github.com/AxaFrance/oidc-client/commit/6941766614d18ff3c92bbd00bdf0583350b16b7f) - fix(service-worker): setAccessTokenToNavigateRequests always true (#1136) (release), 2023-09-07 by *Guillaume Chervet*
+- [823a3c3](https://github.com/AxaFrance/oidc-client/commit/823a3c37351e39b0bb1290228f72c58f11a28960) - fix(oidc+serviceworker): better issueAt, 2023-09-05 by *Guillaume Chervet*
+
+
+## v7.4.0
+
+- [d0dfde4](https://github.com/AxaFrance/oidc-client/commit/d0dfde47e27125248e5af7e9d6c12bfbe1e3ec60) - feat(oidc+serviceworker): increase security preventing sw unresgistration during silent signin (#1134) (release), 2023-09-05 by *Guillaume Chervet*
+- [9a05b9f](https://github.com/AxaFrance/oidc-client/commit/9a05b9f13a7d429f044bf84d57af64d356999955) - [skip ci] Update version package.json, 2023-08-25 by *GitHub*
+
+
+## v7.3.4
+
+- [6d371ff](https://github.com/AxaFrance/oidc-client/commit/6d371ff1ce909ae40ef2f44a145bdcd322ca9d90) - fix(oidc-service-worker): gracefull timeout on firefox (release) (#1132), 2023-08-25 by *Guillaume Chervet*
+- [e004e32](https://github.com/AxaFrance/oidc-client/commit/e004e32dbafd06c766429903fe6cdd74d37b9bd2) - [skip ci] Update version package.json, 2023-08-15 by *GitHub*
+
+
+## v7.3.3
+
+- [e4e7409](https://github.com/AxaFrance/oidc-client/commit/e4e74091a8a6fadb64429dcccbd43331af62f920) - fix(oidc): parent instead of top for iframe allow app inside iframe (#1130) (release), 2023-08-15 by *Guillaume Chervet*
+- [28e21ac](https://github.com/AxaFrance/oidc-client/commit/28e21acd8fbda1a7190917a80239b595fa5f2f36) - [skip ci] Update version package.json, 2023-08-15 by *GitHub*
+
+
+## v7.3.2
+
+- [790ec46](https://github.com/AxaFrance/oidc-client/commit/790ec468355967462b9bfce40196e9336efed0d7) - fix(oidc): allow service worker to chrome 70 (release), 2023-08-15 by *Guillaume Chervet*
+- [bb7de00](https://github.com/AxaFrance/oidc-client/commit/bb7de0060ea81fa4206a5696a5479100f0c64898) - [skip ci] Update version package.json, 2023-08-08 by *GitHub*
+
+
+## v7.3.1
+
+- [c2564f9](https://github.com/AxaFrance/oidc-client/commit/c2564f9ef6de2122962cfb4a8e0f9195aa688d84) - fix(all): copy of service worker files (release), 2023-08-08 by *Guillaume Chervet*
+- [0bc3398](https://github.com/AxaFrance/oidc-client/commit/0bc3398f09fd3bf6dff5a6443d5d42f0a26454bf) - [skip ci] Update version package.json, 2023-08-08 by *GitHub*
+
+
+## v7.3.0
+
+- [282c0f7](https://github.com/AxaFrance/oidc-client/commit/282c0f72ab7741f24468b2278466eb307d1fa0ce) - feat(oidc+serviceworker): add property setAccessTokenToNavigateRequests + service_worker_convert_all_requests_to_cors moved to TrustedDomains.js (#1123) (release), 2023-08-08 by *Guillaume Chervet*
+- [c94163d](https://github.com/AxaFrance/oidc-client/commit/c94163d02f5947761d00bd5e18df6749106d6f3d) - doc(FAQ): add "Does Service Worker is mandatory ?", 2023-08-08 by *Guillaume Chervet*
+- [7ffcde4](https://github.com/AxaFrance/oidc-client/commit/7ffcde465f5f4cbba4b39e0da43dee34d4ec37d9) - doc(readme): update images urls, 2023-08-08 by *Guillaume Chervet*
+- [32b2861](https://github.com/AxaFrance/oidc-client/commit/32b286181436129e6d15e0e166108d1f0d4d5641) - [skip ci] Update version package.json, 2023-08-07 by *GitHub*
+
+
+## v7.2.2
+
+- [e0cad22](https://github.com/AxaFrance/oidc-client/commit/e0cad22179fb1d9e641fbbf14b879ea2d2d78c3a) - fix(faq): update faq (release), 2023-08-07 by *Guillaume Chervet*
+- [a5d2e58](https://github.com/AxaFrance/oidc-client/commit/a5d2e5892cf456225618f55602c87c654cdad62c) - fix(oidc+serviceworker): add more log detail on token validation, 2023-08-07 by *Guillaume Chervet*
+- [ad3a73b](https://github.com/AxaFrance/oidc-client/commit/ad3a73b9a65c942e2f3aee61516581613844a5ec) - [skip ci] Update version package.json, 2023-08-07 by *GitHub*
+
+
+## v7.2.1
+
+- [0e52c56](https://github.com/AxaFrance/oidc-client/commit/0e52c56e1d747aa17ee2bf3005893a8d67a03ab3) - fix(package.json): update new repository link (release), 2023-08-07 by *Guillaume Chervet*
+- [3d0aaff](https://github.com/AxaFrance/oidc-client/commit/3d0aaff74fd1b14afe2aa3ec2b8b3c028dd3fe75) - fix(oidc): add more detail on state error, 2023-08-04 by *Guillaume Chervet*
+- [faa0da2](https://github.com/AxaFrance/oidc-client/commit/faa0da2235239a0b12e82a070b3f6e2c30572bfa) - fix(readme): some path was broken, 2023-08-04 by *Guillaume Chervet*
+- [3713dd6](https://github.com/AxaFrance/oidc-client/commit/3713dd65a6be6ff4a42b1507cd94e904445efb00) - [skip ci] Update version package.json, 2023-08-04 by *GitHub*
+
+
+## v7.2.0
+
+- [60ea58b](https://github.com/AxaFrance/oidc-client/commit/60ea58b266c4173e3a92b8637d9abd09cca0ea1a) - feat(oidc-service-worker): copy become manual (#1120) (release), 2023-08-04 by *Guillaume Chervet*
+- [c74edeb](https://github.com/AxaFrance/oidc-client/commit/c74edeb0380c726fb861f499ba3811fa7317d343) - [skip ci] Update version package.json, 2023-08-04 by *GitHub*
+
+
+## v7.1.0
+
+- [ae8a601](https://github.com/AxaFrance/oidc-client/commit/ae8a60130b4dacfe7a73f6e2262ca1238a07a509) - feat(oidc): update service worker from version (#1121) (release), 2023-08-04 by *Guillaume Chervet*
+- [9f986c6](https://github.com/AxaFrance/oidc-client/commit/9f986c6b576c50b9d87d94e2fc5af0c7521c7bdf) - [skip ci] Update version package.json, 2023-08-03 by *GitHub*
+
+
+## v7.0.1
+
+- [cd97895](https://github.com/AxaFrance/oidc-client/commit/cd9789520090b27ea905401be6d03fd87f817f76) - fix(oidc): expire_in in string instead of number (#1118) (release), 2023-08-03 by *Guillaume Chervet*
+- [e74c0df](https://github.com/AxaFrance/oidc-client/commit/e74c0df57140ca2bd3c7fd631eef39661b1b2b8c) - [skip ci] Update version package.json, 2023-08-01 by *GitHub*
+
+
+## v7.0.0
+
+- [9567873](https://github.com/AxaFrance/oidc-client/commit/95678734c0495f80628f99ad3aa284a3014f8bbc) - feat(oidc): rename repository oidc-client (#1115) (release), 2023-08-01 by *Guillaume Chervet*
+- [ff61e5d](https://github.com/AxaFrance/oidc-client/commit/ff61e5d5e3387888ce18ec8e99fde0044009f481) - fix(demo): google new link and add navigate button, 2023-07-31 by *Guillaume Chervet*
+- [6e9e8bb](https://github.com/AxaFrance/oidc-client/commit/6e9e8bb94db0c52f684ea4c42a81c69f59dd3f2c) - [skip ci] Update version package.json, 2023-07-28 by *GitHub*
+- [0d8bc06](https://github.com/AxaFrance/oidc-client/commit/0d8bc0626be0d5d14edca83dacb7367f57d4bb6d) - feat(oidc): rename vanilla-oidc to oidc-client (#1112) (release), 2023-07-28 by *Guillaume Chervet*
+
+
+## v6.26.6
+
+- [dab3662](https://github.com/AxaFrance/oidc-client/commit/dab36629bdebed5a3f085d606f313c7a12644e77) - fix build (release), 2023-07-28 by *Guillaume Chervet*
+
+
+## v6.26.5
+
+- [48d9db2](https://github.com/AxaFrance/oidc-client/commit/48d9db2f2cffbe74a6fd32b5771f5df0b8314b7f) - test release, 2023-07-28 by *Guillaume Chervet*
+
+
+## v6.26.4
+
+- [9c7a143](https://github.com/AxaFrance/oidc-client/commit/9c7a143797cffff1044c13787c6ceaf690fa4c87) - fix build (release), 2023-07-28 by *Guillaume Chervet*
+
+
+## v6.26.3
+
+- [04f4900](https://github.com/AxaFrance/oidc-client/commit/04f4900d672e954278e6835bc31c62e4bf8660de) - try fix (release), 2023-07-28 by *Guillaume Chervet*
+
+
+## v6.26.2
+
+- [d329ce0](https://github.com/AxaFrance/oidc-client/commit/d329ce0cb013f4877cb401c6ccef316077ce9d09) - fix(ci): add set to replace workspace* (release), 2023-07-28 by *Guillaume Chervet*
+
+
+## v6.26.1
+
+
+
+## v6.26.0
+
+- [7eac9e5](https://github.com/AxaFrance/oidc-client/commit/7eac9e5c10175ae6850a72e21e11bac568a01720) - feat(oidc): rename vanilla-oidc to oidc-client (#1112) (release), 2023-07-28 by *Guillaume Chervet*
+- [9f25be7](https://github.com/AxaFrance/oidc-client/commit/9f25be794ff6b08d8ca30cc5f27dff554136d163) - refactor(lint): Enable linting on examples, fix lint warnings. (#1111), 2023-07-27 by *Jason Finch*
+- [762ca42](https://github.com/AxaFrance/oidc-client/commit/762ca423a2efe946d4213a3c482638a386a5b555) - ci(lint): Move eslint config to root. Add GH workflow to run lint. (#1109), 2023-07-27 by *Jason Finch*
+- [6b5ba95](https://github.com/AxaFrance/oidc-client/commit/6b5ba95db3549c4cfd5ea0412c6f0de046256a57) - [skip ci] Update version package.json, 2023-07-24 by *GitHub*
+
+
+## v6.25.6
+
+- [288ce99](https://github.com/AxaFrance/oidc-client/commit/288ce9937e6e1cb8c1b7c7f6909ebef8a48f12e5) - fix(react): ajust peerDependencies (release), 2023-07-24 by *Guillaume Chervet*
+- [7c86bd7](https://github.com/AxaFrance/oidc-client/commit/7c86bd73d0e880a8ebbdfcad70ed5f2492cc0bc3) - [skip ci] Update version package.json, 2023-07-24 by *GitHub*
+
+
+## v6.25.5
+
+- [8786e85](https://github.com/AxaFrance/oidc-client/commit/8786e85190dbc23de4311381b1c59f08673b0436) - fix(ci): github release (release), 2023-07-24 by *Guillaume Chervet*
+- [34ac877](https://github.com/AxaFrance/oidc-client/commit/34ac877f2a82c9e048896bec8d077274216b8619) - [skip ci] Update version package.json, 2023-07-24 by *GitHub*
+
+
+## v6.25.4
+
+- [9139393](https://github.com/AxaFrance/oidc-client/commit/9139393069142b05708f73a64ee81afdfaf0104f) - fix(oidc): Service Worker improper token revocation when logging out and showAccessToken=true (#1104) (release), 2023-07-24 by *kosciolek*
+- [ccc7c42](https://github.com/AxaFrance/oidc-client/commit/ccc7c429cde1da743993d16db17ef343f374f00b) - fix(ci): website and packages psotinstall error when pnpm from root (#1108), 2023-07-24 by *Guillaume Chervet*
+- [d0ede07](https://github.com/AxaFrance/oidc-client/commit/d0ede07c1cd1aaf8526917df299d7a308eb7ea9d) - ci(version): Add a period between version alpha|beta and run_number (#1107) (alpha), 2023-07-24 by *Jason Finch*
+- [254b9f9](https://github.com/AxaFrance/oidc-client/commit/254b9f945bff154e127782522244378a3a224f94) - refactor(post-install): Alter post-install to not have a dependency on 'cpy' (#1106), 2023-07-24 by *Jason Finch*
+- [e04fb4b](https://github.com/AxaFrance/oidc-client/commit/e04fb4b465178e4fe1d1b8e80c41516979e9702f) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
+
+
+## v6.25.3
+
+- [e7aaa2f](https://github.com/AxaFrance/oidc-client/commit/e7aaa2f63614c1fc76f2e66e69877147aae37d8e) - [skip ci] Update version package.json, 2023-07-23 by *GitHub*
+- [aea4aea](https://github.com/AxaFrance/oidc-client/commit/aea4aea5fda1ef7c7ee6e43f8fc8efb2a0797a58) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
+
+
+## v6.25.2
+
+- [26b27a5](https://github.com/AxaFrance/oidc-client/commit/26b27a5d5242ce9bb47530fd48812f21b218c5be) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [612cf26](https://github.com/AxaFrance/oidc-client/commit/612cf26c1fb087c20f7207ae4e6281c2fe9d6a46) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
+- [c72ac31](https://github.com/AxaFrance/oidc-client/commit/c72ac31f723d26737f0223a4aefb84c0c9da7045) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [5472e0a](https://github.com/AxaFrance/oidc-client/commit/5472e0a9e510ba14c38bd205be39b732e877353a) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
+- [c2c8fd3](https://github.com/AxaFrance/oidc-client/commit/c2c8fd37dee118658bd0186ea18f8554fe4217f9) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [945043c](https://github.com/AxaFrance/oidc-client/commit/945043c39376611ba1e417e24d55607a5a4e861b) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
+- [776f0c2](https://github.com/AxaFrance/oidc-client/commit/776f0c22446763d89cd10412c53c964f3dd2bb57) - fix sw package test (alpha), 2023-07-22 by *Guillaume Chervet*
+- [41dd0c3](https://github.com/AxaFrance/oidc-client/commit/41dd0c3d5c03e7af05e849fd35d4bc4a13078826) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [b2ed839](https://github.com/AxaFrance/oidc-client/commit/b2ed8393b061d4da8bbb67003f7940aaa7b845d3) - fix package sw remove private (alpha), 2023-07-22 by *Guillaume Chervet*
+- [edd5b3d](https://github.com/AxaFrance/oidc-client/commit/edd5b3dd1207ca1683ee0f492914fa514cd2b239) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [d3531a6](https://github.com/AxaFrance/oidc-client/commit/d3531a68b78d48e6150f71d22deba738a15391f3) - fix conflict (alpha), 2023-07-22 by *Guillaume Chervet*
+- [852900f](https://github.com/AxaFrance/oidc-client/commit/852900fd1473ac8c07ad298a275430fa91d5fb02) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [8c3e0c9](https://github.com/AxaFrance/oidc-client/commit/8c3e0c99c2507d7a6e198db517fd120cb06f6ac7) - chore(ci): fix duplicated id (alpha), 2023-07-22 by *Guillaume Chervet*
+- [4ccbef0](https://github.com/AxaFrance/oidc-client/commit/4ccbef0417543bf2a7395788315298b873327e7a) - chore(ci): add serviceworker (alpha), 2023-07-22 by *Guillaume Chervet*
+
+
+## v6.25.1
+
+- [b08f00b](https://github.com/AxaFrance/oidc-client/commit/b08f00bf3d4fa8f798ca812abf1a00f19308df84) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [cf3e31a](https://github.com/AxaFrance/oidc-client/commit/cf3e31af027d60626f1bff9a7c0951db115d11c3) - fix(react): update lock file (alpha), 2023-07-22 by *Guillaume Chervet*
+- [e02bc6e](https://github.com/AxaFrance/oidc-client/commit/e02bc6e77114f585e00f7d9d888db1d0a537be88) - chore(ci): fix numversion (alpha), 2023-07-22 by *Guillaume Chervet*
+
+
+## v6.25.0
+
+- [1adff41](https://github.com/AxaFrance/oidc-client/commit/1adff41b96d4e3e44a63670f2e6d1de13e202c7a) - [skip ci] Update version package.json, 2023-07-22 by *GitHub*
+- [7ba2509](https://github.com/AxaFrance/oidc-client/commit/7ba2509271acefb6ff744fb07a464fd7f9c42064) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
+- [4be9aed](https://github.com/AxaFrance/oidc-client/commit/4be9aedde3a81f11aac5f8dfdef4914ce2c0483b) - feat(workspace): Add workspaces to specify build order dependencies in packages. (#1004), 2023-07-22 by *Jason Finch*
+- [d337b8b](https://github.com/AxaFrance/oidc-client/commit/d337b8b574936b81a4a6de9d533076a9da3a848b) - chore(ci): add way to publish alpha, beta, release (beta) (#1099), 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.27
+
+- [2b50407](https://github.com/AxaFrance/oidc-client/commit/2b50407c39bd95fdbbfec2c5f59c7901c189d3ec) - [skip ci] Update version package.json, 2023-07-21 by *GitHub*
+- [e68b26b](https://github.com/AxaFrance/oidc-client/commit/e68b26be8ab30eef9aa46e5e4dd029fa5b3818c3) - test (beta), 2023-07-21 by *Guillaume Chervet*
+- [4e78bbb](https://github.com/AxaFrance/oidc-client/commit/4e78bbbc4fb6f6728e97ee7a0f517bf8eac72998) - Update npm-publish.yml (alpha), 2023-07-20 by *Guillaume Chervet*
+- [8b7eb9b](https://github.com/AxaFrance/oidc-client/commit/8b7eb9bfc29f242132e1cff4952a2342dd610b34) - fix(ci): Update npm-publish.yml (alpha), 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.26
+
+- [cee3198](https://github.com/AxaFrance/oidc-client/commit/cee3198d3ffde50a71e52a5654907b7f4ac013d9) - fix(ci): lastcomiit (alpha), 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.25
+
+- [f449785](https://github.com/AxaFrance/oidc-client/commit/f44978588f1697fe38fea68accbca0408ad6f6c6) - fix(ci): version badly injected, 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.24
+
+- [0a30ab1](https://github.com/AxaFrance/oidc-client/commit/0a30ab1c3ce16df2ee8bb8c7fab4050e6cb1e3f1) - fix(ci): version empty (alpha), 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.23
+
+- [8ae8b23](https://github.com/AxaFrance/oidc-client/commit/8ae8b23d54c3352221bbca638a8f8ad5d2f70459) - fix(ci): bad variable (alpha), 2023-07-20 by *Guillaume Chervet*
+- [8fd627d](https://github.com/AxaFrance/oidc-client/commit/8fd627df3359f24aa2f8a56381b50b2617dc2f53) - chore(ci): add way to publish alpha, beta, release (alpha) (#1099), 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.22
+
+- [1f8b455](https://github.com/AxaFrance/oidc-client/commit/1f8b455107dda34d267e0a6c898c704de88dfa77) - Merge db00519628cbd0a6f865539245321bcc85570f15 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
+- [db00519](https://github.com/AxaFrance/oidc-client/commit/db00519628cbd0a6f865539245321bcc85570f15) - fix test (alpha), 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.21
+
+- [40ec599](https://github.com/AxaFrance/oidc-client/commit/40ec5994043d3a8c294e520e10d24bd5f1e8a02f) - Merge 822f9aba2b245872401fa15905e7e256e4adb879 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
+- [822f9ab](https://github.com/AxaFrance/oidc-client/commit/822f9aba2b245872401fa15905e7e256e4adb879) - test (alpha), 2023-07-20 by *Guillaume Chervet*
+
+
+## v6.24.20
+
+- [9888924](https://github.com/AxaFrance/oidc-client/commit/9888924541c0754c9dd033972d76c3c854e6ed4d) - Merge 13656ac570b3896db17bcf38f2113ae4443dba17 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
+- [13656ac](https://github.com/AxaFrance/oidc-client/commit/13656ac570b3896db17bcf38f2113ae4443dba17) - test (alpha), 2023-07-20 by *Guillaume Chervet*
+
+

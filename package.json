@@ -1,7 +1,7 @@
 {
   "name": "@axafr/react-oidc-monorepo",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.5",
   "description": "Root package for the project",
   "license": "MIT",
   "workspaces": [
