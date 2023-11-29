@@ -1,5 +1,12 @@
 # Changelog
 
+## 7.12.1
+
+- [b621b37](https://github.com/AxaFrance/oidc-client/commit/b621b379eadbe0beae1c1962b2c89b286cbc9a6f) - [skip ci] Update to version 7.12.1 in package.json, 2023-11-29 by *GitHub*
+- [2b5aa6a](https://github.com/AxaFrance/oidc-client/commit/2b5aa6aba61bb35c7ae95102a34a8517c37607e5) - fix(ci): changelog in another commit (release), 2023-11-29 by *Guillaume Chervet*
+- [9f0c851](https://github.com/AxaFrance/oidc-client/commit/9f0c8513a65550a4baee3c143806f072c20cc1c4) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
+
+
 ## v7.12.0
 
 - [23217fe](https://github.com/AxaFrance/oidc-client/commit/23217fe3439500412eca9facc368e1ef5dfcb939) - feat(oidc-client): export OidcClient instance for client application (#1211) (release), 2023-11-29 by *Douglas Zaltron*
@@ -374,11 +381,5 @@
 
 - [d99b335](https://github.com/AxaFrance/oidc-client/commit/d99b335f24c80e9a752b88275c7831617a68401f) - Merge b1cc89793d89a3bf821d917a99f0b7519526b030 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
 - [b1cc897](https://github.com/AxaFrance/oidc-client/commit/b1cc89793d89a3bf821d917a99f0b7519526b030) - fix(ci): test (alpha), 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.10
-
-- [3fc3e9e](https://github.com/AxaFrance/oidc-client/commit/3fc3e9e2dd5a0c7758d53b1c87570d79906a410c) - Merge 2306e7a6b66ac207993f42b83d146566d2b55a83 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
-- [2306e7a](https://github.com/AxaFrance/oidc-client/commit/2306e7a6b66ac207993f42b83d146566d2b55a83) - fix(ci): test (alpha), 2023-07-20 by *Guillaume Chervet*
 
 
