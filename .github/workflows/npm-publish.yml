@@ -248,6 +248,13 @@ jobs:
           sed -i 's/"@axa-fr\/oidc-client": "[^"]*"/"@axa-fr\/oidc-client": "workspace:*"/g' package.json
           cat package.json
         working-directory: ./packages/react-oidc
+        
+      - name: auto generate changelog
+        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
+        run: |
+          chmod +x ./bin/generate-changelog.sh
+          ./bin/generate-changelog.sh
+        working-directory: ./packages/react-oidc
           
       - name: Commit updates package.json
         uses: stefanzweifel/git-auto-commit-action@v4

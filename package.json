@@ -1,7 +1,7 @@
 {
   "name": "@axafr/react-oidc-monorepo",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.5",
   "description": "Root package for the project",
   "license": "MIT",
   "workspaces": [
@@ -24,7 +24,8 @@
     "lint-fix": "eslint --cache --fix .",
     "outdated": "pnpm outdated -r",
     "test": "pnpm run test --workspaces --if-present",
-    "build": "pnpm -r --filter=./packages/* run build"
+    "build": "pnpm -r --filter=./packages/* run build",
+    "changelog": "standard-version"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -42,6 +43,7 @@
     "eslint-plugin-regexp": "^1.15.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-testing-library": "^5.11.0",
+    "standard-version": "*",
     "prettier": "^3.0.0",
     "tslib": "^2.6.0",
     "tsx": "^3.12.7",
