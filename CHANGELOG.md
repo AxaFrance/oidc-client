@@ -1,11 +1,5 @@
 # Changelog
 
-- [](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) (, )
-- ["](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) ((grafted,, HEAD)
-- [[](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) (, )
-- [](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) (, )
-- [test](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) ((release)",, )
-- [Chervet",](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) (, )
-- [](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) (, )
-- [](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) (, )
-- [](https://github.com/AxaFrance/oidc-client/commit/ commit_hash ) (, )
+
+##  (grafted
+- [ origin/main)]('https://github.com/AxaFrance/oidc-client'/commit/ HEAD -> main) (edb89b3, fix (release),Guillaume Chervet,2023-11-29)
