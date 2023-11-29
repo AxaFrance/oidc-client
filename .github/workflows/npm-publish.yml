@@ -249,7 +249,7 @@ jobs:
           cat package.json
         working-directory: ./packages/react-oidc
         
-      - name: auto generate changelog
+      - name: Auto generate changelog
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         run: |
           chmod +x ./bin/generate-changelog.sh
