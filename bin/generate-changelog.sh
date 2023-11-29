@@ -1,6 +1,8 @@
 #!/bin/bash
 
 num_tags=60
+excluded_author="GitHub"
+
 # Get all tag names in reverse order
 tags=(`git tag -l --sort=-creatordate | head -$num_tags`)
 
@@ -30,13 +32,19 @@ hashes=(`git log --pretty=format:"%H" $previous..$current`)
 # Output commit log for each hash
 for hash in ${hashes[@]}
 do
-# Get commit log in desired format.
-# You can modify the 'format' as per your need. Please refer 'PRETTY FORMATS' section of git-log man page
-log=$(git log -1 --pretty=format:"[%h](https://github.com/AxaFrance/oidc-client/commit/%H) - %s, %ad by *%an*" --date=short $hash)
+    # Check the author of the commit
+    author=$(git log -1 --pretty=format:"%an" $hash)
 
-# Write formatted log to CHANGELOG.md file
-echo "- $log" >> $outfile
-echo "- $log"
+    # Exclude commits from the specified author
+    if [ "$author" != "$excluded_author" ]; then
+      # Get commit log in the desired format.
+      # You can modify the 'format' as per your need. Please refer 'PRETTY FORMATS' section of git-log man page
+      log=$(git log -1 --pretty=format:"[%h](https://github.com/AxaFrance/oidc-client/commit/%H) - %s, %ad by *%an*" --date=short $hash)
+
+      # Write formatted log to CHANGELOG.md file
+      echo "- $log" >> $outfile
+      echo "- $log"
+    fi
 done
 
 # Space between two tags
