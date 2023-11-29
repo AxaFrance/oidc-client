@@ -10,12 +10,23 @@ echo "" >> $CHANGELOG_FILE
 # URL de base du repository Git
 REPO_URL="https://github.com/AxaFrance/oidc-client"
 
-# Récupérer les 100 derniers commits avec les tags et les versions au format JSON
-git log -n 100 --pretty=format:'{"tag":"%d", "hash":"%h", "message":"%s", "author":"%an", "date":"%ad"}' --date=short --decorate=short --branches --tags --remotes --glob=refs/heads/* --glob=refs/tags/* --glob=refs/remotes/* --date-order --no-abbrev-commit | \
-jq -r 'select(.tag != null) | .tag |= sub("tag: "; "") | .tag + "," + .hash + "," + .message + "," + .author + "," + .date' | \
-while IFS=',' read -r tag commit_hash commit_message commit_author commit_date; do
-    if [ ! -z "$tag" ]; then
-        echo -e "\n## $tag" >> $CHANGELOG_FILE
+
+# Récupérer les 100 derniers commits avec les tags et les versions
+git log -n 100 --pretty=format:"%d %s [%h] (%an, %ad)" --date=short | \
+while IFS= read -r line; do
+    if [[ $line == *tag:* ]]; then
+        if [ ! -z "$tag" ]; then
+            echo -e "\n## $tag"
+        fi
+        tag=$(echo "$line" | awk '{print $2}' | tr -d '(),')
+    else
+        commit_hash=$(echo "$line" | awk '{print $3}')
+        commit_message=$(echo "$line" | awk '{$1=$2=$3=""; print $0}')
+        echo "- [$commit_message]($REPO_URL/commit/$commit_hash)"
     fi
-    echo "- [$commit_message]('$REPO_URL'/commit/$commit_hash) ($commit_author, $commit_date)" >> $CHANGELOG_FILE
-done
+done >> $CHANGELOG_FILE
+
+# Ajouter le dernier tag s'il existe
+if [ ! -z "$tag" ]; then
+    echo -e "\n## $tag" >> $CHANGELOG_FILE
+fi
