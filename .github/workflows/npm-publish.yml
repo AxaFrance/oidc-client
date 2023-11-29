@@ -252,12 +252,6 @@ jobs:
           cat package.json
         working-directory: ./packages/react-oidc
         
-      - name: Auto generate changelog
-        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
-        run: |
-          chmod +x ./bin/generate-changelog.sh
-          ./bin/generate-changelog.sh
-        
       - name: Commit and push 
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         run: |
