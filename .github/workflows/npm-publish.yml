@@ -56,6 +56,8 @@ jobs:
         working-directory: ./packages/oidc-client
 
   build:
+    permissions:
+      contents: write
     environment: react-oidc
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
@@ -256,18 +258,32 @@ jobs:
           chmod +x ./bin/generate-changelog.sh
           ./bin/generate-changelog.sh
         
-          
-      - name: Commit updates package.json
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Commit and push 
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
-        with:
-          commit_message: "[skip ci] Update version package.json"
-          commit_user_name: GitHub
-          commit_user_email: github-action@bot.com
-          commit_author: GitHub <github-action@bot.com>
-          push_options: '--force'
-      
+        run: |
+          git config --global user.name "GitHub"
+          git config --global user.email "github-action@bot.com"
+          git add .
+          git commit -m "[skip ci] Update to version ${{ steps.tag.outputs.new_version }} in package.json"
+          git tag ${{ steps.tag.outputs.new_version }}
+          git push --set-upstream origin "HEAD:main" --follow-tags -f
 
+          chmod +x ./bin/generate-changelog.sh
+          ./bin/generate-changelog.sh
+          git add .
+          git commit -m "[skip ci] Generate changelog to version ${{ steps.tag.outputs.new_version }}"
+          git push --set-upstream origin "HEAD:main" --follow-tags -f
+          
+      #- name: Commit updates package.json
+      #  uses: stefanzweifel/git-auto-commit-action@v4
+      #  if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
+      #  with:
+      #    commit_message: "[skip ci] Update version package.json"
+      #    commit_user_name: GitHub
+      #    commit_user_email: github-action@bot.com
+      #    commit_author: GitHub <github-action@bot.com>
+      #    push_options: '--force'
+      
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.head.repo.fork
