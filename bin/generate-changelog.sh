@@ -1,32 +1,21 @@
-﻿#!/bin/bash
+#!/bin/bash
 
-# Nom du fichier changelog
 CHANGELOG_FILE="CHANGELOG.md"
-
-# En-tête du changelog
 echo "# Changelog" > $CHANGELOG_FILE
 echo "" >> $CHANGELOG_FILE
 
-# URL de base du repository Git
 REPO_URL="https://github.com/AxaFrance/oidc-client"
 
-
-# Récupérer les 100 derniers commits avec les tags et les versions
-git log -n 100 --pretty=format:"%d %s [%h] (%an, %ad)" --date=short | \
-while IFS= read -r line; do
-    if [[ $line == *tag:* ]]; then
-        if [ ! -z "$tag" ]; then
-            echo -e "\n## $tag"
-        fi
-        tag=$(echo "$line" | awk '{print $2}' | tr -d '(),')
-    else
-        commit_hash=$(echo "$line" | awk '{print $3}')
-        commit_message=$(echo "$line" | awk '{$1=$2=$3=""; print $0}')
-        echo "- [$commit_message]($REPO_URL/commit/$commit_hash)"
-    fi
-done >> $CHANGELOG_FILE
-
-# Ajouter le dernier tag s'il existe
+git log -n 100 --pretty=format:"%h%x09%an%x09%ad%x09%s%d" --date=short | while IFS= read -r line
+do
+read -r commit_hash commit_author commit_date commit_message remainder <<<"$line"
+if [[ $remainder = *tag:* ]]; then
 if [ ! -z "$tag" ]; then
-    echo -e "\n## $tag" >> $CHANGELOG_FILE
+echo -e "\n## $tag" >> $CHANGELOG_FILE
 fi
+tag=$(echo "$remainder" | grep -o "tag: [v.*[0-9]]*" | awk '{print $2}' | tr -d '(),')
+echo -e "\n## $tag" >> $CHANGELOG_FILE
+fi
+# Generer un lien en bonne et due forme pour chaque commit
+echo "- [$commit_message]($REPO_URL/commit/$commit_hash) - by $commit_author on $commit_date" >> $CHANGELOG_FILE
+done
