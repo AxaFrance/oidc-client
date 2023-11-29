@@ -1,8 +1,7 @@
 # Changelog
 
-## 7.12.1
+## v7.12.1
 
-- [b621b37](https://github.com/AxaFrance/oidc-client/commit/b621b379eadbe0beae1c1962b2c89b286cbc9a6f) - [skip ci] Update to version 7.12.1 in package.json, 2023-11-29 by *GitHub*
 - [2b5aa6a](https://github.com/AxaFrance/oidc-client/commit/2b5aa6aba61bb35c7ae95102a34a8517c37607e5) - fix(ci): changelog in another commit (release), 2023-11-29 by *Guillaume Chervet*
 - [9f0c851](https://github.com/AxaFrance/oidc-client/commit/9f0c8513a65550a4baee3c143806f072c20cc1c4) - [skip ci] Update version package.json, 2023-11-29 by *GitHub*
 
