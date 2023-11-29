@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@axa-fr/oidc-client": "workspace:~",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "typescript": "^5.1.6",
