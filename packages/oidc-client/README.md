@@ -55,7 +55,7 @@ The service worker catch **access_token** and **refresh_token** that will never 
 npm install @axa-fr/oidc-client --save
 
 # To install or update OidcServiceWorker.js file, you can run
-node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public
+node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
 
 # If you have a "public" folder, the 2 files will be created :
 # ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
@@ -66,7 +66,7 @@ WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should a
 ```sh
   "scripts": {
     ...
-    "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
+    "postinstall": "node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public"
   },
 ```
 
