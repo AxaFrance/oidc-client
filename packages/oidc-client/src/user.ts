@@ -8,7 +8,7 @@ export const userInfoAsync = (oidc) => async (noCache = false) => {
 
     // We wait the synchronisation before making a request
     while (oidc.tokens && !isTokensValid(oidc.tokens)) {
-        await sleepAsync(200);
+        await sleepAsync({milliseconds: 200});
     }
 
     if (!oidc.tokens) {

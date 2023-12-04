@@ -194,9 +194,10 @@ const configuration = {
     refresh_time_before_tokens_expiration_in_second: Number, // default is 120 seconds
     service_worker_relative_url: String,
     service_worker_keep_alive_path: String, // default is "/"
-    service_worker_only: Boolean, // default false
-    service_worker_activate: () => boolean, // you can take the control of the service worker default activation which use user agent string
+    service_worker_only: Boolean, // default false, if true, the user will not be able to login if the service worker is not available on its browser
+    service_worker_activate: () => boolean, // you can take the control of the service worker default activation which use user agent string, if return false, the service worker mode will not be used
     service_worker_update_require_callback: (registration:any, stopKeepAlive:Function) => Promise<void>, // callback called when service worker need to be updated, you can take the control of the update process
+    service_worker_register: (url: string) => Promise<ServiceWorkerRegistration>, // Optional, you can take the control of the service worker registration
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
     authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in seconds of the openid well-known URL, default is 1 hour

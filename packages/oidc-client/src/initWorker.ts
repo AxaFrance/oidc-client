@@ -6,7 +6,7 @@ import {ILOidcLocation} from "./location";
 
 let keepAliveServiceWorkerTimeoutId = null;
 let keepAliveController;
-export const sleepAsync = (milliseconds) => {
+export const sleepAsync = ({milliseconds}: { milliseconds: any }) => {
     return new Promise(resolve => timer.setTimeout(resolve, milliseconds));
 };
 
@@ -16,7 +16,7 @@ const keepAlive = (service_worker_keep_alive_path='/') => {
         keepAliveController = new AbortController();
         const promise = fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`, { signal: keepAliveController.signal });
         promise.catch(error => { console.log(error); });
-        sleepAsync(minSleepSeconds * 1000).then(keepAlive);
+        sleepAsync({milliseconds: minSleepSeconds * 1000}).then(keepAlive);
     } catch (error) { console.log(error); }
 };
 
@@ -41,7 +41,7 @@ export const defaultServiceWorkerUpdateRequireCallback = (location:ILOidcLocatio
     await registration.update();
     const isSuccess = await registration.unregister();
     console.log(`Service worker unregistering ${isSuccess}`)
-    await sleepAsync(2000);
+    await sleepAsync({milliseconds: 2000});
     location.reload();
 }
 
@@ -72,7 +72,12 @@ export const initWorkerAsync = async(configuration, configurationName) => {
         return null;
     }
 
-    const registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
+    let registration = null;
+    if(configuration.register) {
+        registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
+    } else {
+        registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);   
+    }
 
     try {
         await navigator.serviceWorker.ready;

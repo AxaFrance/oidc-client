@@ -3,6 +3,7 @@ export type Fetch = typeof window.fetch;
 export type LogoutToken = 'access_token' | 'refresh_token';
 
 export type ServiceWorkerUpdateRequireCallback = (registration:any, stopKeepAlive:Function) => Promise<void>;
+export type ServiceWorkerRegister = (serviceWorkerRelativeUrl:string) => Promise<ServiceWorkerRegistration>;
 export type ServiceWorkerActivate = () => boolean;
 
 export type OidcConfiguration = {
@@ -19,6 +20,7 @@ export type OidcConfiguration = {
     refresh_time_before_tokens_expiration_in_second?: number;
     token_request_timeout?: number;
     service_worker_relative_url?:string;
+    service_worker_register?:ServiceWorkerRegister;
     service_worker_keep_alive_path?:string;
     service_worker_activate?:ServiceWorkerActivate;
     service_worker_only?:boolean;

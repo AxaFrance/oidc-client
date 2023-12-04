@@ -173,7 +173,7 @@ export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWa
         return null;
     }
     while (!isTokensValid(oidc.tokens) && numberWaitTemp > 0) {
-        await sleepAsync(waitMs);
+        await sleepAsync({milliseconds: waitMs});
         numberWaitTemp = numberWaitTemp - 1;
     }
     const isValid = isTokensValid(oidc.tokens);
