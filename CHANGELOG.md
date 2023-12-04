@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.12.12
+## 7.13.0
+
+- [49c3d5e](https://github.com/AxaFrance/oidc-client/commit/49c3d5e5487d714ccd97272e37fc34f2a7bd0ff6) - feat(oidc-client): allow to take control on service-worker registration (release) (#1229), 2023-12-04 by *Guillaume Chervet*
+
+
+## v7.12.12
 
 - [b070c88](https://github.com/AxaFrance/oidc-client/commit/b070c8848582ac6f52ab7cb00f16b0fe9f702b5f) - fix(oidc-client): Update README.md (release), 2023-11-30 by *Guillaume Chervet*
 
@@ -326,11 +331,5 @@
 
 - [8ae8b23](https://github.com/AxaFrance/oidc-client/commit/8ae8b23d54c3352221bbca638a8f8ad5d2f70459) - fix(ci): bad variable (alpha), 2023-07-20 by *Guillaume Chervet*
 - [8fd627d](https://github.com/AxaFrance/oidc-client/commit/8fd627df3359f24aa2f8a56381b50b2617dc2f53) - chore(ci): add way to publish alpha, beta, release (alpha) (#1099), 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.22
-
-- [1f8b455](https://github.com/AxaFrance/oidc-client/commit/1f8b455107dda34d267e0a6c898c704de88dfa77) - Merge db00519628cbd0a6f865539245321bcc85570f15 into 3e535c94dc57d59956498bfa0ca9536106039bda, 2023-07-20 by *Guillaume Chervet*
-- [db00519](https://github.com/AxaFrance/oidc-client/commit/db00519628cbd0a6f865539245321bcc85570f15) - fix test (alpha), 2023-07-20 by *Guillaume Chervet*
 
 
