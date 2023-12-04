@@ -352,18 +352,18 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     async synchroniseTokensAsync(refreshToken, index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) {
         while (!navigator.onLine && document.hidden) {
-            await sleepAsync(1000);
+            await sleepAsync({milliseconds: 1000});
             this.publishEvent(eventNames.refreshTokensAsync, { message: 'wait because navigator is offline and hidden' });
         }
         let numberTryOnline = 6;
         while (!navigator.onLine && numberTryOnline > 0) {
-            await sleepAsync(1000);
+            await sleepAsync({milliseconds: 1000});
             numberTryOnline--;
             this.publishEvent(eventNames.refreshTokensAsync, { message: `wait because navigator is offline try ${numberTryOnline}` });
         }
         let numberTryHidden = Math.floor(Math.random() * 15) + 10;
         while (document.hidden && numberTryHidden > 0) {
-            await sleepAsync(1000);
+            await sleepAsync({milliseconds: 1000});
             numberTryHidden--;
             this.publishEvent(eventNames.refreshTokensAsync, { message: `wait because navigator is hidden try ${numberTryHidden}` });
         }
