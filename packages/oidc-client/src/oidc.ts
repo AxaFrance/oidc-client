@@ -112,6 +112,7 @@ export class Oidc {
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
           service_worker_update_require_callback,
           service_worker_activate: configuration.service_worker_activate ?? activateServiceWorker,
+          storage: configuration.storage ?? sessionStorage,
       };
       
       this.getFetch = getFetch ?? getFetchDefault;
@@ -360,12 +361,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             await sleepAsync({milliseconds: 1000});
             numberTryOnline--;
             this.publishEvent(eventNames.refreshTokensAsync, { message: `wait because navigator is offline try ${numberTryOnline}` });
-        }
-        let numberTryHidden = Math.floor(Math.random() * 15) + 10;
-        while (document.hidden && numberTryHidden > 0) {
-            await sleepAsync({milliseconds: 1000});
-            numberTryHidden--;
-            this.publishEvent(eventNames.refreshTokensAsync, { message: `wait because navigator is hidden try ${numberTryHidden}` });
         }
         const isDocumentHidden = document.hidden;
         const nextIndex = isDocumentHidden ? index : index + 1;
