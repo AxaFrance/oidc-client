@@ -5,28 +5,39 @@ import { computeTimeLeft } from './parseTokens.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
 
+async function syncTokens(oidc, refreshToken, forceRefresh: boolean, extras: StringMap) {
+    const updateTokens = (tokens) => {
+        oidc.tokens = tokens;
+    };
+    const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras, updateTokens);
+
+    const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
+    if (!serviceWorker) {
+        const session = initSession(oidc.configurationName, oidc.configuration.storage);
+        await session.setTokens(oidc.tokens);
+    }
+
+    if (!oidc.tokens) {
+        await oidc.destroyAsync(status);
+        return null;
+    }
+    return tokens;
+}
+
 export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh = false, extras:StringMap = null) {
 
     const configuration = oidc.configuration;
     const lockResourcesName = `${configuration.client_id}_${oidc.configurationName}_${configuration.authority}`;
-    const tokens = await navigator.locks.request(lockResourcesName, async (lock) => {
-        const updateTokens = (tokens) => {
-            oidc.tokens = tokens;
-        };
-        const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras, updateTokens);
-
-        const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
-        if (!serviceWorker) {
-            const session = initSession(oidc.configurationName, oidc.configuration.storage);
-            await session.setTokens(oidc.tokens);
-        }
-
-        if (!oidc.tokens) {
-            await oidc.destroyAsync(status);
-            return null;
-        }
-        return tokens
-    });
+    
+    let tokens = null;
+    const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
+    if(configuration.storage === window.sessionStorage && !serviceWorker) {
+        tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
+    } else {
+        tokens = await navigator.locks.request(lockResourcesName, async (lock) => {
+            return await syncTokens(oidc, refreshToken, forceRefresh, extras);
+        });
+    }
     if(!tokens){
         return null;
     }
