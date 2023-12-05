@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.0
+## 7.13.1
+
+- [96637a7](https://github.com/AxaFrance/oidc-client/commit/96637a73252e9ea34d8687409131f58f09633da6) - fix(oidc): sessions storage renew tokens (release) (#1230), 2023-12-05 by *Guillaume Chervet*
+
+
+## v7.13.0
 
 - [49c3d5e](https://github.com/AxaFrance/oidc-client/commit/49c3d5e5487d714ccd97272e37fc34f2a7bd0ff6) - feat(oidc-client): allow to take control on service-worker registration (release) (#1229), 2023-12-04 by *Guillaume Chervet*
 
@@ -325,11 +330,5 @@
 ## v6.24.24
 
 - [0a30ab1](https://github.com/AxaFrance/oidc-client/commit/0a30ab1c3ce16df2ee8bb8c7fab4050e6cb1e3f1) - fix(ci): version empty (alpha), 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.23
-
-- [8ae8b23](https://github.com/AxaFrance/oidc-client/commit/8ae8b23d54c3352221bbca638a8f8ad5d2f70459) - fix(ci): bad variable (alpha), 2023-07-20 by *Guillaume Chervet*
-- [8fd627d](https://github.com/AxaFrance/oidc-client/commit/8fd627df3359f24aa2f8a56381b50b2617dc2f53) - chore(ci): add way to publish alpha, beta, release (alpha) (#1099), 2023-07-20 by *Guillaume Chervet*
 
 
