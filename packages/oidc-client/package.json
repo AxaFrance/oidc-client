@@ -31,7 +31,7 @@
     "cpy": "^10.1.0",
     "cpy-cli": "^5.0.0",
     "rimraf": "5.0.1",
-    "typescript": "5.1.6",
+    "typescript": "5.3.3",
     "vite": "^4.4.12",
     "vite-plugin-dts": "^3.6.4",
     "vitest": "^0.33.0"
