@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.5
+## 7.13.6
+
+- [da77bb9](https://github.com/AxaFrance/oidc-client/commit/da77bb912b61e5aad93c53e84ce4fbea2a503fb2) - build(npm): bump typescript from 5.1.6 to 5.3.3 (#1232), 2023-12-07 by *dependabot[bot]*
+
+
+## v7.13.5
 
 - [8f5f888](https://github.com/AxaFrance/oidc-client/commit/8f5f888fe34d739ded51f611e194d77a2e788830) - build(npm): bump eslint-plugin-regexp from 1.15.0 to 2.1.2 (#1233), 2023-12-07 by *dependabot[bot]*
 
@@ -321,12 +326,5 @@
 
 - [cf3e31a](https://github.com/AxaFrance/oidc-client/commit/cf3e31af027d60626f1bff9a7c0951db115d11c3) - fix(react): update lock file (alpha), 2023-07-22 by *Guillaume Chervet*
 - [e02bc6e](https://github.com/AxaFrance/oidc-client/commit/e02bc6e77114f585e00f7d9d888db1d0a537be88) - chore(ci): fix numversion (alpha), 2023-07-22 by *Guillaume Chervet*
-
-
-## v6.25.0
-
-- [7ba2509](https://github.com/AxaFrance/oidc-client/commit/7ba2509271acefb6ff744fb07a464fd7f9c42064) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
-- [4be9aed](https://github.com/AxaFrance/oidc-client/commit/4be9aedde3a81f11aac5f8dfdef4914ce2c0483b) - feat(workspace): Add workspaces to specify build order dependencies in packages. (#1004), 2023-07-22 by *Jason Finch*
-- [d337b8b](https://github.com/AxaFrance/oidc-client/commit/d337b8b574936b81a4a6de9d533076a9da3a848b) - chore(ci): add way to publish alpha, beta, release (beta) (#1099), 2023-07-20 by *Guillaume Chervet*
 
 
