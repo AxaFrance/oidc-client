@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.1
+## 7.13.2
+
+- [430a06b](https://github.com/AxaFrance/oidc-client/commit/430a06b27b2f7164bc1557a2e55e547b5af3d8d7) - build(npm): bump vite from 4.4.7 to 4.4.12 (#1231), 2023-12-07 by *dependabot[bot]*
+
+
+## v7.13.1
 
 - [96637a7](https://github.com/AxaFrance/oidc-client/commit/96637a73252e9ea34d8687409131f58f09633da6) - fix(oidc): sessions storage renew tokens (release) (#1230), 2023-12-05 by *Guillaume Chervet*
 
@@ -325,10 +330,5 @@
 ## v6.24.25
 
 - [f449785](https://github.com/AxaFrance/oidc-client/commit/f44978588f1697fe38fea68accbca0408ad6f6c6) - fix(ci): version badly injected, 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.24
-
-- [0a30ab1](https://github.com/AxaFrance/oidc-client/commit/0a30ab1c3ce16df2ee8bb8c7fab4050e6cb1e3f1) - fix(ci): version empty (alpha), 2023-07-20 by *Guillaume Chervet*
 
 
