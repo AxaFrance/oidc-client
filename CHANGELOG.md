@@ -1,6 +1,21 @@
 # Changelog
 
-## 7.13.2
+## 7.13.5
+
+- [8f5f888](https://github.com/AxaFrance/oidc-client/commit/8f5f888fe34d739ded51f611e194d77a2e788830) - build(npm): bump eslint-plugin-regexp from 1.15.0 to 2.1.2 (#1233), 2023-12-07 by *dependabot[bot]*
+
+
+## v7.13.4
+
+- [33a9c83](https://github.com/AxaFrance/oidc-client/commit/33a9c8349f23d98960fb4c60f49d7fd19572cca5) - build(npm): bump react-router-dom from 6.14.2 to 6.20.1 (#1234), 2023-12-07 by *dependabot[bot]*
+
+
+## v7.13.3
+
+- [43eac59](https://github.com/AxaFrance/oidc-client/commit/43eac59f1598ab6a5b07dc52deed95297c73f875) - build(npm): bump vite-plugin-dts from 3.4.0 to 3.6.4 (#1227), 2023-12-07 by *dependabot[bot]*
+
+
+## v7.13.2
 
 - [430a06b](https://github.com/AxaFrance/oidc-client/commit/430a06b27b2f7164bc1557a2e55e547b5af3d8d7) - build(npm): bump vite from 4.4.7 to 4.4.12 (#1231), 2023-12-07 by *dependabot[bot]*
 
@@ -313,22 +328,5 @@
 - [7ba2509](https://github.com/AxaFrance/oidc-client/commit/7ba2509271acefb6ff744fb07a464fd7f9c42064) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
 - [4be9aed](https://github.com/AxaFrance/oidc-client/commit/4be9aedde3a81f11aac5f8dfdef4914ce2c0483b) - feat(workspace): Add workspaces to specify build order dependencies in packages. (#1004), 2023-07-22 by *Jason Finch*
 - [d337b8b](https://github.com/AxaFrance/oidc-client/commit/d337b8b574936b81a4a6de9d533076a9da3a848b) - chore(ci): add way to publish alpha, beta, release (beta) (#1099), 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.27
-
-- [e68b26b](https://github.com/AxaFrance/oidc-client/commit/e68b26be8ab30eef9aa46e5e4dd029fa5b3818c3) - test (beta), 2023-07-21 by *Guillaume Chervet*
-- [4e78bbb](https://github.com/AxaFrance/oidc-client/commit/4e78bbbc4fb6f6728e97ee7a0f517bf8eac72998) - Update npm-publish.yml (alpha), 2023-07-20 by *Guillaume Chervet*
-- [8b7eb9b](https://github.com/AxaFrance/oidc-client/commit/8b7eb9bfc29f242132e1cff4952a2342dd610b34) - fix(ci): Update npm-publish.yml (alpha), 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.26
-
-- [cee3198](https://github.com/AxaFrance/oidc-client/commit/cee3198d3ffde50a71e52a5654907b7f4ac013d9) - fix(ci): lastcomiit (alpha), 2023-07-20 by *Guillaume Chervet*
-
-
-## v6.24.25
-
-- [f449785](https://github.com/AxaFrance/oidc-client/commit/f44978588f1697fe38fea68accbca0408ad6f6c6) - fix(ci): version badly injected, 2023-07-20 by *Guillaume Chervet*
 
 
