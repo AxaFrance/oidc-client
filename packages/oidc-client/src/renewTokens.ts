@@ -34,7 +34,8 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     if(configuration.storage === window.sessionStorage && !serviceWorker) {
         tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
     } else {
-        tokens = await navigator.locks.request(lockResourcesName, async (lock) => {
+        tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
+            oidc.publishEvent('Lock executed', lock);
             return await syncTokens(oidc, refreshToken, forceRefresh, extras);
         });
     }
