@@ -112,7 +112,6 @@ export class Oidc {
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
           service_worker_update_require_callback,
           service_worker_activate: configuration.service_worker_activate ?? activateServiceWorker,
-          storage: configuration.storage ?? sessionStorage,
       };
       
       this.getFetch = getFetch ?? getFetchDefault;

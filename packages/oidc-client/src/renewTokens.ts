@@ -31,17 +31,20 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     
     let tokens = null;
     const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
-    if(configuration.storage === window.sessionStorage && !serviceWorker) {
+    if(configuration?.storage === window?.sessionStorage && !serviceWorker) {
         tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
     } else {
         tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
-            oidc.publishEvent('Lock executed', lock);
+            if(!lock){
+                return tokens;
+            }
             return await syncTokens(oidc, refreshToken, forceRefresh, extras);
         });
     }
     if(!tokens){
         return null;
     }
+    
     if (oidc.timeoutId) {
         oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, extras);
     }
