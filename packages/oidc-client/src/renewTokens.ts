@@ -34,13 +34,18 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     if(configuration?.storage === window?.sessionStorage && !serviceWorker) {
         tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
     } else {
-        tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
-            if(!lock){
-                return tokens;
-            }
-            return await syncTokens(oidc, refreshToken, forceRefresh, extras);
+        const controller = new AbortController();
+        const timeout = Math.max(configuration.token_request_timeout??0, configuration.silent_login_timeout??0, 20000);
+        const timeoutId = timer.setTimeout(() => {
+            controller.abort();
+            }, timeout);
+        tokens = await navigator.locks.request(lockResourcesName, { signal: controller.signal }, async () => {
+            const tokens =  await syncTokens(oidc, refreshToken, forceRefresh, extras);
+            timer.clearTimeout(timeoutId);
+            return tokens;
         });
     }
+    
     if(!tokens){
         return null;
     }
@@ -48,6 +53,7 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     if (oidc.timeoutId) {
         oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, extras);
     }
+    
     return oidc.tokens;
 }
 
