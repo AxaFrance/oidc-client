@@ -2,6 +2,7 @@
 
 num_tags=60
 excluded_author="GitHub"
+project_url="https://github.com/AxaFrance/oidc-client/commit"
 
 # Get all tag names in reverse order
 tags=(`git tag -l --sort=-creatordate | head -$num_tags`)
@@ -39,7 +40,7 @@ do
     if [ "$author" != "$excluded_author" ]; then
       # Get commit log in the desired format.
       # You can modify the 'format' as per your need. Please refer 'PRETTY FORMATS' section of git-log man page
-      log=$(git log -1 --pretty=format:"[%h](https://github.com/AxaFrance/oidc-client/commit/%H) - %s, %ad by *%an*" --date=short $hash)
+      log=$(git log -1 --pretty=format:"[%h]($project_url/%H) - %s, %ad by *%an*" --date=short $hash)
 
       # Write formatted log to CHANGELOG.md file
       echo "- $log" >> $outfile
