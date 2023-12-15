@@ -1,6 +1,14 @@
 # Changelog
 
-## 7.13.6
+## 7.13.7
+
+- [6667eab](https://github.com/AxaFrance/oidc-client/commit/6667eabc8c5cb0ff5874b6583b2223721bd18525) - fix(oidc): temporary fix on lock need to be continued but require refactor (release), 2023-12-15 by *Guillaume Chervet*
+- [23c8715](https://github.com/AxaFrance/oidc-client/commit/23c87152e55c8d7f1c51a33032d48c751b15c4c5) - fix(ci): clean changelog generation, 2023-12-15 by *Guillaume Chervet*
+- [9f1f7f6](https://github.com/AxaFrance/oidc-client/commit/9f1f7f684a6b344f59221caf3e3a14faef73a6bc) - fix(oidc): session storage for next (#1240) (alpha), 2023-12-12 by *Guillaume Chervet*
+- [64a8df3](https://github.com/AxaFrance/oidc-client/commit/64a8df3281f95159a60e5f9ec61db315a8d20c7d) - fix(oidc-client): make locks work only ifAvailable (#1237)(alpha), 2023-12-09 by *abhilashlr*
+
+
+## v7.13.6
 
 - [da77bb9](https://github.com/AxaFrance/oidc-client/commit/da77bb912b61e5aad93c53e84ce4fbea2a503fb2) - build(npm): bump typescript from 5.1.6 to 5.3.3 (#1232), 2023-12-07 by *dependabot[bot]*
 
@@ -320,11 +328,5 @@
 - [d3531a6](https://github.com/AxaFrance/oidc-client/commit/d3531a68b78d48e6150f71d22deba738a15391f3) - fix conflict (alpha), 2023-07-22 by *Guillaume Chervet*
 - [8c3e0c9](https://github.com/AxaFrance/oidc-client/commit/8c3e0c99c2507d7a6e198db517fd120cb06f6ac7) - chore(ci): fix duplicated id (alpha), 2023-07-22 by *Guillaume Chervet*
 - [4ccbef0](https://github.com/AxaFrance/oidc-client/commit/4ccbef0417543bf2a7395788315298b873327e7a) - chore(ci): add serviceworker (alpha), 2023-07-22 by *Guillaume Chervet*
-
-
-## v6.25.1
-
-- [cf3e31a](https://github.com/AxaFrance/oidc-client/commit/cf3e31af027d60626f1bff9a7c0951db115d11c3) - fix(react): update lock file (alpha), 2023-07-22 by *Guillaume Chervet*
-- [e02bc6e](https://github.com/AxaFrance/oidc-client/commit/e02bc6e77114f585e00f7d9d888db1d0a537be88) - chore(ci): fix numversion (alpha), 2023-07-22 by *Guillaume Chervet*
 
 
