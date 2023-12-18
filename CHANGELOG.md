@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.7
+## 7.13.8
+
+- [b0cf4ad](https://github.com/AxaFrance/oidc-client/commit/b0cf4ad52df9c16c130cce791b05ceea7c4370c4) - fix(oidc): temp renew token fix (#1245) (release), 2023-12-18 by *Guillaume Chervet*
+
+
+## v7.13.7
 
 - [6667eab](https://github.com/AxaFrance/oidc-client/commit/6667eabc8c5cb0ff5874b6583b2223721bd18525) - fix(oidc): temporary fix on lock need to be continued but require refactor (release), 2023-12-15 by *Guillaume Chervet*
 - [23c8715](https://github.com/AxaFrance/oidc-client/commit/23c87152e55c8d7f1c51a33032d48c751b15c4c5) - fix(ci): clean changelog generation, 2023-12-15 by *Guillaume Chervet*
@@ -316,17 +321,5 @@
 ## v6.25.3
 
 - [aea4aea](https://github.com/AxaFrance/oidc-client/commit/aea4aea5fda1ef7c7ee6e43f8fc8efb2a0797a58) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
-
-
-## v6.25.2
-
-- [612cf26](https://github.com/AxaFrance/oidc-client/commit/612cf26c1fb087c20f7207ae4e6281c2fe9d6a46) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
-- [5472e0a](https://github.com/AxaFrance/oidc-client/commit/5472e0a9e510ba14c38bd205be39b732e877353a) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
-- [945043c](https://github.com/AxaFrance/oidc-client/commit/945043c39376611ba1e417e24d55607a5a4e861b) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
-- [776f0c2](https://github.com/AxaFrance/oidc-client/commit/776f0c22446763d89cd10412c53c964f3dd2bb57) - fix sw package test (alpha), 2023-07-22 by *Guillaume Chervet*
-- [b2ed839](https://github.com/AxaFrance/oidc-client/commit/b2ed8393b061d4da8bbb67003f7940aaa7b845d3) - fix package sw remove private (alpha), 2023-07-22 by *Guillaume Chervet*
-- [d3531a6](https://github.com/AxaFrance/oidc-client/commit/d3531a68b78d48e6150f71d22deba738a15391f3) - fix conflict (alpha), 2023-07-22 by *Guillaume Chervet*
-- [8c3e0c9](https://github.com/AxaFrance/oidc-client/commit/8c3e0c99c2507d7a6e198db517fd120cb06f6ac7) - chore(ci): fix duplicated id (alpha), 2023-07-22 by *Guillaume Chervet*
-- [4ccbef0](https://github.com/AxaFrance/oidc-client/commit/4ccbef0417543bf2a7395788315298b873327e7a) - chore(ci): add serviceworker (alpha), 2023-07-22 by *Guillaume Chervet*
 
 
