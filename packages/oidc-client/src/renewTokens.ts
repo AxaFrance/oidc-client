@@ -54,8 +54,9 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
         const timeoutId = timer.setTimeout(() => {
             controller.abort();
             }, timeout);
-        tokens = await navigator.locks.request(lockResourcesName, { signal: controller.signal, ifAvailable: true }, async (lock) => {
+        tokens = await navigator.locks.request(lockResourcesName, { /*signal: controller.signal,*/ ifAvailable: true }, async (lock) => {
             if(!lock){
+                console.log("lock not available")
                 return await loadLatestTokensAsync(oidc, configuration);
             }
             const tokens =  await syncTokens(oidc, refreshToken, forceRefresh, extras);
