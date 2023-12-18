@@ -51,7 +51,7 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
         try {
         tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
             if(!lock){
-                console.log("lock not available")
+                oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, { lock: 'lock not available' });
                 return await loadLatestTokensAsync(oidc, configuration);
             }
             return await syncTokens(oidc, refreshToken, forceRefresh, extras);
