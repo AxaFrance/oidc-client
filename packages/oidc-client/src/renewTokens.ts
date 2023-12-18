@@ -1,9 +1,9 @@
-import { initSession } from './initSession.js';
-import { initWorkerAsync } from './initWorker.js';
+import {initSession} from './initSession.js';
+import {initWorkerAsync} from './initWorker.js';
 import Oidc from './oidc.js';
-import { computeTimeLeft } from './parseTokens.js';
+import {computeTimeLeft} from './parseTokens.js';
 import timer from './timer.js';
-import { StringMap } from './types.js';
+import {StringMap} from './types.js';
 
 async function syncTokens(oidc, refreshToken, forceRefresh: boolean, extras: StringMap) {
     const updateTokens = (tokens) => {
@@ -49,19 +49,12 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
         tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
     } else {
         try {
-        const controller = new AbortController();
-        const timeout = Math.max(configuration.token_request_timeout??0, configuration.silent_login_timeout??0, 20000);
-        const timeoutId = timer.setTimeout(() => {
-            controller.abort();
-            }, timeout);
-        tokens = await navigator.locks.request(lockResourcesName, { /*signal: controller.signal,*/ ifAvailable: true }, async (lock) => {
+        tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
             if(!lock){
                 console.log("lock not available")
                 return await loadLatestTokensAsync(oidc, configuration);
             }
-            const tokens =  await syncTokens(oidc, refreshToken, forceRefresh, extras);
-            timer.clearTimeout(timeoutId);
-            return tokens;
+            return await syncTokens(oidc, refreshToken, forceRefresh, extras);
         });
         } catch (e) {
             console.error(e);
