@@ -48,7 +48,6 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     if(configuration?.storage === window?.sessionStorage && !serviceWorker) {
         tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
     } else {
-        try {
         tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
             if(!lock){
                 oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, { lock: 'lock not available' });
@@ -56,10 +55,6 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
             }
             return await syncTokens(oidc, refreshToken, forceRefresh, extras);
         });
-        } catch (e) {
-            console.error(e);
-            tokens = await loadLatestTokensAsync(oidc, configuration);
-        }
         
     }
     
