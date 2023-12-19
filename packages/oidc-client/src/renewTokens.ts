@@ -1,7 +1,7 @@
 import {initSession} from './initSession.js';
 import {initWorkerAsync} from './initWorker.js';
 import Oidc from './oidc.js';
-import {computeTimeLeft} from './parseTokens.js';
+import {computeTimeLeft, setTokens} from './parseTokens.js';
 import timer from './timer.js';
 import {StringMap} from './types.js';
 
@@ -32,7 +32,9 @@ async function loadLatestTokensAsync(oidc, configuration) {
         return tokens;
     } else {
         const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
-        const {tokens} = await session.initAsync();
+        let {tokens} = await session.initAsync();
+        // @ts-ignore
+        tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
         return tokens;
     }
 }
