@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.8
+## 7.13.9
+
+- [819962b](https://github.com/AxaFrance/oidc-client/commit/819962bae1d7c1e7fd997ede7bb42cce27ba76f3) - fix(oidc): renew with simple storage (#1246) (release), 2023-12-19 by *Guillaume Chervet*
+
+
+## v7.13.8
 
 - [b0cf4ad](https://github.com/AxaFrance/oidc-client/commit/b0cf4ad52df9c16c130cce791b05ceea7c4370c4) - fix(oidc): temp renew token fix (#1245) (release), 2023-12-18 by *Guillaume Chervet*
 
@@ -316,10 +321,5 @@
 - [d0ede07](https://github.com/AxaFrance/oidc-client/commit/d0ede07c1cd1aaf8526917df299d7a308eb7ea9d) - ci(version): Add a period between version alpha|beta and run_number (#1107) (alpha), 2023-07-24 by *Jason Finch*
 - [254b9f9](https://github.com/AxaFrance/oidc-client/commit/254b9f945bff154e127782522244378a3a224f94) - refactor(post-install): Alter post-install to not have a dependency on 'cpy' (#1106), 2023-07-24 by *Jason Finch*
 - [e04fb4b](https://github.com/AxaFrance/oidc-client/commit/e04fb4b465178e4fe1d1b8e80c41516979e9702f) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
-
-
-## v6.25.3
-
-- [aea4aea](https://github.com/AxaFrance/oidc-client/commit/aea4aea5fda1ef7c7ee6e43f8fc8efb2a0797a58) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
 
 
