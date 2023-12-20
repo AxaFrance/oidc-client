@@ -68,7 +68,9 @@ export const getOperatingSystem = (navigator) => {
 
         case 'iOS': {
             const osVersionArray = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
-            osVersion = osVersionArray[1] + '.' + osVersionArray[2] + '.' + (parseInt(osVersionArray[3]) | 0);
+            if(osVersionArray !=null && osVersionArray.length > 2) {
+                osVersion = osVersionArray[1] + '.' + osVersionArray[2] + '.' + (parseInt(osVersionArray[3]) | 0);
+            }
             break;
         }
     }
@@ -126,8 +128,6 @@ export const activateServiceWorker : ServiceWorkerActivate = () : boolean =>{
     }
 
     const operatingSystem = getOperatingSystem(navigator);
-    if (excludeOs(operatingSystem)) {
-        return false;
-    }
-    return true;
+    return !excludeOs(operatingSystem);
+    
 }
