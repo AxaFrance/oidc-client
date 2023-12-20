@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.9
+## 7.13.10
+
+- [4b1a9a2](https://github.com/AxaFrance/oidc-client/commit/4b1a9a26eba51e24dd1c9c9fd0087ef0b3b1ce8b) - fix(oidc): crash when regex on userAgent empty result iOS (#1248) (release), 2023-12-20 by *Guillaume Chervet*
+
+
+## v7.13.9
 
 - [819962b](https://github.com/AxaFrance/oidc-client/commit/819962bae1d7c1e7fd997ede7bb42cce27ba76f3) - fix(oidc): renew with simple storage (#1246) (release), 2023-12-19 by *Guillaume Chervet*
 
@@ -312,14 +317,5 @@
 ## v6.25.5
 
 - [8786e85](https://github.com/AxaFrance/oidc-client/commit/8786e85190dbc23de4311381b1c59f08673b0436) - fix(ci): github release (release), 2023-07-24 by *Guillaume Chervet*
-
-
-## v6.25.4
-
-- [9139393](https://github.com/AxaFrance/oidc-client/commit/9139393069142b05708f73a64ee81afdfaf0104f) - fix(oidc): Service Worker improper token revocation when logging out and showAccessToken=true (#1104) (release), 2023-07-24 by *kosciolek*
-- [ccc7c42](https://github.com/AxaFrance/oidc-client/commit/ccc7c429cde1da743993d16db17ef343f374f00b) - fix(ci): website and packages psotinstall error when pnpm from root (#1108), 2023-07-24 by *Guillaume Chervet*
-- [d0ede07](https://github.com/AxaFrance/oidc-client/commit/d0ede07c1cd1aaf8526917df299d7a308eb7ea9d) - ci(version): Add a period between version alpha|beta and run_number (#1107) (alpha), 2023-07-24 by *Jason Finch*
-- [254b9f9](https://github.com/AxaFrance/oidc-client/commit/254b9f945bff154e127782522244378a3a224f94) - refactor(post-install): Alter post-install to not have a dependency on 'cpy' (#1106), 2023-07-24 by *Jason Finch*
-- [e04fb4b](https://github.com/AxaFrance/oidc-client/commit/e04fb4b465178e4fe1d1b8e80c41516979e9702f) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
 
 
