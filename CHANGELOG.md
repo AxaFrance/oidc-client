@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.10
+## 7.13.11
+
+- [529cabf](https://github.com/AxaFrance/oidc-client/commit/529cabfbe7ee602325ba0f70844c969176371746) - fix(oidc): DPOP type jit instead of jti (#1249) (release), 2023-12-20 by *Guillaume Chervet*
+
+
+## v7.13.10
 
 - [4b1a9a2](https://github.com/AxaFrance/oidc-client/commit/4b1a9a26eba51e24dd1c9c9fd0087ef0b3b1ce8b) - fix(oidc): crash when regex on userAgent empty result iOS (#1248) (release), 2023-12-20 by *Guillaume Chervet*
 
@@ -312,10 +317,5 @@
 ## v6.25.6
 
 - [288ce99](https://github.com/AxaFrance/oidc-client/commit/288ce9937e6e1cb8c1b7c7f6909ebef8a48f12e5) - fix(react): ajust peerDependencies (release), 2023-07-24 by *Guillaume Chervet*
-
-
-## v6.25.5
-
-- [8786e85](https://github.com/AxaFrance/oidc-client/commit/8786e85190dbc23de4311381b1c59f08673b0436) - fix(ci): github release (release), 2023-07-24 by *Guillaume Chervet*
 
 
