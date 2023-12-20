@@ -229,7 +229,7 @@ export const generateJwtDemonstratingProofOfPossessionAsync = (jwk, method = 'PO
 
     const claims = {
         // https://www.rfc-editor.org/rfc/rfc9449.html#name-concept
-        jit: btoa(guid()),
+        jti: btoa(guid()),
         htm: method,
         htu: url,
         iat: Math.round(Date.now() / 1000),
