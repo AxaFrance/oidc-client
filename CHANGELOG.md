@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.11
+## 7.13.12
+
+- [9ef56f1](https://github.com/AxaFrance/oidc-client/commit/9ef56f17793e1bfbd668d6f001125a8f773c2370) - fix(oidc): Handling of errors returned from authorize endpoint (#1250) (release), 2023-12-28 by *Guillaume Chervet*
+
+
+## v7.13.11
 
 - [529cabf](https://github.com/AxaFrance/oidc-client/commit/529cabfbe7ee602325ba0f70844c969176371746) - fix(oidc): DPOP type jit instead of jti (#1249) (release), 2023-12-20 by *Guillaume Chervet*
 
@@ -312,10 +317,5 @@
 - [7eac9e5](https://github.com/AxaFrance/oidc-client/commit/7eac9e5c10175ae6850a72e21e11bac568a01720) - feat(oidc): rename vanilla-oidc to oidc-client (#1112) (release), 2023-07-28 by *Guillaume Chervet*
 - [9f25be7](https://github.com/AxaFrance/oidc-client/commit/9f25be794ff6b08d8ca30cc5f27dff554136d163) - refactor(lint): Enable linting on examples, fix lint warnings. (#1111), 2023-07-27 by *Jason Finch*
 - [762ca42](https://github.com/AxaFrance/oidc-client/commit/762ca423a2efe946d4213a3c482638a386a5b555) - ci(lint): Move eslint config to root. Add GH workflow to run lint. (#1109), 2023-07-27 by *Jason Finch*
-
-
-## v6.25.6
-
-- [288ce99](https://github.com/AxaFrance/oidc-client/commit/288ce9937e6e1cb8c1b7c7f6909ebef8a48f12e5) - fix(react): ajust peerDependencies (release), 2023-07-24 by *Guillaume Chervet*
 
 
