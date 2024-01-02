@@ -1,6 +1,17 @@
 # Changelog
 
-## 7.13.12
+## 7.13.14
+
+- [3a1883c](https://github.com/AxaFrance/oidc-client/commit/3a1883c343c55637aa1ce5d118cc2841c76d8752) - build(npm): bump react-router-dom from 6.20.1 to 6.21.1 (#1252), 2024-01-02 by *dependabot[bot]*
+
+
+## v7.13.13
+
+- [1faaab4](https://github.com/AxaFrance/oidc-client/commit/1faaab4ecb86144ed6f3c1ed68b938804854bd36) - build(npm): bump next from 14.0.3 to 14.0.4 (#1255), 2024-01-02 by *dependabot[bot]*
+- [d009de8](https://github.com/AxaFrance/oidc-client/commit/d009de8091ac256d1384466df9b3fe7de75a5629) - chore(ci): Update npm-publish.yml, 2023-12-28 by *Guillaume Chervet*
+
+
+## v7.13.12
 
 - [9ef56f1](https://github.com/AxaFrance/oidc-client/commit/9ef56f17793e1bfbd668d6f001125a8f773c2370) - fix(oidc): Handling of errors returned from authorize endpoint (#1250) (release), 2023-12-28 by *Guillaume Chervet*
 
@@ -306,16 +317,5 @@
 ## v6.26.2
 
 - [d329ce0](https://github.com/AxaFrance/oidc-client/commit/d329ce0cb013f4877cb401c6ccef316077ce9d09) - fix(ci): add set to replace workspace* (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.1
-
-
-
-## v6.26.0
-
-- [7eac9e5](https://github.com/AxaFrance/oidc-client/commit/7eac9e5c10175ae6850a72e21e11bac568a01720) - feat(oidc): rename vanilla-oidc to oidc-client (#1112) (release), 2023-07-28 by *Guillaume Chervet*
-- [9f25be7](https://github.com/AxaFrance/oidc-client/commit/9f25be794ff6b08d8ca30cc5f27dff554136d163) - refactor(lint): Enable linting on examples, fix lint warnings. (#1111), 2023-07-27 by *Jason Finch*
-- [762ca42](https://github.com/AxaFrance/oidc-client/commit/762ca423a2efe946d4213a3c482638a386a5b555) - ci(lint): Move eslint config to root. Add GH workflow to run lint. (#1109), 2023-07-27 by *Jason Finch*
 
 
