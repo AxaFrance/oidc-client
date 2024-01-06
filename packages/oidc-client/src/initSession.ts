@@ -64,6 +64,12 @@ export const initSession = (configurationName, storage = sessionStorage) => {
     };
     const getLoginParams = () => {
         const dataString = storage[`oidc.login.${configurationName}`];
+        
+        if(!dataString){
+            console.warn(`storage[oidc.login.${configurationName}] is empty`);
+            return null;
+        }
+        
         if (!getLoginParamsCache[configurationName]) {
             getLoginParamsCache[configurationName] = JSON.parse(dataString);
         }
