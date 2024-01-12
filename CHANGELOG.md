@@ -1,6 +1,42 @@
 # Changelog
 
-## 7.13.7
+## 7.13.14
+
+- [3a1883c](https://github.com/AxaFrance/oidc-client/commit/3a1883c343c55637aa1ce5d118cc2841c76d8752) - build(npm): bump react-router-dom from 6.20.1 to 6.21.1 (#1252), 2024-01-02 by *dependabot[bot]*
+
+
+## v7.13.13
+
+- [1faaab4](https://github.com/AxaFrance/oidc-client/commit/1faaab4ecb86144ed6f3c1ed68b938804854bd36) - build(npm): bump next from 14.0.3 to 14.0.4 (#1255), 2024-01-02 by *dependabot[bot]*
+- [d009de8](https://github.com/AxaFrance/oidc-client/commit/d009de8091ac256d1384466df9b3fe7de75a5629) - chore(ci): Update npm-publish.yml, 2023-12-28 by *Guillaume Chervet*
+
+
+## v7.13.12
+
+- [9ef56f1](https://github.com/AxaFrance/oidc-client/commit/9ef56f17793e1bfbd668d6f001125a8f773c2370) - fix(oidc): Handling of errors returned from authorize endpoint (#1250) (release), 2023-12-28 by *Guillaume Chervet*
+
+
+## v7.13.11
+
+- [529cabf](https://github.com/AxaFrance/oidc-client/commit/529cabfbe7ee602325ba0f70844c969176371746) - fix(oidc): DPOP type jit instead of jti (#1249) (release), 2023-12-20 by *Guillaume Chervet*
+
+
+## v7.13.10
+
+- [4b1a9a2](https://github.com/AxaFrance/oidc-client/commit/4b1a9a26eba51e24dd1c9c9fd0087ef0b3b1ce8b) - fix(oidc): crash when regex on userAgent empty result iOS (#1248) (release), 2023-12-20 by *Guillaume Chervet*
+
+
+## v7.13.9
+
+- [819962b](https://github.com/AxaFrance/oidc-client/commit/819962bae1d7c1e7fd997ede7bb42cce27ba76f3) - fix(oidc): renew with simple storage (#1246) (release), 2023-12-19 by *Guillaume Chervet*
+
+
+## v7.13.8
+
+- [b0cf4ad](https://github.com/AxaFrance/oidc-client/commit/b0cf4ad52df9c16c130cce791b05ceea7c4370c4) - fix(oidc): temp renew token fix (#1245) (release), 2023-12-18 by *Guillaume Chervet*
+
+
+## v7.13.7
 
 - [6667eab](https://github.com/AxaFrance/oidc-client/commit/6667eabc8c5cb0ff5874b6583b2223721bd18525) - fix(oidc): temporary fix on lock need to be continued but require refactor (release), 2023-12-15 by *Guillaume Chervet*
 - [23c8715](https://github.com/AxaFrance/oidc-client/commit/23c87152e55c8d7f1c51a33032d48c751b15c4c5) - fix(ci): clean changelog generation, 2023-12-15 by *Guillaume Chervet*
@@ -281,52 +317,5 @@
 ## v6.26.2
 
 - [d329ce0](https://github.com/AxaFrance/oidc-client/commit/d329ce0cb013f4877cb401c6ccef316077ce9d09) - fix(ci): add set to replace workspace* (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.1
-
-
-
-## v6.26.0
-
-- [7eac9e5](https://github.com/AxaFrance/oidc-client/commit/7eac9e5c10175ae6850a72e21e11bac568a01720) - feat(oidc): rename vanilla-oidc to oidc-client (#1112) (release), 2023-07-28 by *Guillaume Chervet*
-- [9f25be7](https://github.com/AxaFrance/oidc-client/commit/9f25be794ff6b08d8ca30cc5f27dff554136d163) - refactor(lint): Enable linting on examples, fix lint warnings. (#1111), 2023-07-27 by *Jason Finch*
-- [762ca42](https://github.com/AxaFrance/oidc-client/commit/762ca423a2efe946d4213a3c482638a386a5b555) - ci(lint): Move eslint config to root. Add GH workflow to run lint. (#1109), 2023-07-27 by *Jason Finch*
-
-
-## v6.25.6
-
-- [288ce99](https://github.com/AxaFrance/oidc-client/commit/288ce9937e6e1cb8c1b7c7f6909ebef8a48f12e5) - fix(react): ajust peerDependencies (release), 2023-07-24 by *Guillaume Chervet*
-
-
-## v6.25.5
-
-- [8786e85](https://github.com/AxaFrance/oidc-client/commit/8786e85190dbc23de4311381b1c59f08673b0436) - fix(ci): github release (release), 2023-07-24 by *Guillaume Chervet*
-
-
-## v6.25.4
-
-- [9139393](https://github.com/AxaFrance/oidc-client/commit/9139393069142b05708f73a64ee81afdfaf0104f) - fix(oidc): Service Worker improper token revocation when logging out and showAccessToken=true (#1104) (release), 2023-07-24 by *kosciolek*
-- [ccc7c42](https://github.com/AxaFrance/oidc-client/commit/ccc7c429cde1da743993d16db17ef343f374f00b) - fix(ci): website and packages psotinstall error when pnpm from root (#1108), 2023-07-24 by *Guillaume Chervet*
-- [d0ede07](https://github.com/AxaFrance/oidc-client/commit/d0ede07c1cd1aaf8526917df299d7a308eb7ea9d) - ci(version): Add a period between version alpha|beta and run_number (#1107) (alpha), 2023-07-24 by *Jason Finch*
-- [254b9f9](https://github.com/AxaFrance/oidc-client/commit/254b9f945bff154e127782522244378a3a224f94) - refactor(post-install): Alter post-install to not have a dependency on 'cpy' (#1106), 2023-07-24 by *Jason Finch*
-- [e04fb4b](https://github.com/AxaFrance/oidc-client/commit/e04fb4b465178e4fe1d1b8e80c41516979e9702f) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
-
-
-## v6.25.3
-
-- [aea4aea](https://github.com/AxaFrance/oidc-client/commit/aea4aea5fda1ef7c7ee6e43f8fc8efb2a0797a58) - chore(ci): invert client and react (alpha), 2023-07-22 by *Guillaume Chervet*
-
-
-## v6.25.2
-
-- [612cf26](https://github.com/AxaFrance/oidc-client/commit/612cf26c1fb087c20f7207ae4e6281c2fe9d6a46) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
-- [5472e0a](https://github.com/AxaFrance/oidc-client/commit/5472e0a9e510ba14c38bd205be39b732e877353a) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
-- [945043c](https://github.com/AxaFrance/oidc-client/commit/945043c39376611ba1e417e24d55607a5a4e861b) - Update package.json (alpha), 2023-07-22 by *Guillaume Chervet*
-- [776f0c2](https://github.com/AxaFrance/oidc-client/commit/776f0c22446763d89cd10412c53c964f3dd2bb57) - fix sw package test (alpha), 2023-07-22 by *Guillaume Chervet*
-- [b2ed839](https://github.com/AxaFrance/oidc-client/commit/b2ed8393b061d4da8bbb67003f7940aaa7b845d3) - fix package sw remove private (alpha), 2023-07-22 by *Guillaume Chervet*
-- [d3531a6](https://github.com/AxaFrance/oidc-client/commit/d3531a68b78d48e6150f71d22deba738a15391f3) - fix conflict (alpha), 2023-07-22 by *Guillaume Chervet*
-- [8c3e0c9](https://github.com/AxaFrance/oidc-client/commit/8c3e0c99c2507d7a6e198db517fd120cb06f6ac7) - chore(ci): fix duplicated id (alpha), 2023-07-22 by *Guillaume Chervet*
-- [4ccbef0](https://github.com/AxaFrance/oidc-client/commit/4ccbef0417543bf2a7395788315298b873327e7a) - chore(ci): add serviceworker (alpha), 2023-07-22 by *Guillaume Chervet*
 
 

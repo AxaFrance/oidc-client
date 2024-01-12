@@ -1,7 +1,7 @@
-import { initSession } from './initSession.js';
-import { initWorkerAsync } from './initWorker.js';
+import {initSession} from './initSession.js';
+import {initWorkerAsync} from './initWorker.js';
 import Oidc from './oidc.js';
-import { computeTimeLeft } from './parseTokens.js';
+import {computeTimeLeft, setTokens} from './parseTokens.js';
 import timer from './timer.js';
 import {OidcConfiguration, StringMap} from './types.js';
 
@@ -24,26 +24,40 @@ async function syncTokens(oidc:Oidc, refreshToken, forceRefresh: boolean, extras
     return tokens;
 }
 
-export async function renewTokensAndStartTimerAsync(oidc:Oidc, refreshToken, forceRefresh = false, extras:StringMap = null) {
+async function loadLatestTokensAsync(oidc, configuration) {
+    const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
+    if (serviceWorker) {
+        const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
+        const {tokens} = await serviceWorker.initAsync(oidcServerConfiguration, 'tryKeepExistingSessionAsync', configuration);
+        return tokens;
+    } else {
+        const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
+        let {tokens} = await session.initAsync();
+        // @ts-ignore
+        tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
+        return tokens;
+    }
+}
+
+export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh = false, extras:StringMap = null) {
 
     const configuration = oidc.configuration;
     const lockResourcesName = `${configuration.client_id}_${oidc.configurationName}_${configuration.authority}`;
     
-    let tokens = null;
+    let tokens: null;
     const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
+    
     if(configuration?.storage === window?.sessionStorage && !serviceWorker) {
         tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
     } else {
-        const controller = new AbortController();
-        const timeout = Math.max(configuration.token_request_timeout??0, configuration.silent_login_timeout??0, 20000);
-        const timeoutId = timer.setTimeout(() => {
-            controller.abort();
-            }, timeout);
-        tokens = await navigator.locks.request(lockResourcesName, { signal: controller.signal }, async () => {
-            const tokens =  await syncTokens(oidc, refreshToken, forceRefresh, extras);
-            timer.clearTimeout(timeoutId);
-            return tokens;
+        tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
+            if(!lock){
+                oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, { lock: 'lock not available' });
+                return await loadLatestTokensAsync(oidc, configuration);
+            }
+            return await syncTokens(oidc, refreshToken, forceRefresh, extras);
         });
+        
     }
     
     if(!tokens){
@@ -51,6 +65,7 @@ export async function renewTokensAndStartTimerAsync(oidc:Oidc, refreshToken, for
     }
     
     if (oidc.timeoutId) {
+        // @ts-ignore
         oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, extras);
     }
     

@@ -3,7 +3,6 @@ import { deriveChallengeAsync, generateRandom } from './crypto.js';
 import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
 import { Fetch, StringMap } from './types.js';
-import EC, {JWK, JWT} from './jwt';
 import {ILOidcLocation} from "./location";
 
 const oneHourSecond = 60 * 60;

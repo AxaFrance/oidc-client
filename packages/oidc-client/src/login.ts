@@ -111,13 +111,17 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         }
 
         const params = getParseQueryStringFromLocation(href);
+        
+        if(params.error || params.error_description) {
+            throw new Error(`Error from OIDC server: ${params.error} - ${params.error_description}`);
+        }
 
         if (params.iss && params.iss !== oidcServerConfiguration.issuer) {
             console.error();
-            throw new Error(`issuer not valid (expected: ${oidcServerConfiguration.issuer}, received: ${params.iss})`);
+            throw new Error(`Issuer not valid (expected: ${oidcServerConfiguration.issuer}, received: ${params.iss})`);
         }
         if (params.state && params.state !== state) {
-            throw new Error(`state not valid (expected: ${state}, received: ${params.state})`);
+            throw new Error(`State not valid (expected: ${state}, received: ${params.state})`);
         }
 
         const data = {

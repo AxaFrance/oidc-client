@@ -71,7 +71,7 @@ jobs:
         id: which_tag
         run: |
           if [[ ${{ github.ref }} == refs/pull* ]]; then
-            last_commit_message=$(curl -s "https://api.github.com/repos/AxaFrance/oidc-client/pulls/${{ github.event.number }}/commits" | jq -r '.[-1].commit.message')
+            last_commit_message=$(curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.number }}/commits" | jq -r '.[-1].commit.message')
           else
             last_commit_message=$(git log --format=%B -n 1)
           fi
