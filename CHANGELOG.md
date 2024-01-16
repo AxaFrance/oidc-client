@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.14
+## 7.13.15
+
+- [c56cc84](https://github.com/AxaFrance/oidc-client/commit/c56cc842d8da427b2aa88eb71f7d63937ea3c363) - fix(react-oidc): missing console.log in useOidcFetch (release), 2024-01-16 by *Guillaume Chervet*
+
+
+## v7.13.14
 
 - [3a1883c](https://github.com/AxaFrance/oidc-client/commit/3a1883c343c55637aa1ce5d118cc2841c76d8752) - build(npm): bump react-router-dom from 6.20.1 to 6.21.1 (#1252), 2024-01-02 by *dependabot[bot]*
 
@@ -312,10 +317,5 @@
 ## v6.26.3
 
 - [04f4900](https://github.com/AxaFrance/oidc-client/commit/04f4900d672e954278e6835bc31c62e4bf8660de) - try fix (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.2
-
-- [d329ce0](https://github.com/AxaFrance/oidc-client/commit/d329ce0cb013f4877cb401c6ccef316077ce9d09) - fix(ci): add set to replace workspace* (release), 2023-07-28 by *Guillaume Chervet*
 
 
