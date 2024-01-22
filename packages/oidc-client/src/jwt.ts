@@ -173,7 +173,7 @@ const thumbprint = async (jwk, digestAlgorithm: AlgorithmIdentifier) => {
 
 export var JWK = {thumbprint};
 
-export const generateJwkAsync = (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
+export const generateJwkAsync = async (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
     // @ts-ignore
     const jwk = await EC.generate(generateKeyAlgorithm);
     // console.info('Private Key:', JSON.stringify(jwk));
