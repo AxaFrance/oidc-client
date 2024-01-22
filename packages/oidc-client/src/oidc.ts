@@ -5,7 +5,7 @@ import {initSession} from './initSession.js';
 import {defaultServiceWorkerUpdateRequireCallback, initWorkerAsync, sleepAsync} from './initWorker.js';
 import {defaultLoginAsync, loginCallbackAsync} from './login.js';
 import {destroyAsync, logoutAsync} from './logout.js';
-import {computeTimeLeft, isTokensOidcValid, setTokens, TokenRenewMode, Tokens,} from './parseTokens.js';
+import {isTokensOidcValid, TokenRenewMode, Tokens,} from './parseTokens.js';
 import {
     autoRenewTokens,
     renewTokensAndStartTimerAsync,
@@ -19,7 +19,10 @@ import timer from './timer.js';
 import {AuthorityConfiguration, Fetch, OidcConfiguration, StringMap} from './types.js';
 import {userInfoAsync} from './user.js';
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
-import {generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import {
+    defaultDemonstratingProofOfPossessionConfiguration,
+    generateJwtDemonstratingProofOfPossessionAsync
+} from "./jwt";
 import {ILOidcLocation, OidcLocation} from "./location";
 import {activateServiceWorker} from "./initWorkerOption";
 import {tryKeepSessionAsync} from "./keepSession";
@@ -118,6 +121,7 @@ export class Oidc {
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
           service_worker_update_require_callback,
           service_worker_activate: configuration.service_worker_activate ?? activateServiceWorker,
+          demonstrating_proof_of_possession_configuration: configuration.demonstrating_proof_of_possession_configuration ?? defaultDemonstratingProofOfPossessionConfiguration,
       };
       
       this.getFetch = getFetch ?? getFetchDefault;
@@ -455,7 +459,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),};
 
         const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
-        let demonstratingProofOfPossessionNonce:string = null;
+        let demonstratingProofOfPossessionNonce:string;
         let jwk;
         if (serviceWorker) {
             demonstratingProofOfPossessionNonce = await serviceWorker.getDemonstratingProofOfPossessionNonce();
@@ -470,7 +474,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;
         }
 
-        return await generateJwtDemonstratingProofOfPossessionAsync(jwk, method, url, claimsExtras);
+        return await generateJwtDemonstratingProofOfPossessionAsync(configuration.demonstrating_proof_of_possession_configuration)(jwk, method, url, claimsExtras);
     }
 
     loginCallbackWithAutoTokensRenewPromise:Promise<LoginCallback> = null;

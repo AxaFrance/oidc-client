@@ -4,6 +4,8 @@
 //
 // because... JavaScript, Strings, and Buffers
 // @ts-ignore
+import {DemonstratingProofOfPossessionConfiguration} from "./types";
+
 function strToUint8(str) {
     return new TextEncoder().encode(str);
 }
@@ -56,16 +58,31 @@ function strToUrlBase64(str) {
     return binToUrlBase64(utf8ToBinaryString(str));
 }
 
-export var JWT = {};
+export const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration ={
+    importKeyAlgorithm: {
+        name: 'ECDSA',
+        namedCurve: 'P-256',
+        hash: {name: 'ES256'}
+    },
+    signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
+    generateKeyAlgorithm: {
+        name: 'ECDSA',
+        namedCurve: 'P-256'
+    },
+    digestAlgorithm: { name: 'SHA-256' },
+    jwtHeaderAlgorithm : 'ES256' 
+}
+
+
 // @ts-ignore
-JWT.sign = (jwk, headers, claims, jwtHeaderType= 'dpop+jwt') => {
+const sign = async (jwk, headers, claims, demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration, jwtHeaderType= 'dpop+jwt') => {
     // Make a shallow copy of the key
     // (to set ext if it wasn't already set)
     jwk = Object.assign({}, jwk);
 
     // The headers should probably be empty
     headers.typ = jwtHeaderType;
-    headers.alg = 'ES256';
+    headers.alg = demonstratingProofOfPossessionConfiguration.jwtHeaderAlgorithm;
     if (!headers.kid) {
         // alternate: see thumbprint function below
         headers.jwk = { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y };
@@ -81,11 +98,7 @@ JWT.sign = (jwk, headers, claims, jwtHeaderType= 'dpop+jwt') => {
     };
 
     // To import as EC (ECDSA, P-256, SHA-256, ES256)
-    const keyType = {
-        name: 'ECDSA',
-        namedCurve: 'P-256',
-        hash: {name: 'ES256'}
-    };
+    const keyType = demonstratingProofOfPossessionConfiguration.importKeyAlgorithm;
 
     // To make re-exportable as JSON (or DER/PEM)
     const exportable = true;
@@ -95,63 +108,57 @@ JWT.sign = (jwk, headers, claims, jwtHeaderType= 'dpop+jwt') => {
 
     // Actually do the import, which comes out as an abstract key type
     // @ts-ignore
-    return window.crypto.subtle
-        // @ts-ignore
-        .importKey('jwk', jwk, keyType, exportable, privileges)
-        .then(function(privateKey) {
-            // Convert UTF-8 to Uint8Array ArrayBuffer
-            // @ts-ignore
-            const data = strToUint8(jws.protected + '.' + jws.payload);
+    const privateKey = await window.crypto.subtle.importKey('jwk', jwk, keyType, exportable, privileges);
+    // Convert UTF-8 to Uint8Array ArrayBuffer
+    // @ts-ignore
+    const data = strToUint8(`${jws.protected}.${jws.payload}`);
 
-            // The signature and hash should match the bit-entropy of the key
-            // https://tools.ietf.org/html/rfc7518#section-3
-            const signatureType = {name: 'ECDSA', hash: {name: 'SHA-256'}};
+    // The signature and hash should match the bit-entropy of the key
+    // https://tools.ietf.org/html/rfc7518#section-3
+    const signatureType = demonstratingProofOfPossessionConfiguration.signAlgorithm;
 
-            return window.crypto.subtle.sign(signatureType, privateKey, data).then(function(signature) {
-                // returns an ArrayBuffer containing a JOSE (not X509) signature,
-                // which must be converted to Uint8 to be useful
-                // @ts-ignore
-                jws.signature = uint8ToUrlBase64(new Uint8Array(signature));
-
-                // JWT is just a "compressed", "protected" JWS
-                // @ts-ignore
-                return jws.protected + '.' + jws.payload + '.' + jws.signature;
-            });
-        });
+    const signature = await window.crypto.subtle.sign(signatureType, privateKey, data);
+    // returns an ArrayBuffer containing a JOSE (not X509) signature,
+    // which must be converted to Uint8 to be useful
+    // @ts-ignore
+    jws.signature = uint8ToUrlBase64(new Uint8Array(signature));
+    // JWT is just a "compressed", "protected" JWS
+    // @ts-ignore
+    return `${jws.protected}.${jws.payload}.${jws.signature}`;
 };
 
+export var JWT = {sign};
 
-const EC = {};
+
 // @ts-ignore
-EC.generate = function() {
-    const keyType = {
-        name: 'ECDSA',
-        namedCurve: 'P-256'
-    };
+const generate = async (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
+    const keyType = generateKeyAlgorithm;
     const exportable = true;
     const privileges = ['sign', 'verify'];
     // @ts-ignore
-    return window.crypto.subtle.generateKey(keyType, exportable, privileges).then(function(key) {
-        // returns an abstract and opaque WebCrypto object,
-        // which in most cases you'll want to export as JSON to be able to save
-        return window.crypto.subtle.exportKey('jwk', key.privateKey);
-    });
+    const key = await window.crypto.subtle.generateKey(keyType, exportable, privileges);
+    // returns an abstract and opaque WebCrypto object,
+    // which in most cases you'll want to export as JSON to be able to save
+    return await window.crypto.subtle.exportKey('jwk', key.privateKey);
 };
 
 // Create a Public Key from a Private Key
 //
 // chops off the private parts
 // @ts-ignore
-EC.neuter = function(jwk) {
+const neuter = jwk => {
     const copy = Object.assign({}, jwk);
     delete copy.d;
     copy.key_ops = ['verify'];
     return copy;
 };
 
-export var JWK = {};
+const EC = {
+    generate,
+    neuter
+};
 // @ts-ignore
-JWK.thumbprint = function(jwk) {
+const thumbprint = async (jwk, digestAlgorithm: AlgorithmIdentifier) => {
     // lexigraphically sorted, no spaces
     const sortedPub = '{"crv":"CRV","kty":"EC","x":"X","y":"Y"}'
         .replace('CRV', jwk.crv)
@@ -160,15 +167,40 @@ JWK.thumbprint = function(jwk) {
 
     // The hash should match the size of the key,
     // but we're only dealing with P-256
-    return window.crypto.subtle
-        .digest({ name: 'SHA-256' }, strToUint8(sortedPub))
-        .then(function(hash) {
-            return uint8ToUrlBase64(new Uint8Array(hash));
-        });
-};
+    const hash = await window.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
+    return uint8ToUrlBase64(new Uint8Array(hash));
+}
 
+export var JWK = {thumbprint};
 
-const guid = function () {
+export const generateJwkAsync = (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
+    // @ts-ignore
+    const jwk = await EC.generate(generateKeyAlgorithm);
+    // console.info('Private Key:', JSON.stringify(jwk));
+    // @ts-ignore
+    // console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
+    return jwk;
+}
+
+export const generateJwtDemonstratingProofOfPossessionAsync = (demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration) => async (jwk, method = 'POST', url: string, extrasClaims={}) => {
+
+    const claims = {
+        // https://www.rfc-editor.org/rfc/rfc9449.html#name-concept
+        jti: btoa(guid()),
+        htm: method,
+        htu: url,
+        iat: Math.round(Date.now() / 1000),
+        ...extrasClaims,
+    };
+    // @ts-ignore
+    const kid = await JWK.thumbprint(jwk, demonstratingProofOfPossessionConfiguration.digestAlgorithm);
+    // @ts-ignore
+    const jwt = await JWT.sign(jwk, { /*kid: kid*/ }, claims, demonstratingProofOfPossessionConfiguration)
+    // console.info('JWT:', jwt);
+    return jwt;
+}
+
+const guid = () => {
     // RFC4122: The version 4 UUID is meant for generating UUIDs from truly-random or
     // pseudo-random numbers.
     // The algorithm is as follows:
@@ -213,36 +245,3 @@ const guid = function () {
 
     return guidResponse;
 };
-
-
-export const generateJwkAsync = () => {
-    // @ts-ignore
-    return EC.generate().then(function(jwk) {
-        // console.info('Private Key:', JSON.stringify(jwk));
-        // @ts-ignore
-        // console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
-        return jwk;
-    });
-}
-
-export const generateJwtDemonstratingProofOfPossessionAsync = (jwk, method = 'POST', url: string, extrasClaims={}) => {
-
-    const claims = {
-        // https://www.rfc-editor.org/rfc/rfc9449.html#name-concept
-        jti: btoa(guid()),
-        htm: method,
-        htu: url,
-        iat: Math.round(Date.now() / 1000),
-        ...extrasClaims,
-    };
-    // @ts-ignore
-    return JWK.thumbprint(jwk).then(function(kid) {
-        // @ts-ignore
-        return JWT.sign(jwk, { /*kid: kid*/ }, claims).then(function(jwt) {
-            // console.info('JWT:', jwt);
-            return jwt;
-        });
-    });
-}
-
-export default EC;

@@ -205,8 +205,37 @@ const configuration = {
     monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
+    location: ILOidcLocation, // Optional, default is window.location, you can inject your own location object respecting the ILOidcLocation interface
     demonstrating_proof_of_possession: Boolean, // Optional, default is false, if true, the the Demonstrating Proof of Possession will be activated //https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access
+    demonstrating_proof_of_possession_configuration: DemonstratingProofOfPossessionConfiguration // Optional, more details bellow
 };
+
+
+interface DemonstratingProofOfPossessionConfiguration {
+  generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
+          digestAlgorithm: AlgorithmIdentifier,
+          importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
+          signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
+          jwtHeaderAlgorithm: string
+};
+
+// default value of demonstrating_proof_of_possession_configuration
+const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration ={
+  importKeyAlgorithm: {
+    name: 'ECDSA',
+    namedCurve: 'P-256',
+    hash: {name: 'ES256'}
+  },
+  signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
+  generateKeyAlgorithm: {
+    name: 'ECDSA',
+    namedCurve: 'P-256'
+  },
+  digestAlgorithm: { name: 'SHA-256' },
+  jwtHeaderAlgorithm : 'ES256'
+};
+
+
 ```
 
 ## API
@@ -374,6 +403,8 @@ More information about OIDC
 
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
 - [English : Increase the security and simplicity of your information system with openid connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
+- [English: youtube OIDC](https://www.youtube.com/watch?v=frIJfavZkUE&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=1)
+- [French: youtube OIDC](https://www.youtube.com/watch?v=H-mLMGzQ_y0&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=2)
 
 ## Hash route
 
