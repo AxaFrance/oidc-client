@@ -21,13 +21,13 @@ export const tryKeepSessionAsync = async (oidc: Oidc) =>{
                 if (tokens) {
                     serviceWorker.startKeepAliveServiceWorker();
                     // @ts-ignore
-                    this.tokens = tokens;
+                    oidc.tokens = tokens;
                     const getLoginParams = serviceWorker.getLoginParams(oidc.configurationName);
                     // @ts-ignore
-                    this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
+                    oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.refreshToken, oidc.tokens.expiresAt, getLoginParams.extras);
                     const sessionState = await serviceWorker.getSessionStateAsync();
                     // @ts-ignore
-                    await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
+                    await oidc.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                     oidc.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                         success: true,
                         message: 'tokens inside ServiceWorker are valid',
@@ -48,13 +48,13 @@ export const tryKeepSessionAsync = async (oidc: Oidc) =>{
                 const { tokens } = await session.initAsync();
                 if (tokens) {
                     // @ts-ignore
-                    this.tokens = setTokens(tokens, null, configuration.token_renew_mode);
+                    oidc.tokens = setTokens(tokens, null, configuration.token_renew_mode);
                     const getLoginParams = session.getLoginParams();
                     // @ts-ignore
-                    this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
+                    oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, getLoginParams.extras);
                     const sessionState = await session.getSessionStateAsync();
                     // @ts-ignore
-                    await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
+                    await oidc.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
                     oidc.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                         success: true,
                         message: 'tokens inside storage are valid',
