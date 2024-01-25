@@ -28,7 +28,15 @@ describe('ParseTokens test Suite', () => {
     it('parseJwtShouldExtractData', async () => {
         const claimsPart = "eyJzZXNzaW9uX3N0YXRlIjoiNzVjYzVlZDItZGYyZC00NTY5LWJmYzUtMThhOThlNjhiZTExIiwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoixrTHosOBw6zDhyDlsI_lkI0t44Ob44Or44OYIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdGluZ2NoYXJhY3RlcnNAaW52ZW50ZWRtYWlsLmNvbSIsImdpdmVuX25hbWUiOiLGtMeiw4HDrMOHIiwiZmFtaWx5X25hbWUiOiLlsI_lkI0t44Ob44Or44OYIn0"
         const result = parseJwt(claimsPart);
-        expect(result!=null).toBe(true);
+        expect(result).toStrictEqual({
+            "session_state": "75cc5ed2-df2d-4569-bfc5-18a98e68be11",
+            "scope": "openid email profile",
+            "email_verified": true,
+            "name": "ƴǢÁìÇ 小名-ホルヘ",
+            "preferred_username": "testingcharacters@inventedmail.com",
+            "given_name": "ƴǢÁìÇ",
+            "family_name": "小名-ホルヘ"
+        });
     });
 
 
