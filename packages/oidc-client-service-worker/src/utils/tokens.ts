@@ -10,9 +10,9 @@ import {
 } from '../types';
 import { countLetter } from './strings';
 
-function parseJwt(token: string) {
+export const parseJwt = (payload: string) => {
   return JSON.parse(
-    b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')),
+    b64DecodeUnicode(payload.replace(/-/g, '+').replace(/_/g, '/')),
   );
 }
 function b64DecodeUnicode(str: string) {
@@ -51,7 +51,7 @@ const extractTokenPayload = (token?: string) => {
       return null;
     }
     if (countLetter(token, '.') === 2) {
-      return parseJwt(token);
+      return parseJwt(token.split('.')[1]);
     } else {
       return null;
     }
