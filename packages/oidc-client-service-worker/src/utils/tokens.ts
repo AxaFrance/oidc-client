@@ -12,7 +12,7 @@ import { countLetter } from './strings';
 
 function parseJwt(token: string) {
   return JSON.parse(
-    b64DecodeUnicode(token.split('.')[1].replace('-', '+').replace('_', '/')),
+    b64DecodeUnicode(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
   );
 }
 function b64DecodeUnicode(str: string) {
