@@ -83,9 +83,13 @@ const sign = async (jwk, headers, claims, demonstratingProofOfPossessionConfigur
     // The headers should probably be empty
     headers.typ = jwtHeaderType;
     headers.alg = demonstratingProofOfPossessionConfiguration.jwtHeaderAlgorithm;
-    if (!headers.kid) {
-        // alternate: see thumbprint function below
-        headers.jwk = { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y };
+    if(headers.alg === 'ES256') {
+        //if (!headers.kid) {
+            // alternate: see thumbprint function below
+            headers.jwk = {kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y};
+        //}
+    } else if(headers.alg === 'RS256') {
+        headers.jwk = {kty: jwk.kty, n: jwk.n, e: jwk.e, kid : headers.kid};
     }
 
     const jws = {
@@ -160,15 +164,27 @@ const EC = {
 // @ts-ignore
 const thumbprint = async (jwk, digestAlgorithm: AlgorithmIdentifier) => {
     // lexigraphically sorted, no spaces
-    const sortedPub = '{"crv":"CRV","kty":"EC","x":"X","y":"Y"}'
-        .replace('CRV', jwk.crv)
-        .replace('X', jwk.x)
-        .replace('Y', jwk.y);
+    if(jwk.kty == 'EC') {
+        const sortedPub = '{"crv":"CRV","kty":"EC","x":"X","y":"Y"}'
+            .replace('CRV', jwk.crv)
+            .replace('X', jwk.x)
+            .replace('Y', jwk.y);
+        // The hash should match the size of the key,
+        // but we're only dealing with P-256
+        const hash = await window.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
+        return uint8ToUrlBase64(new Uint8Array(hash));
+    } else if(jwk.kty == 'RSA') {
+        const sortedPub = '{"e":"E","kty":"RSA","n":"N"}'
+            .replace('E', jwk.e)
+            .replace('N', jwk.n);
+        // The hash should match the size of the key,
+        // but we're only dealing with P-256
+        const hash = await window.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
+        return uint8ToUrlBase64(new Uint8Array(hash));
+    }
+    
 
-    // The hash should match the size of the key,
-    // but we're only dealing with P-256
-    const hash = await window.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
-    return uint8ToUrlBase64(new Uint8Array(hash));
+    
 }
 
 export var JWK = {thumbprint};
@@ -176,9 +192,9 @@ export var JWK = {thumbprint};
 export const generateJwkAsync = async (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
     // @ts-ignore
     const jwk = await EC.generate(generateKeyAlgorithm);
-    // console.info('Private Key:', JSON.stringify(jwk));
+    console.info('Private Key:', JSON.stringify(jwk));
     // @ts-ignore
-    // console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
+    console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
     return jwk;
 }
 
@@ -195,7 +211,7 @@ export const generateJwtDemonstratingProofOfPossessionAsync = (demonstratingProo
     // @ts-ignore
     const kid = await JWK.thumbprint(jwk, demonstratingProofOfPossessionConfiguration.digestAlgorithm);
     // @ts-ignore
-    const jwt = await JWT.sign(jwk, { /*kid: kid*/ }, claims, demonstratingProofOfPossessionConfiguration)
+    const jwt = await JWT.sign(jwk, { kid: kid }, claims, demonstratingProofOfPossessionConfiguration)
     // console.info('JWT:', jwt);
     return jwt;
 }

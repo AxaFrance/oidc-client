@@ -45,6 +45,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
                         <option value="config_with_hash">config_with_hash</option>
                         <option value="config_show_access_token">config_show_access_token</option>
                         <option value="config_separate_oidc_access_token_domains">config_separate_oidc_access_token_domains</option>
+                        <option value="config_with_dpop">config_with_dpop</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { 'test:token_request': 'test', youhou: 'youhou', grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
@@ -118,6 +119,27 @@ export const MultiAuthContainer = () => {
             redirect_uri: callBack,
             silent_redirect_uri,
         },
+        config_with_dpop: {
+            ...configurationIdentityServer,
+            redirect_uri: callBack,
+            silent_redirect_uri,
+            demonstrating_proof_of_possession: true,
+            /*demonstrating_proof_of_possession_configuration: {
+                importKeyAlgorithm: {
+                    name: "RSASSA-PKCS1-v1_5",
+                    hash: { name: "SHA-256" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+                },
+                signAlgorithm: { name: "RSASSA-PKCS1-v1_5" },
+                generateKeyAlgorithm: {
+                    name: "RSASSA-PKCS1-v1_5",
+                    modulusLength: 2048, //can be 1024, 2048, or 4096
+                    publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+                    hash: { name: "SHA-256" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+                },
+                digestAlgorithm: { name: "SHA-256" },
+                jwtHeaderAlgorithm: "RS256",
+            },*/
+        }
     };
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
