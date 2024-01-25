@@ -1,6 +1,6 @@
 ﻿import { describe, expect,it } from 'vitest';
 
-import {getValidTokenAsync, isTokensOidcValid, parseOriginalTokens} from "./parseTokens";
+import { getValidTokenAsync, isTokensOidcValid, parseJwt, parseOriginalTokens} from "./parseTokens";
 
 describe('ParseTokens test Suite', () => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -23,6 +23,12 @@ describe('ParseTokens test Suite', () => {
             const result = await getValidTokenAsync(oidc, 1, 1);
             expect(result.isTokensValid).toEqual(expectIsValidToken);
         });
+    });
+
+    it('parseJwtShouldExtractData', async () => {
+        const claimsPart = "eyJzZXNzaW9uX3N0YXRlIjoiNzVjYzVlZDItZGYyZC00NTY5LWJmYzUtMThhOThlNjhiZTExIiwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoixrTHosOBw6zDhyDlsI_lkI0t44Ob44Or44OYIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdGluZ2NoYXJhY3RlcnNAaW52ZW50ZWRtYWlsLmNvbSIsImdpdmVuX25hbWUiOiLGtMeiw4HDrMOHIiwiZmFtaWx5X25hbWUiOiLlsI_lkI0t44Ob44Or44OYIn0"
+        const result = parseJwt(claimsPart);
+        expect(result!=null).toBe(true);
     });
 
 

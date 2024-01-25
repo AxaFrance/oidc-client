@@ -2,15 +2,15 @@ import {sleepAsync} from './initWorker.js';
 
 const b64DecodeUnicode = (str) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-const parseJwt = (token) => JSON.parse(b64DecodeUnicode(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+export const parseJwt = (payload:string) => JSON.parse(b64DecodeUnicode(payload.replace(/-/g, '+').replace(/_/g, '/')));
 
-const extractTokenPayload = (token) => {
+const extractTokenPayload = (token:string) => {
     try {
         if (!token) {
             return null;
         }
         if (countLetter(token, '.') === 2) {
-            return parseJwt(token);
+            return parseJwt(token.split('.')[1]);
         } else {
             return null;
         }
