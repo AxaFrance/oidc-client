@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.15
+## 7.13.16
+
+- [f2310bc](https://github.com/AxaFrance/oidc-client/commit/f2310bc917898b779a40edecf3dd73c21ec32b47) - fix(oidc): parseJwt fails for some JWT because of wrong use of replace (release) (#1269), 2024-01-25 by *Guillaume Chervet*
+
+
+## v7.13.15
 
 - [c56cc84](https://github.com/AxaFrance/oidc-client/commit/c56cc842d8da427b2aa88eb71f7d63937ea3c363) - fix(react-oidc): missing console.log in useOidcFetch (release), 2024-01-16 by *Guillaume Chervet*
 
@@ -312,10 +317,5 @@
 ## v6.26.4
 
 - [9c7a143](https://github.com/AxaFrance/oidc-client/commit/9c7a143797cffff1044c13787c6ceaf690fa4c87) - fix build (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.3
-
-- [04f4900](https://github.com/AxaFrance/oidc-client/commit/04f4900d672e954278e6835bc31c62e4bf8660de) - try fix (release), 2023-07-28 by *Guillaume Chervet*
 
 
