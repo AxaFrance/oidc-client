@@ -83,13 +83,17 @@ const sign = async (jwk, headers, claims, demonstratingProofOfPossessionConfigur
     // The headers should probably be empty
     headers.typ = jwtHeaderType;
     headers.alg = demonstratingProofOfPossessionConfiguration.jwtHeaderAlgorithm;
-    if(headers.alg === 'ES256') {
-        //if (!headers.kid) {
+    switch (headers.alg) {
+        case 'ES256': //if (!headers.kid) {
             // alternate: see thumbprint function below
             headers.jwk = {kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y};
-        //}
-    } else if(headers.alg === 'RS256') {
-        headers.jwk = {kty: jwk.kty, n: jwk.n, e: jwk.e, kid : headers.kid};
+            //}
+            break;
+        case 'RS256':
+            headers.jwk = {kty: jwk.kty, n: jwk.n, e: jwk.e, kid: headers.kid};
+            break;
+        default:
+            throw new Error('Unknown or not implemented JWS algorithm');
     }
 
     const jws = {
@@ -163,28 +167,27 @@ const EC = {
 };
 // @ts-ignore
 const thumbprint = async (jwk, digestAlgorithm: AlgorithmIdentifier) => {
+    let sortedPub;
     // lexigraphically sorted, no spaces
-    if(jwk.kty == 'EC') {
-        const sortedPub = '{"crv":"CRV","kty":"EC","x":"X","y":"Y"}'
-            .replace('CRV', jwk.crv)
-            .replace('X', jwk.x)
-            .replace('Y', jwk.y);
-        // The hash should match the size of the key,
-        // but we're only dealing with P-256
-        const hash = await window.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
-        return uint8ToUrlBase64(new Uint8Array(hash));
-    } else if(jwk.kty == 'RSA') {
-        const sortedPub = '{"e":"E","kty":"RSA","n":"N"}'
-            .replace('E', jwk.e)
-            .replace('N', jwk.n);
-        // The hash should match the size of the key,
-        // but we're only dealing with P-256
-        const hash = await window.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
-        return uint8ToUrlBase64(new Uint8Array(hash));
+    switch (jwk.kty) {
+        case 'EC':
+            sortedPub = '{"crv":"CRV","kty":"EC","x":"X","y":"Y"}'
+                .replace('CRV', jwk.crv)
+                .replace('X', jwk.x)
+                .replace('Y', jwk.y);
+            break;
+        case 'RSA':
+            sortedPub = '{"e":"E","kty":"RSA","n":"N"}'
+                .replace('E', jwk.e)
+                .replace('N', jwk.n);
+            break;
+        default:
+            throw new Error('Unknown or not implemented JWK type');
     }
-    
-
-    
+    // The hash should match the size of the key,
+    // but we're only dealing with P-256
+    const hash = await window.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
+    return uint8ToUrlBase64(new Uint8Array(hash));
 }
 
 export var JWK = {thumbprint};

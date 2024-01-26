@@ -8,6 +8,7 @@ import { CallBackSuccess } from './override/Callback.component';
 import Loading from './override/Loading.component';
 import ServiceWorkerNotSupported from './override/ServiceWorkerNotSupported.component';
 import SessionLost from './override/SessionLost.component';
+import {FetchUserHook} from "./FetchUser";
 
 const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => {
     const [url, options, ...rest] = params;
@@ -198,15 +199,18 @@ const DisplayAccessToken = ({ configurationName }) => {
         return <p>you are not authentified</p>;
     }
     return (
-        <div className="card text-white bg-info mb-3">
-            <div className="card-body">
-                <h5 className="card-title">Access Token</h5>
-                <p style={{ color: 'red', backgroundColor: 'white' }}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be accessible from your client side javascript.</p>
-                {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
-                {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
-                <h5 className="card-title">Id Token</h5>
-                {idTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(idTokenPayload)}</p>}
+        <>
+            <div className="card text-white bg-info mb-3">
+                <div className="card-body">
+                    <h5 className="card-title">Access Token</h5>
+                    <p style={{ color: 'red', backgroundColor: 'white' }}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be accessible from your client side javascript.</p>
+                    {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
+                    {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
+                    <h5 className="card-title">Id Token</h5>
+                    {idTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(idTokenPayload)}</p>}
+                </div>
             </div>
-        </div>
+            <FetchUserHook configurationName={configurationName} />
+        </>
     );
 };
