@@ -74,7 +74,16 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
     } else {
         accessTokenPayload = extractTokenPayload(tokens.accessToken);
     }
-    const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : extractTokenPayload(tokens.idToken);
+
+    // When id_token is not rotated we reuse old id_token
+    let idToken: string;
+    if (oldTokens != null && 'idToken' in oldTokens && !('idToken' in tokens)) {
+        idToken = oldTokens.idToken;
+    } else {
+        idToken = tokens.idToken;
+    }
+    
+    const _idTokenPayload = tokens.idTokenPayload ? tokens.idTokenPayload : extractTokenPayload(idToken);
 
     const idTokenExpireAt = (_idTokenPayload && _idTokenPayload.exp) ? _idTokenPayload.exp : Number.MAX_VALUE;
     const accessTokenExpiresAt = (accessTokenPayload && accessTokenPayload.exp) ? accessTokenPayload.exp : tokens.issuedAt + expireIn;
@@ -96,8 +105,8 @@ export const setTokens = (tokens, oldTokens = null, tokenRenewMode: string):Toke
         }
     }
     
-    const newTokens = { ...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt };
-    // When refresh_token is not rotated we reuse ald refresh_token
+    const newTokens = { ...tokens, idTokenPayload: _idTokenPayload, accessTokenPayload, expiresAt, idToken };
+    // When refresh_token is not rotated we reuse old refresh_token
     if (oldTokens != null && 'refreshToken' in oldTokens && !('refreshToken' in tokens)) {
         const refreshToken = oldTokens.refreshToken;
         return { ...newTokens, refreshToken };
