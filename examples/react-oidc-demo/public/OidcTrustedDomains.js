@@ -21,4 +21,6 @@ trustedDomains.config_separate_oidc_access_token_domains = {
     oidcDomains: ["https://demo.duendesoftware.com"],
     accessTokenDomains: ["https://myapi"]
 };
+
+trustedDomains.config_with_dpop = { domains: ["https://demo.duendesoftware.com"], showAccessToken: true };
 //# sourceMappingURL=OidcTrustedDomains.js.map

@@ -20,7 +20,7 @@ const extractTokenPayload = (token:string) => {
     return null;
 };
 
-const countLetter = (str, find) => {
+const countLetter = (str : string, find) => {
     return (str.split(find)).length - 1;
 };
 

@@ -5,8 +5,13 @@ import {initSession} from './initSession.js';
 import {defaultServiceWorkerUpdateRequireCallback, initWorkerAsync, sleepAsync} from './initWorker.js';
 import {defaultLoginAsync, loginCallbackAsync} from './login.js';
 import {destroyAsync, logoutAsync} from './logout.js';
-import {computeTimeLeft, isTokensOidcValid, setTokens, TokenRenewMode, Tokens,} from './parseTokens.js';
-import {autoRenewTokens, renewTokensAndStartTimerAsync} from './renewTokens.js';
+import {isTokensOidcValid, TokenRenewMode, Tokens,} from './parseTokens.js';
+import {
+    autoRenewTokens,
+    renewTokensAndStartTimerAsync,
+    synchroniseTokensStatus,
+    syncTokensInfoAsync
+} from './renewTokens.js';
 import {fetchFromIssuer, performTokenRequestAsync} from './requests.js';
 import {getParseQueryStringFromLocation} from './route-utils.js';
 import defaultSilentLoginAsync, {_silentLoginAsync} from './silentLogin.js';
@@ -14,9 +19,13 @@ import timer from './timer.js';
 import {AuthorityConfiguration, Fetch, OidcConfiguration, StringMap} from './types.js';
 import {userInfoAsync} from './user.js';
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
-import {generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import {
+    defaultDemonstratingProofOfPossessionConfiguration,
+    generateJwtDemonstratingProofOfPossessionAsync
+} from "./jwt";
 import {ILOidcLocation, OidcLocation} from "./location";
 import {activateServiceWorker} from "./initWorkerOption";
+import {tryKeepSessionAsync} from "./keepSession";
 
 
 
@@ -83,11 +92,11 @@ export class Oidc {
     public userInfo: null;
     public tokens?: Tokens;
     public events: Array<any>;
-    private timeoutId: NodeJS.Timeout;
+    public timeoutId: NodeJS.Timeout | number;
     public configurationName: string;
-    private checkSessionIFrame: CheckSessionIFrame;
+    public checkSessionIFrame: CheckSessionIFrame;
     private getFetch: () => Fetch;
-    private location: ILOidcLocation;
+    public location: ILOidcLocation;
     constructor(configuration:OidcConfiguration, configurationName = 'default', getFetch : () => Fetch, location: ILOidcLocation = new OidcLocation()) {
       let silent_login_uri = configuration.silent_login_uri;
       if (configuration.silent_redirect_uri && !configuration.silent_login_uri) {
@@ -112,6 +121,7 @@ export class Oidc {
           logout_tokens_to_invalidate: configuration.logout_tokens_to_invalidate ?? ['access_token', 'refresh_token'],
           service_worker_update_require_callback,
           service_worker_activate: configuration.service_worker_activate ?? activateServiceWorker,
+          demonstrating_proof_of_possession_configuration: configuration.demonstrating_proof_of_possession_configuration ?? defaultDemonstratingProofOfPossessionConfiguration,
       };
       
       this.getFetch = getFetch ?? getFetchDefault;
@@ -225,78 +235,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.tryKeepExistingSessionPromise !== null) {
             return this.tryKeepExistingSessionPromise;
         }
-        const funcAsync = async () => {
-            let serviceWorker;
-            if (this.tokens != null) {
-                return false;
-            }
-            this.publishEvent(eventNames.tryKeepExistingSessionAsync_begin, {});
-            try {
-                const configuration = this.configuration;
-                const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-                serviceWorker = await initWorkerAsync(configuration, this.configurationName);
-                if (serviceWorker) {
-                    const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'tryKeepExistingSessionAsync', configuration);
-                    if (tokens) {
-                        serviceWorker.startKeepAliveServiceWorker();
-                        // @ts-ignore
-                        this.tokens = tokens;
-                        const getLoginParams = serviceWorker.getLoginParams(this.configurationName);
-                        // @ts-ignore
-                        this.timeoutId = autoRenewTokens(this, this.tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
-                        const sessionState = await serviceWorker.getSessionStateAsync();
-                        // @ts-ignore
-                        await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
-                        this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
-                            success: true,
-                            message: 'tokens inside ServiceWorker are valid',
-                        });
-                        return true;
-                    }
-                    this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
-                        success: false,
-                        message: 'no exiting session found',
-                    });
-                } else {
-                    if (configuration.service_worker_relative_url) {
-                        this.publishEvent(eventNames.service_worker_not_supported_by_browser, {
-                            message: 'service worker is not supported by this browser',
-                        });
-                    }
-                    const session = initSession(this.configurationName, configuration.storage ?? sessionStorage);
-                    const { tokens } = await session.initAsync();
-                    if (tokens) {
-                        // @ts-ignore
-                        this.tokens = setTokens(tokens, null, configuration.token_renew_mode);
-                        const getLoginParams = session.getLoginParams();
-                        // @ts-ignore
-                        this.timeoutId = autoRenewTokens(this, tokens.refreshToken, this.tokens.expiresAt, getLoginParams.extras);
-                        const sessionState = await session.getSessionStateAsync();
-                        // @ts-ignore
-                        await this.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
-                        this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
-                            success: true,
-                            message: 'tokens inside storage are valid',
-                        });
-                        return true;
-                    }
-                }
-                this.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
-                    success: false,
-                    message: serviceWorker ? 'service worker sessions not retrieved' : 'session storage sessions not retrieved',
-                });
-                return false;
-            } catch (exception) {
-                console.error(exception);
-                if (serviceWorker) {
-                    await serviceWorker.clearAsync();
-                }
-                this.publishEvent(eventNames.tryKeepExistingSessionAsync_error, 'tokens inside ServiceWorker are invalid');
-                return false;
-            }
-        };
-
-        this.tryKeepExistingSessionPromise = funcAsync();
+        
+        this.tryKeepExistingSessionPromise = tryKeepSessionAsync(this);
         return this.tryKeepExistingSessionPromise.then((result) => {
             this.tryKeepExistingSessionPromise = null;
             return result;
@@ -349,8 +289,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return result;
         });
     }
+    
+    
 
     async synchroniseTokensAsync(refreshToken, index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) {
+        
         while (!navigator.onLine && document.hidden) {
             await sleepAsync({milliseconds: 1000});
             this.publishEvent(eventNames.refreshTokensAsync, { message: 'wait because navigator is offline and hidden' });
@@ -410,27 +353,27 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return { tokens: null, status: 'SESSION_LOST' };
         }
         try {
-            const { status, tokens, nonce } = await this.syncTokensInfoAsync(configuration, this.configurationName, this.tokens, forceRefresh);
+            const { status, tokens, nonce } = await syncTokensInfoAsync(this)(configuration, this.configurationName, this.tokens, forceRefresh);
             switch (status) {
-                case 'SESSION_LOST':
+                case synchroniseTokensStatus.SESSION_LOST:
                     updateTokens(null);
                     this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token session lost' });
                     return { tokens: null, status: 'SESSION_LOST' };
-                case 'NOT_CONNECTED':
+                case synchroniseTokensStatus.NOT_CONNECTED:
                     updateTokens(null);
                     return { tokens: null, status: null };
-                case 'TOKENS_VALID':
+                case synchroniseTokensStatus.TOKENS_VALID:
                     updateTokens(tokens);
                     return { tokens, status: 'LOGGED_IN' };
-                case 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID':
+                case synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID:
                     updateTokens(tokens);
                     this.publishEvent(Oidc.eventNames.token_renewed, { reason: 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID' });
                     return { tokens, status: 'LOGGED_IN' };
-                case 'LOGOUT_FROM_ANOTHER_TAB':
+                case synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB:
                     updateTokens(null);
                     this.publishEvent(eventNames.logout_from_another_tab, { status: 'session syncTokensAsync' });
                     return { tokens: null, status: 'LOGGED_OUT' };
-                case 'REQUIRE_SYNC_TOKENS':
+                case synchroniseTokensStatus.REQUIRE_SYNC_TOKENS:
                     this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
                     return await localsilentLoginAsync();
                 default: {
@@ -516,7 +459,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),};
 
         const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
-        let demonstratingProofOfPossessionNonce:string = null;
+        let demonstratingProofOfPossessionNonce:string;
         let jwk;
         if (serviceWorker) {
             demonstratingProofOfPossessionNonce = await serviceWorker.getDemonstratingProofOfPossessionNonce();
@@ -531,56 +474,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;
         }
 
-        return await generateJwtDemonstratingProofOfPossessionAsync(jwk, method, url, claimsExtras);
-    }
-
-    async syncTokensInfoAsync(configuration, configurationName, currentTokens, forceRefresh = false) {
-        // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
-        // const configuration = this.configuration;
-        const nullNonce = { nonce: null };
-        if (!currentTokens) {
-            return { tokens: null, status: 'NOT_CONNECTED', nonce: nullNonce };
-        }
-        let nonce = nullNonce;
-        const oidcServerConfiguration = await this.initAsync(configuration.authority, configuration.authority_configuration);
-        const serviceWorker = await initWorkerAsync(configuration, configurationName);
-        if (serviceWorker) {
-            const { status, tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
-            if (status === 'LOGGED_OUT') {
-                return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
-            } else if (status === 'SESSIONS_LOST') {
-                    return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
-            } else if (!status || !tokens) {
-                return { tokens: null, status: 'REQUIRE_SYNC_TOKENS', nonce: nullNonce };
-            } else if (tokens.issuedAt !== currentTokens.issuedAt) {
-                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
-                const status = (timeLeft > 0) ? 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID' : 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID';
-                const nonce = await serviceWorker.getNonceAsync();
-                return { tokens, status, nonce };
-            }
-            nonce = await serviceWorker.getNonceAsync();
-        } else {
-            const session = initSession(configurationName, configuration.storage ?? sessionStorage);
-            const { tokens, status } = await session.initAsync();
-            if (!tokens) {
-                return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
-            } else if (status === 'SESSIONS_LOST') {
-                    return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
-                } else if (tokens.issuedAt !== currentTokens.issuedAt) {
-                const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
-                const status = (timeLeft > 0) ? 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID' : 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID';
-                const nonce = await session.getNonceAsync();
-                return { tokens, status, nonce };
-            }
-            nonce = await session.getNonceAsync();
-        }
-
-        const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, currentTokens.expiresAt);
-        const status = (timeLeft > 0) ? 'TOKENS_VALID' : 'TOKENS_INVALID';
-        if (forceRefresh) {
-            return { tokens: currentTokens, status: 'FORCE_REFRESH', nonce };
-        }
-        return { tokens: currentTokens, status, nonce };
+        return await generateJwtDemonstratingProofOfPossessionAsync(configuration.demonstrating_proof_of_possession_configuration)(jwk, method, url, claimsExtras);
     }
 
     loginCallbackWithAutoTokensRenewPromise:Promise<LoginCallback> = null;

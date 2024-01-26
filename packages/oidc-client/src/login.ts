@@ -11,6 +11,7 @@ import {getParseQueryStringFromLocation} from './route-utils.js';
 import {OidcConfiguration, StringMap} from './types.js';
 import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
 import {ILOidcLocation} from "./location";
+import Oidc from "./oidc";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const defaultLoginAsync = (configurationName:string, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function, oidcLocation: ILOidcLocation) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {
@@ -75,7 +76,7 @@ export const defaultLoginAsync = (configurationName:string, configuration:OidcCo
     return loginLocalAsync();
 };
 
-export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
+export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) => {
     try {
         oidc.publishEvent(eventNames.loginCallbackAsync_begin, {});
         const configuration = oidc.configuration;
@@ -148,14 +149,14 @@ export const loginCallbackAsync = (oidc) => async (isSilentSignin = false) => {
         const url = oidcServerConfiguration.tokenEndpoint;
         const headersExtras = {};
         if(configuration.demonstrating_proof_of_possession) {
-            const jwk = await generateJwkAsync();
+            const jwk = await generateJwkAsync(configuration.demonstrating_proof_of_possession_configuration.generateKeyAlgorithm);
             if (serviceWorker) {
                 await serviceWorker.setDemonstratingProofOfPossessionJwkAsync(jwk);
             } else {
                 const session = initSession(oidc.configurationName, configuration.storage);
                 await session.setDemonstratingProofOfPossessionJwkAsync(jwk);
             }
-            headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(jwk, 'POST', url);
+            headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(configuration.demonstrating_proof_of_possession_configuration)(jwk, 'POST', url);
         }
 
         const tokenResponse = await performFirstTokenRequestAsync(storage)(url, 

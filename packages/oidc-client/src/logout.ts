@@ -4,6 +4,7 @@ import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
 import {ILOidcLocation} from "./location";
+import Oidc from "./oidc";
 
 export const oidcLogoutTokens = {
     access_token: 'access_token',
