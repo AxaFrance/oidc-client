@@ -162,6 +162,7 @@ More information about OIDC :
 - [English : Increase the security and simplicity of your information system with OpenID Connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
 - [English: youtube OIDC](https://www.youtube.com/watch?v=frIJfavZkUE&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=1)
 - [French: youtube OIDC](https://www.youtube.com/watch?v=H-mLMGzQ_y0&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=2)
+
 ## FAQ
 
 -  Frequented Asked Question [`FAQ`](./FAQ.md)
