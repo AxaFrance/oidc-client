@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.13.16
+## 7.14.0
+
+- [b0510eb](https://github.com/AxaFrance/oidc-client/commit/b0510eb8d7170e8e142cb2d9bec01f41f610ed51) - feat(oidc): add DPOP configuration  (#1259) (release), 2024-01-26 by *Guillaume Chervet*
+
+
+## v7.13.16
 
 - [f2310bc](https://github.com/AxaFrance/oidc-client/commit/f2310bc917898b779a40edecf3dd73c21ec32b47) - fix(oidc): parseJwt fails for some JWT because of wrong use of replace (release) (#1269), 2024-01-25 by *Guillaume Chervet*
 
@@ -312,10 +317,5 @@
 ## v6.26.5
 
 - [48d9db2](https://github.com/AxaFrance/oidc-client/commit/48d9db2f2cffbe74a6fd32b5771f5df0b8314b7f) - test release, 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.4
-
-- [9c7a143](https://github.com/AxaFrance/oidc-client/commit/9c7a143797cffff1044c13787c6ceaf690fa4c87) - fix build (release), 2023-07-28 by *Guillaume Chervet*
 
 
