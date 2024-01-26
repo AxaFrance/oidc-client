@@ -160,8 +160,8 @@ More information about OIDC :
 
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
 - [English : Increase the security and simplicity of your information system with OpenID Connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
-- [English: youtube OIDC](https://www.youtube.com/watch?v=frIJfavZkUE&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=1)
-- [French: youtube OIDC](https://www.youtube.com/watch?v=H-mLMGzQ_y0&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=2)
+- [English: youtube react-oidc introduction](https://www.youtube.com/watch?v=frIJfavZkUE&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=1)
+- [French: youtube react-oidc introduction](https://www.youtube.com/watch?v=H-mLMGzQ_y0&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=2)
 
 ## FAQ
 
