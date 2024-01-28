@@ -17,6 +17,7 @@ const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => 
 };
 
 const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
+    console.log('MultiAuth', configurationName);
     const { login, logout, isAuthenticated } = useOidc(configurationName);
     const { isAuthenticated: isAuthenticatedDefault } = useOidc('default');
     const [fname, setFname] = useState('');
@@ -80,8 +81,8 @@ export const MultiAuthContainer = () => {
     const [isSessionLost, setIsSessionLost] = useState(false);
     const [configurationName, setConfigurationName] = useState(sessionStorage.configurationName);
     const [events, dispatch] = useReducer(reducer, []);
-    const callBack = window.location.origin + '/multi-auth/authentification/callback2';
-    const silent_redirect_uri = window.location.origin + '/multi-auth/authentification/silent-callback2';
+    const callBack = window.location.origin + '/multi-auth/authentification/callback';
+    const silent_redirect_uri = window.location.origin + '/multi-auth/authentification/silent-callback';
     const configurations = {
         config_classic: {
             ...configurationIdentityServer,
@@ -155,7 +156,7 @@ export const MultiAuthContainer = () => {
         // console.log(`oidc:${configurationName}:${eventName}`, data);
         dispatch({ type: 'event', data: { name: `oidc:${configurationName}:${eventName}`, data } });
     };
-
+    console.log('MultiAuthContainer', configurationName);
     return (
         <>
         <OidcProvider configuration={configurations[configurationName]}
