@@ -1,6 +1,14 @@
 # Changelog
 
-## 7.14.0
+## 7.14.1
+
+- [0fe53a6](https://github.com/AxaFrance/oidc-client/commit/0fe53a6b870c13c71330806a045896ea1e0a57e2) - fix(oidc): remove console.log (release), 2024-01-28 by *Guillaume Chervet*
+- [b23d6a7](https://github.com/AxaFrance/oidc-client/commit/b23d6a7e1fc04ce43f489ac8977de9fe5affff73) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-01-28 by *Guillaume Chervet*
+- [14ccbeb](https://github.com/AxaFrance/oidc-client/commit/14ccbeb83f1d7e790b496e571d424f615a39b43f) - fix(oidc): demo and remove console.log, 2024-01-28 by *Guillaume Chervet*
+- [15eb259](https://github.com/AxaFrance/oidc-client/commit/15eb2592d9582cb43798a5d7fc988b3c349e5b43) - doc(oidc): Update README.md, 2024-01-26 by *Guillaume Chervet*
+
+
+## v7.14.0
 
 - [b0510eb](https://github.com/AxaFrance/oidc-client/commit/b0510eb8d7170e8e142cb2d9bec01f41f610ed51) - feat(oidc): add DPOP configuration  (#1259) (release), 2024-01-26 by *Guillaume Chervet*
 
@@ -312,10 +320,5 @@
 ## v6.26.6
 
 - [dab3662](https://github.com/AxaFrance/oidc-client/commit/dab36629bdebed5a3f085d606f313c7a12644e77) - fix build (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.5
-
-- [48d9db2](https://github.com/AxaFrance/oidc-client/commit/48d9db2f2cffbe74a6fd32b5771f5df0b8314b7f) - test release, 2023-07-28 by *Guillaume Chervet*
 
 

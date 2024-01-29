@@ -195,9 +195,9 @@ export var JWK = {thumbprint};
 export const generateJwkAsync = async (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
     // @ts-ignore
     const jwk = await EC.generate(generateKeyAlgorithm);
-    console.info('Private Key:', JSON.stringify(jwk));
+    // console.info('Private Key:', JSON.stringify(jwk));
     // @ts-ignore
-    console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
+    // console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
     return jwk;
 }
 
