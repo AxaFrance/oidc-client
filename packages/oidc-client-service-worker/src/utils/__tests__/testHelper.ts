@@ -188,6 +188,13 @@ class OidcConfigBuilder {
     return this;
   }
 
+  public withOidcConfiguration(
+      oidcConfiguration: OidcConfiguration,
+  ): OidcConfigBuilder {
+    this.oidcConfig.oidcConfiguration = oidcConfiguration;
+    return this;
+  }
+
   public build() {
     return this.oidcConfig;
   }
