@@ -104,5 +104,33 @@ describe('tokens', () => {
       expect(secureTokens.access_token).toBe(expectedAccessToken);
       expect(typeof secureTokens.expiresAt).toBe("number");
     });
+
+    it('should reuse old id_token', () => {
+      const token = new TokenBuilder().withNonExpiredToken().build();
+      // @ts-ignore
+      delete token.id_token;
+      // @ts-ignore
+      delete token.idTokenPayload;
+      const oidcConfiguration = new OidcConfigBuilder()
+          .withOidcConfiguration({token_renew_mode: "access_token_invalid"})
+          .withOidcServerConfiguration({issuer: "", 
+            authorizationEndpoint:"", 
+            revocationEndpoint:"", 
+            tokenEndpoint:"", 
+            userInfoEndpoint:"" })
+          .withTokens(new TokenBuilder()
+          .withNonExpiredToken()
+          .withIdToken("old_id_token")
+          .withIdTokenPayload({
+            iss: oidcServerConfig.issuer,
+            exp: 0,
+            iat: 0,
+            nonce: null,
+          })
+          .build()).build();
+      const secureTokens = _hideTokens(token, oidcConfiguration, 'test');
+      expect(secureTokens.id_token).toBe("old_id_token"); 
+      
+    });
   });
 });

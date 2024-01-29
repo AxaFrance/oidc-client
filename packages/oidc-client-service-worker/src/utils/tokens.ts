@@ -133,9 +133,19 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   }
   tokens.accessTokenPayload = accessTokenPayload;
 
+  // When id_token is not rotated we reuse old id_token
+  const oldTokens = currentDatabaseElement.tokens;
+  let id_token: string | null;
+  if (oldTokens != null && 'id_token' in oldTokens && !('id_token' in tokens)) {
+    id_token = oldTokens.id_token;
+  } else {
+    id_token = tokens.id_token;
+  }
+  tokens.id_token = id_token;
+  
   let _idTokenPayload = null;
-  if (tokens.id_token) {
-    _idTokenPayload = extractTokenPayload(tokens.id_token);
+  if (id_token) {
+    _idTokenPayload = extractTokenPayload(id_token);
     tokens.idTokenPayload = { ..._idTokenPayload };
     if (_idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
       const keyNonce =
@@ -193,11 +203,11 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
 
   // When refresh_token is not rotated we reuse ald refresh_token
   if (
-      currentDatabaseElement.tokens != null &&
-      'refresh_token' in currentDatabaseElement.tokens &&
+      oldTokens != null &&
+      'refresh_token' in oldTokens &&
       !('refresh_token' in tokens)
   ) {
-    const refreshToken = currentDatabaseElement.tokens.refresh_token;
+    const refreshToken = oldTokens.refresh_token;
 
     currentDatabaseElement.tokens = {
       ...tokens,
