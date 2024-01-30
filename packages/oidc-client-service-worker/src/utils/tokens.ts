@@ -71,7 +71,7 @@ const isTokensOidcValid = (
   if (tokens.idTokenPayload) {
     const idTokenPayload = tokens.idTokenPayload;
     // 2: The Issuer Identifier for the OpenID Provider (which is typically obtained during Discovery) MUST exactly match the value of the iss (issuer) Claim.
-    if (oidcServerConfiguration.issuer !== idTokenPayload.iss) {
+    if (idTokenPayload && oidcServerConfiguration.issuer !== idTokenPayload.iss) {
       return { isValid: false, reason: `Issuer does not match (oidcServerConfiguration issuer) ${oidcServerConfiguration.issuer} !== (idTokenPayload issuer) ${idTokenPayload.iss}` };
     }
     // 3: The Client MUST validate that the aud (audience) Claim contains its client_id value registered at the Issuer identified by the iss (issuer) Claim as an audience. The aud (audience) Claim MAY contain an array with more than one element. The ID Token MUST be rejected if the ID Token does not list the Client as a valid audience, or if it contains additional audiences not trusted by the Client.
@@ -80,19 +80,19 @@ const isTokensOidcValid = (
 
     // 9: The current time MUST be before the time represented by the exp Claim.
     const currentTimeUnixSecond = new Date().getTime() / 1000;
-    if (idTokenPayload.exp && idTokenPayload.exp < currentTimeUnixSecond) {
+    if (idTokenPayload && idTokenPayload.exp && idTokenPayload.exp < currentTimeUnixSecond) {
       return { isValid: false, reason: `Token expired at (idTokenPayload exp) ${idTokenPayload.exp} < (currentTimeUnixSecond) ${currentTimeUnixSecond}` };
     }
     // 10: The iat Claim can be used to reject tokens that were issued too far away from the current time, limiting the amount of time that nonces need to be stored to prevent attacks. The acceptable range is Client specific.
     const timeInSevenDays = 60 * 60 * 24 * 7;
     if (
-      idTokenPayload.iat &&
+        idTokenPayload && idTokenPayload.iat &&
       idTokenPayload.iat + timeInSevenDays < currentTimeUnixSecond
     ) {
       return { isValid: false, reason: `Token is used from too long time (idTokenPayload iat + timeInSevenDays) ${idTokenPayload.iat + timeInSevenDays} < (currentTimeUnixSecond) ${currentTimeUnixSecond}` };
     }
     // 11: If a nonce value was sent in the Authentication Request, a nonce Claim MUST be present and its value checked to verify that it is the same value as the one that was sent in the Authentication Request. The Client SHOULD check the nonce value for replay attacks. The precise method for detecting replay attacks is Client specific.
-    if (nonce && idTokenPayload.nonce && idTokenPayload.nonce !== nonce) {
+    if (idTokenPayload && nonce && idTokenPayload.nonce && idTokenPayload.nonce !== nonce) {
       return { isValid: false, reason: `Nonce does not match (nonce) ${nonce} !== (idTokenPayload nonce) ${idTokenPayload.nonce}` };
     }
   }
@@ -146,8 +146,8 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   let _idTokenPayload = null;
   if (id_token) {
     _idTokenPayload = extractTokenPayload(id_token);
-    tokens.idTokenPayload = { ..._idTokenPayload };
-    if (_idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
+    tokens.idTokenPayload = _idTokenPayload !=null ? { ..._idTokenPayload }: null;
+    if (_idTokenPayload && _idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
       const keyNonce =
           TOKEN.NONCE_TOKEN + '_' + currentDatabaseElement.configurationName;
       _idTokenPayload.nonce = keyNonce;

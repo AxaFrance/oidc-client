@@ -128,8 +128,8 @@ describe('tokens', () => {
             nonce: null,
           })
           .build()).build();
-      const secureTokens = _hideTokens(token, oidcConfiguration, 'test');
-      expect(secureTokens.id_token).toBe("old_id_token"); 
+      _hideTokens(token, oidcConfiguration, 'test');
+      expect(token.id_token).toBe("old_id_token"); 
       
     });
   });
