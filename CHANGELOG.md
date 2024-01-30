@@ -1,6 +1,16 @@
 # Changelog
 
-## 7.14.1
+## 7.15.1
+
+- [5094e36](https://github.com/AxaFrance/oidc-client/commit/5094e36c1435684c5863e8d27eca59093aaec7b7) - fix(service-worker): unit test broken (release), 2024-01-30 by *Guillaume Chervet*
+
+
+## v7.15.0
+
+- [1676881](https://github.com/AxaFrance/oidc-client/commit/1676881f1db53cff6652ee7fe9658a437682231f) - feat(oidc): idToken can be null on a refresh (release) (#1271), 2024-01-29 by *Guillaume Chervet*
+
+
+## v7.14.1
 
 - [0fe53a6](https://github.com/AxaFrance/oidc-client/commit/0fe53a6b870c13c71330806a045896ea1e0a57e2) - fix(oidc): remove console.log (release), 2024-01-28 by *Guillaume Chervet*
 - [b23d6a7](https://github.com/AxaFrance/oidc-client/commit/b23d6a7e1fc04ce43f489ac8977de9fe5affff73) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-01-28 by *Guillaume Chervet*
@@ -308,17 +318,5 @@
 ## v7.0.1
 
 - [cd97895](https://github.com/AxaFrance/oidc-client/commit/cd9789520090b27ea905401be6d03fd87f817f76) - fix(oidc): expire_in in string instead of number (#1118) (release), 2023-08-03 by *Guillaume Chervet*
-
-
-## v7.0.0
-
-- [9567873](https://github.com/AxaFrance/oidc-client/commit/95678734c0495f80628f99ad3aa284a3014f8bbc) - feat(oidc): rename repository oidc-client (#1115) (release), 2023-08-01 by *Guillaume Chervet*
-- [ff61e5d](https://github.com/AxaFrance/oidc-client/commit/ff61e5d5e3387888ce18ec8e99fde0044009f481) - fix(demo): google new link and add navigate button, 2023-07-31 by *Guillaume Chervet*
-- [0d8bc06](https://github.com/AxaFrance/oidc-client/commit/0d8bc0626be0d5d14edca83dacb7367f57d4bb6d) - feat(oidc): rename vanilla-oidc to oidc-client (#1112) (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.6
-
-- [dab3662](https://github.com/AxaFrance/oidc-client/commit/dab36629bdebed5a3f085d606f313c7a12644e77) - fix build (release), 2023-07-28 by *Guillaume Chervet*
 
 
