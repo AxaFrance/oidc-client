@@ -1,15 +1,15 @@
 import {initSession} from './initSession.js';
 import {initWorkerAsync} from './initWorker.js';
 import Oidc from './oidc.js';
-import {computeTimeLeft, setTokens} from './parseTokens.js';
+import {computeTimeLeft, setTokens, Tokens} from './parseTokens.js';
 import timer from './timer.js';
 import {OidcConfiguration, StringMap} from './types.js';
 
-async function syncTokens(oidc:Oidc, refreshToken, forceRefresh: boolean, extras: StringMap) {
+async function syncTokens(oidc:Oidc, forceRefresh: boolean, extras: StringMap) {
     const updateTokens = (tokens) => {
         oidc.tokens = tokens;
     };
-    const {tokens, status} = await oidc.synchroniseTokensAsync(refreshToken, 0, forceRefresh, extras, updateTokens);
+    const {tokens, status} = await oidc.synchroniseTokensAsync(0, forceRefresh, extras, updateTokens);
 
     const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
     if (!serviceWorker) {
@@ -24,7 +24,7 @@ async function syncTokens(oidc:Oidc, refreshToken, forceRefresh: boolean, extras
     return tokens;
 }
 
-async function loadLatestTokensAsync(oidc, configuration) {
+const loadLatestTokensAsync = async (oidc:Oidc, configuration:OidcConfiguration) :Promise<Tokens> => {
     const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
     if (serviceWorker) {
         const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
@@ -39,7 +39,7 @@ async function loadLatestTokensAsync(oidc, configuration) {
     }
 }
 
-export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRefresh = false, extras:StringMap = null) {
+export async function renewTokensAndStartTimerAsync(oidc, forceRefresh = false, extras:StringMap = null) {
 
     const configuration = oidc.configuration;
     const lockResourcesName = `${configuration.client_id}_${oidc.configurationName}_${configuration.authority}`;
@@ -48,14 +48,14 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
     
     if(configuration?.storage === window?.sessionStorage && !serviceWorker) {
-        tokens = await syncTokens(oidc, refreshToken, forceRefresh, extras);
+        tokens = await syncTokens(oidc, forceRefresh, extras);
     } else {
         tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async (lock) => {
             if(!lock){
                 oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, { lock: 'lock not available' });
                 return await loadLatestTokensAsync(oidc, configuration);
             }
-            return await syncTokens(oidc, refreshToken, forceRefresh, extras);
+            return await syncTokens(oidc, forceRefresh, extras);
         });
         
     }
@@ -72,13 +72,13 @@ export async function renewTokensAndStartTimerAsync(oidc, refreshToken, forceRef
     return oidc.tokens;
 }
 
-export const autoRenewTokens = (oidc:Oidc, refreshToken, expiresAt, extras:StringMap = null) => {
+export const autoRenewTokens = (oidc:Oidc, expiresAt, extras:StringMap = null) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second;
     return timer.setTimeout(async () => {
         const timeLeft = computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond, expiresAt);
         const timeInfo = { timeLeft };
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
-        await renewTokensAndStartTimerAsync(oidc, refreshToken, false, extras);
+        await renewTokensAndStartTimerAsync(oidc, false, extras);
     }, 1000);
 };
 
@@ -118,7 +118,10 @@ export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConf
         nonce = await serviceWorker.getNonceAsync();
     } else {
         const session = initSession(configurationName, configuration.storage ?? sessionStorage);
-        const { tokens, status } = await session.initAsync();
+        let { tokens, status } = await session.initAsync();
+        if(tokens){
+            tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
+        }
         if (!tokens) {
             return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
         } else if (status === 'SESSIONS_LOST') {

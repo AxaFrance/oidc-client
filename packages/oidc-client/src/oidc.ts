@@ -292,7 +292,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     
     
 
-    async synchroniseTokensAsync(refreshToken, index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) {
+    async synchroniseTokensAsync(index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) {
         
         while (!navigator.onLine && document.hidden) {
             await sleepAsync({milliseconds: 1000});
@@ -344,7 +344,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 }
             }
             this.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token silent return' });
-            return await this.synchroniseTokensAsync(null, nextIndex, forceRefresh, extras, updateTokens);
+            return await this.synchroniseTokensAsync(nextIndex, forceRefresh, extras, updateTokens);
         };
 
         if (index > 4) {
@@ -374,11 +374,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     this.publishEvent(eventNames.logout_from_another_tab, { status: 'session syncTokensAsync' });
                     return { tokens: null, status: 'LOGGED_OUT' };
                 case synchroniseTokensStatus.REQUIRE_SYNC_TOKENS:
-                    this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
+                    this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken: tokens.refreshToken, status, tryNumber: index });
                     return await localsilentLoginAsync();
                 default: {
-                    this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken, status, tryNumber: index });
-                    if (!refreshToken) {
+                    this.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken: tokens.refreshToken, status, tryNumber: index });
+                    if (!tokens.refreshToken) {
                         return await localsilentLoginAsync();
                     }
 
@@ -440,7 +440,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                                 message: 'bad request',
                                 tokenResponse,
                             });
-                            return await this.synchroniseTokensAsync(refreshToken, nextIndex, forceRefresh, extras, updateTokens);
+                            return await this.synchroniseTokensAsync(nextIndex, forceRefresh, extras, updateTokens);
                         }
                     };
                     return await localFunctionAsync();
@@ -449,7 +449,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         } catch (exception: any) {
                 console.error(exception);
                 this.publishEvent(eventNames.refreshTokensAsync_silent_error, { message: 'exception', exception: exception.message });
-                return this.synchroniseTokensAsync(refreshToken, nextIndex, forceRefresh, extras, updateTokens);
+                return this.synchroniseTokensAsync(nextIndex, forceRefresh, extras, updateTokens);
             }
      }
 
@@ -512,7 +512,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          }
          timer.clearTimeout(this.timeoutId);
          // @ts-ignore
-         this.renewTokensPromise = renewTokensAndStartTimerAsync(this, this.tokens.refreshToken, true, extras);
+         this.renewTokensPromise = renewTokensAndStartTimerAsync(this, true, extras);
          return this.renewTokensPromise.then(result => {
              this.renewTokensPromise = null;
              return result;
