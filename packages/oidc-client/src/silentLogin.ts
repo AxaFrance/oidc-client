@@ -131,7 +131,7 @@ export const defaultSilentLoginAsync = (window, configurationName, configuration
                 oidc.tokens = silentResult.tokens;
                 publishEvent(eventNames.token_aquired, {});
                 // @ts-ignore
-                oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.refreshToken, oidc.tokens.expiresAt, extras);
+                oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras);
                 return {};
             }
         } catch (e) {

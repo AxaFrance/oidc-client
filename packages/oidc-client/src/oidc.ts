@@ -79,7 +79,7 @@ export type InternalLoginCallback = {
 
 const loginCallbackWithAutoTokensRenewAsync = async (oidc) : Promise<LoginCallback> => {
     const { parsedTokens, callbackPath } = await oidc.loginCallbackAsync();
-    oidc.timeoutId = autoRenewTokens(oidc, parsedTokens.refreshToken, parsedTokens.expiresAt);
+    oidc.timeoutId = autoRenewTokens(oidc, parsedTokens.expiresAt);
     return { callbackPath };
 };
 

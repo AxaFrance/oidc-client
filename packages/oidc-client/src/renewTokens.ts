@@ -66,7 +66,7 @@ export async function renewTokensAndStartTimerAsync(oidc, forceRefresh = false, 
     
     if (oidc.timeoutId) {
         // @ts-ignore
-        oidc.timeoutId = autoRenewTokens(oidc, tokens.refreshToken, oidc.tokens.expiresAt, extras);
+        oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras);
     }
     
     return oidc.tokens;
