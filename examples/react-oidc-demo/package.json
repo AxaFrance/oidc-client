@@ -28,7 +28,7 @@
     "@testing-library/react": "14.1.2",
     "@testing-library/user-event": "14.4.3",
     "@types/react": "^18.2.39",
-    "@vitejs/plugin-react": "4.0.3",
+    "@vitejs/plugin-react": "4.2.1",
     "@vitest/coverage-c8": "^0.33.0",
     "bootstrap": "^4.6.2",
     "copyfiles": "2.4.1",
