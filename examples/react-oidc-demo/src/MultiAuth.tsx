@@ -16,8 +16,7 @@ const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => 
     return await fetch(url, options, ...rest);
 };
 
-const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
-    console.log('MultiAuth', configurationName);
+const MultiAuth = ({ configurationName, handleConfigurationChange }) => {;
     const { login, logout, isAuthenticated } = useOidc(configurationName);
     const { isAuthenticated: isAuthenticatedDefault } = useOidc('default');
     const [fname, setFname] = useState('');
@@ -156,7 +155,7 @@ export const MultiAuthContainer = () => {
         // console.log(`oidc:${configurationName}:${eventName}`, data);
         dispatch({ type: 'event', data: { name: `oidc:${configurationName}:${eventName}`, data } });
     };
-    console.log('MultiAuthContainer', configurationName);
+
     return (
         <>
         <OidcProvider configuration={configurations[configurationName]}
