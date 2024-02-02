@@ -1,7 +1,7 @@
 import { TokenRenewMode } from '@axa-fr/react-oidc';
 
 export const configurationIdentityServer = {
-    client_id: 'interactive.public.short',
+    client_id: 'interactive.public',
     redirect_uri: window.location.origin + '/authentication/callback',
     // silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
     // silent_login_uri: window.location.origin + '/authentication/silent-login',
