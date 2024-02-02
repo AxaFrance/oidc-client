@@ -4,7 +4,7 @@ import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
 import {ILOidcLocation} from "./location";
-import Oidc from "./oidc";
+import {eventNames} from "./events";
 
 export const oidcLogoutTokens = {
     access_token: 'access_token',
@@ -67,15 +67,18 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOi
     }
     // @ts-ignore
     const sub = oidc.tokens && oidc.tokens.idTokenPayload ? oidc.tokens.idTokenPayload.sub : null;
-    await oidc.destroyAsync('LOGGED_OUT');
+    
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [key, itemOidc] of Object.entries(oidcDatabase)) {
         if (itemOidc !== oidc) {
             // @ts-ignore
             await oidc.logoutSameTabAsync(oidc.configuration.client_id, sub);
+        } else {
+            oidc.publishEvent(eventNames.logout_from_same_tab, {} );
         }
     }
-
+    await oidc.destroyAsync('LOGGED_OUT');
+    
     if (oidcServerConfiguration.endSessionEndpoint) {
         if (!extras) {
             extras = {
