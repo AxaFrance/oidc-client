@@ -201,9 +201,8 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
         } catch (exceptionSilent: any) {
             console.error(exceptionSilent);
             oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, { message: 'exceptionSilent', exception: exceptionSilent.message });
+            return await synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
         }
-        oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token silent return' });
-        return await synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
     };
 
     if (index > 4) {
