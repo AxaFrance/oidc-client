@@ -66,7 +66,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         const dataString = storage[`oidc.login.${configurationName}`];
         
         if(!dataString){
-            console.warn(`storage[oidc.login.${configurationName}] is empty`);
+            console.warn(`storage[oidc.login.${configurationName}] is empty, you should have an bad OIDC or code configuration somewhere.`);
             return null;
         }
         
