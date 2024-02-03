@@ -122,7 +122,11 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url:string,
         body: formBodyString,
     }, timeoutMs);
     if (response.status !== 200) {
-        return { success: false, status: response.status, demonstratingProofOfPossessionNonce:null };
+        return { 
+            success: false, 
+            status: response.status, 
+            demonstratingProofOfPossessionNonce:null 
+        };
     }
     const tokens = await response.json();
 
@@ -132,6 +136,7 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url:string,
     }
     return {
         success: true,
+        status: response.status,
         data: parseOriginalTokens(tokens, oldTokens, tokenRenewMode),
         demonstratingProofOfPossessionNonce: demonstratingProofOfPossessionNonce,
     };

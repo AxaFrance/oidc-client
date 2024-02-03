@@ -1,15 +1,18 @@
 import {initSession} from './initSession.js';
-import {initWorkerAsync} from './initWorker.js';
+import {initWorkerAsync, sleepAsync} from './initWorker.js';
 import Oidc from './oidc.js';
-import {computeTimeLeft, setTokens, Tokens} from './parseTokens.js';
+import {computeTimeLeft, isTokensOidcValid, setTokens, Tokens} from './parseTokens.js';
 import timer from './timer.js';
 import {OidcConfiguration, StringMap} from './types.js';
+import {_silentLoginAsync} from "./silentLogin";
+import {performTokenRequestAsync} from "./requests";
+import {eventNames} from "./events";
 
 async function syncTokens(oidc:Oidc, forceRefresh: boolean, extras: StringMap) {
     const updateTokens = (tokens) => {
         oidc.tokens = tokens;
     };
-    const {tokens, status} = await oidc.synchroniseTokensAsync(0, forceRefresh, extras, updateTokens);
+    const {tokens, status} = await synchroniseTokensAsync(oidc)(0, forceRefresh, extras, updateTokens);
 
     const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
     if (!serviceWorker) {
@@ -141,4 +144,181 @@ export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConf
         return { tokens: currentTokens, status: 'FORCE_REFRESH', nonce };
     }
     return { tokens: currentTokens, status, nonce };
+}
+
+
+
+
+const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) =>{
+
+    while (!navigator.onLine && document.hidden) {
+        await sleepAsync({milliseconds: 1000});
+        oidc.publishEvent(eventNames.refreshTokensAsync, { message: 'wait because navigator is offline and hidden' });
+    }
+    let numberTryOnline = 6;
+    while (!navigator.onLine && numberTryOnline > 0) {
+        await sleepAsync({milliseconds: 1000});
+        numberTryOnline--;
+        oidc.publishEvent(eventNames.refreshTokensAsync, { message: `wait because navigator is offline try ${numberTryOnline}` });
+    }
+    const isDocumentHidden = document.hidden;
+    const nextIndex = index + 1;
+    if (!extras) {
+        extras = {};
+    }
+    const configuration = oidc.configuration;
+
+    const silentLoginAsync = (extras: StringMap, state:string=null, scope:string = null) => {
+        return _silentLoginAsync(oidc.configurationName, oidc.configuration, oidc.publishEvent.bind(oidc))(extras, state, scope);
+    };
+    const localsilentLoginAsync = async () => {
+        try {
+            let loginParams;
+            const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
+            if (serviceWorker) {
+                loginParams = serviceWorker.getLoginParams();
+            } else {
+                const session = initSession(oidc.configurationName, configuration.storage);
+                loginParams = session.getLoginParams();
+            }
+            const silent_token_response = await silentLoginAsync({
+                ...loginParams.extras,
+                ...extras,
+                prompt: 'none',
+            });
+            if (silent_token_response) {
+                if(silent_token_response.error) {
+                    updateTokens(null);
+                    oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token silent' });
+                    return { tokens: null, status: 'SESSION_LOST' };
+                }
+                
+                updateTokens(silent_token_response.tokens);
+                oidc.publishEvent(Oidc.eventNames.token_renewed, {});
+                return { tokens: silent_token_response.tokens, status: 'LOGGED' };
+            } 
+            
+        } catch (exceptionSilent: any) {
+            console.error(exceptionSilent);
+            oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, { message: 'exceptionSilent', exception: exceptionSilent.message });
+            return await synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
+        }
+    };
+
+    if (index > 4) {
+        if(isDocumentHidden){
+            //oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
+            return { tokens: oidc.tokens, status: 'GIVE_UP' };
+        } else{
+            updateTokens(null);
+            oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
+            return { tokens: null, status: 'SESSION_LOST' };
+        }
+    }
+    try {
+        const { status, tokens, nonce } = await syncTokensInfoAsync(oidc)(configuration, oidc.configurationName, oidc.tokens, forceRefresh);
+        switch (status) {
+            case synchroniseTokensStatus.SESSION_LOST:
+                updateTokens(null);
+                oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token session lost' });
+                return { tokens: null, status: 'SESSION_LOST' };
+            case synchroniseTokensStatus.NOT_CONNECTED:
+                updateTokens(null);
+                return { tokens: null, status: null };
+            case synchroniseTokensStatus.TOKENS_VALID:
+                updateTokens(tokens);
+                return { tokens, status: 'LOGGED_IN' };
+            case synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID:
+                updateTokens(tokens);
+                oidc.publishEvent(Oidc.eventNames.token_renewed, { reason: 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID' });
+                return { tokens, status: 'LOGGED_IN' };
+            case synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB:
+                updateTokens(null);
+                oidc.publishEvent(eventNames.logout_from_another_tab, { status: 'session syncTokensAsync' });
+                return { tokens: null, status: 'LOGGED_OUT' };
+            case synchroniseTokensStatus.REQUIRE_SYNC_TOKENS:
+                oidc.publishEvent(eventNames.refreshTokensAsync_begin, {  tryNumber: index });
+                return await localsilentLoginAsync();
+            default: {
+                oidc.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken: tokens.refreshToken, status, tryNumber: index });
+                if (!tokens.refreshToken) {
+                    return await localsilentLoginAsync();
+                }
+
+                const clientId = configuration.client_id;
+                const redirectUri = configuration.redirect_uri;
+                const authority = configuration.authority;
+                const tokenExtras = configuration.token_request_extras ? configuration.token_request_extras : {};
+                const finalExtras = { ...tokenExtras };
+
+                for (const [key, value] of Object.entries(extras)) {
+                    if (key.endsWith(':token_request')) {
+                        finalExtras[key.replace(':token_request', '')] = value;
+                    }
+                }
+                const localFunctionAsync = async () => {
+                    const details = {
+                        client_id: clientId,
+                        redirect_uri: redirectUri,
+                        grant_type: 'refresh_token',
+                        refresh_token: tokens.refreshToken,
+                    };
+                    const oidcServerConfiguration = await oidc.initAsync(authority, configuration.authority_configuration);
+                    const timeoutMs = document.hidden ? 10000 : 30000 * 10;
+                    const url = oidcServerConfiguration.tokenEndpoint;
+                    const headersExtras = {};
+                    if(configuration.demonstrating_proof_of_possession) {
+                        headersExtras['DPoP'] = await oidc.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, 'POST');
+                    }
+                    const tokenResponse = await performTokenRequestAsync(oidc.getFetch())(url,
+                        details,
+                        finalExtras,
+                        tokens,
+                        headersExtras,
+                        configuration.token_renew_mode,
+                        timeoutMs);
+
+                    if (tokenResponse.success) {
+                        const { isValid, reason } = isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration);
+                        if (!isValid) {
+                            updateTokens(null);
+                            oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: `refresh token return not valid tokens, reason: ${reason}` });
+                            return { tokens: null, status: 'SESSION_LOST' };
+                        }
+                        updateTokens(tokenResponse.data);
+                        if(tokenResponse.demonstratingProofOfPossessionNonce) {
+                            const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
+                            if(serviceWorker){
+                                await serviceWorker.setDemonstratingProofOfPossessionNonce(tokenResponse.demonstratingProofOfPossessionNonce);
+                            } else {
+                                const session = initSession(oidc.configurationName, configuration.storage);
+                                await session.setDemonstratingProofOfPossessionNonce(tokenResponse.demonstratingProofOfPossessionNonce);
+                            }
+                        }
+                        oidc.publishEvent(eventNames.refreshTokensAsync_end, { success: tokenResponse.success });
+                        oidc.publishEvent(Oidc.eventNames.token_renewed, { reason: 'REFRESH_TOKEN' });
+                        return { tokens: tokenResponse.data, status: 'LOGGED_IN' };
+                    } else {
+                        oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
+                            message: 'bad request',
+                            tokenResponse,
+                        });
+                        
+                        if (tokenResponse.status >= 400 && tokenResponse.status < 500) {
+                            updateTokens(null);
+                            oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: `session lost: ${tokenResponse.status}` });
+                            return { tokens: null, status: 'SESSION_LOST' };
+                        }
+                        
+                        return await synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
+                    }
+                };
+                return await localFunctionAsync();
+            }
+        }
+    } catch (exception: any) {
+        console.error(exception);
+        oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, { message: 'exception', exception: exception.message });
+        return synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
+    }
 }
