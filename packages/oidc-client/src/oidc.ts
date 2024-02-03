@@ -182,11 +182,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
     }
 
-    _silentLoginErrorCallbackFromIFrame() {
+    _silentLoginErrorCallbackFromIFrame(exception=null) {
         if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
             const location = this.location;
             const queryParams = getParseQueryStringFromLocation(location.getCurrentHref());
-            window.parent.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({ error: queryParams.error })}`, location.getOrigin());
+            if(queryParams.error) {
+                window.parent.postMessage(`${this.configurationName}_oidc_error:${JSON.stringify({error: queryParams.error})}`, location.getOrigin());
+            } else {
+                window.parent.postMessage(`${this.configurationName}_oidc_exception:${JSON.stringify({ error: exception == null ? "" : exception.toString() })}`, location.getOrigin());
+            }
+            
         }
     }
 
@@ -194,9 +199,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         try {
             await this.loginCallbackAsync(true);
             this._silentLoginCallbackFromIFrame();
-        } catch (error) {
-            console.error(error);
-            this._silentLoginErrorCallbackFromIFrame();
+        } catch (exception) {
+            console.error(exception);
+            this._silentLoginErrorCallbackFromIFrame(exception);
         }
     }
 

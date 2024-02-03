@@ -61,6 +61,7 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
                     ) {
                         const key = `${configurationName}_oidc_tokens:`;
                         const key_error = `${configurationName}_oidc_error:`;
+                        const key_exception = `${configurationName}_oidc_exception:`;
                         const data = e.data;
                         if (data && typeof (data) === 'string') {
                             if (!isResolved) {
@@ -75,8 +76,15 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
                                     publishEvent(eventNames.silentLoginAsync_error, result);
                                     iframe.remove();
                                     isResolved = true;
-                                    resolve({error : 'oidc_' + result.error, tokens:null, sessionState:null});
+                                    resolve({error: 'oidc_' + result.error, tokens: null, sessionState: null});
+                                } else if (data.startsWith(key_exception)) {
+                                    const result = JSON.parse(e.data.replace(key_exception, ''));
+                                    publishEvent(eventNames.silentLoginAsync_error, result);
+                                    iframe.remove();
+                                    isResolved = true;
+                                    reject(new Error(result.error));
                                 }
+                                
                             }
                         }
                     }
