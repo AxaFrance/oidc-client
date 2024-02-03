@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.15.3
+## 7.15.4
+
+- [f2d74fb](https://github.com/AxaFrance/oidc-client/commit/f2d74fba6d2e48e6d478aa69d261fe9cceb69bfa) - fix(oidc): eternal lock when refresh_token invalid and multiple tabs (#1281) (release), 2024-02-03 by *Guillaume Chervet*
+
+
+## v7.15.3
 
 - [7a5d32c](https://github.com/AxaFrance/oidc-client/commit/7a5d32cf650870a5b1c2910ceb0a3e6db4cec0b7) - fix(oidc): storage empty update message (release), 2024-02-03 by *Guillaume Chervet*
 
@@ -315,10 +320,5 @@
 - [0e52c56](https://github.com/AxaFrance/oidc-client/commit/0e52c56e1d747aa17ee2bf3005893a8d67a03ab3) - fix(package.json): update new repository link (release), 2023-08-07 by *Guillaume Chervet*
 - [3d0aaff](https://github.com/AxaFrance/oidc-client/commit/3d0aaff74fd1b14afe2aa3ec2b8b3c028dd3fe75) - fix(oidc): add more detail on state error, 2023-08-04 by *Guillaume Chervet*
 - [faa0da2](https://github.com/AxaFrance/oidc-client/commit/faa0da2235239a0b12e82a070b3f6e2c30572bfa) - fix(readme): some path was broken, 2023-08-04 by *Guillaume Chervet*
-
-
-## v7.2.0
-
-- [60ea58b](https://github.com/AxaFrance/oidc-client/commit/60ea58b266c4173e3a92b8637d9abd09cca0ea1a) - feat(oidc-service-worker): copy become manual (#1120) (release), 2023-08-04 by *Guillaume Chervet*
 
 
