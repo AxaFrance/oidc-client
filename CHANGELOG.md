@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.15.2
+## 7.15.3
+
+- [7a5d32c](https://github.com/AxaFrance/oidc-client/commit/7a5d32cf650870a5b1c2910ceb0a3e6db4cec0b7) - fix(oidc): storage empty update message (release), 2024-02-03 by *Guillaume Chervet*
+
+
+## v7.15.2
 
 - [940ffac](https://github.com/AxaFrance/oidc-client/commit/940ffac724894460af13e4e4a0de5e691e487c74) - fix(oidc): json not valid add warning message (release) (#1258), 2024-02-03 by *Guillaume Chervet*
 - [31f295c](https://github.com/AxaFrance/oidc-client/commit/31f295cb549bf55dfd5db1e1c71178363c7f2dae) - fix(logout): add event when same config name (alpha), 2024-02-02 by *Guillaume Chervet*
@@ -315,10 +320,5 @@
 ## v7.2.0
 
 - [60ea58b](https://github.com/AxaFrance/oidc-client/commit/60ea58b266c4173e3a92b8637d9abd09cca0ea1a) - feat(oidc-service-worker): copy become manual (#1120) (release), 2023-08-04 by *Guillaume Chervet*
-
-
-## v7.1.0
-
-- [ae8a601](https://github.com/AxaFrance/oidc-client/commit/ae8a60130b4dacfe7a73f6e2262ca1238a07a509) - feat(oidc): update service worker from version (#1121) (release), 2023-08-04 by *Guillaume Chervet*
 
 
