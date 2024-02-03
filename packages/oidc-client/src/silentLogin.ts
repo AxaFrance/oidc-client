@@ -6,6 +6,7 @@ import { OidcConfiguration, StringMap } from './types.js';
 export type SilentLoginResponse = {
     tokens:Tokens;
     sessionState:string;
+    error:string;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -74,7 +75,7 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
                                     publishEvent(eventNames.silentLoginAsync_error, result);
                                     iframe.remove();
                                     isResolved = true;
-                                    reject(new Error('oidc_' + result.error));
+                                    resolve({error : 'oidc_' + result.error, tokens:null, sessionState:null});
                                 }
                             }
                         }

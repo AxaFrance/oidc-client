@@ -24,6 +24,9 @@ export const startCheckSessionAsync = (oidc:Oidc, oidcDatabase:any, configuratio
                     id_token_hint: idToken,
                     scope: configuration.scope || 'openid',
                 }).then((silentSigninResponse) => {
+                    if(silentSigninResponse.error) {
+                        throw new Error(silentSigninResponse.error);
+                    }   
                     const iFrameIdTokenPayload = silentSigninResponse.tokens.idTokenPayload;
                     if (idTokenPayload.sub === iFrameIdTokenPayload.sub) {
                         const sessionState = silentSigninResponse.sessionState;
