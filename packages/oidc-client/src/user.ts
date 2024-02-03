@@ -1,7 +1,8 @@
 import { sleepAsync } from './initWorker.js';
 import { isTokensValid } from './parseTokens.js';
+import Oidc from "./oidc";
 
-export const userInfoAsync = (oidc) => async (noCache = false) => {
+export const userInfoAsync = (oidc:Oidc) => async (noCache = false) => {
     if (oidc.userInfo != null && !noCache) {
         return oidc.userInfo;
     }

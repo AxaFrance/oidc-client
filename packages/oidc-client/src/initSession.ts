@@ -29,7 +29,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         storage[`oidc.nonce.${configurationName}`] = nonce.nonce;
     };
 
-    const setDemonstratingProofOfPossessionJwkAsync = (jwk) => {
+    const setDemonstratingProofOfPossessionJwkAsync = (jwk:JsonWebKey) => {
         storage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
     };
 

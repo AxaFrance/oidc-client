@@ -28,7 +28,6 @@ export const useOidcFetch = (fetch: Fetch = null, configurationName = defaultCon
     (input: RequestInfo | URL, init?: RequestInit) => {
       const getOidcWithConfigurationName = () => getOidc(configurationName);
       const newFetch = fetchWithToken(previousFetch, getOidcWithConfigurationName);
-      console.log('newFetch', input)
       return newFetch(input, init);
     },
     [previousFetch, configurationName],

@@ -27,7 +27,7 @@ export const fetchFromIssuer = (fetch) => async (openIdIssuerUrl: string, timeCa
     return new OidcAuthorizationServiceConfiguration(result);
 };
 
-const internalFetch = (fetch) => async (url, headers = {}, timeoutMs = 10000, numberRetry = 0) : Promise<Response> => {
+const internalFetch = (fetch) => async (url:string, headers = {}, timeoutMs = 10000, numberRetry = 0) : Promise<Response> => {
     let response;
     try {
         const controller = new AbortController();

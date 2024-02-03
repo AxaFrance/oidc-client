@@ -1,6 +1,39 @@
 # Changelog
 
-## 7.13.14
+## 7.15.1
+
+- [5094e36](https://github.com/AxaFrance/oidc-client/commit/5094e36c1435684c5863e8d27eca59093aaec7b7) - fix(service-worker): unit test broken (release), 2024-01-30 by *Guillaume Chervet*
+
+
+## v7.15.0
+
+- [1676881](https://github.com/AxaFrance/oidc-client/commit/1676881f1db53cff6652ee7fe9658a437682231f) - feat(oidc): idToken can be null on a refresh (release) (#1271), 2024-01-29 by *Guillaume Chervet*
+
+
+## v7.14.1
+
+- [0fe53a6](https://github.com/AxaFrance/oidc-client/commit/0fe53a6b870c13c71330806a045896ea1e0a57e2) - fix(oidc): remove console.log (release), 2024-01-28 by *Guillaume Chervet*
+- [b23d6a7](https://github.com/AxaFrance/oidc-client/commit/b23d6a7e1fc04ce43f489ac8977de9fe5affff73) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-01-28 by *Guillaume Chervet*
+- [14ccbeb](https://github.com/AxaFrance/oidc-client/commit/14ccbeb83f1d7e790b496e571d424f615a39b43f) - fix(oidc): demo and remove console.log, 2024-01-28 by *Guillaume Chervet*
+- [15eb259](https://github.com/AxaFrance/oidc-client/commit/15eb2592d9582cb43798a5d7fc988b3c349e5b43) - doc(oidc): Update README.md, 2024-01-26 by *Guillaume Chervet*
+
+
+## v7.14.0
+
+- [b0510eb](https://github.com/AxaFrance/oidc-client/commit/b0510eb8d7170e8e142cb2d9bec01f41f610ed51) - feat(oidc): add DPOP configuration  (#1259) (release), 2024-01-26 by *Guillaume Chervet*
+
+
+## v7.13.16
+
+- [f2310bc](https://github.com/AxaFrance/oidc-client/commit/f2310bc917898b779a40edecf3dd73c21ec32b47) - fix(oidc): parseJwt fails for some JWT because of wrong use of replace (release) (#1269), 2024-01-25 by *Guillaume Chervet*
+
+
+## v7.13.15
+
+- [c56cc84](https://github.com/AxaFrance/oidc-client/commit/c56cc842d8da427b2aa88eb71f7d63937ea3c363) - fix(react-oidc): missing console.log in useOidcFetch (release), 2024-01-16 by *Guillaume Chervet*
+
+
+## v7.13.14
 
 - [3a1883c](https://github.com/AxaFrance/oidc-client/commit/3a1883c343c55637aa1ce5d118cc2841c76d8752) - build(npm): bump react-router-dom from 6.20.1 to 6.21.1 (#1252), 2024-01-02 by *dependabot[bot]*
 
@@ -285,37 +318,5 @@
 ## v7.0.1
 
 - [cd97895](https://github.com/AxaFrance/oidc-client/commit/cd9789520090b27ea905401be6d03fd87f817f76) - fix(oidc): expire_in in string instead of number (#1118) (release), 2023-08-03 by *Guillaume Chervet*
-
-
-## v7.0.0
-
-- [9567873](https://github.com/AxaFrance/oidc-client/commit/95678734c0495f80628f99ad3aa284a3014f8bbc) - feat(oidc): rename repository oidc-client (#1115) (release), 2023-08-01 by *Guillaume Chervet*
-- [ff61e5d](https://github.com/AxaFrance/oidc-client/commit/ff61e5d5e3387888ce18ec8e99fde0044009f481) - fix(demo): google new link and add navigate button, 2023-07-31 by *Guillaume Chervet*
-- [0d8bc06](https://github.com/AxaFrance/oidc-client/commit/0d8bc0626be0d5d14edca83dacb7367f57d4bb6d) - feat(oidc): rename vanilla-oidc to oidc-client (#1112) (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.6
-
-- [dab3662](https://github.com/AxaFrance/oidc-client/commit/dab36629bdebed5a3f085d606f313c7a12644e77) - fix build (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.5
-
-- [48d9db2](https://github.com/AxaFrance/oidc-client/commit/48d9db2f2cffbe74a6fd32b5771f5df0b8314b7f) - test release, 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.4
-
-- [9c7a143](https://github.com/AxaFrance/oidc-client/commit/9c7a143797cffff1044c13787c6ceaf690fa4c87) - fix build (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.3
-
-- [04f4900](https://github.com/AxaFrance/oidc-client/commit/04f4900d672e954278e6835bc31c62e4bf8660de) - try fix (release), 2023-07-28 by *Guillaume Chervet*
-
-
-## v6.26.2
-
-- [d329ce0](https://github.com/AxaFrance/oidc-client/commit/d329ce0cb013f4877cb401c6ccef316077ce9d09) - fix(ci): add set to replace workspace* (release), 2023-07-28 by *Guillaume Chervet*
 
 

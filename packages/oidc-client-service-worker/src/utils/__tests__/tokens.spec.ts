@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { OidcServerConfiguration } from '../../types';
-import { _hideTokens, extractTokenPayload, isTokensOidcValid, isTokensValid } from '..';
+import {_hideTokens, extractTokenPayload, isTokensOidcValid, isTokensValid, parseJwt} from '..';
 import { OidcConfigBuilder, OidcServerConfigBuilder, TokenBuilder } from './testHelper';
 
 describe('tokens', () => {
@@ -31,6 +31,21 @@ describe('tokens', () => {
   });
 
   describe('extractTokenPayload', () => {
+
+    it('parseJwtShouldExtractData', async () => {
+      const claimsPart = "eyJzZXNzaW9uX3N0YXRlIjoiNzVjYzVlZDItZGYyZC00NTY5LWJmYzUtMThhOThlNjhiZTExIiwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoixrTHosOBw6zDhyDlsI_lkI0t44Ob44Or44OYIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdGluZ2NoYXJhY3RlcnNAaW52ZW50ZWRtYWlsLmNvbSIsImdpdmVuX25hbWUiOiLGtMeiw4HDrMOHIiwiZmFtaWx5X25hbWUiOiLlsI_lkI0t44Ob44Or44OYIn0"
+      const result = parseJwt(claimsPart);
+      expect(result).toStrictEqual({
+        "session_state": "75cc5ed2-df2d-4569-bfc5-18a98e68be11",
+        "scope": "openid email profile",
+        "email_verified": true,
+        "name": "ƴǢÁìÇ 小名-ホルヘ",
+        "preferred_username": "testingcharacters@inventedmail.com",
+        "given_name": "ƴǢÁìÇ",
+        "family_name": "小名-ホルヘ"
+      });
+    });
+    
     it('can extract token payload', () => {
       const result = extractTokenPayload(
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
@@ -88,6 +103,34 @@ describe('tokens', () => {
       const secureTokens = _hideTokens(token, oidcConfiguration, 'test');
       expect(secureTokens.access_token).toBe(expectedAccessToken);
       expect(typeof secureTokens.expiresAt).toBe("number");
+    });
+
+    it('should reuse old id_token', () => {
+      const token = new TokenBuilder().withNonExpiredToken().build();
+      // @ts-ignore
+      delete token.id_token;
+      // @ts-ignore
+      delete token.idTokenPayload;
+      const oidcConfiguration = new OidcConfigBuilder()
+          .withOidcConfiguration({token_renew_mode: "access_token_invalid"})
+          .withOidcServerConfiguration({issuer: "", 
+            authorizationEndpoint:"", 
+            revocationEndpoint:"", 
+            tokenEndpoint:"", 
+            userInfoEndpoint:"" })
+          .withTokens(new TokenBuilder()
+          .withNonExpiredToken()
+          .withIdToken("old_id_token")
+          .withIdTokenPayload({
+            iss: oidcServerConfig.issuer,
+            exp: 0,
+            iat: 0,
+            nonce: null,
+          })
+          .build()).build();
+      _hideTokens(token, oidcConfiguration, 'test');
+      expect(token.id_token).toBe("old_id_token"); 
+      
     });
   });
 });

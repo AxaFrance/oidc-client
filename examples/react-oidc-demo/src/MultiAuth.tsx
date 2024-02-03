@@ -8,6 +8,7 @@ import { CallBackSuccess } from './override/Callback.component';
 import Loading from './override/Loading.component';
 import ServiceWorkerNotSupported from './override/ServiceWorkerNotSupported.component';
 import SessionLost from './override/SessionLost.component';
+import {FetchUserHook} from "./FetchUser";
 
 const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => {
     const [url, options, ...rest] = params;
@@ -15,7 +16,7 @@ const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => 
     return await fetch(url, options, ...rest);
 };
 
-const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
+const MultiAuth = ({ configurationName, handleConfigurationChange }) => {;
     const { login, logout, isAuthenticated } = useOidc(configurationName);
     const { isAuthenticated: isAuthenticatedDefault } = useOidc('default');
     const [fname, setFname] = useState('');
@@ -45,6 +46,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
                         <option value="config_with_hash">config_with_hash</option>
                         <option value="config_show_access_token">config_show_access_token</option>
                         <option value="config_separate_oidc_access_token_domains">config_separate_oidc_access_token_domains</option>
+                        <option value="config_with_dpop">config_with_dpop</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { 'test:token_request': 'test', youhou: 'youhou', grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
@@ -78,8 +80,8 @@ export const MultiAuthContainer = () => {
     const [isSessionLost, setIsSessionLost] = useState(false);
     const [configurationName, setConfigurationName] = useState(sessionStorage.configurationName);
     const [events, dispatch] = useReducer(reducer, []);
-    const callBack = window.location.origin + '/multi-auth/authentification/callback2';
-    const silent_redirect_uri = window.location.origin + '/multi-auth/authentification/silent-callback2';
+    const callBack = window.location.origin + '/multi-auth/authentification/callback';
+    const silent_redirect_uri = window.location.origin + '/multi-auth/authentification/silent-callback';
     const configurations = {
         config_classic: {
             ...configurationIdentityServer,
@@ -118,6 +120,27 @@ export const MultiAuthContainer = () => {
             redirect_uri: callBack,
             silent_redirect_uri,
         },
+        config_with_dpop: {
+            ...configurationIdentityServer,
+            redirect_uri: callBack,
+            silent_redirect_uri,
+            demonstrating_proof_of_possession: true,
+            /*demonstrating_proof_of_possession_configuration: {
+                importKeyAlgorithm: {
+                    name: "RSASSA-PKCS1-v1_5",
+                    hash: { name: "SHA-256" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+                },
+                signAlgorithm: { name: "RSASSA-PKCS1-v1_5" },
+                generateKeyAlgorithm: {
+                    name: "RSASSA-PKCS1-v1_5",
+                    modulusLength: 2048, //can be 1024, 2048, or 4096
+                    publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+                    hash: { name: "SHA-256" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+                },
+                digestAlgorithm: { name: "SHA-256" },
+                jwtHeaderAlgorithm: "RS256",
+            },*/
+        }
     };
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;
@@ -176,15 +199,18 @@ const DisplayAccessToken = ({ configurationName }) => {
         return <p>you are not authentified</p>;
     }
     return (
-        <div className="card text-white bg-info mb-3">
-            <div className="card-body">
-                <h5 className="card-title">Access Token</h5>
-                <p style={{ color: 'red', backgroundColor: 'white' }}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be accessible from your client side javascript.</p>
-                {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
-                {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
-                <h5 className="card-title">Id Token</h5>
-                {idTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(idTokenPayload)}</p>}
+        <>
+            <div className="card text-white bg-info mb-3">
+                <div className="card-body">
+                    <h5 className="card-title">Access Token</h5>
+                    <p style={{ color: 'red', backgroundColor: 'white' }}>Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be accessible from your client side javascript.</p>
+                    {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
+                    {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
+                    <h5 className="card-title">Id Token</h5>
+                    {idTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(idTokenPayload)}</p>}
+                </div>
             </div>
-        </div>
+            <FetchUserHook configurationName={configurationName} />
+        </>
     );
 };

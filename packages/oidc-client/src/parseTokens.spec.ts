@@ -1,6 +1,13 @@
 ﻿import { describe, expect,it } from 'vitest';
 
-import {getValidTokenAsync, isTokensOidcValid, parseOriginalTokens} from "./parseTokens";
+import {
+    getValidTokenAsync,
+    isTokensOidcValid,
+    parseJwt,
+    parseOriginalTokens,
+    setTokens,
+    TokenRenewMode
+} from "./parseTokens";
 
 describe('ParseTokens test Suite', () => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -22,6 +29,20 @@ describe('ParseTokens test Suite', () => {
             };
             const result = await getValidTokenAsync(oidc, 1, 1);
             expect(result.isTokensValid).toEqual(expectIsValidToken);
+        });
+    });
+
+    it('parseJwtShouldExtractData', async () => {
+        const claimsPart = "eyJzZXNzaW9uX3N0YXRlIjoiNzVjYzVlZDItZGYyZC00NTY5LWJmYzUtMThhOThlNjhiZTExIiwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoixrTHosOBw6zDhyDlsI_lkI0t44Ob44Or44OYIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdGluZ2NoYXJhY3RlcnNAaW52ZW50ZWRtYWlsLmNvbSIsImdpdmVuX25hbWUiOiLGtMeiw4HDrMOHIiwiZmFtaWx5X25hbWUiOiLlsI_lkI0t44Ob44Or44OYIn0"
+        const result = parseJwt(claimsPart);
+        expect(result).toStrictEqual({
+            "session_state": "75cc5ed2-df2d-4569-bfc5-18a98e68be11",
+            "scope": "openid email profile",
+            "email_verified": true,
+            "name": "ƴǢÁìÇ 小名-ホルヘ",
+            "preferred_username": "testingcharacters@inventedmail.com",
+            "given_name": "ƴǢÁìÇ",
+            "family_name": "小名-ホルヘ"
         });
     });
 
@@ -78,6 +99,75 @@ describe('ParseTokens test Suite', () => {
             };
             const {isValid} = isTokensOidcValid(oidc, nonce, oidcServerConfiguration);
             expect(isValid).toEqual(expectIsValidToken);
+        });
+    });
+
+
+    const testTokens = {
+        "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IkMyNTJGOUNBQjc3Q0MxNTQwNTBFMTg1NTk5MjJCMTJGIiwidHlwIjoiSldUIn0.eyJpc3MiOiJodHRwczovL2RlbW8uZHVlbmRlc29mdHdhcmUuY29tIiwibmJmIjoxNzA2NTQwMjU4LCJpYXQiOjE3MDY1NDAyNTgsImV4cCI6MTcwNjU0MDU1OCwiYXVkIjoiaW50ZXJhY3RpdmUucHVibGljLnNob3J0IiwiYW1yIjpbInB3ZCJdLCJub25jZSI6IlA5dEo5eGxHZE05NiIsImF0X2hhc2giOiJOWnZhR0dZYlhoelRNWlVxUjlNYk5nIiwic2lkIjoiMzQ1QUJDODhFNkU1MEFGMTI3M0VENDE1QTdGRDZBMjMiLCJzdWIiOiIyIiwiYXV0aF90aW1lIjoxNzA2NTMxNjY1LCJpZHAiOiJsb2NhbCJ9.MVtXrCkshJFBplbOw7az3fdWB1Ewqixb2fuHXpx7KbGWUY6qgT9ijlldeD-ZV7JGA958AKqmGwfNjovAJE89pQsCFKkNft6fRO8eM9qKif6eRUqMMPiQrawARpuJOs1NvJ-SyeRs_jSNLwPVzI8NlZyFWHoyQ4DZnFoQLSQMy5UaHaCtWhC_FrWMFLQvbE3RuMlnJGzrsoMewFyVAZctMCTE1MOI3Akvhe1IGc1hmxzwNg3OkxwzHLinsDlDw8UVn8vX5iNI18GFuyTuJlawOq5OHHJH3LdKQD_RbwRF-9BFjKRZfWzGpdpxTD2lIPf1Irc3U_R6xCNuXYUwzrHp6Q",
+        "access_token": "ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_default",
+        "expires_in": 75,
+        "token_type": "Bearer",
+        "refresh_token": "REFRESH_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_default",
+        "scope": "openid profile email api offline_access",
+        "issued_at": 1706540256.465,
+        "accessTokenPayload": {
+            "iss": "https://demo.duendesoftware.com",
+            "nbf": 1706540258,
+            "iat": 1706540258,
+            "exp": 1706540333,
+            "aud": "api",
+            "scope": [
+                "openid",
+                "profile",
+                "email",
+                "api",
+                "offline_access"
+            ],
+            "amr": [
+                "pwd"
+            ],
+            "client_id": "interactive.public.short",
+            "sub": "2",
+            "auth_time": 1706531665,
+            "idp": "local",
+            "name": "Bob Smith",
+            "email": "BobSmith@email.com",
+            "sid": "345ABC88E6E50AF1273ED415A7FD6A23",
+            "jti": "E3CF3853D77AC90ABC774266CD381C43"
+        },
+        "idTokenPayload": {
+            "iss": "https://demo.duendesoftware.com",
+            "nbf": 1706540258,
+            "iat": 1706540258,
+            "exp": 1706540558,
+            "aud": "interactive.public.short",
+            "amr": [
+                "pwd"
+            ],
+            "nonce": "NONCE_SECURED_BY_OIDC_SERVICE_WORKER_default",
+            "at_hash": "NZvaGGYbXhzTMZUqR9MbNg",
+            "sid": "345ABC88E6E50AF1273ED415A7FD6A23",
+            "sub": "2",
+            "auth_time": 1706531665,
+            "idp": "local"
+        },
+        "expiresAt": 1706540333
+    }
+
+    describe.each([
+        [testTokens, null, TokenRenewMode.access_token_invalid, () => {}],
+        [testTokens, {testTokens, idTokenPayload: undefined, id_token: undefined}, TokenRenewMode.access_token_invalid, (newTokens:any) => {
+            expect(newTokens.idTokenPayload).toBeDefined();
+            expect(newTokens.id_token).toBeDefined();
+        }],
+    ])('setTokens', (tokens,  oldTokens, tokenRenewMode, validationFunction) => {
+        it('should setTokens return updatedTokens' , async () => {
+            const oidc = {
+                idTokenPayload,
+            };
+            const newTokens = setTokens(tokens, oldTokens, tokenRenewMode);
+            validationFunction(newTokens)
         });
     });
     
