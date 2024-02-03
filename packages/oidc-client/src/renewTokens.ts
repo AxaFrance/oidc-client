@@ -238,7 +238,7 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
                 oidc.publishEvent(eventNames.logout_from_another_tab, { status: 'session syncTokensAsync' });
                 return { tokens: null, status: 'LOGGED_OUT' };
             case synchroniseTokensStatus.REQUIRE_SYNC_TOKENS:
-                oidc.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken: tokens.refreshToken, status, tryNumber: index });
+                oidc.publishEvent(eventNames.refreshTokensAsync_begin, {  tryNumber: index });
                 return await localsilentLoginAsync();
             default: {
                 oidc.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken: tokens.refreshToken, status, tryNumber: index });
