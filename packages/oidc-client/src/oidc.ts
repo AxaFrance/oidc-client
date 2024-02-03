@@ -234,8 +234,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     async tryKeepExistingSessionAsync() :Promise<boolean> {
         if (this.tryKeepExistingSessionPromise !== null) {
             return this.tryKeepExistingSessionPromise;
-        }
-        
+        }        
         this.tryKeepExistingSessionPromise = tryKeepSessionAsync(this);
         return this.tryKeepExistingSessionPromise.then((result) => {
             this.tryKeepExistingSessionPromise = null;
@@ -311,7 +310,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         }
         const configuration = this.configuration;
 
-        const silentLoginAsync = (extras: StringMap, state:string, scope:string = null) => {
+        const silentLoginAsync = (extras: StringMap, state:string=null, scope:string = null) => {
             return _silentLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this))(extras, state, scope);
         };
         const localsilentLoginAsync = async () => {
@@ -328,7 +327,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                     ...loginParams.extras,
                     ...extras,
                     prompt: 'none',
-                }, loginParams.state);
+                });
                 if (silent_token_response) {
                     updateTokens(silent_token_response.tokens);
                     this.publishEvent(Oidc.eventNames.token_renewed, {});
