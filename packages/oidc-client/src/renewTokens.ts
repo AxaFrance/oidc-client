@@ -169,7 +169,7 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
     const configuration = oidc.configuration;
 
     const silentLoginAsync = (extras: StringMap, state:string=null, scope:string = null) => {
-        return _silentLoginAsync(oidc.configurationName, oidc.configuration, oidc.publishEvent.bind(this))(extras, state, scope);
+        return _silentLoginAsync(oidc.configurationName, oidc.configuration, oidc.publishEvent.bind(oidc))(extras, state, scope);
     };
     const localsilentLoginAsync = async () => {
         try {
@@ -217,7 +217,7 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
         }
     }
     try {
-        const { status, tokens, nonce } = await syncTokensInfoAsync(this)(configuration, oidc.configurationName, oidc.tokens, forceRefresh);
+        const { status, tokens, nonce } = await syncTokensInfoAsync(oidc)(configuration, oidc.configurationName, oidc.tokens, forceRefresh);
         switch (status) {
             case synchroniseTokensStatus.SESSION_LOST:
                 updateTokens(null);
