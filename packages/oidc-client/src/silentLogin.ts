@@ -64,6 +64,7 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
                         const key_exception = `${configurationName}_oidc_exception:`;
                         const data = e.data;
                         if (data && typeof (data) === 'string') {
+                            console.log('silentLoginAsync', data);
                             if (!isResolved) {
                                 if (data.startsWith(key)) {
                                     const result = JSON.parse(e.data.replace(key, ''));
