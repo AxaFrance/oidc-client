@@ -215,6 +215,9 @@ importers:
 
   packages/oidc-client-service-worker:
     devDependencies:
+      '@vitest/coverage-v8':
+        specifier: 1.2.2
+        version: 1.2.2(vitest@1.2.2)
       cpy:
         specifier: 11.0.0
         version: 11.0.0
