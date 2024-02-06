@@ -34,6 +34,7 @@
     "lint": "eslint src"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "1.2.2",
     "cpy": "11.0.0",
     "cpy-cli": "^5.0.0",
     "rimraf": "5.0.5",
