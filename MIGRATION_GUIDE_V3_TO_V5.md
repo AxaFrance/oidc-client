@@ -27,7 +27,7 @@ import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 
 // in v5 becomes
 
-import { OidcProvider } from '@axa-fr/react-oidc-context';
+import { OidcProvider } from '@axa-fr/react-oidc';
 
 // loggerLevel : Logger property has been removed in v4
 <OidcProvider configuration={oidcConfiguration}>
