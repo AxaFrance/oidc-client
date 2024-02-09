@@ -27,7 +27,7 @@ import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 
 // in v5 becomes
 
-import { OidcProvider } from '@axa-fr/react-oidc-context';
+import { OidcProvider } from '@axa-fr/react-oidc';
 
 // loggerLevel : Logger property has been removed in v4
 <OidcProvider configuration={oidcConfiguration}>
@@ -110,7 +110,7 @@ const  { isEnabled, login, logout, oidcUser, events } = useReactOidc();
 
 
 // new v5
-import { useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc-context';
+import { useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc';
 
 const { login, logout, isAuthenticated} = useOidc(); // login and logout return a Promise
 const { oidcUser, oidcUserLoadingState } = useOidcUser(); // Return user_info endpoint data
@@ -127,14 +127,14 @@ import { withFetchRedirectionOn401,
          withAuthentication } from '@axa-fr/react-oidc-context-fetch';
 
 // new v5
-import { withOidcFetch } from '@axa-fr/react-oidc-context';
+import { withOidcFetch } from '@axa-fr/react-oidc';
 
 // withFetchRedirectionOn401 : removed, you have to implement your own 401 management
 // withFetchSilentAuthenticateAndRetryOn401 : removed, not necessary in v4 token are in auto refresh mode only
 // withFetchRedirectionOn403 : removed, you have to implement your own 403 management
 // withAuthentication : removed
 
-// withFetchToken in v3 have been rename to withOidcFetch and set inside  '@axa-fr/react-oidc-context' package
+// withFetchToken in v3 have been rename to withOidcFetch and set inside  '@axa-fr/react-oidc' package
 withOidcFetch(</MyComponent/>)
  
 ```
