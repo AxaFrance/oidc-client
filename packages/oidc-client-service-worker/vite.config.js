@@ -6,11 +6,6 @@ export default defineConfig({
   plugins: [dts({
     insertTypesEntry: true,
   })],
-  test: {
-    coverage: {
-        provider: 'c8'
-    }
-  },
   build: {
     minify: false, //default esbuild
     sourcemap: true,
