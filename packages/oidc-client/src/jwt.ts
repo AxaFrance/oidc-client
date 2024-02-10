@@ -30,18 +30,16 @@ function utf8ToBinaryString(str) {
     const escstr = encodeURIComponent(str);
     // replaces any uri escape sequence, such as %0A,
     // with binary escape, such as 0x0A
-    const binstr = escstr.replace(/%([0-9A-F]{2})/g, function (match, p1) {
+    return escstr.replace(/%([0-9A-F]{2})/g, function (match, p1) {
         return String.fromCharCode(parseInt(p1, 16));
     });
-
-    return binstr;
 }
 
 // Uint8Array to URL Safe Base64
 //
 // the shortest distant between two encodings... binary string
 // @ts-ignore
-function uint8ToUrlBase64(uint8) {
+export const uint8ToUrlBase64 =(uint8: Uint8Array) => {
     let bin = '';
     // @ts-ignore
     uint8.forEach(function(code) {
