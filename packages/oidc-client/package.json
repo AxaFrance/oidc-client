@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/oidc-client",
-  "version": "7.16.0",
+  "version": "7.17.1",
   "private": false,
   "type": "module",
   "main": "./dist/index.umd.cjs",
