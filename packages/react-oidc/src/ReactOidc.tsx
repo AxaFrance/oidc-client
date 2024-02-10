@@ -1,5 +1,6 @@
 import { StringMap, OidcClient } from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
+import {Tokens} from "@axa-fr/oidc-client/dist/parseTokens";
 
 const defaultConfigurationName = 'default';
 
@@ -72,6 +73,7 @@ const initTokens = (configurationName: string) => {
         return {
             accessToken: tokens.accessToken,
             accessTokenPayload: tokens.accessTokenPayload,
+            generateDemonstrationOfProofOfPossessionAsync: oidc.configuration.demonstrating_proof_of_possession ? (url:string, method:string) => oidc.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, method) : null,
         };
     }
     return accessTokenInitialState;
@@ -80,6 +82,11 @@ const initTokens = (configurationName: string) => {
 export type OidcAccessToken = {
     accessToken?: any;
     accessTokenPayload?: any;
+    generateDemonstrationOfProofOfPossessionAsync?: any;
+}
+
+function getGenerateDemonstrationOfProofOfPossessionAsync(oidc: OidcClient, tokens: Tokens) {
+    return oidc.configuration.demonstrating_proof_of_possession ? (url: string, method: string) => oidc.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, method) : null;
 }
 
 export const useOidcAccessToken = (configurationName = defaultConfigurationName) => {
@@ -103,7 +110,11 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
                 name === OidcClient.eventNames.syncTokensAsync_error) {
                 if (isMounted) {
                     const tokens = oidc.tokens;
-                    setAccessToken(tokens != null ? { accessToken: tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload } : accessTokenInitialState);
+                    setAccessToken(tokens != null ? { 
+                        accessToken: tokens.accessToken, 
+                        accessTokenPayload: tokens.accessTokenPayload ,
+                        generateDemonstrationOfProofOfPossessionAsync: getGenerateDemonstrationOfProofOfPossessionAsync(oidc, tokens),
+                    } : accessTokenInitialState);
                 }
             }
         });
