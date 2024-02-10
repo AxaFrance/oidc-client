@@ -32,6 +32,7 @@ export const Home = () => {
                     {!isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('/profile')}>logout /profile</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button></p>}
+                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout(null, {"no_reload:oidc":"true"})}>logout no reload</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout(null)}>logout whithout callbackredirect</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={async () => console.log('renewTokens result', await renewTokens())}>renew tokens</button></p>}
                     <p><button type="button" className="btn btn-primary" onClick={navigateProfile}>Navigate to profile</button></p>

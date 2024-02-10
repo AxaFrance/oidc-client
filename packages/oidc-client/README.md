@@ -312,7 +312,7 @@ export class OidcClient {
   /**
    * Starts the OIDC logout process with specified options.
    * @param callbackPathOrUrl The callback path or URL to use after logout.
-   * @param extras Additional parameters to send to the OIDC server during the logout request.
+   * @param extras Additional parameters to send to the OIDC server during the logout request. {"no_reload:oidc":"true"} to avoid the page reload after logout.
    * @returns A promise resolved when the logout is completed.
    */
   logoutAsync(callbackPathOrUrl?: string | null | undefined, extras?: StringMap): Promise<void>;
