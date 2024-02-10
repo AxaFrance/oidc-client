@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.17.0
+## 7.17.1
+
+- [2511648](https://github.com/AxaFrance/oidc-client/commit/251164830a9a1b976e8d6c743490795a028afa16) - refactor(oidc): remove base64.js dependency (#1292) (release), 2024-02-10 by *Guillaume Chervet*
+
+
+## v7.17.0
 
 - [a09e6fd](https://github.com/AxaFrance/oidc-client/commit/a09e6fda64aa210fe7f63d70b6c64af559012640) - feat(oidc): logout add extras parameter to avoid the page reload (release) (#1290), 2024-02-10 by *Guillaume Chervet*
 
@@ -310,10 +315,5 @@
 ## v7.3.2
 
 - [790ec46](https://github.com/AxaFrance/oidc-client/commit/790ec468355967462b9bfce40196e9336efed0d7) - fix(oidc): allow service worker to chrome 70 (release), 2023-08-15 by *Guillaume Chervet*
-
-
-## v7.3.1
-
-- [c2564f9](https://github.com/AxaFrance/oidc-client/commit/c2564f9ef6de2122962cfb4a8e0f9195aa688d84) - fix(all): copy of service worker files (release), 2023-08-08 by *Guillaume Chervet*
 
 
