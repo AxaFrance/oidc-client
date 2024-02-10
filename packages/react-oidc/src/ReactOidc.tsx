@@ -27,7 +27,9 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
         setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-            if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab || name === OidcClient.eventNames.token_aquired) {
+            if (name === OidcClient.eventNames.logout_from_another_tab || 
+                name === OidcClient.eventNames.logout_from_same_tab || 
+                name === OidcClient.eventNames.token_aquired) {
                 if (isMounted) {
                     setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
                 }

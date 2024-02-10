@@ -366,16 +366,16 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
      async logoutSameTabAsync(clientId: string, sub: any) {
          // @ts-ignore
          if (this.configuration.monitor_session && this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
-             this.publishEvent(eventNames.logout_from_same_tab, { mmessage: 'SessionMonitor', sub });
              await this.destroyAsync('LOGGED_OUT');
+             this.publishEvent(eventNames.logout_from_same_tab, { message: 'SessionMonitor', sub });
          } 
      }
 
     async logoutOtherTabAsync(clientId: string, sub: any) {
         // @ts-ignore
         if (this.configuration.monitor_session && this.configuration.client_id === clientId && sub && this.tokens && this.tokens.idTokenPayload && this.tokens.idTokenPayload.sub === sub) {
-            this.publishEvent(eventNames.logout_from_another_tab, { message: 'SessionMonitor', sub });
             await this.destroyAsync('LOGGED_OUT');
+            this.publishEvent(eventNames.logout_from_another_tab, { message: 'SessionMonitor', sub });
         }
     }
 
