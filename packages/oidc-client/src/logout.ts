@@ -78,6 +78,21 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOi
         }
     }
     await oidc.destroyAsync('LOGGED_OUT');
+
+    let noReload = false;
+    if(extras) {
+        extras = {...extras};
+        for (const [key, value] of Object.entries(extras)) {
+            if (key.endsWith('no_reload:oidc')) {
+                noReload = extras[key] == "true";
+                delete extras[key];
+            }
+        }
+    }
+    
+    if(noReload) {
+        return;
+    }
     
     if (oidcServerConfiguration.endSessionEndpoint) {
         if (!extras) {
