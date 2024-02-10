@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.16.0
+## 7.17.0
+
+- [a09e6fd](https://github.com/AxaFrance/oidc-client/commit/a09e6fda64aa210fe7f63d70b6c64af559012640) - feat(oidc): logout add extras parameter to avoid the page reload (release) (#1290), 2024-02-10 by *Guillaume Chervet*
+
+
+## v7.16.0
 
 - [6b9b524](https://github.com/AxaFrance/oidc-client/commit/6b9b524c54a18dca9cc5bab34f0d058716e9d116) - feat(react): expose dpop method generation (#1291) (release), 2024-02-10 by *Guillaume Chervet*
 
@@ -310,12 +315,5 @@
 ## v7.3.1
 
 - [c2564f9](https://github.com/AxaFrance/oidc-client/commit/c2564f9ef6de2122962cfb4a8e0f9195aa688d84) - fix(all): copy of service worker files (release), 2023-08-08 by *Guillaume Chervet*
-
-
-## v7.3.0
-
-- [282c0f7](https://github.com/AxaFrance/oidc-client/commit/282c0f72ab7741f24468b2278466eb307d1fa0ce) - feat(oidc+serviceworker): add property setAccessTokenToNavigateRequests + service_worker_convert_all_requests_to_cors moved to TrustedDomains.js (#1123) (release), 2023-08-08 by *Guillaume Chervet*
-- [c94163d](https://github.com/AxaFrance/oidc-client/commit/c94163d02f5947761d00bd5e18df6749106d6f3d) - doc(FAQ): add "Does Service Worker is mandatory ?", 2023-08-08 by *Guillaume Chervet*
-- [7ffcde4](https://github.com/AxaFrance/oidc-client/commit/7ffcde465f5f4cbba4b39e0da43dee34d4ec37d9) - doc(readme): update images urls, 2023-08-08 by *Guillaume Chervet*
 
 
