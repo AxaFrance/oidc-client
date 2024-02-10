@@ -69,6 +69,7 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOi
     const sub = oidc.tokens && oidc.tokens.idTokenPayload ? oidc.tokens.idTokenPayload.sub : null;
     
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    await oidc.destroyAsync('LOGGED_OUT');
     for (const [key, itemOidc] of Object.entries(oidcDatabase)) {
         if (itemOidc !== oidc) {
             // @ts-ignore
@@ -77,7 +78,6 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOi
             oidc.publishEvent(eventNames.logout_from_same_tab, {} );
         }
     }
-    await oidc.destroyAsync('LOGGED_OUT');
 
     let noReload = false;
     if(extras) {
