@@ -1,6 +1,14 @@
 # Changelog
 
-## 7.17.1
+## 7.17.2
+
+- [c3d5c6b](https://github.com/AxaFrance/oidc-client/commit/c3d5c6b1a6a2a82450d134134513634031c1c338) - refactor(react-oidc): remove base64js dependencies (release), 2024-02-11 by *Guillaume Chervet*
+- [2a7031b](https://github.com/AxaFrance/oidc-client/commit/2a7031bfdd5a7c638940ece97778988ead73cbdc) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-02-11 by *Guillaume Chervet*
+- [3973497](https://github.com/AxaFrance/oidc-client/commit/397349749e9abb75a6910b3824786f3c688447fe) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-02-10 by *Guillaume Chervet*
+- [d20953a](https://github.com/AxaFrance/oidc-client/commit/d20953a0180bdf3b8b6dd3247a025e3b4fc389f8) - refactor(oidc): remove base64.js dependencies (alpha), 2024-02-10 by *Guillaume Chervet*
+
+
+## v7.17.1
 
 - [2511648](https://github.com/AxaFrance/oidc-client/commit/251164830a9a1b976e8d6c743490795a028afa16) - refactor(oidc): remove base64.js dependency (#1292) (release), 2024-02-10 by *Guillaume Chervet*
 
@@ -310,10 +318,5 @@
 ## v7.3.3
 
 - [e4e7409](https://github.com/AxaFrance/oidc-client/commit/e4e74091a8a6fadb64429dcccbd43331af62f920) - fix(oidc): parent instead of top for iframe allow app inside iframe (#1130) (release), 2023-08-15 by *Guillaume Chervet*
-
-
-## v7.3.2
-
-- [790ec46](https://github.com/AxaFrance/oidc-client/commit/790ec468355967462b9bfce40196e9336efed0d7) - fix(oidc): allow service worker to chrome 70 (release), 2023-08-15 by *Guillaume Chervet*
 
 
