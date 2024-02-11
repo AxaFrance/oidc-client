@@ -245,9 +245,6 @@ importers:
       '@axa-fr/oidc-client-service-worker':
         specifier: workspace:*
         version: link:../oidc-client-service-worker
-      base64-js:
-        specifier: 1.5.1
-        version: 1.5.1
     devDependencies:
       '@testing-library/jest-dom':
         specifier: 6.4.2
@@ -2032,6 +2029,7 @@ packages:
 
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+    dev: true
 
   /binary-extensions@2.2.0:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}

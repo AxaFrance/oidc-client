@@ -41,7 +41,8 @@
     "openid",
     "oauth2",
     "oauth",
-    "vanilla"
+    "vanilla",
+    "vanillajs"
   ],
   "scripts": {
     "clean": "rimraf dist",
