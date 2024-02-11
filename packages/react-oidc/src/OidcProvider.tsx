@@ -1,4 +1,4 @@
-import { Fetch, getFetchDefault, OidcConfiguration, OidcClient } from '@axa-fr/oidc-client';
+import {Fetch, getFetchDefault, OidcConfiguration, OidcClient, ILOidcLocation, OidcLocation} from '@axa-fr/oidc-client';
 import { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import AuthenticatingError from './core/default-component/AuthenticateError.component.js';
@@ -28,6 +28,7 @@ export type OidcProviderProps = {
     withCustomHistory?: () => CustomHistory;
     onEvent?: (configuration: string, name: string, data: any) => void;
     getFetch?: () => Fetch;
+    location?: ILOidcLocation;
 };
 
 export type OidcSessionProps = {
@@ -69,9 +70,10 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     withCustomHistory = null,
     onEvent = null,
     getFetch = null,
+    location= null,
 }) => {
     const getOidc = (configurationName = 'default') => {
-        return OidcClient.getOrCreate(getFetch ?? getFetchDefault)(configuration, configurationName);
+        return OidcClient.getOrCreate(getFetch ?? getFetchDefault, location ?? new OidcLocation())(configuration, configurationName);
     };
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const [loading, setLoading] = useState(true);
@@ -170,7 +172,8 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
                         callbackErrorComponent={authenticatingErrorComponent}
                         authenticatingComponent={authenticatingComponent}
                         configurationName={configurationName}
-                        withCustomHistory={withCustomHistory}>
+                        withCustomHistory={withCustomHistory} 
+                        location={location ?? new OidcLocation()}>
                         <OidcSession configurationName={configurationName}>
                             {children}
                         </OidcSession>

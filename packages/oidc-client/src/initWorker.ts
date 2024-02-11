@@ -2,121 +2,21 @@ import { parseOriginalTokens } from './parseTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
 import codeVersion from './version.js';
-
-export const getOperatingSystem = (navigator) => {
-    const nVer = navigator.appVersion;
-    const nAgt = navigator.userAgent;
-    const unknown = '-';
-    // system
-    let os = unknown;
-    const clientStrings = [
-        { s: 'Windows 10', r: /(Windows 10.0|Windows NT 10.0)/ },
-        { s: 'Windows 8.1', r: /(Windows 8.1|Windows NT 6.3)/ },
-        { s: 'Windows 8', r: /(Windows 8|Windows NT 6.2)/ },
-        { s: 'Windows 7', r: /(Windows 7|Windows NT 6.1)/ },
-        { s: 'Windows Vista', r: /Windows NT 6.0/ },
-        { s: 'Windows Server 2003', r: /Windows NT 5.2/ },
-        { s: 'Windows XP', r: /(Windows NT 5.1|Windows XP)/ },
-        { s: 'Windows 2000', r: /(Windows NT 5.0|Windows 2000)/ },
-        { s: 'Windows ME', r: /(Win 9x 4.90|Windows ME)/ },
-        { s: 'Windows 98', r: /(Windows 98|Win98)/ },
-        { s: 'Windows 95', r: /(Windows 95|Win95|Windows_95)/ },
-        { s: 'Windows NT 4.0', r: /(Windows NT 4.0|WinNT4.0|WinNT|Windows NT)/ },
-        { s: 'Windows CE', r: /Windows CE/ },
-        { s: 'Windows 3.11', r: /Win16/ },
-        { s: 'Android', r: /Android/ },
-        { s: 'Open BSD', r: /OpenBSD/ },
-        { s: 'Sun OS', r: /SunOS/ },
-        { s: 'Chrome OS', r: /CrOS/ },
-        { s: 'Linux', r: /(Linux|X11(?!.*CrOS))/ },
-        { s: 'iOS', r: /(iPhone|iPad|iPod)/ },
-        { s: 'Mac OS X', r: /Mac OS X/ },
-        { s: 'Mac OS', r: /(Mac OS|MacPPC|MacIntel|Mac_PowerPC|Macintosh)/ },
-        { s: 'QNX', r: /QNX/ },
-        { s: 'UNIX', r: /UNIX/ },
-        { s: 'BeOS', r: /BeOS/ },
-        { s: 'OS/2', r: /OS\/2/ },
-        { s: 'Search Bot', r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/ },
-    ];
-    for (const id in clientStrings) {
-        const cs = clientStrings[id];
-        if (cs.r.test(nAgt)) {
-            os = cs.s;
-            break;
-        }
-    }
-
-    let osVersion = unknown;
-
-    if (/Windows/.test(os)) {
-        osVersion = /Windows (.*)/.exec(os)[1];
-        os = 'Windows';
-    }
-
-    switch (os) {
-        case 'Mac OS':
-        case 'Mac OS X':
-        case 'Android':
-            osVersion = /(?:Android|Mac OS|Mac OS X|MacPPC|MacIntel|Mac_PowerPC|Macintosh) ([._\d]+)/.exec(nAgt)[1];
-            break;
-
-        case 'iOS': {
-            const osVersionArray = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
-            osVersion = osVersionArray[1] + '.' + osVersionArray[2] + '.' + (parseInt(osVersionArray[3]) | 0);
-            break;
-        }
-    }
-    return {
-        os,
-        osVersion,
-    };
-};
-
-function getBrowser() {
-    const ua = navigator.userAgent; let tem;
-        let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-    if (/trident/i.test(M[1])) {
-        tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
-        return { name: 'ie', version: (tem[1] || '') };
-    }
-    if (M[1] === 'Chrome') {
-        tem = ua.match(/\bOPR|Edge\/(\d+)/);
-
-        if (tem != null) {
-            let version = tem[1];
-            if (!version) {
-                const splits = ua.split(tem[0] + '/');
-                if (splits.length > 1) {
-                    version = splits[1];
-                }
-            }
-
-            return { name: 'opera', version };
-        }
-    }
-    M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
-    if ((tem = ua.match(/version\/(\d+)/i)) != null) { M.splice(1, 1, tem[1]); }
-    return {
-        name: M[0].toLowerCase(),
-        version: M[1],
-    };
-}
+import {ILOidcLocation} from "./location";
 
 let keepAliveServiceWorkerTimeoutId = null;
-
-export const sleepAsync = (milliseconds) => {
+let keepAliveController;
+export const sleepAsync = ({milliseconds}: { milliseconds: any }) => {
     return new Promise(resolve => timer.setTimeout(resolve, milliseconds));
 };
 
-let keepAliveController ;
-const keepAlive = () => {
+const keepAlive = (service_worker_keep_alive_path='/') => {
     try {
-        const operatingSystem = getOperatingSystem(navigator);
-        const minSleepSeconds = operatingSystem.os === 'Android' ? 240 : 150;
+        const minSleepSeconds =  150;
         keepAliveController = new AbortController();
-        const promise = fetch(`/OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`, { signal: keepAliveController.signal });
+        const promise = fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`, { signal: keepAliveController.signal });
         promise.catch(error => { console.log(error); });
-        sleepAsync(minSleepSeconds * 1000).then(keepAlive);
+        sleepAsync({milliseconds: minSleepSeconds * 1000}).then(keepAlive);
     } catch (error) { console.log(error); }
 };
 
@@ -126,8 +26,8 @@ const stopKeepAlive = () => {
     }
 };
 
-const isServiceWorkerProxyActiveAsync = () => {
-    return fetch('/OidcKeepAliveServiceWorker.json', {
+const isServiceWorkerProxyActiveAsync = (service_worker_keep_alive_path='/') => {
+    return fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json`, {
         headers: {
             'oidc-vanilla': 'true',
         },
@@ -136,17 +36,18 @@ const isServiceWorkerProxyActiveAsync = () => {
     }).catch(error => { console.log(error); });
 };
 
-export const excludeOs = (operatingSystem) => {
-    if (operatingSystem.os === 'iOS' && operatingSystem.osVersion.startsWith('12')) {
-        return true;
-    }
-    if (operatingSystem.os === 'Mac OS X' && operatingSystem.osVersion.startsWith('10_15_6')) {
-        return true;
-    }
-    return false;
-};
+export const defaultServiceWorkerUpdateRequireCallback = (location:ILOidcLocation) => async (registration: any, stopKeepAlive: Function) => {
+    stopKeepAlive();
+    await registration.update();
+    const isSuccess = await registration.unregister();
+    console.log(`Service worker unregistering ${isSuccess}`)
+    await sleepAsync({milliseconds: 2000});
+    location.reload();
+}
 
-const sendMessageAsync = (registration) => (data) => {
+
+
+const sendMessageAsync = (registration) => (data) : Promise<any> => {
     return new Promise(function(resolve, reject) {
         const messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function (event) {
@@ -160,35 +61,28 @@ const sendMessageAsync = (registration) => (data) => {
     });
 };
 
-export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName) => {
+export const initWorkerAsync = async(configuration, configurationName) => {
+    
+    const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
     if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.serviceWorker || !serviceWorkerRelativeUrl) {
         return null;
     }
-    const { name, version } = getBrowser();
-    if (name === 'chrome' && parseInt(version) < 90) {
-        return null;
-    }
-    if (name === 'opera') {
-        if (!version) {
-            return null;
-        }
-        if (parseInt(version.split('.')[0]) < 80) {
-            return null;
-        }
-    }
-    if (name === 'ie') {
+    
+    if(configuration.service_worker_activate() === false) {
         return null;
     }
 
-   const operatingSystem = getOperatingSystem(navigator);
-    if (excludeOs(operatingSystem)) {
-        return null;
+    let registration = null;
+    if(configuration.register) {
+        registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
+    } else {
+        registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);   
     }
-
-    const registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
 
     try {
         await navigator.serviceWorker.ready;
+        if (!navigator.serviceWorker.controller)
+            await sendMessageAsync(registration)({ type: 'claim' });
     } catch (err) {
         return null;
     }
@@ -214,28 +108,17 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         const serviceWorkerVersion = result.version;
         if(serviceWorkerVersion !== codeVersion) {
             console.warn(`Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`);
-            
-            if(oidcConfiguration.service_worker_update_require_callback)
-            {
-                await oidcConfiguration.service_worker_update_require_callback(registration, stopKeepAlive);  
-            } else {
-                stopKeepAlive();
-                await registration.update();
-                const isSuccess = await registration.unregister();
-                console.log(`Service worker unregistering ${isSuccess}`)
-                await sleepAsync(2000);
-                window.location.reload();
-            }
+            await oidcConfiguration.service_worker_update_require_callback(registration, stopKeepAlive);
         }
         
         // @ts-ignore
         return { tokens: parseOriginalTokens(result.tokens, null, oidcConfiguration.token_renew_mode), status: result.status };
     };
 
-    const startKeepAliveServiceWorker = () => {
+    const startKeepAliveServiceWorker = (service_worker_keep_alive_path='/') => {
         if (keepAliveServiceWorkerTimeoutId == null) {
             keepAliveServiceWorkerTimeoutId = 'not_null';
-            keepAlive();
+            keepAlive(service_worker_keep_alive_path);
         }
     };
 
@@ -250,7 +133,7 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     };
 
     const setNonceAsync = (nonce) => {
-        sessionStorage['oidc.nonce'] = nonce.nonce;
+        sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
         return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
     };
     const getNonceAsync = async () => {
@@ -259,25 +142,48 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         // @ts-ignore
         let nonce = result.nonce;
         if (!nonce) {
-            nonce = sessionStorage['oidc.nonce'];
+            nonce = sessionStorage[`oidc.nonce.${configurationName}`];
             console.warn('nonce not found in service worker, using sessionStorage');
         }
         return { nonce };
     };
 
-    let getLoginParamsCache = null;
-    const setLoginParams = (configurationName:string, data) => {
-        getLoginParamsCache = data;
+    let getLoginParamsCache = {};
+    const setLoginParams = (data) => {
+        getLoginParamsCache[configurationName] = data;
         localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
     };
-    const getLoginParams = (configurationName) => {
+
+    const getLoginParams = () => {
         const dataString = localStorage[`oidc.login.${configurationName}`];
-        if (!getLoginParamsCache) {
-            getLoginParamsCache = JSON.parse(dataString);
+        if (!getLoginParamsCache[configurationName]) {
+            getLoginParamsCache[configurationName] = JSON.parse(dataString);
         }
-        return getLoginParamsCache;
+        return getLoginParamsCache[configurationName];
     };
 
+    const setDemonstratingProofOfPossessionNonce = async (demonstratingProofOfPossessionNonce: string) => {
+        await sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionNonce', data: { demonstratingProofOfPossessionNonce }, configurationName });
+    };
+
+    const getDemonstratingProofOfPossessionNonce = async () => {
+        const result = await sendMessageAsync(registration)({type: 'getDemonstratingProofOfPossessionNonce', data: null, configurationName});
+        return result.demonstratingProofOfPossessionNonce;
+    };
+
+    const setDemonstratingProofOfPossessionJwkAsync = async (demonstratingProofOfPossessionJwk:JsonWebKey) => {
+        const demonstratingProofOfPossessionJwkJson = JSON.stringify(demonstratingProofOfPossessionJwk);
+        sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionJwk', data: { demonstratingProofOfPossessionJwkJson }, configurationName });
+    };
+
+    const getDemonstratingProofOfPossessionJwkAsync = async () => {
+        const result = await sendMessageAsync(registration)({type: 'getDemonstratingProofOfPossessionJwk', data: null, configurationName});
+        if(!result.demonstratingProofOfPossessionJwkJson) {
+            return null;
+        }
+        return JSON.parse(result.demonstratingProofOfPossessionJwkJson);
+    };
+    
     const getStateAsync = async () => {
         const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
         // @ts-ignore
@@ -313,8 +219,8 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
     return {
         clearAsync,
         initAsync,
-        startKeepAliveServiceWorker,
-        isServiceWorkerProxyActiveAsync,
+        startKeepAliveServiceWorker : () => startKeepAliveServiceWorker(configuration.service_worker_keep_alive_path),
+        isServiceWorkerProxyActiveAsync : () => isServiceWorkerProxyActiveAsync(configuration.service_worker_keep_alive_path),
         setSessionStateAsync,
         getSessionStateAsync,
         setNonceAsync,
@@ -325,5 +231,9 @@ export const initWorkerAsync = async(serviceWorkerRelativeUrl, configurationName
         setStateAsync,
         getCodeVerifierAsync,
         setCodeVerifierAsync,
+        setDemonstratingProofOfPossessionNonce,
+        getDemonstratingProofOfPossessionNonce,
+        setDemonstratingProofOfPossessionJwkAsync,
+        getDemonstratingProofOfPossessionJwkAsync,
     };
 };

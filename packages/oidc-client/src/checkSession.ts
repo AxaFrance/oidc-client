@@ -1,9 +1,10 @@
 import { CheckSessionIFrame } from './checkSessionIFrame.js';
 import { _silentLoginAsync, SilentLoginResponse } from './silentLogin.js';
 import { OidcConfiguration } from './types.js';
+import Oidc from "./oidc";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const startCheckSessionAsync = (oidc:any, oidcDatabase:any, configuration :OidcConfiguration) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
+export const startCheckSessionAsync = (oidc:Oidc, oidcDatabase:any, configuration :OidcConfiguration) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
     const silentLoginAsync = (extras, state = undefined, scope = undefined):Promise<SilentLoginResponse> => {
         return _silentLoginAsync(oidc.configurationName, configuration, oidc.publishEvent.bind(oidc))(extras, state, scope);
     };
@@ -23,6 +24,9 @@ export const startCheckSessionAsync = (oidc:any, oidcDatabase:any, configuration
                     id_token_hint: idToken,
                     scope: configuration.scope || 'openid',
                 }).then((silentSigninResponse) => {
+                    if(silentSigninResponse.error) {
+                        throw new Error(silentSigninResponse.error);
+                    }   
                     const iFrameIdTokenPayload = silentSigninResponse.tokens.idTokenPayload;
                     if (idTokenPayload.sub === iFrameIdTokenPayload.sub) {
                         const sessionState = silentSigninResponse.sessionState;

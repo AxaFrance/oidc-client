@@ -1,6 +1,8 @@
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
+import {ILOidcLocation, OidcLocation} from "./location";
+import {fetchWithTokens} from "./fetch";
 
 export interface EventSubscriber {
     (name: string, data:any);
@@ -24,8 +26,8 @@ export class OidcClient {
         this._oidc.publishEvent(eventName, data);
     }
 
-    static getOrCreate = (getFetch : () => Fetch) => (configuration:OidcConfiguration, name = 'default'): OidcClient => {
-        return new OidcClient(Oidc.getOrCreate(getFetch)(configuration, name));
+    static getOrCreate = (getFetch : () => Fetch, location:ILOidcLocation= new OidcLocation()) => (configuration:OidcConfiguration, name = 'default'): OidcClient => {
+        return new OidcClient(Oidc.getOrCreate(getFetch, location)(configuration, name));
     };
 
     static get(name = 'default'):OidcClient {
@@ -65,8 +67,16 @@ export class OidcClient {
         return this._oidc.configuration;
     }
 
+    async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string) : Promise<string> {
+        return this._oidc.generateDemonstrationOfProofOfPossessionAsync(accessToken, url, method);
+    }
+
     async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken> {
         return getValidTokenAsync(this._oidc, waitMs, numberWait);
+    }
+    
+    fetchWithTokens(fetch: Fetch): Fetch {
+        return fetchWithTokens(fetch, this);
     }
 
     async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false):Promise<T> {

@@ -125,6 +125,8 @@ class OidcConfigBuilder {
     hideAccessToken: true,
     convertAllRequestsToCorsExceptNavigate: false,
     setAccessTokenToNavigateRequests: true,
+    demonstratingProofOfPossessionNonce: null,
+    demonstratingProofOfPossessionJwkJson: null,
   };
 
   public withTestingDefault(): OidcConfigBuilder {
@@ -183,6 +185,13 @@ class OidcConfigBuilder {
     oidcServerConfiguration: OidcServerConfiguration,
   ): OidcConfigBuilder {
     this.oidcConfig.oidcServerConfiguration = oidcServerConfiguration;
+    return this;
+  }
+
+  public withOidcConfiguration(
+      oidcConfiguration: OidcConfiguration,
+  ): OidcConfigBuilder {
+    this.oidcConfig.oidcConfiguration = oidcConfiguration;
     return this;
   }
 

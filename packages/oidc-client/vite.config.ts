@@ -2,10 +2,6 @@
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-import pkg from './package.json';
-
-const dependencies = externalDependencies();
-console.log('external dependencies:', dependencies);
 
 export default defineConfig({
   build: {
@@ -15,9 +11,6 @@ export default defineConfig({
       formats: ['es', 'umd'],
       fileName: 'index',
     },
-    rollupOptions: {
-      external: [...dependencies],
-    },
   },
 
   plugins: [
@@ -26,15 +19,5 @@ export default defineConfig({
   resolve: {
     preserveSymlinks: true, // https://github.com/vitejs/vite/issues/11657
   },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './tests/setup.js',
-  },
 });
 
-function externalDependencies(): Array<string> {
-  const deps = Object.keys(pkg.dependencies || {});
-  const peerDeps = Object.keys(pkg.peerDependencies || {});
-  return [...deps, ...peerDeps];
-}

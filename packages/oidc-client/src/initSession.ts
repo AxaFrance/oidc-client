@@ -26,12 +26,28 @@ export const initSession = (configurationName, storage = sessionStorage) => {
     };
 
     const setNonceAsync = (nonce) => {
-        localStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
+        storage[`oidc.nonce.${configurationName}`] = nonce.nonce;
+    };
+
+    const setDemonstratingProofOfPossessionJwkAsync = (jwk:JsonWebKey) => {
+        storage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
+    };
+
+    const getDemonstratingProofOfPossessionJwkAsync = () => {
+        return JSON.parse(storage[`oidc.jwk.${configurationName}`]);
     };
 
     const getNonceAsync = async () => {
         // @ts-ignore
-        return { nonce: localStorage[`oidc.nonce.${configurationName}`] };
+        return { nonce: storage[`oidc.nonce.${configurationName}`] };
+    };
+
+    const setDemonstratingProofOfPossessionNonce = async (dpopNonce:string) => {
+        storage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
+    };
+
+    const getDemonstratingProofOfPossessionNonce = () => {
+        return storage[`oidc.dpop_nonce.${configurationName}`];
     };
 
     const getTokens = () => {
@@ -41,17 +57,23 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return JSON.stringify({ tokens: JSON.parse(storage[`oidc.${configurationName}`]).tokens });
     };
 
-    let getLoginParamsCache = null;
-    const setLoginParams = (configurationName:string, data) => {
-        getLoginParamsCache = data;
+    let getLoginParamsCache = {};
+    const setLoginParams = (data) => {
+        getLoginParamsCache[configurationName] = data;
         storage[`oidc.login.${configurationName}`] = JSON.stringify(data);
     };
-    const getLoginParams = (configurationName) => {
+    const getLoginParams = () => {
         const dataString = storage[`oidc.login.${configurationName}`];
-        if (!getLoginParamsCache) {
-            getLoginParamsCache = JSON.parse(dataString);
+        
+        if(!dataString){
+            console.warn(`storage[oidc.login.${configurationName}] is empty, you should have an bad OIDC or code configuration somewhere.`);
+            return null;
         }
-        return getLoginParamsCache;
+        
+        if (!getLoginParamsCache[configurationName]) {
+            getLoginParamsCache[configurationName] = JSON.parse(dataString);
+        }
+        return getLoginParamsCache[configurationName];
     };
 
     const getStateAsync = async () => {
@@ -85,5 +107,9 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         setStateAsync,
         getCodeVerifierAsync,
         setCodeVerifierAsync,
+        setDemonstratingProofOfPossessionNonce,
+        getDemonstratingProofOfPossessionNonce,
+        setDemonstratingProofOfPossessionJwkAsync,
+        getDemonstratingProofOfPossessionJwkAsync,
     };
 };

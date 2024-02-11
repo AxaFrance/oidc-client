@@ -30,8 +30,9 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
 @axa-fr/oidc-client is:
 
 - **Secure** :
-  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSS attacks)
-  - OIDC using client side Code Credential Grant with pkce only
+    - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection) 
+    - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
+    - OIDC using client side Code Credential Grant with pkce only
 - **Lightweight** : Unpacked Size on npm is **274 kB**
 - **Simple**
   - refresh_token and access_token are auto refreshed in background
@@ -54,7 +55,7 @@ The service worker catch **access_token** and **refresh_token** that will never 
 npm install @axa-fr/oidc-client --save
 
 # To install or update OidcServiceWorker.js file, you can run
-node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public
+node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
 
 # If you have a "public" folder, the 2 files will be created :
 # ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
@@ -65,7 +66,7 @@ WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should a
 ```sh
   "scripts": {
     ...
-    "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
+    "postinstall": "node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public"
   },
 ```
 
@@ -110,12 +111,22 @@ export const configuration = {
   silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
-  service_worker_relative_url: '/OidcServiceWorker.js',
+  service_worker_relative_url: '/OidcServiceWorker.js', // just comment that line to disable service worker mode
   service_worker_only: false,
+  demonstrating_proof_of_possession: false, // demonstrating proof of possession will work only if access_token is accessible from the client (This is because WebCrypto API is not available inside a Service Worker)
 };
 
 const href = window.location.href;
-const oidcClient = OidcClient.getOrCreate(() => fetch)(configuration);
+const oidcClient = OidcClient.getOrCreate()(configuration);
+
+// Use the fetch bellow to inject access_token and DPOP tokens automatically
+const oidcFetch = oidcClient.fetchWithTokens(fetch);
+
+// You can inject you own fetch (default Fetch Interface) function and location object (respecting IOidcLocation interface)
+// import {OidcLocation} from '@axa-fr/oidc-client'
+// const oidcClient = OidcClient.getOrCreate(() => fetch, new OidcLocation())(configuration);
+
+
 
 console.log(href);
 
@@ -182,8 +193,11 @@ const configuration = {
     },
     refresh_time_before_tokens_expiration_in_second: Number, // default is 120 seconds
     service_worker_relative_url: String,
-    service_worker_only: Boolean, // default false
+    service_worker_keep_alive_path: String, // default is "/"
+    service_worker_only: Boolean, // default false, if true, the user will not be able to login if the service worker is not available on its browser
+    service_worker_activate: () => boolean, // you can take the control of the service worker default activation which use user agent string, if return false, the service worker mode will not be used
     service_worker_update_require_callback: (registration:any, stopKeepAlive:Function) => Promise<void>, // callback called when service worker need to be updated, you can take the control of the update process
+    service_worker_register: (url: string) => Promise<ServiceWorkerRegistration>, // Optional, you can take the control of the service worker registration
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
     authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in seconds of the openid well-known URL, default is 1 hour
@@ -191,7 +205,37 @@ const configuration = {
     monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
+    location: ILOidcLocation, // Optional, default is window.location, you can inject your own location object respecting the ILOidcLocation interface
+    demonstrating_proof_of_possession: Boolean, // Optional, default is false, if true, the the Demonstrating Proof of Possession will be activated //https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access
+    demonstrating_proof_of_possession_configuration: DemonstratingProofOfPossessionConfiguration // Optional, more details bellow
 };
+
+
+interface DemonstratingProofOfPossessionConfiguration {
+  generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
+          digestAlgorithm: AlgorithmIdentifier,
+          importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
+          signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
+          jwtHeaderAlgorithm: string
+};
+
+// default value of demonstrating_proof_of_possession_configuration
+const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration ={
+  importKeyAlgorithm: {
+    name: 'ECDSA',
+    namedCurve: 'P-256',
+    hash: {name: 'ES256'}
+  },
+  signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
+  generateKeyAlgorithm: {
+    name: 'ECDSA',
+    namedCurve: 'P-256'
+  },
+  digestAlgorithm: { name: 'SHA-256' },
+  jwtHeaderAlgorithm : 'ES256'
+};
+
+
 ```
 
 ## API
@@ -268,7 +312,7 @@ export class OidcClient {
   /**
    * Starts the OIDC logout process with specified options.
    * @param callbackPathOrUrl The callback path or URL to use after logout.
-   * @param extras Additional parameters to send to the OIDC server during the logout request.
+   * @param extras Additional parameters to send to the OIDC server during the logout request. {"no_reload:oidc":"true"} to avoid the page reload after logout.
    * @returns A promise resolved when the logout is completed.
    */
   logoutAsync(callbackPathOrUrl?: string | null | undefined, extras?: StringMap): Promise<void>;
@@ -311,11 +355,27 @@ export class OidcClient {
   async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken>;
 
   /**
+   * Retrieves a new fetch function that inject bearer tokens (also DPOP tokens).
+   * @param fetch The current fetch function to use
+   * @returns Fetch A new fectch function that inject bearer tokens (also DPOP tokens).
+   */
+  fetchWithTokens(fetch: Fetch): Fetch;
+
+  /**
    * Retrieves OIDC user information.
    * @param noCache Indicates whether user information should be retrieved bypassing the cache.
    * @returns A promise resolved with the user information, or rejected with an error.
    */
   async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false): Promise<T>;
+
+  /**
+   * Generate Demonstration of proof of possession.
+   * @param accessToken The access token to use.
+   * @param url The url to use.
+   * @param method The method to use.
+   * @returns A promise resolved with the proof of possession.
+   */
+  async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string>;
 }
 
 ```
@@ -343,6 +403,8 @@ More information about OIDC
 
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
 - [English : Increase the security and simplicity of your information system with openid connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
+- [English: youtube OIDC](https://www.youtube.com/watch?v=frIJfavZkUE&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=1)
+- [French: youtube OIDC](https://www.youtube.com/watch?v=H-mLMGzQ_y0&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=2)
 
 ## Hash route
 

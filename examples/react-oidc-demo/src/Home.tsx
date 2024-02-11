@@ -1,6 +1,14 @@
 import { useOidc } from '@axa-fr/react-oidc';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
+
+
+/*const createIframeHack =() => {
+    const iframe = document.createElement('iframe');
+    const html = '<body>Foo<script>alert("youhou");</script></body>';
+    iframe.srcdoc = html;
+    document.body.appendChild(iframe);
+}*/
 
 export const Home = () => {
     const { login, logout, renewTokens, isAuthenticated } = useOidc();
@@ -9,6 +17,11 @@ export const Home = () => {
     const navigateProfile = () => {
         navigate("/profile");
     };
+    
+    /*useEffect(() => {
+        createIframeHack();
+    }, []);*/
+
 
     return (
         <div className="container-fluid mt-3">
@@ -19,6 +32,7 @@ export const Home = () => {
                     {!isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => login('/profile')}>Login</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout('/profile')}>logout /profile</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button></p>}
+                    {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout(null, {"no_reload:oidc":"true"})}>logout no reload</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout(null)}>logout whithout callbackredirect</button></p>}
                     {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={async () => console.log('renewTokens result', await renewTokens())}>renew tokens</button></p>}
                     <p><button type="button" className="btn btn-primary" onClick={navigateProfile}>Navigate to profile</button></p>

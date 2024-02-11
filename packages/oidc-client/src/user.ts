@@ -1,14 +1,15 @@
 import { sleepAsync } from './initWorker.js';
 import { isTokensValid } from './parseTokens.js';
+import Oidc from "./oidc";
 
-export const userInfoAsync = (oidc) => async (noCache = false) => {
+export const userInfoAsync = (oidc:Oidc) => async (noCache = false) => {
     if (oidc.userInfo != null && !noCache) {
         return oidc.userInfo;
     }
 
     // We wait the synchronisation before making a request
     while (oidc.tokens && !isTokensValid(oidc.tokens)) {
-        await sleepAsync(200);
+        await sleepAsync({milliseconds: 200});
     }
 
     if (!oidc.tokens) {
@@ -19,7 +20,8 @@ export const userInfoAsync = (oidc) => async (noCache = false) => {
         return null;
     }
 
-    const oidcServerConfiguration = await oidc.initAsync(oidc.configuration.authority, oidc.configuration.authority_configuration);
+    const configuration = oidc.configuration;
+    const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     const url = oidcServerConfiguration.userInfoEndpoint;
     const fetchUserInfo = async (accessToken) => {
         const res = await fetch(url, {

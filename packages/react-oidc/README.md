@@ -31,7 +31,8 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
 @axa-fr/react is:
 
 - **Secure** :
-  - With the use of Service Worker, your tokens (refresh_token and access_token) are not accessible to the JavaScript client code (big protection against XSS attacks)
+  - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
+  - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
   - OIDC using client side Code Credential Grant with pkce only
 - **Lightweight** : Unpacked Size on npm is **274 kB**
 - **Simple**
@@ -141,6 +142,7 @@ const configuration = {
   authority: "https://demo.duendesoftware.com",
   service_worker_relative_url: "/OidcServiceWorker.js", // just comment that line to disable service worker mode
   service_worker_only: false,
+  demonstrating_proof_of_possession: false, // demonstrating proof of possession will work only if access_token is accessible from the client (This is because WebCrypto API is not available inside a Service Worker)
 };
 
 const App = () => (
@@ -185,8 +187,11 @@ const configuration = {
     },
     refresh_time_before_tokens_expiration_in_second: Number, // default is 120 seconds
     service_worker_relative_url: String,
-    service_worker_only: Boolean, // default false
+    service_worker_keep_alive_path: String, // default is "/"
+    service_worker_only: Boolean, // default false 
+    service_worker_activate: () => boolean, // you can take the control of the service worker default activation which use user agent string
     service_worker_update_require_callback: (registration:any, stopKeepAlive:Function) => Promise<void>, // callback called when service worker need to be updated, you can take the control of the update process
+    service_worker_register: (url: string) => Promise<ServiceWorkerRegistration>, // Optional, you can take the control of the service worker registration
     extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
     withCustomHistory: Function, // Override history modification, return an instance with replaceState(url, stateHistory) implemented (like History.replaceState())
@@ -197,8 +202,40 @@ const configuration = {
     onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user is logged out from the same tab when session_monitor is active
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
-  }.isRequired,
+    location: ILOidcLocation, // Optional, default is window.location, you can inject your own location object respecting the ILOidcLocation interface
+    demonstrating_proof_of_possession: Boolean, // Optional, default is false, if true, the the Demonstrating Proof of Possession will be activated //https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access
+    demonstrating_proof_of_possession_configuration: DemonstratingProofOfPossessionConfiguration // Optional, more details bellow
+  },
 };
+
+demonstrating_proof_of_possession_configuration: DemonstratingProofOfPossessionConfiguration // Optional, more details bellow
+};
+
+
+interface DemonstratingProofOfPossessionConfiguration {
+  generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
+          digestAlgorithm: AlgorithmIdentifier,
+          importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
+          signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
+          jwtHeaderAlgorithm: string
+};
+
+// default value of demonstrating_proof_of_possession_configuration
+const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration ={
+  importKeyAlgorithm: {
+    name: 'ECDSA',
+    namedCurve: 'P-256',
+    hash: {name: 'ES256'}
+  },
+  signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
+  generateKeyAlgorithm: {
+    name: 'ECDSA',
+    namedCurve: 'P-256'
+  },
+  digestAlgorithm: { name: 'SHA-256' },
+  jwtHeaderAlgorithm : 'ES256'
+};
+
 
 ```
 
@@ -583,6 +620,8 @@ More information about OIDC
 
 - [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
 - [English : Increase the security and simplicity of your information system with openid connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
+- [English: youtube OIDC](https://www.youtube.com/watch?v=frIJfavZkUE&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=1)
+- [French: youtube OIDC](https://www.youtube.com/watch?v=H-mLMGzQ_y0&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=2)
 
 ## NextJS
 

@@ -1,17 +1,19 @@
-﻿import '@testing-library/jest-dom';
+﻿// import '@testing-library/jest-dom';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { logoutAsync } from "./logout";
+import {ILOidcLocation, OidcLocation} from "./location";
 
 describe('Logout test suite', () => {
-
+    const expectedFinalUrl = "http://api/connect/endsession?id_token_hint=abcd&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Flogged_out";
     it.each([
-        {logout_tokens_to_invalidate:['access_token', 'refresh_token'], expectedResults: ["token=abcd&token_type_hint=access_token&client_id=interactive.public.short","token=abdc&token_type_hint=refresh_token&client_id=interactive.public.short"]}, 
-        {logout_tokens_to_invalidate:['refresh_token'], expectedResults: ["token=abdc&token_type_hint=refresh_token&client_id=interactive.public.short"]}, 
-        {logout_tokens_to_invalidate:['access_token'], expectedResults: ["token=abcd&token_type_hint=access_token&client_id=interactive.public.short"]}, 
-        {logout_tokens_to_invalidate:[], expectedResults: []}, 
-    ])('Logout should revoke tokens $logout_tokens_to_invalidate', async ({ logout_tokens_to_invalidate, expectedResults}) => {
+        {logout_tokens_to_invalidate:['access_token', 'refresh_token'], extras:null, expectedResults: ["token=abcd&token_type_hint=access_token&client_id=interactive.public.short","token=abdc&token_type_hint=refresh_token&client_id=interactive.public.short"], expectedFinalUrl}, 
+        {logout_tokens_to_invalidate:['refresh_token'],extras:null, expectedResults: ["token=abdc&token_type_hint=refresh_token&client_id=interactive.public.short"], expectedFinalUrl}, 
+        {logout_tokens_to_invalidate:['access_token'],extras:null, expectedResults: ["token=abcd&token_type_hint=access_token&client_id=interactive.public.short"], expectedFinalUrl}, 
+        {logout_tokens_to_invalidate:[],extras:null, expectedResults: [], expectedFinalUrl}, 
+        {logout_tokens_to_invalidate:[],extras: {"no_reload:oidc":"true"}, expectedResults: [], expectedFinalUrl:""}, 
+    ])('Logout should revoke tokens $logout_tokens_to_invalidate', async ({ logout_tokens_to_invalidate, extras =null, expectedResults, expectedFinalUrl}) => {
 
         const configuration = {
             client_id: 'interactive.public.short',
@@ -45,21 +47,37 @@ describe('Logout test suite', () => {
         };
         
         const oidcDatabase = {default: () => oidc};
-        
-        const window = {
-            location: {
-                href: "",
-                origin: "http://localhost:4200",
-            },
-        };
+                
+        let finalUrl = "";
+        class OidcLocationMock implements ILOidcLocation{
+            open(url: string): void {
+                finalUrl = url;
+            }
 
-        await logoutAsync(oidc, oidcDatabase, mockFetchFn, window, console)("/logged_out");
+            getCurrentHref(): string {
+                return "";
+            }
+
+            getPath(): string {
+                return "";
+            }
+
+            reload(): void {
+            }
+
+            getOrigin(): string {
+                return "http://localhost:4200";
+            }
+            
+        }
+
+        await logoutAsync(oidc, oidcDatabase, mockFetchFn, console, new OidcLocationMock())("/logged_out", extras);
         
         // @ts-ignore
 
         const results =  mockFetchFn.mock.calls.map((call, index) => call[1].body);
     
         expect(results).toEqual(expectedResults);
-        expect(window.location.href).toBe("http://api/connect/endsession?id_token_hint=abcd&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Flogged_out");
+        expect(finalUrl).toBe(expectedFinalUrl);
     });
 });

@@ -1,6 +1,6 @@
 import { describe, expect,it } from 'vitest';
 
-import { excludeOs, getOperatingSystem } from './initWorker';
+import { excludeOs, getOperatingSystem } from './initWorkerOption';
 
 describe('initWorker test Suite', () => {
 

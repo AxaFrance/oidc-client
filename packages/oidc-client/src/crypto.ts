@@ -1,4 +1,5 @@
-import * as base64 from 'base64-js';
+import {uint8ToUrlBase64} from "./jwt";
+
 
 const cryptoInfo = () => {
   const hasCrypto = typeof window !== 'undefined' && !!(window.crypto as any);
@@ -14,11 +15,6 @@ const bufferToString = (buffer: Uint8Array) => {
     state.push(charset[index]);
   }
   return state.join('');
-};
-
-const urlSafe = (buffer: Uint8Array): string => {
-  const encoded = base64.fromByteArray(new Uint8Array(buffer));
-  return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 };
 
 export const generateRandom = (size: number) => {
@@ -44,7 +40,16 @@ export function textEncodeLite(str: string) {
   }
   return bufView;
 }
-  export const deriveChallengeAsync = (code: string): Promise<string> => {
+
+export function base64urlOfHashOfASCIIEncodingAsync(code: string):Promise<string> {
+  return new Promise((resolve, reject) => {
+    crypto.subtle.digest('SHA-256', textEncodeLite(code)).then(buffer => {
+      return resolve(uint8ToUrlBase64(new Uint8Array(buffer)));
+    }, error => reject(error));
+  });
+}
+
+export const deriveChallengeAsync = (code: string): Promise<string> => {
     if (code.length < 43 || code.length > 128) {
       return Promise.reject(new Error('Invalid code length.'));
     }
@@ -53,9 +58,5 @@ export function textEncodeLite(str: string) {
       return Promise.reject(new Error('window.crypto.subtle is unavailable.'));
     }
 
-    return new Promise((resolve, reject) => {
-      crypto.subtle.digest('SHA-256', textEncodeLite(code)).then(buffer => {
-        return resolve(urlSafe(new Uint8Array(buffer)));
-      }, error => reject(error));
-    });
+    return base64urlOfHashOfASCIIEncodingAsync(code);
 };

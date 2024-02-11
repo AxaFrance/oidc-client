@@ -9,7 +9,7 @@ export enum OidcUserStatus {
 }
 
 export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
-    user: T;
+    user: T | null;
     status: OidcUserStatus;
 }
 

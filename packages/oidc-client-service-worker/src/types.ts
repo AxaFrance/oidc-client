@@ -31,7 +31,7 @@ export interface FetchHeaders extends Headers {
 }
 
 export type Status = 'LOGGED' | 'LOGGED_IN' | 'LOGGED_OUT' | 'NOT_CONNECTED' | 'LOGOUT_FROM_ANOTHER_TAB' | 'SESSION_LOST' | 'REQUIRE_SYNC_TOKENS' | 'FORCE_REFRESH' | null;
-export type MessageEventType = 'clear' | 'init' | 'setState' | 'getState' | 'setCodeVerifier' | 'getCodeVerifier' | 'setSessionState' | 'getSessionState' | 'setNonce' | 'getNonce';
+export type MessageEventType = 'clear' | 'init' | 'setState' | 'getState' | 'setCodeVerifier' | 'getCodeVerifier' | 'setSessionState' | 'getSessionState' | 'setNonce' | 'getNonce' | 'setDemonstratingProofOfPossessionNonce' | 'getDemonstratingProofOfPossessionNonce' | 'setDemonstratingProofOfPossessionJwk' | 'getDemonstratingProofOfPossessionJwk';
 
 export type MessageData = {
     status: Status;
@@ -41,6 +41,8 @@ export type MessageData = {
     state: string;
     codeVerifier: string;
     sessionState: string;
+    demonstratingProofOfPossessionNonce: string;
+    demonstratingProofOfPossessionJwkJson: string;
     nonce: Nonce;
 }
 
@@ -68,6 +70,8 @@ export type OidcConfig = {
     hideAccessToken: boolean;
     convertAllRequestsToCorsExceptNavigate: boolean,
     setAccessTokenToNavigateRequests: boolean,
+    demonstratingProofOfPossessionNonce: string | null;
+    demonstratingProofOfPossessionJwkJson: string | null;
 }
 
 export type IdTokenPayload = {
@@ -86,6 +90,7 @@ export type IdTokenPayload = {
 export type AccessTokenPayload = {
     exp: number;
     sub: string;
+    iat: number;
 }
 
 export type Tokens = {

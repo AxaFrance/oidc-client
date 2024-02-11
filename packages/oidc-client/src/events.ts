@@ -23,6 +23,7 @@ export const eventNames = {
     silentLoginAsync_end: 'silentLoginAsync_end',
     silentLoginAsync_error: 'silentLoginAsync_error',
     syncTokensAsync_begin: 'syncTokensAsync_begin',
+    syncTokensAsync_lock_not_available: 'syncTokensAsync_lock_not_available',
     syncTokensAsync_end: 'syncTokensAsync_end',
     syncTokensAsync_error: 'syncTokensAsync_error',
 };
