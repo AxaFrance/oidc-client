@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.17.2
+## 7.17.3
+
+- [dbaf602](https://github.com/AxaFrance/oidc-client/commit/dbaf602d31e0b437285496e2711ff7cce5d8d3f7) - fix(react-oidc): typings user can be null (release), 2024-02-11 by *Guillaume Chervet*
+
+
+## v7.17.2
 
 - [c3d5c6b](https://github.com/AxaFrance/oidc-client/commit/c3d5c6b1a6a2a82450d134134513634031c1c338) - refactor(react-oidc): remove base64js dependencies (release), 2024-02-11 by *Guillaume Chervet*
 - [2a7031b](https://github.com/AxaFrance/oidc-client/commit/2a7031bfdd5a7c638940ece97778988ead73cbdc) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-02-11 by *Guillaume Chervet*
@@ -313,10 +318,5 @@
 ## v7.3.4
 
 - [6d371ff](https://github.com/AxaFrance/oidc-client/commit/6d371ff1ce909ae40ef2f44a145bdcd322ca9d90) - fix(oidc-service-worker): gracefull timeout on firefox (release) (#1132), 2023-08-25 by *Guillaume Chervet*
-
-
-## v7.3.3
-
-- [e4e7409](https://github.com/AxaFrance/oidc-client/commit/e4e74091a8a6fadb64429dcccbd43331af62f920) - fix(oidc): parent instead of top for iframe allow app inside iframe (#1130) (release), 2023-08-15 by *Guillaume Chervet*
 
 
