@@ -139,7 +139,6 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     const ServiceWorkerNotSupportedComponent = serviceWorkerNotSupportedComponent;
     const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
-    const isLoading = (loading || (currentConfigurationName !== configurationName));
     const oidc = getOidc(configurationName);
     const eventName = event.name;
     switch (eventName) {
@@ -158,7 +157,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
             );
         case OidcClient.eventNames.refreshTokensAsync_error:
         case OidcClient.eventNames.syncTokensAsync_error:
-        case OidcClient.eventNames.logout_from_another_tab:
+        //case OidcClient.eventNames.logout_from_another_tab:
             return (
                 <SessionLostComponent configurationName={configurationName} />
             );
