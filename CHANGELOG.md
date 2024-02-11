@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.17.3
+## 7.17.4
+
+- [91b11af](https://github.com/AxaFrance/oidc-client/commit/91b11afa983bf4bee8def95c4ee101ede5447dc9) - fix(oidc): resfreshTokenError not triggered when silentsignin disabled (release), 2024-02-11 by *Guillaume Chervet*
+
+
+## v7.17.3
 
 - [dbaf602](https://github.com/AxaFrance/oidc-client/commit/dbaf602d31e0b437285496e2711ff7cce5d8d3f7) - fix(react-oidc): typings user can be null (release), 2024-02-11 by *Guillaume Chervet*
 
@@ -313,10 +318,5 @@
 ## v7.4.0
 
 - [d0dfde4](https://github.com/AxaFrance/oidc-client/commit/d0dfde47e27125248e5af7e9d6c12bfbe1e3ec60) - feat(oidc+serviceworker): increase security preventing sw unresgistration during silent signin (#1134) (release), 2023-09-05 by *Guillaume Chervet*
-
-
-## v7.3.4
-
-- [6d371ff](https://github.com/AxaFrance/oidc-client/commit/6d371ff1ce909ae40ef2f44a145bdcd322ca9d90) - fix(oidc-service-worker): gracefull timeout on firefox (release) (#1132), 2023-08-25 by *Guillaume Chervet*
 
 
