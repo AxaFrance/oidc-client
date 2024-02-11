@@ -186,17 +186,20 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
                 ...extras,
                 prompt: 'none',
             });
-            if (silent_token_response) {
-                if(silent_token_response.error) {
-                    updateTokens(null);
-                    oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token silent' });
-                    return { tokens: null, status: 'SESSION_LOST' };
-                }
+            if (!silent_token_response) {
+                updateTokens(null);
+                oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token silent not active' });
+                return { tokens: null, status: 'SESSION_LOST' };
+            }
+            if(silent_token_response.error) {
+                updateTokens(null);
+                oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token silent' });
+                return { tokens: null, status: 'SESSION_LOST' };
+            }
                 
-                updateTokens(silent_token_response.tokens);
-                oidc.publishEvent(Oidc.eventNames.token_renewed, {});
-                return { tokens: silent_token_response.tokens, status: 'LOGGED' };
-            } 
+            updateTokens(silent_token_response.tokens);
+            oidc.publishEvent(Oidc.eventNames.token_renewed, {});
+            return { tokens: silent_token_response.tokens, status: 'LOGGED' };
             
         } catch (exceptionSilent: any) {
             console.error(exceptionSilent);
