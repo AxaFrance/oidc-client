@@ -1,6 +1,8 @@
-import { StringMap, OidcClient } from '@axa-fr/oidc-client';
+import {StringMap, OidcClient, OidcLocation} from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
 import {Tokens} from "@axa-fr/oidc-client/dist/parseTokens";
+import OidcRoutes from "./core/routes/OidcRoutes";
+import {eventNames} from "@axa-fr/oidc-client/dist/events";
 
 const defaultConfigurationName = 'default';
 
@@ -8,29 +10,60 @@ type GetOidcFn = {
     (configurationName?: string): any;
 }
 
-const defaultIsAuthenticated = (getOidc: GetOidcFn, configurationName: string) => {
+const defaultAuthenticateStatus = (getOidc: GetOidcFn, configurationName: string) : OidcAuthenticateStatus => {
     let isAuthenticated = false;
     const oidc = getOidc(configurationName);
     if (oidc) {
-        isAuthenticated = getOidc(configurationName).tokens != null;
-    }
-    return isAuthenticated;
+        if(getOidc(configurationName).tokens != null){
+            return OidcAuthenticateStatus.Authenticated;
+        } else {
+            return OidcAuthenticateStatus.Unauthenticated;
+        }
+    } 
+    return OidcAuthenticateStatus.Loading;
 };
+export enum OidcAuthenticateStatus {
+    Unauthenticated= 'Unauthenticated',
+    Loading = 'Loading',
+    Authenticated= 'Authenticated',
+    Authenticating= 'Authenticating',
+    AuthenticatingCallback= 'Authenticating callback',
+    AuthenticatingError= 'Authenticating error',
+    SessionLost= 'Session lost',
+    ServiceWorkerNotSupported= 'ServiceWorker not supported',
+}
 
 export const useOidc = (configurationName = defaultConfigurationName) => {
     const getOidc = OidcClient.get;
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(defaultIsAuthenticated(getOidc, configurationName));
+    const [authenticateStatus, setAuthenticateStatus] = useState<OidcAuthenticateStatus>(defaultAuthenticateStatus(getOidc, configurationName));
 
     useEffect(() => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
-        setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
+        setAuthenticateStatus(defaultAuthenticateStatus(getOidc, configurationName));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-            if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab || name === OidcClient.eventNames.token_aquired || name == OidcClient.eventNames.tryKeepExistingSessionAsync_end) {
-                if (isMounted) {
-                    setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
-                }
+            console.log('useOidc', name, data);
+            switch (name) {
+                case OidcClient.eventNames.service_worker_not_supported_by_browser:
+                    setAuthenticateStatus(OidcAuthenticateStatus.ServiceWorkerNotSupported);
+                    return ;
+                case OidcClient.eventNames.loginAsync_begin:
+                    setAuthenticateStatus(OidcAuthenticateStatus.Authenticating);
+                    return ;
+                case OidcClient.eventNames.loginCallbackAsync_begin:
+                    setAuthenticateStatus(OidcAuthenticateStatus.AuthenticatingCallback);
+                    return ;
+                case OidcClient.eventNames.loginAsync_error:
+                case OidcClient.eventNames.loginCallbackAsync_error:
+                    setAuthenticateStatus(OidcAuthenticateStatus.AuthenticatingError);
+                    return ;
+                case OidcClient.eventNames.refreshTokensAsync_error:
+                case OidcClient.eventNames.syncTokensAsync_error:
+                    setAuthenticateStatus(OidcAuthenticateStatus.SessionLost);
+                    return ;
+                default:
+                    return ;
             }
         });
         return () => {
@@ -60,7 +93,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
             idTokenPayload: tokens.idTokenPayload,
         };
     };
-    return { login, logout, renewTokens, isAuthenticated };
+    return { login, logout, renewTokens, authenticateStatus };
 };
 
 const accessTokenInitialState = { accessToken: null, accessTokenPayload: null };

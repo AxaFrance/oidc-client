@@ -1,6 +1,8 @@
-import { useOidc } from '@axa-fr/react-oidc';
+import { useOidc, OidcAuthenticateStatus } from '@axa-fr/react-oidc';
 import React, {useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
+import AuthenticatingError from "./override/AuthenticateError.component";
+import Authenticating from "./override/Authenticating.component";
 
 
 /*const createIframeHack =() => {
@@ -11,7 +13,7 @@ import {useNavigate} from "react-router-dom";
 }*/
 
 export const Home = () => {
-    const { login, logout, renewTokens, isAuthenticated } = useOidc();
+    const { login, logout, renewTokens,  authenticateStatus  } = useOidc();
     const navigate = useNavigate();
 
     const navigateProfile = () => {
@@ -21,7 +23,25 @@ export const Home = () => {
     /*useEffect(() => {
         createIframeHack();
     }, []);*/
-
+    console.log('authenticateStatus', authenticateStatus);
+    
+    switch (authenticateStatus) {
+        case OidcAuthenticateStatus.AuthenticatingError:
+            return (<AuthenticatingError/>);
+        case OidcAuthenticateStatus.Loading:
+            return (<p>Loading...</p>);
+        case OidcAuthenticateStatus.Authenticating:
+            return (<Authenticating/>);
+        case OidcAuthenticateStatus.AuthenticatingCallback:
+            return (<p>Authenticating callback</p>);
+        case OidcAuthenticateStatus.SessionLost:
+            return (<p>Session Lost</p>);
+        case OidcAuthenticateStatus.ServiceWorkerNotSupported:
+            return (<p>Service Worker Not Supported</p>);
+        default:
+            break;
+    }
+    const isAuthenticated = authenticateStatus === OidcAuthenticateStatus.Authenticated;
 
     return (
         <div className="container-fluid mt-3">

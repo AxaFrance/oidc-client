@@ -7,26 +7,20 @@ import SilentLoginComponent from '../default-component/SilentLogin.component.js'
 import { CustomHistory } from './withRouter.js';
 
 type OidcRoutesProps = {
-  callbackSuccessComponent?: ComponentType;
-  callbackErrorComponent?: ComponentType;
-  authenticatingComponent?: ComponentType;
   configurationName: string;
   redirect_uri: string;
   silent_redirect_uri?: string;
   silent_login_uri?: string;
   withCustomHistory?: () => CustomHistory;
-  location: ILOidcLocation;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
-  callbackErrorComponent,
-  callbackSuccessComponent,
   redirect_uri,
   silent_redirect_uri,
   silent_login_uri,
-  children, configurationName,
-  withCustomHistory = null, 
-  location,
+  children, 
+                                                              configurationName,
+  withCustomHistory = null,
 }) => {
   // This exist because in next.js window outside useEffect is null
   const pathname = window ? getPath(window.location.href) : '';
@@ -56,7 +50,7 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
 
   switch (path) {
     case callbackPath:
-      return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} withCustomHistory={withCustomHistory} />;
+      return <CallbackComponent configurationName={configurationName} withCustomHistory={withCustomHistory} >{children}</CallbackComponent>;
     default:
       return <>{children}</>;
   }

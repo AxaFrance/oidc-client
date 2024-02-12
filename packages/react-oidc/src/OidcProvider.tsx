@@ -2,7 +2,7 @@ import {Fetch, getFetchDefault, OidcConfiguration, OidcClient, ILOidcLocation, O
 import { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import AuthenticatingError from './core/default-component/AuthenticateError.component.js';
-import { Authenticating, CallBackSuccess, Loading, SessionLost } from './core/default-component/index.js';
+import { Authenticating, Loading, SessionLost } from './core/default-component/index.js';
 import ServiceWorkerNotSupported from './core/default-component/ServiceWorkerNotSupported.component.js';
 import OidcRoutes from './core/routes/OidcRoutes.js';
 import { CustomHistory } from './core/routes/withRouter.js';
@@ -14,7 +14,6 @@ export type oidcContext = {
 const defaultEventState = { name: '', data: null };
 
 export type OidcProviderProps = {
-    callbackSuccessComponent?: ComponentType<any>;
     sessionLostComponent?: ComponentType<any>;
     authenticatingComponent?: ComponentType<any>;
     authenticatingErrorComponent?: ComponentType<any>;
@@ -59,7 +58,6 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     children,
     configuration,
     configurationName = 'default',
-    callbackSuccessComponent = CallBackSuccess,
     authenticatingComponent = Authenticating,
     serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
     authenticatingErrorComponent = AuthenticatingError,
@@ -112,7 +110,6 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
                 if (onLogoutFromSameTab != null) {
                     onLogoutFromSameTab();
                 }
-                // setEvent({name, data});
             } else if (name === OidcClient.eventNames.loginAsync_begin ||
                 name === OidcClient.eventNames.loginCallbackAsync_end ||
                 name === OidcClient.eventNames.loginAsync_error ||
@@ -133,46 +130,35 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configuration, configurationName]);
-
-    const SessionLostComponent = sessionLostComponent;
-    const AuthenticatingComponent = authenticatingComponent;
-    const ServiceWorkerNotSupportedComponent = serviceWorkerNotSupportedComponent;
-    const AuthenticatingErrorComponent = authenticatingErrorComponent;
-
+    
     const oidc = getOidc(configurationName);
     const eventName = event.name;
     switch (eventName) {
         case OidcClient.eventNames.service_worker_not_supported_by_browser:
             return (
-                <ServiceWorkerNotSupportedComponent configurationName={configurationName} />
+                <>{children}</>
             );
         case OidcClient.eventNames.loginAsync_begin:
             return (
-                <AuthenticatingComponent configurationName={configurationName} />
+                <>{children}</>
             );
         case OidcClient.eventNames.loginAsync_error:
         case OidcClient.eventNames.loginCallbackAsync_error:
             return (
-                <AuthenticatingErrorComponent configurationName={configurationName} />
+                <>{children}</>
             );
         case OidcClient.eventNames.refreshTokensAsync_error:
         case OidcClient.eventNames.syncTokensAsync_error:
-        //case OidcClient.eventNames.logout_from_another_tab:
             return (
-                <SessionLostComponent configurationName={configurationName} />
+               <>{children}</>
             );
         default:
             return (
-                
                     <OidcRoutes redirect_uri={oidc.configuration.redirect_uri}
                         silent_redirect_uri={oidc.configuration.silent_redirect_uri}
                         silent_login_uri={oidc.configuration.silent_login_uri}
-                        callbackSuccessComponent={callbackSuccessComponent}
-                        callbackErrorComponent={authenticatingErrorComponent}
-                        authenticatingComponent={authenticatingComponent}
                         configurationName={configurationName}
-                        withCustomHistory={withCustomHistory} 
-                        location={location ?? new OidcLocation()}>
+                        withCustomHistory={withCustomHistory} >
                         <OidcSession configurationName={configurationName}>
                             {children}
                         </OidcSession>
