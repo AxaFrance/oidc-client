@@ -34,7 +34,20 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
         } else {
             setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
         }
-        return () => { isMounted = false; };
+
+        const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
+            console.log(`Event ${name} has been raised`);
+            if (name == OidcClient.eventNames.tryKeepExistingSessionAsync_end) {
+                if (isMounted) {
+                    reloadOidcUser();
+                }
+            }
+        });
+        
+        return () => { 
+            isMounted = false;
+            oidc.removeEventSubscription(newSubscriptionId);
+        };
     }, [oidcUserId]);
 
     const reloadOidcUser = () => {

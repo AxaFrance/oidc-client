@@ -11,12 +11,14 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({ children, c
     const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
     useEffect(() => {
-        if (!oidc.tokens) {
-            oidc.loginAsync(callbackPath, extras);
-        }
+        oidc.tryKeepExistingSessionAsync().then(() => {
+            if (!oidc.tokens) {
+                oidc.loginAsync(callbackPath, extras);
+            }
+        });
     }, [configurationName, callbackPath, extras]);
 
-    if (!oidc.tokens) {
+    if (!oidc &&!oidc.tokens) {
       return null;
     }
     return <>{children}</>;
