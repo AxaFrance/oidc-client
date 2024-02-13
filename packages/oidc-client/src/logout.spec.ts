@@ -12,7 +12,9 @@ describe('Logout test suite', () => {
         {logout_tokens_to_invalidate:['refresh_token'],extras:null, expectedResults: ["token=abdc&token_type_hint=refresh_token&client_id=interactive.public.short"], expectedFinalUrl}, 
         {logout_tokens_to_invalidate:['access_token'],extras:null, expectedResults: ["token=abcd&token_type_hint=access_token&client_id=interactive.public.short"], expectedFinalUrl}, 
         {logout_tokens_to_invalidate:[],extras:null, expectedResults: [], expectedFinalUrl}, 
-        {logout_tokens_to_invalidate:[],extras: {"no_reload:oidc":"true"}, expectedResults: [], expectedFinalUrl:""}, 
+        {logout_tokens_to_invalidate:[],extras: {"no_reload:oidc":"true"}, expectedResults: [], expectedFinalUrl:""},
+        {logout_tokens_to_invalidate:['refresh_token'],extras:{"client_secret:revoke_refresh_token":"secret"}, expectedResults: ["token=abdc&token_type_hint=refresh_token&client_id=interactive.public.short&client_secret=secret"], expectedFinalUrl},
+        {logout_tokens_to_invalidate:['access_token'],extras:{"client_secret:revoke_access_token":"secret"}, expectedResults: ["token=abcd&token_type_hint=access_token&client_id=interactive.public.short&client_secret=secret"], expectedFinalUrl},
     ])('Logout should revoke tokens $logout_tokens_to_invalidate', async ({ logout_tokens_to_invalidate, extras =null, expectedResults, expectedFinalUrl}) => {
 
         const configuration = {

@@ -312,7 +312,10 @@ export class OidcClient {
   /**
    * Starts the OIDC logout process with specified options.
    * @param callbackPathOrUrl The callback path or URL to use after logout.
-   * @param extras Additional parameters to send to the OIDC server during the logout request. {"no_reload:oidc":"true"} to avoid the page reload after logout.
+   * @param extras Additional parameters to send to the OIDC server during the logout request. 
+   * {"no_reload:oidc":"true"} to avoid the page reload after logout.
+   * you can add extras like {"client_secret:revoke_refresh_token":"secret"} to revoke the refresh token with extra client secret. Any key ending with ":revoke_refresh_token" will be used to revoke the refresh token.
+   * you can add extras like {"client_secret:revoke_access_token":"secret"} to revoke the access token with extra client secret. Any key ending with ":revoke_access_token" will be used to revoke the access token.
    * @returns A promise resolved when the logout is completed.
    */
   logoutAsync(callbackPathOrUrl?: string | null | undefined, extras?: StringMap): Promise<void>;

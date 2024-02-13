@@ -167,7 +167,7 @@ export class Oidc {
         const isInsideBrowser = (typeof process === 'undefined');
         if (!Object.prototype.hasOwnProperty.call(oidcDatabase, name) && isInsideBrowser) {
             throw Error(`OIDC library does seem initialized.
-Please checkout that you are using OIDC hook inside a <OidcProvider configurationName="${name}"></OidcProvider> compoment.`);
+Please checkout that you are using OIDC hook inside a <OidcProvider configurationName="${name}"></OidcProvider> component.`);
         }
         return oidcDatabase[name];
     }
