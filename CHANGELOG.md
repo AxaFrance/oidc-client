@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.18.0
+## 7.18.1
+
+- [0d13cc2](https://github.com/AxaFrance/oidc-client/commit/0d13cc28a8cc40c610d3943d33fe8a7d4e28c32f) - fix(oidc): unload user on logout (#1296) (release), 2024-02-13 by *Guillaume Chervet*
+
+
+## v7.18.0
 
 - [5e35346](https://github.com/AxaFrance/oidc-client/commit/5e35346bfa477b560f5bde1afb2125a2c5f6e9c4) - feat(oidc): add extras to revoke access_token and refresh_tokens (#1295) (release), 2024-02-13 by *Guillaume Chervet*
 
@@ -312,11 +317,5 @@
 
 - [ff7ac6a](https://github.com/AxaFrance/oidc-client/commit/ff7ac6ae7defbd84067b4084222430ef07f15713) - feat(oidc): add dpop (#1139) (release), 2023-09-19 by *Guillaume Chervet*
 - [1980813](https://github.com/AxaFrance/oidc-client/commit/1980813234a63e13353b8e5623982e714b42ac12) - feat(demo): hack iframe unregister serviceworker (#1137), 2023-09-14 by *Guillaume Chervet*
-
-
-## v7.4.1
-
-- [6941766](https://github.com/AxaFrance/oidc-client/commit/6941766614d18ff3c92bbd00bdf0583350b16b7f) - fix(service-worker): setAccessTokenToNavigateRequests always true (#1136) (release), 2023-09-07 by *Guillaume Chervet*
-- [823a3c3](https://github.com/AxaFrance/oidc-client/commit/823a3c37351e39b0bb1290228f72c58f11a28960) - fix(oidc+serviceworker): better issueAt, 2023-09-05 by *Guillaume Chervet*
 
 
