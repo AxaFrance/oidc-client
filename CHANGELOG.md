@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.17.4
+## 7.18.0
+
+- [5e35346](https://github.com/AxaFrance/oidc-client/commit/5e35346bfa477b560f5bde1afb2125a2c5f6e9c4) - feat(oidc): add extras to revoke access_token and refresh_tokens (#1295) (release), 2024-02-13 by *Guillaume Chervet*
+
+
+## v7.17.4
 
 - [91b11af](https://github.com/AxaFrance/oidc-client/commit/91b11afa983bf4bee8def95c4ee101ede5447dc9) - fix(oidc): resfreshTokenError not triggered when silentsignin disabled (release), 2024-02-11 by *Guillaume Chervet*
 
@@ -313,10 +318,5 @@
 
 - [6941766](https://github.com/AxaFrance/oidc-client/commit/6941766614d18ff3c92bbd00bdf0583350b16b7f) - fix(service-worker): setAccessTokenToNavigateRequests always true (#1136) (release), 2023-09-07 by *Guillaume Chervet*
 - [823a3c3](https://github.com/AxaFrance/oidc-client/commit/823a3c37351e39b0bb1290228f72c58f11a28960) - fix(oidc+serviceworker): better issueAt, 2023-09-05 by *Guillaume Chervet*
-
-
-## v7.4.0
-
-- [d0dfde4](https://github.com/AxaFrance/oidc-client/commit/d0dfde47e27125248e5af7e9d6c12bfbe1e3ec60) - feat(oidc+serviceworker): increase security preventing sw unresgistration during silent signin (#1134) (release), 2023-09-05 by *Guillaume Chervet*
 
 
