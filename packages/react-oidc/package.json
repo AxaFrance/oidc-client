@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc",
-  "version": "7.17.4",
+  "version": "7.18.0",
   "private": false,
   "type": "module",
   "main": "./dist/index.umd.cjs",
