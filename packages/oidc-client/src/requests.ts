@@ -54,12 +54,23 @@ export const TOKEN_TYPE = {
     access_token: 'access_token',
 };
 
-export const performRevocationRequestAsync = (fetch) => async (url, token, token_type = TOKEN_TYPE.refresh_token, client_id, timeoutMs = 10000) => {
+export const performRevocationRequestAsync = (fetch) => async (url, 
+                                                               token, 
+                                                               token_type = TOKEN_TYPE.refresh_token, 
+                                                               client_id,
+                                                               extras:StringMap = {},
+                                                               timeoutMs = 10000) => {
     const details = {
         token,
         token_type_hint: token_type,
         client_id,
     };
+    for (const [key, value] of Object.entries(extras)) {
+
+        if (details[key] === undefined) {
+            details[key] = value;
+        }
+    }
 
     const formBody = [];
     for (const property in details) {

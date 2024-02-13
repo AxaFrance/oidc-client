@@ -11,6 +11,33 @@ export const oidcLogoutTokens = {
     refresh_token: 'refresh_token',
 };
 
+const extractExtras = (extras: StringMap, postKey: string):StringMap => {
+    const postExtras:StringMap = {};
+    if (extras) {
+        for (const [key, value] of Object.entries(extras)) {
+            if (key.endsWith(postKey)) {
+                const newKey = key.replace(postKey, '');
+                postExtras[newKey] = value;
+            }
+        }
+        return postExtras;
+    }
+    return postExtras;
+}
+
+const keepExtras = (extras: StringMap):StringMap => {
+    const postExtras : StringMap = {};
+    if (extras) {
+        for (const [key, value] of Object.entries(extras)) {
+            if (!key.includes(':')) {
+                postExtras[key] = value;
+            }
+        }
+        return postExtras;
+    }
+    return postExtras;
+}
+
 export const destroyAsync = (oidc) => async (status) => {
     timer.clearTimeout(oidc.timeoutId);
     oidc.timeoutId = null;
@@ -28,7 +55,10 @@ export const destroyAsync = (oidc) => async (status) => {
     oidc.userInfo = null;
 };
 
-export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOidcLocation) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
+export const logoutAsync = (oidc, 
+                            oidcDatabase, 
+                            fetch, 
+                            console, oicLocation:ILOidcLocation) => async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
     const configuration = oidc.configuration;
     const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     if (callbackPathOrUrl && (typeof callbackPathOrUrl !== 'string')) {
@@ -49,12 +79,22 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOi
             const promises = [];
             const accessToken = oidc.tokens ? oidc.tokens.accessToken : null;
             if (accessToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.access_token)) {
-                const revokeAccessTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, accessToken, TOKEN_TYPE.access_token, configuration.client_id);
+                const revokeAccessTokenExtras = extractExtras(extras, ':revoke_access_token');
+                const revokeAccessTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, 
+                    accessToken, 
+                    TOKEN_TYPE.access_token, 
+                    configuration.client_id,
+                    revokeAccessTokenExtras);
                 promises.push(revokeAccessTokenPromise);
             }
             const refreshToken = oidc.tokens ? oidc.tokens.refreshToken : null;
             if (refreshToken && configuration.logout_tokens_to_invalidate.includes(oidcLogoutTokens.refresh_token)) {
-                const revokeRefreshTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, refreshToken, TOKEN_TYPE.refresh_token, configuration.client_id);
+                const revokeAccessTokenExtras = extractExtras(extras, ':revoke_refresh_token');
+                const revokeRefreshTokenPromise = performRevocationRequestAsync(fetch)(revocationEndpoint, 
+                    refreshToken, 
+                    TOKEN_TYPE.refresh_token, 
+                    configuration.client_id,
+                    revokeAccessTokenExtras);
                 promises.push(revokeRefreshTokenPromise);
             }
             if (promises.length > 0) {
@@ -78,34 +118,26 @@ export const logoutAsync = (oidc, oidcDatabase, fetch, console, oicLocation:ILOi
             oidc.publishEvent(eventNames.logout_from_same_tab, {} );
         }
     }
-
-    let noReload = false;
-    if(extras) {
-        extras = {...extras};
-        for (const [key, value] of Object.entries(extras)) {
-            if (key.endsWith('no_reload:oidc')) {
-                noReload = extras[key] == "true";
-                delete extras[key];
-            }
-        }
-    }
+    
+    const oidcExtras = extractExtras(extras, ':oidc');
+    let noReload = oidcExtras && oidcExtras['no_reload'] === 'true';
     
     if(noReload) {
         return;
     }
+
+    const endPointExtras = keepExtras(extras);
     
     if (oidcServerConfiguration.endSessionEndpoint) {
-        if (!extras) {
-            extras = {
-                id_token_hint: idToken,
-            };
-            if (callbackPathOrUrl !== null) {
-                extras.post_logout_redirect_uri = url;
-            }
+        if (!('id_token_hint' in endPointExtras)) {
+            endPointExtras['id_token_hint'] = idToken;
+        }
+        if (!('post_logout_redirect_uri' in endPointExtras) && callbackPathOrUrl !== null) {
+            endPointExtras['post_logout_redirect_uri'] = url;
         }
         let queryString = '';
-        if (extras) {
-            for (const [key, value] of Object.entries(extras)) {
+        for (const [key, value] of Object.entries(endPointExtras)) {
+            if(value !== null && value !== undefined) {
                 if (queryString === '') {
                     queryString += '?';
                 } else {
