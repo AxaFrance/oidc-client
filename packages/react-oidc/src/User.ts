@@ -17,8 +17,9 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
     const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: null, status: OidcUserStatus.Unauthenticated });
     const [oidcUserId, setOidcUserId] = useState<string>('');
 
-    const oidc = OidcClient.get(configurationName);
+   
     useEffect(() => {
+        const oidc = OidcClient.get(configurationName);
         let isMounted = true;
         if (oidc && oidc.tokens) {
             setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
@@ -34,7 +35,18 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
         } else {
             setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
         }
-        return () => { isMounted = false; };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
+            if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab) {
+                if (isMounted) {
+                    setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
+                }
+            }
+        });
+        return () => {
+            isMounted = false;
+            oidc.removeEventSubscription(newSubscriptionId);
+        };
     }, [oidcUserId]);
 
     const reloadOidcUser = () => {
