@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.18.2
+## 7.18.3
+
+- [8eb75d3](https://github.com/AxaFrance/oidc-client/commit/8eb75d3f2036708d9c3067a2973a4d685d8b4923) - fix(oidc): logout continue to run before redirecting (#1301) (release), 2024-02-15 by *Guillaume Chervet*
+
+
+## v7.18.2
 
 - [77329ce](https://github.com/AxaFrance/oidc-client/commit/77329ce52a5fc7278ff35ccd13ca572ff7ebbf4d) - fix(oidc-service-worker): bad request on many token request at the same time (#1300) (release), 2024-02-15 by *Guillaume Chervet*
 
@@ -311,10 +316,5 @@
 ## v7.6.0
 
 - [3e0e554](https://github.com/AxaFrance/oidc-client/commit/3e0e5546ec756b4a9ddad695e4e2368c5721175f) - feat(service-worker): add to trusted type (#1142) (release), 2023-09-21 by *Guillaume Chervet*
-
-
-## v7.5.1
-
-- [60d9c4e](https://github.com/AxaFrance/oidc-client/commit/60d9c4e68622f81ecceaf480de21d4646ae909f1) - fix(oidc): clean link with service worker (#1141) (release), 2023-09-20 by *Guillaume Chervet*
 
 
