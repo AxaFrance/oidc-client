@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { replaceCodeVerifier } from '../codeVerifier';
+import { replaceCodeVerifier, extractConfigurationNameFromCodeVerifier } from '../codeVerifier';
 
 describe('replaceCodeVerifier should', () => {
     it.each([
@@ -11,3 +11,19 @@ describe('replaceCodeVerifier should', () => {
         expect(bodyExpected).toEqual(result);
     });
 });
+
+
+describe('extractConfigurationNameFromCodeVerifier should', () => {
+    it.each([
+        { body: "code=56DB8E3592FBD48DCF6F65B38B12845FF0186ECF6D66ECB5425C0F7E658B7951-1&grant_type=authorization_code&client_id=interactive.public.short&redirect_uri=https%3A%2F%2Fblack-rock-0dc6b0d03.1.azurestaticapps.net%2Fauthentication%2Fcallback&code_verifier=CODE_VERIFIER_SECURED_BY_OIDC_SERVICE_WORKER_default", expected: 'default' },
+        { body: "code=56DB8E3592FBD48DCF6F65B38B12845FF0186ECF6D66ECB5425C0F7E658B7951-1&code_verifier=CODE_VERIFIER_SECURED_BY_OIDC_SERVICE_WORKER_youhou&grant_type=authorization_code&client_id=interactive.public.short&redirect_uri=https%3A%2F%2Fblack-rock-0dc6b0d03.1.azurestaticapps.net%2Fauthentication%2Fcallback", expected: 'youhou' },
+    ])('inject new codeVerifier', async ({ body, expected }) => {
+
+        const configurationName = extractConfigurationNameFromCodeVerifier(body);
+        console.log(configurationName);
+        expect(configurationName).toEqual(expected);
+    });
+});
+
+
+
