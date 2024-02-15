@@ -14,7 +14,7 @@ import {
 	serializeHeaders,
 	sleep,
 } from './utils';
-import { replaceCodeVerifier } from './utils/codeVerifier';
+import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './utils/codeVerifier';
 import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
 
@@ -51,7 +51,6 @@ const handleActivate = (event: ExtendableEvent) => {
 	event.waitUntil(_self.clients.claim());
 };
 
-let currentLoginCallbackConfigurationName: string | null = null;
 const database: Database = {};
 
 const getCurrentDatabasesTokenEndpoint = (database: Database, url: string) => {
@@ -136,10 +135,16 @@ const handleFetch = async (event: FetchEvent) => {
 				...serializeHeaders(originalRequest.headers),
 			};
 		} else {
+			
+			const authorization = originalRequest.headers.get('authorization');
+			if (!authorization ) {
+				throw new Error('No authorization header');
+			}
+			const authentificationMode = authorization.split(" ")[0];
 			headers = {
 				...serializeHeaders(originalRequest.headers),
 				authorization:
-					'Bearer ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+				 authentificationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
 			};
 		}
 		let init: RequestInit;
@@ -232,13 +237,16 @@ const handleFetch = async (event: FetchEvent) => {
 							return new Response(text, response);
 						});
 					}
-					return fetchPromise.then(hideTokens(currentDatabase as OidcConfig)); // todo type assertion to OidcConfig but could be null, NEEDS REVIEW
+					return fetchPromise.then(hideTokens(currentDatabase as OidcConfig)); 
 				} else if (
 					actualBody.includes('code_verifier=') &&
-					currentLoginCallbackConfigurationName
+					extractConfigurationNameFromCodeVerifier(actualBody) != null
 				) {
+					const currentLoginCallbackConfigurationName = extractConfigurationNameFromCodeVerifier(
+						actualBody,
+					);
+					// @ts-ignore
 					currentDatabase = database[currentLoginCallbackConfigurationName];
-					currentLoginCallbackConfigurationName = null;
 					let newBody = actualBody;
 					if (currentDatabase && currentDatabase.codeVerifier != null) {
 						newBody = replaceCodeVerifier(
@@ -246,7 +254,7 @@ const handleFetch = async (event: FetchEvent) => {
 							currentDatabase.codeVerifier,
 						);
 					}
-
+					
 					return fetch(originalRequest, {
 						body: newBody,
 						method: clonedRequest.method,
@@ -259,6 +267,7 @@ const handleFetch = async (event: FetchEvent) => {
 						referrer: clonedRequest.referrer,
 						credentials: clonedRequest.credentials,
 						integrity: clonedRequest.integrity,
+						// @ts-ignore
 					}).then(hideTokens(currentDatabase));
 				}
 
@@ -338,7 +347,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			trustedDomains[configurationName] = [];
 		}
 	}
-
+	console.log('[OidcServiceWorker] handleMessage', data.type);
 	switch (data.type) {
 		case 'clear':
 			currentDatabase.tokens = null;
@@ -363,15 +372,6 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			}
 			currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
 			currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
-			const where = data.data.where;
-			if (
-				where === 'loginCallbackAsync' ||
-				where === 'tryKeepExistingSessionAsync'
-			) {
-				currentLoginCallbackConfigurationName = configurationName;
-			} else {
-				currentLoginCallbackConfigurationName = null;
-			}
 
 			if (!currentDatabase.tokens) {
 				port.postMessage({
@@ -487,8 +487,9 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			return;
 		}
 		default: {
-			currentDatabase.items = { ...data.data };
-			port.postMessage({ configurationName });
+			return;
+			// currentDatabase.items = { ...data.data };
+			// port.postMessage({ configurationName });
 		}
 	}
 };
