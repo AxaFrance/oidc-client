@@ -9,7 +9,7 @@ export interface ILOidcLocation {
 
 export class OidcLocation implements ILOidcLocation {
     open(url:string) {
-        window.open(url, '_self');
+        window.location.href = url;
     }
 
     reload() {
