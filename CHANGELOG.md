@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.18.1
+## 7.18.2
+
+- [77329ce](https://github.com/AxaFrance/oidc-client/commit/77329ce52a5fc7278ff35ccd13ca572ff7ebbf4d) - fix(oidc-service-worker): bad request on many token request at the same time (#1300) (release), 2024-02-15 by *Guillaume Chervet*
+
+
+## v7.18.1
 
 - [0d13cc2](https://github.com/AxaFrance/oidc-client/commit/0d13cc28a8cc40c610d3943d33fe8a7d4e28c32f) - fix(oidc): unload user on logout (#1296) (release), 2024-02-13 by *Guillaume Chervet*
 
@@ -311,11 +316,5 @@
 ## v7.5.1
 
 - [60d9c4e](https://github.com/AxaFrance/oidc-client/commit/60d9c4e68622f81ecceaf480de21d4646ae909f1) - fix(oidc): clean link with service worker (#1141) (release), 2023-09-20 by *Guillaume Chervet*
-
-
-## v7.5.0
-
-- [ff7ac6a](https://github.com/AxaFrance/oidc-client/commit/ff7ac6ae7defbd84067b4084222430ef07f15713) - feat(oidc): add dpop (#1139) (release), 2023-09-19 by *Guillaume Chervet*
-- [1980813](https://github.com/AxaFrance/oidc-client/commit/1980813234a63e13353b8e5623982e714b42ac12) - feat(demo): hack iframe unregister serviceworker (#1137), 2023-09-14 by *Guillaume Chervet*
 
 
