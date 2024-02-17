@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.18.3
+## 7.18.4
+
+- [b4e5ec8](https://github.com/AxaFrance/oidc-client/commit/b4e5ec834bdfedf8975b79086c2c0144f4e6e9b1) - fix(oidc-service-worker): set Bearer as default (release), 2024-02-17 by *Guillaume Chervet*
+
+
+## v7.18.3
 
 - [8eb75d3](https://github.com/AxaFrance/oidc-client/commit/8eb75d3f2036708d9c3067a2973a4d685d8b4923) - fix(oidc): logout continue to run before redirecting (#1301) (release), 2024-02-15 by *Guillaume Chervet*
 
@@ -311,10 +316,5 @@
 
 - [ec5ba27](https://github.com/AxaFrance/oidc-client/commit/ec5ba27f463c513e4d476621f684d0dcccd34470) - feat(oidc): make location injectable (release) (#1155), 2023-10-19 by *Guillaume Chervet*
 - [8f24b11](https://github.com/AxaFrance/oidc-client/commit/8f24b119613fef5d7214826528bdb04c931a1986) - doc(faq): Update FAQ.md (#1151), 2023-10-13 by *Mateusz Popielarz*
-
-
-## v7.6.0
-
-- [3e0e554](https://github.com/AxaFrance/oidc-client/commit/3e0e5546ec756b4a9ddad695e4e2368c5721175f) - feat(service-worker): add to trusted type (#1142) (release), 2023-09-21 by *Guillaume Chervet*
 
 
