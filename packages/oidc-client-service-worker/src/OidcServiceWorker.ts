@@ -137,14 +137,14 @@ const handleFetch = async (event: FetchEvent) => {
 		} else {
 			
 			const authorization = originalRequest.headers.get('authorization');
-			if (!authorization ) {
-				throw new Error('No authorization header');
+			let authenticationMode = "Bearer"
+			if (authorization ) {
+				authenticationMode = authorization.split(" ")[0];
 			}
-			const authentificationMode = authorization.split(" ")[0];
 			headers = {
 				...serializeHeaders(originalRequest.headers),
 				authorization:
-				 authentificationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+				 authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
 			};
 		}
 		let init: RequestInit;
