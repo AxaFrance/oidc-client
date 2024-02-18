@@ -12,7 +12,7 @@ import { countLetter } from './strings';
 
 export const parseJwt = (payload: string) => {
   return JSON.parse(
-    b64DecodeUnicode(payload.replace(/-/g, '+').replace(/_/g, '/')),
+    b64DecodeUnicode(payload.replaceAll(/-/g, '+').replaceAll(/_/g, '/')),
   );
 }
 function b64DecodeUnicode(str: string) {
