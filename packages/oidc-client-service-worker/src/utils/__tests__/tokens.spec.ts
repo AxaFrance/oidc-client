@@ -30,12 +30,9 @@ describe('tokens', () => {
     });
   });
 
-  describe('extractTokenPayload', () => {
-
-    it('parseJwtShouldExtractData', async () => {
-      const claimsPart = "eyJzZXNzaW9uX3N0YXRlIjoiNzVjYzVlZDItZGYyZC00NTY5LWJmYzUtMThhOThlNjhiZTExIiwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoixrTHosOBw6zDhyDlsI_lkI0t44Ob44Or44OYIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdGluZ2NoYXJhY3RlcnNAaW52ZW50ZWRtYWlsLmNvbSIsImdpdmVuX25hbWUiOiLGtMeiw4HDrMOHIiwiZmFtaWx5X25hbWUiOiLlsI_lkI0t44Ob44Or44OYIn0"
-      const result = parseJwt(claimsPart);
-      expect(result).toStrictEqual({
+  describe.each([
+    ["eyJzZXNzaW9uX3N0YXRlIjoiNzVjYzVlZDItZGYyZC00NTY5LWJmYzUtMThhOThlNjhiZTExIiwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoixrTHosOBw6zDhyDlsI_lkI0t44Ob44Or44OYIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdGluZ2NoYXJhY3RlcnNAaW52ZW50ZWRtYWlsLmNvbSIsImdpdmVuX25hbWUiOiLGtMeiw4HDrMOHIiwiZmFtaWx5X25hbWUiOiLlsI_lkI0t44Ob44Or44OYIn0",
+      {
         "session_state": "75cc5ed2-df2d-4569-bfc5-18a98e68be11",
         "scope": "openid email profile",
         "email_verified": true,
@@ -43,8 +40,24 @@ describe('tokens', () => {
         "preferred_username": "testingcharacters@inventedmail.com",
         "given_name": "ƴǢÁìÇ",
         "family_name": "小名-ホルヘ"
-      });
+      }],
+    [
+      "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCI_IjoiYWE_In0",
+      {
+        "?": "aa?",
+        "iat": 1516239022,
+        "name": "John Doe",
+        "sub": "1234567890",
+      }
+    ]
+  ])('parseJwtShouldExtractData', (claimsPart, expectedResult) => {
+    it('should parseJwtShouldExtractData ', async () => {
+      const result = parseJwt(claimsPart);
+      expect(expectedResult).toStrictEqual(result);
     });
+  });
+
+  describe('extractTokenPayload', () => {
     
     it('can extract token payload', () => {
       const result = extractTokenPayload(
