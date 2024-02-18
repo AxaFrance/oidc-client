@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.18.4
+## 7.18.5
+
+- [7a38d96](https://github.com/AxaFrance/oidc-client/commit/7a38d962b0e08837989a1d2affeb5e557dc09444) - fix(oidc): parse token with many _ or - (#1302) (release), 2024-02-18 by *Guillaume Chervet*
+
+
+## v7.18.4
 
 - [b4e5ec8](https://github.com/AxaFrance/oidc-client/commit/b4e5ec834bdfedf8975b79086c2c0144f4e6e9b1) - fix(oidc-service-worker): set Bearer as default (release), 2024-02-17 by *Guillaume Chervet*
 
@@ -310,11 +315,5 @@
 ## v7.7.1
 
 - [07d266b](https://github.com/AxaFrance/oidc-client/commit/07d266b32b275038176a407036a338624d2bed47) - build(npm): bump next from 13.4.12 to 13.5.6 (#1158), 2023-10-25 by *dependabot[bot]*
-
-
-## v7.7.0
-
-- [ec5ba27](https://github.com/AxaFrance/oidc-client/commit/ec5ba27f463c513e4d476621f684d0dcccd34470) - feat(oidc): make location injectable (release) (#1155), 2023-10-19 by *Guillaume Chervet*
-- [8f24b11](https://github.com/AxaFrance/oidc-client/commit/8f24b119613fef5d7214826528bdb04c931a1986) - doc(faq): Update FAQ.md (#1151), 2023-10-13 by *Mateusz Popielarz*
 
 
