@@ -347,7 +347,6 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			trustedDomains[configurationName] = [];
 		}
 	}
-	console.log('[OidcServiceWorker] handleMessage', data.type);
 	switch (data.type) {
 		case 'clear':
 			currentDatabase.tokens = null;
@@ -488,8 +487,6 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 		}
 		default: {
 			return;
-			// currentDatabase.items = { ...data.data };
-			// port.postMessage({ configurationName });
 		}
 	}
 };

@@ -173,7 +173,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
 
     const setDemonstratingProofOfPossessionJwkAsync = async (demonstratingProofOfPossessionJwk:JsonWebKey) => {
         const demonstratingProofOfPossessionJwkJson = JSON.stringify(demonstratingProofOfPossessionJwk);
-        sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionJwk', data: { demonstratingProofOfPossessionJwkJson }, configurationName });
+        await sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionJwk', data: { demonstratingProofOfPossessionJwkJson }, configurationName });
     };
 
     const getDemonstratingProofOfPossessionJwkAsync = async () => {
