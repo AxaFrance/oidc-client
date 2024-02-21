@@ -3,12 +3,12 @@ import React, {useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
 
 
-/*const createIframeHack =() => {
+ const createIframeHack =() => {
     const iframe = document.createElement('iframe');
     const html = '<body>Foo<script>alert("youhou");</script></body>';
     iframe.srcdoc = html;
     document.body.appendChild(iframe);
-}*/
+}
 
 export const Home = () => {
     const { login, logout, renewTokens, isAuthenticated } = useOidc();
@@ -18,9 +18,9 @@ export const Home = () => {
         navigate("/profile");
     };
     
-    /*useEffect(() => {
+    useEffect(() => {
         createIframeHack();
-    }, []);*/
+    }, []);
 
 
     return (

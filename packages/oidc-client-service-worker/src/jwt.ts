@@ -6,7 +6,7 @@
 // @ts-ignore
 import {DemonstratingProofOfPossessionConfiguration} from "./types";
 
-function strToUint8(str) {
+function strToUint8(str:string) {
     return new TextEncoder().encode(str);
 }
 
@@ -30,7 +30,8 @@ function utf8ToBinaryString(str) {
     const escstr = encodeURIComponent(str);
     // replaces any uri escape sequence, such as %0A,
     // with binary escape, such as 0x0A
-    return escstr.replace(/%([0-9A-F]{2})/g, function (match, p1) {
+    // @ts-ignore
+    return escstr.replace(/%([0-9A-F]{2})/g, function (match:string, p1) {
         return String.fromCharCode(parseInt(p1, 16));
     });
 }
@@ -199,7 +200,7 @@ export const generateJwkAsync = (w:any) => async (generateKeyAlgorithm: RsaHashe
     return jwk;
 }
 
-export const generateJwtDemonstratingProofOfPossessionAsync = (w:any) => (demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration) => async (jwk, method = 'POST', url: string, extrasClaims={}) => {
+export const generateJwtDemonstratingProofOfPossessionAsync = (w:any) => (demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration) => async (jwk:any, method = 'POST', url: string, extrasClaims={}) => {
 
     const claims = {
         // https://www.rfc-editor.org/rfc/rfc9449.html#name-concept

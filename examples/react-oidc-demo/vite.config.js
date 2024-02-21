@@ -12,7 +12,7 @@ export default defineConfig({
   },
   server: {
     headers: {
-     // "Content-Security-Policy": "script-src 'self' 'unsafe-inline';",
+      //"Content-Security-Policy": "script-src 'unsafe-inline' https://www.google-analitics.com;",
     },
   },
 });

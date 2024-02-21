@@ -5,6 +5,16 @@ export type DomainDetails = {
     showAccessToken: boolean;
     convertAllRequestsToCorsExceptNavigate?: boolean,
     setAccessTokenToNavigateRequests?: boolean,
+    demonstratingProofOfPossession?:boolean;
+    demonstratingProofOfPossessionConfiguration?: DemonstratingProofOfPossessionConfiguration;
+}
+
+export interface DemonstratingProofOfPossessionConfiguration {
+    generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
+    digestAlgorithm: AlgorithmIdentifier,
+    importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
+    signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
+    jwtHeaderAlgorithm: string
 }
 
 export type Domain = string | RegExp;

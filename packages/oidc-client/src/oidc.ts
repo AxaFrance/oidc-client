@@ -314,7 +314,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;
         }
 
-        return await generateJwtDemonstratingProofOfPossessionAsync(configuration.demonstrating_proof_of_possession_configuration)(jwk, method, url, claimsExtras);
+        return await generateJwtDemonstratingProofOfPossessionAsync(window)(configuration.demonstrating_proof_of_possession_configuration)(jwk, method, url, claimsExtras);
     }
 
     loginCallbackWithAutoTokensRenewPromise:Promise<LoginCallback> = null;

@@ -17,6 +17,7 @@ import {
 import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './utils/codeVerifier';
 import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
+import {generateJwkAsync} from "./jwt";
 
 // @ts-ignore
 if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
@@ -301,7 +302,7 @@ const handleFetch = async (event: FetchEvent) => {
 	}
 };
 
-const handleMessage = (event: ExtendableMessageEvent) => {
+const handleMessage = async (event: ExtendableMessageEvent) => {
 	const port = event.ports[0];
 	const data = event.data as MessageEventData;
 	if (event.data.type === 'claim') {
@@ -347,6 +348,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			trustedDomains[configurationName] = [];
 		}
 	}
+	
 	switch (data.type) {
 		case 'clear':
 			currentDatabase.tokens = null;
@@ -422,6 +424,15 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			return;
 		}
 		case 'setDemonstratingProofOfPossessionJwk': {
+
+			const generateKeyAlgorithm= {
+				name: 'ECDSA',
+					namedCurve: 'P-256'
+			};
+
+			const jwk = await generateJwkAsync(self)(generateKeyAlgorithm);
+			console.log('jwk', jwk);
+			
 			currentDatabase.demonstratingProofOfPossessionJwkJson =
 				data.data.demonstratingProofOfPossessionJwkJson;
 			port.postMessage({ configurationName });
