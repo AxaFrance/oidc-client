@@ -149,14 +149,16 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         const url = oidcServerConfiguration.tokenEndpoint;
         const headersExtras = {};
         if(configuration.demonstrating_proof_of_possession) {
-            const jwk = await generateJwkAsync(window)(configuration.demonstrating_proof_of_possession_configuration.generateKeyAlgorithm);
+            
             if (serviceWorker) {
-                await serviceWorker.setDemonstratingProofOfPossessionJwkAsync(jwk);
+                //await serviceWorker.setDemonstratingProofOfPossessionJwkAsync(jwk);
+                headersExtras['DPoP'] = "YOUHOULALALA";
             } else {
+                const jwk = await generateJwkAsync(window)(configuration.demonstrating_proof_of_possession_configuration.generateKeyAlgorithm);
                 const session = initSession(oidc.configurationName, configuration.storage);
                 await session.setDemonstratingProofOfPossessionJwkAsync(jwk);
+                headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(window)(configuration.demonstrating_proof_of_possession_configuration)(jwk, 'POST', url);
             }
-            headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(window)(configuration.demonstrating_proof_of_possession_configuration)(jwk, 'POST', url);
         }
 
         const tokenResponse = await performFirstTokenRequestAsync(storage)(url, 

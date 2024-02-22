@@ -301,9 +301,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
         let demonstratingProofOfPossessionNonce:string;
         let jwk;
+
+        console.log("url.front", url);
         if (serviceWorker) {
-            demonstratingProofOfPossessionNonce = await serviceWorker.getDemonstratingProofOfPossessionNonce();
-            jwk = await serviceWorker.getDemonstratingProofOfPossessionJwkAsync();
+            //demonstratingProofOfPossessionNonce = await serviceWorker.getDemonstratingProofOfPossessionNonce();
+            //jwk = await serviceWorker.getDemonstratingProofOfPossessionJwkAsync();
+            return "youhou";
         } else {
             const session = initSession(this.configurationName, configuration.storage);
             jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
@@ -313,7 +316,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (demonstratingProofOfPossessionNonce) {
             claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;
         }
-
+        
+        
+        
         return await generateJwtDemonstratingProofOfPossessionAsync(window)(configuration.demonstrating_proof_of_possession_configuration)(jwk, method, url, claimsExtras);
     }
 

@@ -17,7 +17,9 @@ import {
 import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './utils/codeVerifier';
 import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
-import {generateJwkAsync} from "./jwt";
+import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import {getDpopConfiguration} from "./dpop";
+import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 
 // @ts-ignore
 if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
@@ -92,6 +94,32 @@ const keepAliveAsync = async (event: FetchEvent) => {
 	}
 	return response;
 };
+
+async function extracted2(originalRequest: Request, currentLoginCallbackConfigurationName: string | null, url: string, extrasClaims={} ) {
+	const headersExtras = serializeHeaders(originalRequest.headers);
+	if (currentLoginCallbackConfigurationName != null && trustedDomains != null) {
+		const dpopConfiguration = getDpopConfiguration(trustedDomains[currentLoginCallbackConfigurationName]);
+		if (dpopConfiguration != null) {
+			const jwk = database.jwk;
+			headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
+		}
+	}
+	return headersExtras;
+}
+
+async function extracted(originalRequest: Request, currentLoginCallbackConfigurationName: string | null, url: string, extrasClaims={} ) {
+	const headersExtras = serializeHeaders(originalRequest.headers);
+	if (currentLoginCallbackConfigurationName != null && trustedDomains != null) {
+		const dpopConfiguration = getDpopConfiguration(trustedDomains[currentLoginCallbackConfigurationName]);
+		if (dpopConfiguration != null) {
+			const jwk = await generateJwkAsync(self)(dpopConfiguration.generateKeyAlgorithm);
+			console.log('url', url);
+			database.jwk = jwk;
+			headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
+		}
+	}
+	return headersExtras;
+}
 
 const handleFetch = async (event: FetchEvent) => {
 	const originalRequest = event.request;
@@ -177,16 +205,19 @@ const handleFetch = async (event: FetchEvent) => {
 	if (numberDatabase > 0) {
 		const maPromesse = new Promise<Response>((resolve, reject) => {
 			const clonedRequest = originalRequest.clone();
-			const response = clonedRequest.text().then((actualBody) => {
+			const response = clonedRequest.text().then(async (actualBody) => {
 				if (
 					actualBody.includes(TOKEN.REFRESH_TOKEN) ||
 					actualBody.includes(TOKEN.ACCESS_TOKEN)
 				) {
+					let headers = serializeHeaders(originalRequest.headers);
 					let newBody = actualBody;
 					for (let i = 0; i < numberDatabase; i++) {
 						const currentDb = currentDatabases[i];
-
 						if (currentDb && currentDb.tokens != null) {
+							console.log('currentDb.tokens.access_token', currentDb.tokens.access_token);
+							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),};
+							headers = await extracted2(originalRequest, currentDb.configurationName, url, claimsExtras);
 							const keyRefreshToken =
 								TOKEN.REFRESH_TOKEN + '_' + currentDb.configurationName;
 							if (actualBody.includes(keyRefreshToken)) {
@@ -195,6 +226,9 @@ const handleFetch = async (event: FetchEvent) => {
 									encodeURIComponent(currentDb.tokens.refresh_token as string),
 								);
 								currentDatabase = currentDb;
+								if(currentDb.demonstratingProofOfPossessionNonce != null) {
+									headers['nonce'] = currentDb.demonstratingProofOfPossessionNonce;
+								}
 								break;
 							}
 							const keyAccessToken =
@@ -209,11 +243,12 @@ const handleFetch = async (event: FetchEvent) => {
 							}
 						}
 					}
+					
 					const fetchPromise = fetch(originalRequest, {
 						body: newBody,
 						method: clonedRequest.method,
 						headers: {
-							...serializeHeaders(originalRequest.headers),
+							...headers,
 						},
 						mode: clonedRequest.mode,
 						cache: clonedRequest.cache,
@@ -255,12 +290,14 @@ const handleFetch = async (event: FetchEvent) => {
 							currentDatabase.codeVerifier,
 						);
 					}
-					
+
+					const headersExtras = await extracted(originalRequest, currentLoginCallbackConfigurationName, url);
+
 					return fetch(originalRequest, {
 						body: newBody,
 						method: clonedRequest.method,
 						headers: {
-							...serializeHeaders(originalRequest.headers),
+							...headersExtras,
 						},
 						mode: clonedRequest.mode,
 						cache: clonedRequest.cache,
@@ -424,17 +461,8 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			return;
 		}
 		case 'setDemonstratingProofOfPossessionJwk': {
-
-			const generateKeyAlgorithm= {
-				name: 'ECDSA',
-					namedCurve: 'P-256'
-			};
-
-			const jwk = await generateJwkAsync(self)(generateKeyAlgorithm);
-			console.log('jwk', jwk);
-			
-			currentDatabase.demonstratingProofOfPossessionJwkJson =
-				data.data.demonstratingProofOfPossessionJwkJson;
+			//currentDatabase.demonstratingProofOfPossessionJwkJson =
+			//	data.data.demonstratingProofOfPossessionJwkJson;
 			port.postMessage({ configurationName });
 			return;
 		}
