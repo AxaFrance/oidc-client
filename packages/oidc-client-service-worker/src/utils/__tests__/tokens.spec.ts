@@ -125,7 +125,7 @@ describe('tokens', () => {
       // @ts-ignore
       delete token.idTokenPayload;
       const oidcConfiguration = new OidcConfigBuilder()
-          .withOidcConfiguration({token_renew_mode: "access_token_invalid"})
+          .withOidcConfiguration({token_renew_mode: "access_token_invalid", demonstrating_proof_of_possession: false})
           .withOidcServerConfiguration({issuer: "", 
             authorizationEndpoint:"", 
             revocationEndpoint:"", 

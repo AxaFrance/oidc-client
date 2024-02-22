@@ -53,6 +53,7 @@ describe('domains', () => {
 					setAccessTokenToNavigateRequests: true,
 					demonstratingProofOfPossessionNonce: null,
 					demonstratingProofOfPossessionJwkJson: null,
+					demonstratingProofOfPossessionConfiguration: null,
 				},
 			};
 		});

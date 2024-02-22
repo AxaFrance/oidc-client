@@ -95,26 +95,14 @@ const keepAliveAsync = async (event: FetchEvent) => {
 	return response;
 };
 
-async function extracted2(originalRequest: Request, currentLoginCallbackConfigurationName: string | null, url: string, extrasClaims={} ) {
+async function generateDpopAsync(originalRequest: Request, currentDatabase:OidcConfig|null, url: string, extrasClaims={} ) {
 	const headersExtras = serializeHeaders(originalRequest.headers);
-	if (currentLoginCallbackConfigurationName != null && trustedDomains != null) {
-		const dpopConfiguration = getDpopConfiguration(trustedDomains[currentLoginCallbackConfigurationName]);
-		if (dpopConfiguration != null) {
-			const jwk = database.jwk;
-			headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
-		}
-	}
-	return headersExtras;
-}
-
-async function extracted(originalRequest: Request, currentLoginCallbackConfigurationName: string | null, url: string, extrasClaims={} ) {
-	const headersExtras = serializeHeaders(originalRequest.headers);
-	if (currentLoginCallbackConfigurationName != null && trustedDomains != null) {
-		const dpopConfiguration = getDpopConfiguration(trustedDomains[currentLoginCallbackConfigurationName]);
-		if (dpopConfiguration != null) {
-			const jwk = await generateJwkAsync(self)(dpopConfiguration.generateKeyAlgorithm);
-			database.jwk = jwk;
-			headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
+	if (currentDatabase && currentDatabase.demonstratingProofOfPossessionConfiguration && currentDatabase.demonstratingProofOfPossessionJwkJson) {
+		const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
+		const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
+		headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
+		if(currentDatabase.demonstratingProofOfPossessionNonce != null) {
+			headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
 		}
 	}
 	return headersExtras;
@@ -215,7 +203,7 @@ const handleFetch = async (event: FetchEvent) => {
 						const currentDb = currentDatabases[i];
 						if (currentDb && currentDb.tokens != null) {
 							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),};
-							headers = await extracted2(originalRequest, currentDb.configurationName, url, claimsExtras);
+							headers = await generateDpopAsync(originalRequest, currentDb, url, claimsExtras);
 							const keyRefreshToken =
 								TOKEN.REFRESH_TOKEN + '_' + currentDb.configurationName;
 							if (actualBody.includes(keyRefreshToken)) {
@@ -224,9 +212,7 @@ const handleFetch = async (event: FetchEvent) => {
 									encodeURIComponent(currentDb.tokens.refresh_token as string),
 								);
 								currentDatabase = currentDb;
-								if(currentDb.demonstratingProofOfPossessionNonce != null) {
-									headers['nonce'] = currentDb.demonstratingProofOfPossessionNonce;
-								}
+								
 								break;
 							}
 							const keyAccessToken =
@@ -289,7 +275,7 @@ const handleFetch = async (event: FetchEvent) => {
 						);
 					}
 
-					const headersExtras = await extracted(originalRequest, currentLoginCallbackConfigurationName, url);
+					const headersExtras = await generateDpopAsync(originalRequest, currentDatabase, url);
 
 					return fetch(originalRequest, {
 						body: newBody,
@@ -376,6 +362,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 				convertAllRequestsToCorsExceptNavigate ?? false,
 			demonstratingProofOfPossessionNonce: null,
 			demonstratingProofOfPossessionJwkJson: null,
+			demonstratingProofOfPossessionConfiguration: null,
 		};
 		currentDatabase = database[configurationName];
 
@@ -389,6 +376,9 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			currentDatabase.tokens = null;
 			currentDatabase.state = null;
 			currentDatabase.codeVerifier = null;
+			currentDatabase.demonstratingProofOfPossessionNonce = null;
+			currentDatabase.demonstratingProofOfPossessionJwkJson = null;
+			currentDatabase.demonstratingProofOfPossessionConfiguration = null;
 			currentDatabase.status = data.data.status;
 			port.postMessage({ configurationName });
 			return;
@@ -408,6 +398,17 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			}
 			currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
 			currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
+
+			if(currentDatabase.demonstratingProofOfPossessionConfiguration == null ){
+				const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomains[configurationName]);
+				if(demonstratingProofOfPossessionConfiguration != null){
+					if(currentDatabase.oidcConfiguration.demonstrating_proof_of_possession){
+						console.warn("In service worker, demonstrating_proof_of_possession must be configured from trustedDomains file")
+					}
+					currentDatabase.demonstratingProofOfPossessionConfiguration = demonstratingProofOfPossessionConfiguration;
+					currentDatabase.demonstratingProofOfPossessionJwkJson = await generateJwkAsync(self)(demonstratingProofOfPossessionConfiguration.generateKeyAlgorithm);
+				}
+			}
 
 			if (!currentDatabase.tokens) {
 				port.postMessage({
