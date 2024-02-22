@@ -98,6 +98,28 @@ trustedDomains.config_show_access_token = {
   // setAccessTokenToNavigateRequests: true, // default value is true
 };
 
+// DPoP (Demonstrating Proof of Possession) will be activated for the following domains
+trustedDomains.config_with_dpop = {
+  domains: ["https://demo.duendesoftware.com"],
+  demonstratingProofOfPossession: true
+  // Optional, more details bellow
+  /*demonstratingProofOfPossessionConfiguration: {  
+   importKeyAlgorithm: {
+     name: 'ECDSA',
+     namedCurve: 'P-256',
+     hash: {name: 'ES256'}
+   },
+   signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
+   generateKeyAlgorithm: {
+     name: 'ECDSA',
+     namedCurve: 'P-256'
+   },
+   digestAlgorithm: { name: 'SHA-256' },
+   jwtHeaderAlgorithm : 'ES256'
+ }*/
+};
+
+
 ```
 
 ## Run The Demo
@@ -142,7 +164,7 @@ const configuration = {
   authority: "https://demo.duendesoftware.com",
   service_worker_relative_url: "/OidcServiceWorker.js", // just comment that line to disable service worker mode
   service_worker_only: false,
-  demonstrating_proof_of_possession: false, // demonstrating proof of possession will work only if access_token is accessible from the client (This is because WebCrypto API is not available inside a Service Worker)
+  demonstrating_proof_of_possession: false, 
 };
 
 const App = () => (

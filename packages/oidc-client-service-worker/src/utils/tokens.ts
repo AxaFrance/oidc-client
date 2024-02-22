@@ -1,5 +1,5 @@
 /* eslint-disable simple-import-sort/exports */
-import { TOKEN, TokenRenewMode } from '../constants';
+import {TOKEN, TokenRenewMode} from '../constants';
 import {
   AccessTokenPayload,
   IdTokenPayload,
@@ -8,7 +8,7 @@ import {
   OidcServerConfiguration,
   Tokens
 } from '../types';
-import { countLetter } from './strings';
+import {countLetter} from './strings';
 
 export const parseJwt = (payload: string) => {
   return JSON.parse(
@@ -221,16 +221,27 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   return secureTokens;
 }
 
+const demonstratingProofOfPossessionNonceResponseHeader = "DPoP-Nonce";
 function hideTokens(currentDatabaseElement: OidcConfig) {
   const configurationName = currentDatabaseElement.configurationName;
   return (response: Response) => {
     if (response.status !== 200) {
       return response;
     }
+    const newHeaders = new Headers(response.headers);
+    if( response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)){
+      currentDatabaseElement.demonstratingProofOfPossessionNonce = response.headers.get(demonstratingProofOfPossessionNonceResponseHeader);
+      newHeaders.delete(demonstratingProofOfPossessionNonceResponseHeader);
+    }
+
     return response.json().then<Response>((tokens: Tokens) => {
       const secureTokens = _hideTokens(tokens, currentDatabaseElement, configurationName);
       const body = JSON.stringify(secureTokens);
-      return new Response(body, response);
+      return new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders
+      });
     });
   };
 }

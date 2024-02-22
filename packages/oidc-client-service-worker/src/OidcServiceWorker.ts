@@ -17,6 +17,9 @@ import {
 import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './utils/codeVerifier';
 import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
+import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import {getDpopConfiguration} from "./dpop";
+import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 
 // @ts-ignore
 if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
@@ -91,6 +94,19 @@ const keepAliveAsync = async (event: FetchEvent) => {
 	}
 	return response;
 };
+
+async function generateDpopAsync(originalRequest: Request, currentDatabase:OidcConfig|null, url: string, extrasClaims={} ) {
+	const headersExtras = serializeHeaders(originalRequest.headers);
+	if (currentDatabase && currentDatabase.demonstratingProofOfPossessionConfiguration && currentDatabase.demonstratingProofOfPossessionJwkJson) {
+		const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
+		const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
+		headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
+		if(currentDatabase.demonstratingProofOfPossessionNonce != null) {
+			headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
+		}
+	}
+	return headersExtras;
+}
 
 const handleFetch = async (event: FetchEvent) => {
 	const originalRequest = event.request;
@@ -176,16 +192,18 @@ const handleFetch = async (event: FetchEvent) => {
 	if (numberDatabase > 0) {
 		const maPromesse = new Promise<Response>((resolve, reject) => {
 			const clonedRequest = originalRequest.clone();
-			const response = clonedRequest.text().then((actualBody) => {
+			const response = clonedRequest.text().then(async (actualBody) => {
 				if (
 					actualBody.includes(TOKEN.REFRESH_TOKEN) ||
 					actualBody.includes(TOKEN.ACCESS_TOKEN)
 				) {
+					let headers = serializeHeaders(originalRequest.headers);
 					let newBody = actualBody;
 					for (let i = 0; i < numberDatabase; i++) {
 						const currentDb = currentDatabases[i];
-
 						if (currentDb && currentDb.tokens != null) {
+							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),};
+							headers = await generateDpopAsync(originalRequest, currentDb, url, claimsExtras);
 							const keyRefreshToken =
 								TOKEN.REFRESH_TOKEN + '_' + currentDb.configurationName;
 							if (actualBody.includes(keyRefreshToken)) {
@@ -194,6 +212,7 @@ const handleFetch = async (event: FetchEvent) => {
 									encodeURIComponent(currentDb.tokens.refresh_token as string),
 								);
 								currentDatabase = currentDb;
+								
 								break;
 							}
 							const keyAccessToken =
@@ -208,11 +227,12 @@ const handleFetch = async (event: FetchEvent) => {
 							}
 						}
 					}
+					
 					const fetchPromise = fetch(originalRequest, {
 						body: newBody,
 						method: clonedRequest.method,
 						headers: {
-							...serializeHeaders(originalRequest.headers),
+							...headers,
 						},
 						mode: clonedRequest.mode,
 						cache: clonedRequest.cache,
@@ -254,12 +274,14 @@ const handleFetch = async (event: FetchEvent) => {
 							currentDatabase.codeVerifier,
 						);
 					}
-					
+
+					const headersExtras = await generateDpopAsync(originalRequest, currentDatabase, url);
+
 					return fetch(originalRequest, {
 						body: newBody,
 						method: clonedRequest.method,
 						headers: {
-							...serializeHeaders(originalRequest.headers),
+							...headersExtras,
 						},
 						mode: clonedRequest.mode,
 						cache: clonedRequest.cache,
@@ -301,7 +323,7 @@ const handleFetch = async (event: FetchEvent) => {
 	}
 };
 
-const handleMessage = (event: ExtendableMessageEvent) => {
+const handleMessage = async (event: ExtendableMessageEvent) => {
 	const port = event.ports[0];
 	const data = event.data as MessageEventData;
 	if (event.data.type === 'claim') {
@@ -340,6 +362,7 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 				convertAllRequestsToCorsExceptNavigate ?? false,
 			demonstratingProofOfPossessionNonce: null,
 			demonstratingProofOfPossessionJwkJson: null,
+			demonstratingProofOfPossessionConfiguration: null,
 		};
 		currentDatabase = database[configurationName];
 
@@ -347,11 +370,15 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			trustedDomains[configurationName] = [];
 		}
 	}
+	
 	switch (data.type) {
 		case 'clear':
 			currentDatabase.tokens = null;
 			currentDatabase.state = null;
 			currentDatabase.codeVerifier = null;
+			currentDatabase.demonstratingProofOfPossessionNonce = null;
+			currentDatabase.demonstratingProofOfPossessionJwkJson = null;
+			currentDatabase.demonstratingProofOfPossessionConfiguration = null;
 			currentDatabase.status = data.data.status;
 			port.postMessage({ configurationName });
 			return;
@@ -371,6 +398,17 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			}
 			currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
 			currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
+
+			if(currentDatabase.demonstratingProofOfPossessionConfiguration == null ){
+				const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomains[configurationName]);
+				if(demonstratingProofOfPossessionConfiguration != null){
+					if(currentDatabase.oidcConfiguration.demonstrating_proof_of_possession){
+						console.warn("In service worker, demonstrating_proof_of_possession must be configured from trustedDomains file")
+					}
+					currentDatabase.demonstratingProofOfPossessionConfiguration = demonstratingProofOfPossessionConfiguration;
+					currentDatabase.demonstratingProofOfPossessionJwkJson = await generateJwkAsync(self)(demonstratingProofOfPossessionConfiguration.generateKeyAlgorithm);
+				}
+			}
 
 			if (!currentDatabase.tokens) {
 				port.postMessage({
@@ -418,21 +456,6 @@ const handleMessage = (event: ExtendableMessageEvent) => {
 			port.postMessage({
 				configurationName,
 				demonstratingProofOfPossessionNonce,
-			});
-			return;
-		}
-		case 'setDemonstratingProofOfPossessionJwk': {
-			currentDatabase.demonstratingProofOfPossessionJwkJson =
-				data.data.demonstratingProofOfPossessionJwkJson;
-			port.postMessage({ configurationName });
-			return;
-		}
-		case 'getDemonstratingProofOfPossessionJwk': {
-			const demonstratingProofOfPossessionJwkJson =
-				currentDatabase.demonstratingProofOfPossessionJwkJson;
-			port.postMessage({
-				configurationName,
-				demonstratingProofOfPossessionJwkJson,
 			});
 			return;
 		}

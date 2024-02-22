@@ -96,6 +96,7 @@ class TokenBuilder {
 class OidcConfigurationBuilder {
   private oidcConfiguration: OidcConfiguration = {
     token_renew_mode: 'offline',
+    demonstrating_proof_of_possession: false,
   };
 
   public withTokenRenewMode(
@@ -127,6 +128,7 @@ class OidcConfigBuilder {
     setAccessTokenToNavigateRequests: true,
     demonstratingProofOfPossessionNonce: null,
     demonstratingProofOfPossessionJwkJson: null,
+    demonstratingProofOfPossessionConfiguration: null,
   };
 
   public withTestingDefault(): OidcConfigBuilder {

@@ -5,6 +5,16 @@ export type DomainDetails = {
     showAccessToken: boolean;
     convertAllRequestsToCorsExceptNavigate?: boolean,
     setAccessTokenToNavigateRequests?: boolean,
+    demonstratingProofOfPossession?:boolean;
+    demonstratingProofOfPossessionConfiguration?: DemonstratingProofOfPossessionConfiguration;
+}
+
+export interface DemonstratingProofOfPossessionConfiguration {
+    generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
+    digestAlgorithm: AlgorithmIdentifier,
+    importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
+    signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
+    jwtHeaderAlgorithm: string
 }
 
 export type Domain = string | RegExp;
@@ -23,6 +33,7 @@ export type OidcServerConfiguration = {
 
 export type OidcConfiguration = {
     token_renew_mode: string;
+    demonstrating_proof_of_possession: boolean;
 }
 
 // Uncertain why the Headers interface in lib.webworker.d.ts does not have a keys() function, so extending
@@ -57,6 +68,7 @@ export type Nonce = {
 } | null;
 
 export type OidcConfig = {
+    demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration | null;
     configurationName: string;
     tokens: Tokens | null;
     status: Status;

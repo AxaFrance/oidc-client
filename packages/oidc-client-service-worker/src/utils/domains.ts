@@ -36,6 +36,8 @@ export const getDomains = (
 	return trustedDomain[`${type}Domains`] ?? trustedDomain.domains ?? [];
 };
 
+
+
 export const getCurrentDatabaseDomain = (
 	database: Database,
 	url: string,

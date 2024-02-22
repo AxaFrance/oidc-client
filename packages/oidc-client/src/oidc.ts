@@ -300,21 +300,21 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
         const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
         let demonstratingProofOfPossessionNonce:string;
-        let jwk;
+        
         if (serviceWorker) {
-            demonstratingProofOfPossessionNonce = await serviceWorker.getDemonstratingProofOfPossessionNonce();
-            jwk = await serviceWorker.getDemonstratingProofOfPossessionJwkAsync();
-        } else {
-            const session = initSession(this.configurationName, configuration.storage);
-            jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
-            demonstratingProofOfPossessionNonce = await session.getDemonstratingProofOfPossessionNonce();
+            return `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${this.configurationName}`;
         }
+        
+        const session = initSession(this.configurationName, configuration.storage);
+        let jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
+        demonstratingProofOfPossessionNonce = await session.getDemonstratingProofOfPossessionNonce();
+        
 
         if (demonstratingProofOfPossessionNonce) {
             claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;
         }
-
-        return await generateJwtDemonstratingProofOfPossessionAsync(configuration.demonstrating_proof_of_possession_configuration)(jwk, method, url, claimsExtras);
+        
+        return await generateJwtDemonstratingProofOfPossessionAsync(window)(configuration.demonstrating_proof_of_possession_configuration)(jwk, method, url, claimsExtras);
     }
 
     loginCallbackWithAutoTokensRenewPromise:Promise<LoginCallback> = null;
