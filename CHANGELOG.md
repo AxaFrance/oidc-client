@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.18.5
+## 7.19.0
+
+- [8f3940c](https://github.com/AxaFrance/oidc-client/commit/8f3940c42ad62264abfd61690777b602e0bdc31a) - feat(oidc): dpop inside serviceworker (#1306) (release), 2024-02-22 by *Guillaume Chervet*
+- [4a5887f](https://github.com/AxaFrance/oidc-client/commit/4a5887f5e7b3d739d709c7bb4fb7a007ccb051a1) - fix(oidc-service-worker): remove sw unecessary log, 2024-02-19 by *Guillaume Chervet*
+
+
+## v7.18.5
 
 - [7a38d96](https://github.com/AxaFrance/oidc-client/commit/7a38d962b0e08837989a1d2affeb5e557dc09444) - fix(oidc): parse token with many _ or - (#1302) (release), 2024-02-18 by *Guillaume Chervet*
 
@@ -310,10 +316,5 @@
 ## v7.7.2
 
 - [41ecf9e](https://github.com/AxaFrance/oidc-client/commit/41ecf9e1752f291f0d8f96a979ab393f5aaeb885) - build(npm): bump @testing-library/dom from 9.3.1 to 9.3.3 (#1161), 2023-10-25 by *dependabot[bot]*
-
-
-## v7.7.1
-
-- [07d266b](https://github.com/AxaFrance/oidc-client/commit/07d266b32b275038176a407036a338624d2bed47) - build(npm): bump next from 13.4.12 to 13.5.6 (#1158), 2023-10-25 by *dependabot[bot]*
 
 
