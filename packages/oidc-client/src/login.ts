@@ -149,10 +149,8 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         const url = oidcServerConfiguration.tokenEndpoint;
         const headersExtras = {};
         if(configuration.demonstrating_proof_of_possession) {
-            
             if (serviceWorker) {
-                //await serviceWorker.setDemonstratingProofOfPossessionJwkAsync(jwk);
-                headersExtras['DPoP'] = "YOUHOULALALA";
+                headersExtras['DPoP'] = `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${oidc.configurationName}`;
             } else {
                 const jwk = await generateJwkAsync(window)(configuration.demonstrating_proof_of_possession_configuration.generateKeyAlgorithm);
                 const session = initSession(oidc.configurationName, configuration.storage);

@@ -113,7 +113,6 @@ async function extracted(originalRequest: Request, currentLoginCallbackConfigura
 		const dpopConfiguration = getDpopConfiguration(trustedDomains[currentLoginCallbackConfigurationName]);
 		if (dpopConfiguration != null) {
 			const jwk = await generateJwkAsync(self)(dpopConfiguration.generateKeyAlgorithm);
-			console.log('url', url);
 			database.jwk = jwk;
 			headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
 		}
@@ -215,7 +214,6 @@ const handleFetch = async (event: FetchEvent) => {
 					for (let i = 0; i < numberDatabase; i++) {
 						const currentDb = currentDatabases[i];
 						if (currentDb && currentDb.tokens != null) {
-							console.log('currentDb.tokens.access_token', currentDb.tokens.access_token);
 							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),};
 							headers = await extracted2(originalRequest, currentDb.configurationName, url, claimsExtras);
 							const keyRefreshToken =
@@ -457,21 +455,6 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			port.postMessage({
 				configurationName,
 				demonstratingProofOfPossessionNonce,
-			});
-			return;
-		}
-		case 'setDemonstratingProofOfPossessionJwk': {
-			//currentDatabase.demonstratingProofOfPossessionJwkJson =
-			//	data.data.demonstratingProofOfPossessionJwkJson;
-			port.postMessage({ configurationName });
-			return;
-		}
-		case 'getDemonstratingProofOfPossessionJwk': {
-			const demonstratingProofOfPossessionJwkJson =
-				currentDatabase.demonstratingProofOfPossessionJwkJson;
-			port.postMessage({
-				configurationName,
-				demonstratingProofOfPossessionJwkJson,
 			});
 			return;
 		}

@@ -228,14 +228,20 @@ function hideTokens(currentDatabaseElement: OidcConfig) {
     if (response.status !== 200) {
       return response;
     }
+    const newHeaders = new Headers(response.headers);
     if( response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)){
       currentDatabaseElement.demonstratingProofOfPossessionNonce = response.headers.get(demonstratingProofOfPossessionNonceResponseHeader);
+      newHeaders.delete(demonstratingProofOfPossessionNonceResponseHeader);
     }
 
     return response.json().then<Response>((tokens: Tokens) => {
       const secureTokens = _hideTokens(tokens, currentDatabaseElement, configurationName);
       const body = JSON.stringify(secureTokens);
-      return new Response(body, response);
+      return new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders
+      });
     });
   };
 }
