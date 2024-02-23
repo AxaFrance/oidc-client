@@ -130,21 +130,28 @@ export const execute = () => {
             }
             // @ts-ignore
             element.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
-            <button id="logout">Logout</button>
-            <p>Game, let's try to make an XSS attacks to retrieve original tokens !</p>
-            <p>You may think servcie worker mode is not secure like said here <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow</a>
+            <h2>Demo</h2>
+
+            <p>Game, let's try to make an XSS attacks to retrieve some secure tokens !</p>
+            <p>Service Worker mode is not magic <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow</a>
             So let try to hack it !
-            In fact it can be prevented by using the following CSP header to forbid to write dynamic iframe with javascript dynamic inside:
-            <pre>
-            Content-Security-Policy: script-src 'self'
-            </pre>
-            and setting up the redirect_uri and redirect_silent_uri at the top level of your javascript application before any XSS attack could accur.
-            Security is always good a cursor level to adjsut and a set of good practices.
             </p>
+            <p>Service Worker mode is secure if your follow 2 following rules: </p>
+            <h4>Rule 1: Configure CSP</h4>
+            <p>
+            Add CSP header to forbid to write dynamic iframe with javascript dynamic inside. 
+            You should never add "unsafe-inline" in your CSP header. For this game we set up 'unsafe-eval' in the CSP header to allow the eval function to be executed and allow you to hack the application like a big XSS attack.
+            <pre>
+            Content-Security-Policy: script-src 'self' 'unsafe-eval'; 
+            </pre>
+            <h4>Rule 2: Apply redirect URI before any WebService call</h4>
+            Set up the redirect_uri and redirect_silent_uri at the top level of your javascript application before any XSS attack could be executed.
+            </p>
+            <h4>Let's play</h4>
             <textarea id="xsshack">alert('XSS');</textarea>
             <button id="buttonxsshack" >Hack</button>
-            <h2>Authenticated</h2>
+            <h3>Authenticated</h3>
+            <button id="logout">Logout</button>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
             
         </div>`;
