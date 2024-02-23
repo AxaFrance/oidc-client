@@ -70,12 +70,52 @@ class Router
 
 }
 
+
+const display = (element:any) => {
+
+    // @ts-ignore
+    element.innerHTML = `<hr/><div>
+            <h2>Game Hack Challenge</h2>
+
+            <p>Game, let's try to make an XSS attacks to retrieve some secure tokens !</p>
+            <p>Service Worker mode is not magic <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow</a>
+            So let try to hack it !
+            </p>
+            <p>Service Worker mode is secure if your follow 2 following rules: </p>
+            <h4>Rule 1: Configure CSP</h4>
+            <p>
+            Add CSP header to forbid to write dynamic iframe with javascript dynamic inside. 
+            You should never add "unsafe-inline" in your CSP header. 
+            <pre>
+            Content-Security-Policy: script-src 'self';  // Secure
+            </pre>
+            <h4>Rule 2: Apply redirect URI before any WebService call</h4>
+            Set up the redirect_uri and redirect_silent_uri at the top level of your javascript application before any XSS attack could be executed.
+            </p>
+            <h4>Let's play</h4>
+            <p>To help you for this game, we set up 'unsafe-eval' in the CSP header to allow the eval function to be executed and allow you to hack the application like a big XSS attack.</p>
+             <pre>
+            Content-Security-Policy: script-src 'self' 'unsafe-eval'; 
+            </pre>
+            <textarea id="xsshack">alert('XSS');</textarea>
+            <button id="buttonxsshack" >Hack</button>
+
+            
+        </div>`;
+    // @ts-ignore
+    window.document.getElementById('buttonxsshack').addEventListener('click',()=> {
+        // @ts-ignore
+        eval(document.getElementById('xsshack').value)
+    });
+}
+
 // @ts-ignore
 export const execute = () => {
 
     const router = new Router();
 
-    const element = document.getElementById("root");
+    const root = document.getElementById("root");
+    const game = document.getElementById("game");
 
     const configuration = {
         client_id: 'interactive.public.short',
@@ -92,92 +132,61 @@ export const execute = () => {
 
     const vanillaOidc = OidcClient.getOrCreate(() => fetch)(configuration);
 
+    // @ts-ignore
+    function logout () {
+        vanillaOidc.logoutAsync();
+    }
+
     console.log(href);
 
     if(href.includes(configuration.redirect_uri)){
         // @ts-ignore
-        element.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
+        root.innerHTML = `<div>
+            <h1>Login demo</h1>
             <h2>Loading callback</h2>
         </div>`;
         vanillaOidc.loginCallbackAsync().then(()=>{
             router.getCustomHistory().replaceState("/");
+            display(game);
             // @ts-ignore
-            function logout() {
-                vanillaOidc.logoutAsync();
-            }
-            const tokens = vanillaOidc.tokens;
-            // @ts-ignore
-            element.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
-            <button id="logout" >Logout</button>
-            <h2>Authenticated</h2>
-            <pre>${JSON.stringify(tokens,null,'\t')}</pre>
+            root.innerHTML = `<div>
+            <h3>Login demo Authenticated</h3>
+            <button id="logout">Logout</button>
+            <pre>${JSON.stringify(vanillaOidc.tokens,null,'\t')}</pre>
         </div>`;
-
             // @ts-ignore
             window.document.getElementById('logout').addEventListener('click',logout);
         });
+        return;
     }
 
     vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         const tokens = vanillaOidc.tokens;
         if(tokens){
-
+            display(game);
             // @ts-ignore
-            function logout () {
-                vanillaOidc.logoutAsync();
-            }
-            // @ts-ignore
-            element.innerHTML = `<div>
-            <h2>Demo</h2>
-
-            <p>Game, let's try to make an XSS attacks to retrieve some secure tokens !</p>
-            <p>Service Worker mode is not magic <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow</a>
-            So let try to hack it !
-            </p>
-            <p>Service Worker mode is secure if your follow 2 following rules: </p>
-            <h4>Rule 1: Configure CSP</h4>
-            <p>
-            Add CSP header to forbid to write dynamic iframe with javascript dynamic inside. 
-            You should never add "unsafe-inline" in your CSP header. For this game we set up 'unsafe-eval' in the CSP header to allow the eval function to be executed and allow you to hack the application like a big XSS attack.
-            <pre>
-            Content-Security-Policy: script-src 'self' 'unsafe-eval'; 
-            </pre>
-            <h4>Rule 2: Apply redirect URI before any WebService call</h4>
-            Set up the redirect_uri and redirect_silent_uri at the top level of your javascript application before any XSS attack could be executed.
-            </p>
-            <h4>Let's play</h4>
-            <textarea id="xsshack">alert('XSS');</textarea>
-            <button id="buttonxsshack" >Hack</button>
-            <h3>Authenticated</h3>
+            root.innerHTML = `<div>
+            <h3>Login demo Authenticated</h3>
             <button id="logout">Logout</button>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
-            
         </div>`;
             // @ts-ignore
             window.document.getElementById('logout').addEventListener('click',logout);
-            // @ts-ignore
-            window.document.getElementById('buttonxsshack').addEventListener('click',()=> {
-                // @ts-ignore
-                eval(document.getElementById('xsshack').value)
-            });
-
         }
         else {
             // @ts-ignore
             function login()  {
                 // @ts-ignore
-                element.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
+                root.innerHTML = `<div>
+            <h1>Login demo</h1>
             <h2>Loading</h2>
         </div>`;
                 vanillaOidc.loginAsync("/");
             }
-
+            display(game);
             // @ts-ignore
-            element.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
+            root.innerHTML = `<div>
+            <h1>Login demo</h1>
             <button id="login" >Login</button>
         </div>`;
             // @ts-ignore
