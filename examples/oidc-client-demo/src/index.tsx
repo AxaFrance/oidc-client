@@ -83,8 +83,7 @@ export const configuration = {
     authority: 'https://demo.duendesoftware.com',
     refresh_time_before_tokens_expiration_in_second: 40,
     service_worker_relative_url:'/OidcServiceWorker.js',
-    service_worker_only: false,
-    // monitor_session: true,
+    service_worker_only: true,
 };
 
 const href = window.location.href;
@@ -93,44 +92,53 @@ const vanillaOidc = OidcClient.getOrCreate(() => fetch)(configuration);
 
 console.log(href);
 
-
-vanillaOidc.tryKeepExistingSessionAsync().then(() => {
-    if(href.includes(configuration.redirect_uri)){
-        // @ts-ignore
-        element.innerHTML = `<div>
+if(href.includes(configuration.redirect_uri)){
+    // @ts-ignore
+    element.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
             <h2>Loading callback</h2>
         </div>`;
-        vanillaOidc.loginCallbackAsync().then(()=>{
-            router.getCustomHistory().replaceState("/");
-            // @ts-ignore
-            window.logout = () =>  vanillaOidc.logoutAsync();
-            const tokens = vanillaOidc.tokens;
-            // @ts-ignore
-            element.innerHTML = `<div>
+    vanillaOidc.loginCallbackAsync().then(()=>{
+        router.getCustomHistory().replaceState("/");
+        // @ts-ignore
+        window.logout = () =>  vanillaOidc.logoutAsync();
+        const tokens = vanillaOidc.tokens;
+        // @ts-ignore
+        element.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
         </div>`;
-        });
-        return;
-    }
+    });
+}
 
+vanillaOidc.tryKeepExistingSessionAsync().then(() => {
     const tokens = vanillaOidc.tokens;
-
     if(tokens){
-
+        
         // @ts-ignore
         window.logout = () =>  vanillaOidc.logoutAsync();
         // @ts-ignore
         element.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.logout()">Logout</button>
+            <p>Game, let's try to make an XSS attacks to retrieve original tokens !</p>
+            <p>You may think servcie worker mode is not secure like said here <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#payload-new-flow</a>
+            So let try to hack it !
+            In fact it can be prevented by using the following CSP header to forbid to write dynamic iframe with javascript dynamic inside:
+            <pre>
+            Content-Security-Policy: script-src 'self'
+            </pre>
+            and setting up the redirect_uri and redirect_silent_uri at the top level of your javascript application before any XSS attack could accur.
+            Security is always good a cursor level to adjsute and a set of good practices.
+            </p>
+            <textarea id="xsshack">alert('XSS');</textarea>
+            <button onclick="eval(document.getElementById('xsshack').value)">Hack</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens,null,'\t')}</pre>
+            
         </div>`;
-        
     }
     else {
         // @ts-ignore
@@ -142,6 +150,7 @@ vanillaOidc.tryKeepExistingSessionAsync().then(() => {
         </div>`;
             vanillaOidc.loginAsync("/");
         };
+        
         // @ts-ignore
         element.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
