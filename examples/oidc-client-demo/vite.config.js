@@ -7,7 +7,7 @@ export default defineConfig({
   },
   server: {
     headers: {
-      //"Content-Security-Policy": "script-src 'self';",
+      "Content-Security-Policy": "script-src 'self' 'unsafe-eval';",
     },
   },
 });
