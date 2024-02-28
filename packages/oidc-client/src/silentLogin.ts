@@ -44,7 +44,7 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
         }
         const link = configuration.silent_login_uri + queries;
         const idx = link.indexOf('/', link.indexOf('//') + 2);
-        const iFrameOrigin = link.substr(0, idx);
+        const iFrameOrigin = link.substring(0, idx);
         const iframe = document.createElement('iframe');
         iframe.width = '0px';
         iframe.height = '0px';
@@ -53,53 +53,60 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
         iframe.setAttribute('src', link);
         document.body.appendChild(iframe);
         return new Promise((resolve, reject) => {
-            try {
-                let isResolved = false;
-                window.onmessage = (e: MessageEvent<any>) => {
-                    if (e.origin === iFrameOrigin &&
-                        e.source === iframe.contentWindow
-                    ) {
-                        const key = `${configurationName}_oidc_tokens:`;
-                        const key_error = `${configurationName}_oidc_error:`;
-                        const key_exception = `${configurationName}_oidc_exception:`;
-                        const data = e.data;
-                        if (data && typeof (data) === 'string') {
-                            if (!isResolved) {
-                                if (data.startsWith(key)) {
-                                    const result = JSON.parse(e.data.replace(key, ''));
-                                    publishEvent(eventNames.silentLoginAsync_end, {});
-                                    iframe.remove();
-                                    isResolved = true;
-                                    resolve(result);
-                                } else if (data.startsWith(key_error)) {
-                                    const result = JSON.parse(e.data.replace(key_error, ''));
-                                    publishEvent(eventNames.silentLoginAsync_error, result);
-                                    iframe.remove();
-                                    isResolved = true;
-                                    resolve({error: 'oidc_' + result.error, tokens: null, sessionState: null});
-                                } else if (data.startsWith(key_exception)) {
-                                    const result = JSON.parse(e.data.replace(key_exception, ''));
-                                    publishEvent(eventNames.silentLoginAsync_error, result);
-                                    iframe.remove();
-                                    isResolved = true;
-                                    reject(new Error(result.error));
-                                }
-                                
+            let isResolved = false;
+
+            const clear = () => {
+                window.removeEventListener('message', listener);
+                iframe.remove();
+                isResolved = true;
+            };
+
+            const listener = (e: MessageEvent<any>) => {
+                if (e.origin === iFrameOrigin &&
+                    e.source === iframe.contentWindow
+                ) {
+                    const key = `${configurationName}_oidc_tokens:`;
+                    const key_error = `${configurationName}_oidc_error:`;
+                    const key_exception = `${configurationName}_oidc_exception:`;
+                    const data = e.data;
+
+                    if (data && typeof (data) === 'string') {
+                        if (!isResolved) {
+                            if (data.startsWith(key)) {
+                                const result = JSON.parse(e.data.replace(key, ''));
+                                publishEvent(eventNames.silentLoginAsync_end, {});
+                                resolve(result);
+                                clear();
+                            } else if (data.startsWith(key_error)) {
+                                const result = JSON.parse(e.data.replace(key_error, ''));
+                                publishEvent(eventNames.silentLoginAsync_error, result);
+                                resolve({error: 'oidc_' + result.error, tokens: null, sessionState: null});
+                                clear();
+                            } else if (data.startsWith(key_exception)) {
+                                const result = JSON.parse(e.data.replace(key_exception, ''));
+                                publishEvent(eventNames.silentLoginAsync_error, result);
+                                reject(new Error(result.error));
+                                clear();
                             }
+
                         }
                     }
-                };
+                }
+            };
+
+            try {
+                window.addEventListener('message', listener);
+
                 const silentSigninTimeout = configuration.silent_login_timeout;
                 setTimeout(() => {
                     if (!isResolved) {
+                        clear();
                         publishEvent(eventNames.silentLoginAsync_error, { reason: 'timeout' });
-                        iframe.remove();
-                        isResolved = true;
                         reject(new Error('timeout'));
                     }
                 }, silentSigninTimeout);
             } catch (e) {
-                iframe.remove();
+                clear();
                 publishEvent(eventNames.silentLoginAsync_error, e);
                 reject(e);
             }
