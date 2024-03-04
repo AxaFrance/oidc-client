@@ -1,6 +1,16 @@
 # Changelog
 
-## 7.19.0
+## 7.19.1
+
+- [7b2b21a](https://github.com/AxaFrance/oidc-client/commit/7b2b21a9837210d0caaea9e16cfea9e9daeb8364) - build(npm): bump rimraf from 5.0.1 to 5.0.5 (#1313) (release), 2024-03-04 by *dependabot[bot]*
+- [d4c9ec6](https://github.com/AxaFrance/oidc-client/commit/d4c9ec6b8a4760c81f4d88bc72563cc810b52b00) - fix(oidc): when having multiple iframes, only the last one gets resolved (#1311) (alpha), 2024-02-28 by *Jean-Marc Rakotoarisoa*
+- [db13d8b](https://github.com/AxaFrance/oidc-client/commit/db13d8bdfbd49e564452461aeefc6e3024ce4435) - doc(oidc-client-demo): fix workflow, 2024-02-23 by *Guillaume Chervet*
+- [322c1f1](https://github.com/AxaFrance/oidc-client/commit/322c1f1fbd3563b27b01a6ca98c8d95eeef12038) - doc(oidc-client-demo): update content and CSP, 2024-02-23 by *Guillaume Chervet*
+- [cf92792](https://github.com/AxaFrance/oidc-client/commit/cf92792db7ede5f35c3e2883f4353376e73ff7e3) - doc(oidc-client-demo): repair demo, 2024-02-23 by *Guillaume Chervet*
+- [fa33e72](https://github.com/AxaFrance/oidc-client/commit/fa33e7250cd5d46c98940c999b8f701116f78446) - doc(oidc-client): update vanilla to add Hack game, 2024-02-23 by *Guillaume Chervet*
+
+
+## v7.19.0
 
 - [8f3940c](https://github.com/AxaFrance/oidc-client/commit/8f3940c42ad62264abfd61690777b602e0bdc31a) - feat(oidc): dpop inside serviceworker (#1306) (release), 2024-02-22 by *Guillaume Chervet*
 - [4a5887f](https://github.com/AxaFrance/oidc-client/commit/4a5887f5e7b3d739d709c7bb4fb7a007ccb051a1) - fix(oidc-service-worker): remove sw unecessary log, 2024-02-19 by *Guillaume Chervet*
@@ -311,10 +321,5 @@
 ## v7.7.3
 
 - [ac7f37b](https://github.com/AxaFrance/oidc-client/commit/ac7f37be28883edbe539eff02d0a6a054b2aab14) - build(npm): bump msw from 1.2.2 to 2.0.0 (#1165), 2023-10-29 by *dependabot[bot]*
-
-
-## v7.7.2
-
-- [41ecf9e](https://github.com/AxaFrance/oidc-client/commit/41ecf9e1752f291f0d8f96a979ab393f5aaeb885) - build(npm): bump @testing-library/dom from 9.3.1 to 9.3.3 (#1161), 2023-10-25 by *dependabot[bot]*
 
 
