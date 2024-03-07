@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.19.1
+## 7.19.2
+
+- [95be8f7](https://github.com/AxaFrance/oidc-client/commit/95be8f79a3fc399b05322d0197ab674cf272326a) - build(npm): bump vitest from 1.2.2 to 1.3.1 (#1315), 2024-03-07 by *dependabot[bot]*
+
+
+## v7.19.1
 
 - [7b2b21a](https://github.com/AxaFrance/oidc-client/commit/7b2b21a9837210d0caaea9e16cfea9e9daeb8364) - build(npm): bump rimraf from 5.0.1 to 5.0.5 (#1313) (release), 2024-03-04 by *dependabot[bot]*
 - [d4c9ec6](https://github.com/AxaFrance/oidc-client/commit/d4c9ec6b8a4760c81f4d88bc72563cc810b52b00) - fix(oidc): when having multiple iframes, only the last one gets resolved (#1311) (alpha), 2024-02-28 by *Jean-Marc Rakotoarisoa*
@@ -316,10 +321,5 @@
 ## v7.8.0
 
 - [1684abb](https://github.com/AxaFrance/oidc-client/commit/1684abba7d982ecbd2f30610eb140e2ce4549814) - feat(oidc-client): move fetch to oidc-client (#1175) (release), 2023-11-06 by *Guillaume Chervet*
-
-
-## v7.7.3
-
-- [ac7f37b](https://github.com/AxaFrance/oidc-client/commit/ac7f37be28883edbe539eff02d0a6a054b2aab14) - build(npm): bump msw from 1.2.2 to 2.0.0 (#1165), 2023-10-29 by *dependabot[bot]*
 
 
