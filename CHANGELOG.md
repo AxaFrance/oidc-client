@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.19.2
+## 7.19.3
+
+- [397629d](https://github.com/AxaFrance/oidc-client/commit/397629d2c9e1d58efab96c000247382cfc94ce24) - build(npm): bump vite from 5.0.12 to 5.1.5 (#1319), 2024-03-07 by *dependabot[bot]*
+
+
+## v7.19.2
 
 - [95be8f7](https://github.com/AxaFrance/oidc-client/commit/95be8f79a3fc399b05322d0197ab674cf272326a) - build(npm): bump vitest from 1.2.2 to 1.3.1 (#1315), 2024-03-07 by *dependabot[bot]*
 
@@ -316,10 +321,5 @@
 - [c54c7b9](https://github.com/AxaFrance/oidc-client/commit/c54c7b9f3447c0474b460649eb315c13f5f8b1da) - fix(service-worker): Reclaming all clients from SW after hard reload (#1149), 2023-11-12 by *VladimirPlatonenko*
 - [dbcfec4](https://github.com/AxaFrance/oidc-client/commit/dbcfec46798b2137154dd33f31bf842f6b7730b8) - feat(oidc-client): enhance service worker flexibility (alpha) (#1180), 2023-11-12 by *Guillaume Chervet*
 - [9549b9a](https://github.com/AxaFrance/oidc-client/commit/9549b9ae613d3cf357cb4b760fc8cc9e0af80c44) - doc(oidc-client): typo in method name, 2023-11-07 by *Guillaume Chervet*
-
-
-## v7.8.0
-
-- [1684abb](https://github.com/AxaFrance/oidc-client/commit/1684abba7d982ecbd2f30610eb140e2ce4549814) - feat(oidc-client): move fetch to oidc-client (#1175) (release), 2023-11-06 by *Guillaume Chervet*
 
 
