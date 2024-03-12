@@ -1,6 +1,16 @@
 # Changelog
 
-## 7.19.3
+## 7.19.5
+
+- [be24bba](https://github.com/AxaFrance/oidc-client/commit/be24bbab3d699ff003cb14302dedc3463b1f3a1b) - refactor(all): update build libraries (release), 2024-03-12 by *Guillaume Chervet*
+
+
+## v7.19.4
+
+- [7df257c](https://github.com/AxaFrance/oidc-client/commit/7df257ca7ba32a2605cd5d76881ea3aa50aba208) - refactor(all): update build libraries (release), 2024-03-12 by *Guillaume Chervet*
+
+
+## v7.19.3
 
 - [397629d](https://github.com/AxaFrance/oidc-client/commit/397629d2c9e1d58efab96c000247382cfc94ce24) - build(npm): bump vite from 5.0.12 to 5.1.5 (#1319), 2024-03-07 by *dependabot[bot]*
 
@@ -308,18 +318,5 @@
 ## v7.9.2
 
 - [5085e05](https://github.com/AxaFrance/oidc-client/commit/5085e05beb4c7a88fad1df61e11213b68672e7d9) - fix(sevice-worker): add URL normalization for getCurrentDatabaseDomain endpoints comparison (release) (#1196), 2023-11-17 by *meesvandongen*
-
-
-## v7.9.1
-
-- [7e0cb29](https://github.com/AxaFrance/oidc-client/commit/7e0cb297587e314451321c3ddd1b0e5f7e7e6c0e) - fix(logout): okta tokens null (release) (#1188), 2023-11-13 by *Guillaume Chervet*
-
-
-## v7.9.0
-
-- [b08cd59](https://github.com/AxaFrance/oidc-client/commit/b08cd594d2427170cde835dcff97d5be396952e6) - doc(FAQ): Update FAQ.md (release), 2023-11-12 by *Guillaume Chervet*
-- [c54c7b9](https://github.com/AxaFrance/oidc-client/commit/c54c7b9f3447c0474b460649eb315c13f5f8b1da) - fix(service-worker): Reclaming all clients from SW after hard reload (#1149), 2023-11-12 by *VladimirPlatonenko*
-- [dbcfec4](https://github.com/AxaFrance/oidc-client/commit/dbcfec46798b2137154dd33f31bf842f6b7730b8) - feat(oidc-client): enhance service worker flexibility (alpha) (#1180), 2023-11-12 by *Guillaume Chervet*
-- [9549b9a](https://github.com/AxaFrance/oidc-client/commit/9549b9ae613d3cf357cb4b760fc8cc9e0af80c44) - doc(oidc-client): typo in method name, 2023-11-07 by *Guillaume Chervet*
 
 
