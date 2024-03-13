@@ -36,8 +36,6 @@ export const getDomains = (
 	return trustedDomain[`${type}Domains`] ?? trustedDomain.domains ?? [];
 };
 
-
-
 export const getCurrentDatabaseDomain = (
 	database: Database,
 	url: string,
@@ -69,7 +67,7 @@ export const getCurrentDatabaseDomain = (
 
 		const domains = getDomains(trustedDomain, 'accessToken');
 		const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint
-			? [oidcServerConfiguration.userInfoEndpoint, ...domains]
+			? [normalizeUrl(oidcServerConfiguration.userInfoEndpoint), ...domains]
 			: [...domains];
 
 		let hasToSendToken = false;
