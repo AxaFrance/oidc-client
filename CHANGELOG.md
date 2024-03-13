@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.19.5
+## 7.19.6
+
+- [b7568f8](https://github.com/AxaFrance/oidc-client/commit/b7568f8d73d21ba1b7cd4890bff2ad30941696e2) - fix(oidc-service-worker): normalize userinfo endpoint in service worker (#1320) (release), 2024-03-13 by *meesvandongen*
+
+
+## v7.19.5
 
 - [be24bba](https://github.com/AxaFrance/oidc-client/commit/be24bbab3d699ff003cb14302dedc3463b1f3a1b) - refactor(all): update build libraries (release), 2024-03-12 by *Guillaume Chervet*
 
@@ -313,10 +318,5 @@
 
 - [a80844c](https://github.com/AxaFrance/oidc-client/commit/a80844c2668066b083009043f1dd94fa196e1f18) - fix(service-worker): make sure URL is normalized when comparing with token endpoint and revocation endpoint (#1198) (release), 2023-11-24 by *meesvandongen*
 - [bf19dd0](https://github.com/AxaFrance/oidc-client/commit/bf19dd0cc975ea4524b0f68f9315625b3789801b) - fix(oidc-client): tokens refresh conflict multiple tabs (alpha), 2023-11-17 by *Guillaume Chervet*
-
-
-## v7.9.2
-
-- [5085e05](https://github.com/AxaFrance/oidc-client/commit/5085e05beb4c7a88fad1df61e11213b68672e7d9) - fix(sevice-worker): add URL normalization for getCurrentDatabaseDomain endpoints comparison (release) (#1196), 2023-11-17 by *meesvandongen*
 
 
