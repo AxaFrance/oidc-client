@@ -101,6 +101,14 @@ describe('domains', () => {
 			expect(getCurrentDatabaseDomain(db, url, trustedDomains)).not.toBeNull();
 		});
 
+		it('will not return null, url is the userinfo endpoint on other domain, default port is set', () => {
+			db['default'].oidcServerConfiguration!.userInfoEndpoint =
+				'https://otherdomain.com:443/connect/userinfo';
+
+			const url = 'https://otherdomain.com/connect/userinfo';
+			expect(getCurrentDatabaseDomain(db, url, null)).not.toBeNull();
+		});
+
 		it('will test urls against domains list if accessTokenDomains list is not present', () => {
 			const trustedDomains: TrustedDomains = {
 				default: {
