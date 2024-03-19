@@ -293,10 +293,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         });
     }
 
-    async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string> {
+    async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string, extras:StringMap= {}): Promise<string> {
 
         const configuration = this.configuration;
-        const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),};
+        const claimsExtras = {
+            ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),
+            ...extras
+        };
 
         const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
         let demonstratingProofOfPossessionNonce:string;

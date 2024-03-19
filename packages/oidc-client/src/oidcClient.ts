@@ -67,8 +67,8 @@ export class OidcClient {
         return this._oidc.configuration;
     }
 
-    async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string) : Promise<string> {
-        return this._oidc.generateDemonstrationOfProofOfPossessionAsync(accessToken, url, method);
+    async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string, extras:StringMap= {}) : Promise<string> {
+        return this._oidc.generateDemonstrationOfProofOfPossessionAsync(accessToken, url, method, extras);
     }
 
     async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken> {
