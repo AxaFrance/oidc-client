@@ -1,6 +1,5 @@
-import { StringMap, OidcClient } from '@axa-fr/oidc-client';
+import { StringMap, OidcClient, Tokens } from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
-import {Tokens} from "@axa-fr/oidc-client/dist/parseTokens";
 
 const defaultConfigurationName = 'default';
 
@@ -86,7 +85,7 @@ export type OidcAccessToken = {
 }
 
 function getGenerateDemonstrationOfProofOfPossessionAsync(oidc: OidcClient, tokens: Tokens) {
-    return oidc.configuration.demonstrating_proof_of_possession ? (url: string, method: string) => oidc.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, method) : null;
+    return oidc.configuration.demonstrating_proof_of_possession ? (url: string, method: string, extras:StringMap={}) => oidc.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, method, extras) : null;
 }
 
 export const useOidcAccessToken = (configurationName = defaultConfigurationName) => {
