@@ -69,7 +69,9 @@ export const getCurrentDatabaseDomain = (
 		const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint
 			? [normalizeUrl(oidcServerConfiguration.userInfoEndpoint), ...domains]
 			: [...domains];
-
+		console.log("url", url)
+		console.log("domainsToSendTokens", domainsToSendTokens)
+		
 		let hasToSendToken = false;
 		if (domainsToSendTokens.find((f) => f === acceptAnyDomainToken)) {
 			hasToSendToken = true;

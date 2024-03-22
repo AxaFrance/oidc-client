@@ -119,6 +119,8 @@ const handleFetch = async (event: FetchEvent) => {
 		url,
 		trustedDomains,
 	);
+	console.log("currentDatabaseForRequestAccessToken", currentDatabaseForRequestAccessToken)
+	console.log("trustedDomains", trustedDomains)
 	if (
 		currentDatabaseForRequestAccessToken &&
 		currentDatabaseForRequestAccessToken.tokens &&
@@ -174,9 +176,7 @@ const handleFetch = async (event: FetchEvent) => {
 		}
 
 		const newRequest = new Request(originalRequest, init);
-
 		event.respondWith(fetch(newRequest));
-
 		return;
 	}
 
