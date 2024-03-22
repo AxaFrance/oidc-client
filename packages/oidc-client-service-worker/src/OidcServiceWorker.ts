@@ -41,16 +41,14 @@ declare let trustedDomains: TrustedDomains;
 
 _self.importScripts(scriptFilename);
 
-const id = Math.round(new Date().getTime() / 1000).toString();
-
 const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
 const handleInstall = (event: ExtendableEvent) => {
-	console.log('[OidcServiceWorker] service worker installed ' + id);
+	console.log('[OidcServiceWorker] service worker installed ' + version);
 	event.waitUntil(_self.skipWaiting());
 };
 
 const handleActivate = (event: ExtendableEvent) => {
-	console.log('[OidcServiceWorker] service worker activated ' + id);
+	console.log('[OidcServiceWorker] service worker activated ' + version);
 	event.waitUntil(_self.clients.claim());
 };
 
@@ -370,7 +368,8 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			trustedDomains[configurationName] = [];
 		}
 	}
-	
+	console.log("configurationName", configurationName)
+	console.log("data", data)
 	switch (data.type) {
 		case 'clear':
 			currentDatabase.tokens = null;
@@ -398,7 +397,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			}
 			currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
 			currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
-
+			console.log("init:currentDatabase", currentDatabase)
 			if(currentDatabase.demonstratingProofOfPossessionConfiguration == null ){
 				const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomains[configurationName]);
 				if(demonstratingProofOfPossessionConfiguration != null){

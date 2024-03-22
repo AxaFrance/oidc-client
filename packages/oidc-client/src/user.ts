@@ -23,18 +23,18 @@ export const userInfoAsync = (oidc:Oidc) => async (noCache = false) => {
     const configuration = oidc.configuration;
     const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     const url = oidcServerConfiguration.userInfoEndpoint;
-    const fetchUserInfo = async (accessToken) => {
-        const res = await fetch(url, {
+    const fetchUserInfo = async (accessToken:string) => {
+        const response = await fetch(url, {
             headers: {
                 authorization: `Bearer ${accessToken}`,
             },
         });
 
-        if (res.status !== 200) {
+        if (response.status !== 200) {
             return null;
         }
 
-        return res.json();
+        return response.json();
     };
     const userInfo = await fetchUserInfo(accessToken);
     oidc.userInfo = userInfo;

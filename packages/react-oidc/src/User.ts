@@ -16,7 +16,6 @@ export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
 export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName = 'default') => {
     const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: null, status: OidcUserStatus.Unauthenticated });
     const [oidcUserId, setOidcUserId] = useState<string>('');
-
    
     useEffect(() => {
         const oidc = OidcClient.get(configurationName);
