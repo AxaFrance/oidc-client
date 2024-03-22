@@ -193,7 +193,7 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         }
         
         if (serviceWorker) {
-            await serviceWorker.initAsync(redirectUri, 'syncTokensAsync', configuration);
+            await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
             loginParams = serviceWorker.getLoginParams();
             if(demonstratingProofOfPossessionNonce) {
                 await serviceWorker.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);
