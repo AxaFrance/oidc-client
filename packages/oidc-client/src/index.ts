@@ -6,6 +6,7 @@ export type {
   Fetch,
   OidcConfiguration,
   StringMap,
+  TokenAutomaticRenewMode
 } from './types.js';
 export { type ILOidcLocation, OidcLocation } from './location.js';
 export { type OidcUserInfo, OidcClient } from './oidcClient.js';

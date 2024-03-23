@@ -3,7 +3,7 @@ import {initWorkerAsync, sleepAsync} from './initWorker.js';
 import Oidc from './oidc.js';
 import {computeTimeLeft, isTokensOidcValid, setTokens, Tokens} from './parseTokens.js';
 import timer from './timer.js';
-import {OidcConfiguration, StringMap} from './types.js';
+import {OidcConfiguration, StringMap, TokenAutomaticRenewMode} from './types.js';
 import {_silentLoginAsync} from "./silentLogin";
 import {performTokenRequestAsync} from "./requests";
 import {eventNames} from "./events";
@@ -86,15 +86,16 @@ export const autoRenewTokens = (oidc:Oidc, expiresAt, extras:StringMap = null) =
 };
 
 export const synchroniseTokensStatus ={
-    'SESSION_LOST': 'SESSION_LOST',
-    'NOT_CONNECTED':'NOT_CONNECTED',
-    'TOKENS_VALID':'TOKENS_VALID',
-    'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID': 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID',
-    'LOGOUT_FROM_ANOTHER_TAB': 'LOGOUT_FROM_ANOTHER_TAB',
-    'REQUIRE_SYNC_TOKENS': 'REQUIRE_SYNC_TOKENS'
+    FORCE_REFRESH: 'FORCE_REFRESH',
+    SESSION_LOST: 'SESSION_LOST',
+    NOT_CONNECTED:'NOT_CONNECTED',
+    TOKENS_VALID:'TOKENS_VALID',
+    TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID: 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID',
+    LOGOUT_FROM_ANOTHER_TAB: 'LOGOUT_FROM_ANOTHER_TAB',
+    REQUIRE_SYNC_TOKENS: 'REQUIRE_SYNC_TOKENS'
 };
 
-export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConfiguration, configurationName: string, currentTokens, forceRefresh = false) => {
+export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConfiguration, configurationName: string, currentTokens: Tokens, forceRefresh = false) => {
     // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
     // const configuration = this.configuration;
     const nullNonce = { nonce: null };
@@ -145,8 +146,6 @@ export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConf
     }
     return { tokens: currentTokens, status, nonce };
 }
-
-
 
 
 const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) =>{
@@ -210,7 +209,6 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
 
     if (index > 4) {
         if(isDocumentHidden){
-            //oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
             return { tokens: oidc.tokens, status: 'GIVE_UP' };
         } else{
             updateTokens(null);
@@ -218,6 +216,7 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
             return { tokens: null, status: 'SESSION_LOST' };
         }
     }
+    
     try {
         const { status, tokens, nonce } = await syncTokensInfoAsync(oidc)(configuration, oidc.configurationName, oidc.tokens, forceRefresh);
         switch (status) {
@@ -240,9 +239,19 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
                 oidc.publishEvent(eventNames.logout_from_another_tab, { status: 'session syncTokensAsync' });
                 return { tokens: null, status: 'LOGGED_OUT' };
             case synchroniseTokensStatus.REQUIRE_SYNC_TOKENS:
+
+                if(configuration.token_automatic_renew_mode == TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted && synchroniseTokensStatus.FORCE_REFRESH !== status ){
+                    return { tokens: oidc.tokens, status: 'GIVE_UP' };
+                }
+                
                 oidc.publishEvent(eventNames.refreshTokensAsync_begin, {  tryNumber: index });
                 return await localsilentLoginAsync();
             default: {
+                
+                if(configuration.token_automatic_renew_mode == TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted && synchroniseTokensStatus.FORCE_REFRESH !== status ){
+                    return { tokens: oidc.tokens, status: 'GIVE_UP' };
+                }
+                
                 oidc.publishEvent(eventNames.refreshTokensAsync_begin, { refreshToken: tokens.refreshToken, status, tryNumber: index });
                 if (!tokens.refreshToken) {
                     return await localsilentLoginAsync();

@@ -8,6 +8,8 @@ import {
     setTokens,
     TokenRenewMode
 } from "./parseTokens";
+import {StringMap, TokenAutomaticRenewMode} from "./types";
+import {sleepAsync} from "./initWorker";
 
 describe('ParseTokens test Suite', () => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -26,6 +28,10 @@ describe('ParseTokens test Suite', () => {
                     expiresAt,
                     issuedAt,
                 },
+                configuration: { token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration},
+                renewTokensAsync: async (extras: StringMap) => {
+                    await sleepAsync({milliseconds:10});
+                }
             };
             const result = await getValidTokenAsync(oidc, 1, 1);
             expect(result.isTokensValid).toEqual(expectIsValidToken);
