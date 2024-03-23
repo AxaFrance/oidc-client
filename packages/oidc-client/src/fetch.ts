@@ -2,7 +2,7 @@
 import {OidcClient} from "./oidcClient";
 
 // @ts-ignore
-export const fetchWithTokens = (fetch: Fetch, oidcClient: OidcClient | null) : Fetch => async (...params: Parameters<Fetch>) :Promise<Response> => {
+export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null) : Fetch => async (...params: Parameters<Fetch>) :Promise<Response> => {
     const [url, options, ...rest] = params;
     const optionTmp = options ? { ...options } : { method: 'GET' };
     let headers = new Headers();
