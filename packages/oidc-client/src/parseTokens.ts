@@ -189,8 +189,8 @@ export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWa
             await oidc.renewTokensAsync({});
         } else {
             await sleepAsync({milliseconds: waitMs});
-            numberWaitTemp = numberWaitTemp - 1;
         }
+        numberWaitTemp = numberWaitTemp - 1;
     }
     const isValid = isTokensValid(oidc.tokens);
     return {

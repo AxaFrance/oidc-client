@@ -1,5 +1,6 @@
 ﻿import {Fetch} from "./types";
 import {OidcClient} from "./oidcClient";
+import {getValidTokenAsync} from "./parseTokens";
 
 // @ts-ignore
 export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null) : Fetch => async (...params: Parameters<Fetch>) :Promise<Response> => {
@@ -14,7 +15,9 @@ export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null) : Fetch =
     const oidc = oidcClient;
 
     // @ts-ignore
-    const getValidToken = await oidc.getValidTokenAsync();
+    console.log('before', getValidTokenAsync);
+    const getValidToken = await getValidTokenAsync(oidc);
+    console.log('getValidToken', getValidToken);
     const accessToken = getValidToken?.tokens?.accessToken;
 
     if (!headers.has('Accept')) {
