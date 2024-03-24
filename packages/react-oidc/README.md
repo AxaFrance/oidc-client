@@ -223,6 +223,10 @@ const configuration = {
     onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user with the same subject is logged out from another tab when session_monitor is active
     onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user is logged out from the same tab when session_monitor is active
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
+    token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted, // Optional, default is TokenAutomaticRenewMode.AutomaticBeforeTokensExpiration
+    // TokenAutomaticRenewMode.AutomaticBeforeTokensExpiration: renew tokens automatically before they expire
+    // TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted: renew tokens automatically only when fetch is executed
+    // It requires you to use fetch given by hook useOidcFetch(fetch) or HOC withOidcFetch(fetch)(Component)
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
     location: ILOidcLocation, // Optional, default is window.location, you can inject your own location object respecting the ILOidcLocation interface
     demonstrating_proof_of_possession: Boolean, // Optional, default is false, if true, the the Demonstrating Proof of Possession will be activated //https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access

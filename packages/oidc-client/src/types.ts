@@ -6,6 +6,11 @@ export type ServiceWorkerUpdateRequireCallback = (registration:any, stopKeepAliv
 export type ServiceWorkerRegister = (serviceWorkerRelativeUrl:string) => Promise<ServiceWorkerRegistration>;
 export type ServiceWorkerActivate = () => boolean;
 
+export enum TokenAutomaticRenewMode {
+    AutomaticBeforeTokenExpiration = 'AutomaticBeforeTokensExpiration',
+    AutomaticOnlyWhenFetchExecuted = 'AutomaticOnlyWhenFetchExecuted'
+}
+
 export type OidcConfiguration = {
     client_id: string;
     redirect_uri: string;
@@ -18,6 +23,7 @@ export type OidcConfiguration = {
     authority_timeout_wellknowurl_in_millisecond?: number;
     authority_configuration?: AuthorityConfiguration;
     refresh_time_before_tokens_expiration_in_second?: number;
+    token_automatic_renew_mode?: TokenAutomaticRenewMode;
     token_request_timeout?: number;
     service_worker_relative_url?:string;
     service_worker_register?:ServiceWorkerRegister;

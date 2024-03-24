@@ -127,11 +127,12 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
     return state;
 };
 
-const idTokenInitialState = { idToken: null, idTokenPayload: null };
+const idTokenInitialState = { idToken: null, idTokenPayload: null};
 
 const initIdToken = (configurationName: string) => {
     const getOidc = OidcClient.get;
     const oidc = getOidc(configurationName);
+    
     if (oidc.tokens) {
         const tokens = oidc.tokens;
         return { idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload };

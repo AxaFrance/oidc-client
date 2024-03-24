@@ -5,18 +5,16 @@ import {initSession} from './initSession.js';
 import {defaultServiceWorkerUpdateRequireCallback, initWorkerAsync, sleepAsync} from './initWorker.js';
 import {defaultLoginAsync, loginCallbackAsync} from './login.js';
 import {destroyAsync, logoutAsync} from './logout.js';
-import {isTokensOidcValid, TokenRenewMode, Tokens,} from './parseTokens.js';
+import {TokenRenewMode, Tokens,} from './parseTokens.js';
 import {
     autoRenewTokens,
-    renewTokensAndStartTimerAsync,
-    synchroniseTokensStatus,
-    syncTokensInfoAsync
+    renewTokensAndStartTimerAsync
 } from './renewTokens.js';
-import {fetchFromIssuer, performTokenRequestAsync} from './requests.js';
+import {fetchFromIssuer} from './requests.js';
 import {getParseQueryStringFromLocation} from './route-utils.js';
-import defaultSilentLoginAsync, {_silentLoginAsync} from './silentLogin.js';
+import defaultSilentLoginAsync from './silentLogin.js';
 import timer from './timer.js';
-import {AuthorityConfiguration, Fetch, OidcConfiguration, StringMap} from './types.js';
+import {AuthorityConfiguration, Fetch, OidcConfiguration, StringMap, TokenAutomaticRenewMode} from './types.js';
 import {userInfoAsync} from './user.js';
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 import {
@@ -112,6 +110,7 @@ export class Oidc {
       this.configuration = {
           ...configuration,
           silent_login_uri,
+          token_automatic_renew_mode: configuration.token_automatic_renew_mode ?? TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
           monitor_session: configuration.monitor_session ?? false,
           refresh_time_before_tokens_expiration_in_second,
           silent_login_timeout: configuration.silent_login_timeout ?? 12000,

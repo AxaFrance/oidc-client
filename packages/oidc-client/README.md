@@ -161,7 +161,7 @@ oidcClient.tryKeepExistingSessionAsync().then(() => {
             <h1>@axa-fr/oidc-client demo</h1>
             <h2>Loading</h2>
         </div>`;
-    return
+    return;
   }
 
   let tokens = oidcClient.tokens;
@@ -226,6 +226,10 @@ const configuration = {
     authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in milliseconds of the openid well-known URL, default is 10 seconds, then an error is thrown
     monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
+    token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted, // Optional, default is TokenAutomaticRenewMode.AutomaticBeforeTokensExpiration
+    // TokenAutomaticRenewMode.AutomaticBeforeTokensExpiration: renew tokens automatically before they expire
+    // TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted: renew tokens automatically only when fetch is executed
+    // It requires you to use fetch given by oidcClient.fetchWithTokens(fetch) or to use oidcClient.getValidTokenAsync()
     logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
     location: ILOidcLocation, // Optional, default is window.location, you can inject your own location object respecting the ILOidcLocation interface
     demonstrating_proof_of_possession: Boolean, // Optional, default is false, if true, the the Demonstrating Proof of Possession will be activated //https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access
