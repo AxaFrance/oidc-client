@@ -15,11 +15,8 @@ export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null) : Fetch =
     const oidc = oidcClient;
 
     // @ts-ignore
-    console.log('before', getValidTokenAsync);
     const getValidToken = await getValidTokenAsync(oidc);
-    console.log('getValidToken', getValidToken);
     const accessToken = getValidToken?.tokens?.accessToken;
-
     if (!headers.has('Accept')) {
         headers.set('Accept', 'application/json');
     }

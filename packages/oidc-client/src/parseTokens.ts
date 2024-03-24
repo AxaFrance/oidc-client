@@ -185,8 +185,9 @@ export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWa
         return null;
     }
     while (!isTokensValid(oidc.tokens) && numberWaitTemp > 0) {
-        if(oidc.configuration.token_automatic_renew_mode == TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted ){
+        if(oidc.configuration.token_automatic_renew_mode == TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted){
             await oidc.renewTokensAsync({});
+            break;
         } else {
             await sleepAsync({milliseconds: waitMs});
         }

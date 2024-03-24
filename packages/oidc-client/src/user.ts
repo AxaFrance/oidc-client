@@ -2,7 +2,6 @@ import Oidc from "./oidc";
 import {fetchWithTokens} from "./fetch";
 
 export const userInfoAsync = (oidc:Oidc) => async (noCache = false) => {
-    console.log("oidc.userInfo", oidc.userInfo);
     if (oidc.userInfo != null && !noCache) {
         return oidc.userInfo;
     }

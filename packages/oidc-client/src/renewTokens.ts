@@ -241,7 +241,7 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
             case synchroniseTokensStatus.REQUIRE_SYNC_TOKENS:
 
                 if(configuration.token_automatic_renew_mode == TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted && synchroniseTokensStatus.FORCE_REFRESH !== status ){
-                    oidc.publishEvent(eventNames.tokensInvalidButWaitingActionsToRefresh, {});
+                    oidc.publishEvent(eventNames.tokensInvalidAndWaitingActionsToRefresh, {});
                     return { tokens: oidc.tokens, status: 'GIVE_UP' };
                 }
                 
@@ -250,7 +250,7 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
             default: {
                 
                 if(configuration.token_automatic_renew_mode == TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted && synchroniseTokensStatus.FORCE_REFRESH !== status ){
-                    oidc.publishEvent(eventNames.tokensInvalidButWaitingActionsToRefresh, {});
+                    oidc.publishEvent(eventNames.tokensInvalidAndWaitingActionsToRefresh, {});
                     return { tokens: oidc.tokens, status: 'GIVE_UP' };
                 }
                 
