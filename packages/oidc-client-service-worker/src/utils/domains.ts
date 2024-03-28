@@ -2,9 +2,9 @@ import { acceptAnyDomainToken, openidWellknownUrlEndWith, scriptFilename } from 
 import { Database, Domain, DomainDetails, OidcConfig, TrustedDomains } from '../types';
 import { normalizeUrl } from './normalizeUrl';
 
-export function checkDomain(domains: Domain[], endpoint: string) {
+export function checkDomainBoolean(domains: Domain[], endpoint: string) : boolean {
 	if (!endpoint) {
-		return;
+		return false;
 	}
 
 	const domain = domains.find((domain) => {
@@ -19,10 +19,22 @@ export function checkDomain(domains: Domain[], endpoint: string) {
 		return testable.test?.(endpoint);
 	});
 	if (!domain) {
+		return false;
+	}
+	return true;
+}
+export function checkDomain(domains: Domain[], endpoint: string) {
+	if (!endpoint) {
+		return;
+	}
+
+	const domain = checkDomainBoolean(domains, endpoint);
+	if (!domain) {
 		throw new Error(
 			'Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename,
 		);
 	}
+	
 }
 
 export const getDomains = (
@@ -35,6 +47,7 @@ export const getDomains = (
 
 	return trustedDomain[`${type}Domains`] ?? trustedDomain.domains ?? [];
 };
+
 
 export const getCurrentDatabaseDomain = (
 	database: Database,
