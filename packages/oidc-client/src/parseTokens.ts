@@ -1,4 +1,5 @@
 import {sleepAsync} from './initWorker.js';
+import {OidcConfiguration, StringMap, TokenAutomaticRenewMode} from "./types";
 
 const b64DecodeUnicode = (str) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
@@ -174,6 +175,8 @@ export type ValidToken = {
 
 export interface OidcToken{
     tokens?: Tokens;
+    configuration: {  token_automatic_renew_mode?: TokenAutomaticRenewMode; },
+    renewTokensAsync: (extras: StringMap) => Promise<void>;
 }
 
 export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWait = 50): Promise<ValidToken> => {
@@ -182,7 +185,12 @@ export const getValidTokenAsync = async (oidc: OidcToken, waitMs = 200, numberWa
         return null;
     }
     while (!isTokensValid(oidc.tokens) && numberWaitTemp > 0) {
-        await sleepAsync({milliseconds: waitMs});
+        if(oidc.configuration.token_automatic_renew_mode == TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted){
+            await oidc.renewTokensAsync({});
+            break;
+        } else {
+            await sleepAsync({milliseconds: waitMs});
+        }
         numberWaitTemp = numberWaitTemp - 1;
     }
     const isValid = isTokensValid(oidc.tokens);

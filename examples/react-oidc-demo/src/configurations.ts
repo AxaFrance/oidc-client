@@ -1,4 +1,4 @@
-import { TokenRenewMode } from '@axa-fr/react-oidc';
+import { TokenRenewMode, TokenAutomaticRenewMode } from '@axa-fr/react-oidc';
 
 export const configurationIdentityServer = {
     client_id: 'interactive.public.short',
@@ -16,6 +16,7 @@ export const configurationIdentityServer = {
     // monitor_session: true,
     extras: { youhou_demo: 'youhou' },
     token_renew_mode: TokenRenewMode.access_token_invalid,
+    token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted,
     demonstrating_proof_of_possession: false,
 };
 

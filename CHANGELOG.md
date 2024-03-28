@@ -1,6 +1,17 @@
 # Changelog
 
-## 7.19.6
+## 7.20.1
+
+- [9a3ad3a](https://github.com/AxaFrance/oidc-client/commit/9a3ad3a474a66cc77fa2c3eb3eafa42f167f1e45) - feature(oidc): token renew only when required (release) (#1327), 2024-03-24 by *Guillaume Chervet*
+
+
+## v7.20.0
+
+- [44d15be](https://github.com/AxaFrance/oidc-client/commit/44d15be1c4d8f5069f15ddc5351e546fc5eb7730) - fix(oidc): userInfo 401 on first login (release), 2024-03-22 by *Guillaume Chervet*
+- [c7793c9](https://github.com/AxaFrance/oidc-client/commit/c7793c9913128dbb82a60dff11261ca5b4749f0c) - feat(oidc-client): add dpop extras to claims (alpha), 2024-03-19 by *Guillaume Chervet*
+
+
+## v7.19.6
 
 - [b7568f8](https://github.com/AxaFrance/oidc-client/commit/b7568f8d73d21ba1b7cd4890bff2ad30941696e2) - fix(oidc-service-worker): normalize userinfo endpoint in service worker (#1320) (release), 2024-03-13 by *meesvandongen*
 
@@ -306,17 +317,5 @@
 
 - [23217fe](https://github.com/AxaFrance/oidc-client/commit/23217fe3439500412eca9facc368e1ef5dfcb939) - feat(oidc-client): export OidcClient instance for client application (#1211) (release), 2023-11-29 by *Douglas Zaltron*
 - [2fdfcb5](https://github.com/AxaFrance/oidc-client/commit/2fdfcb5ec727f0c6f5f86c4648b95ba4f265fc57) - Update README.md (#1210), 2023-11-29 by *Guillaume Chervet*
-
-
-## v7.11.0
-
-- [6751b5c](https://github.com/AxaFrance/oidc-client/commit/6751b5c3f0e1265e35ac9b4b20cb673657eea6b4) - feat(ci): add auto changelog (release), 2023-11-29 by *Guillaume Chervet*
-- [56bde67](https://github.com/AxaFrance/oidc-client/commit/56bde67566f8203e9d62ae6e8b722c86a7b63cae) - doc(readme): Update README.md, 2023-11-27 by *Guillaume Chervet*
-
-
-## v7.9.3
-
-- [a80844c](https://github.com/AxaFrance/oidc-client/commit/a80844c2668066b083009043f1dd94fa196e1f18) - fix(service-worker): make sure URL is normalized when comparing with token endpoint and revocation endpoint (#1198) (release), 2023-11-24 by *meesvandongen*
-- [bf19dd0](https://github.com/AxaFrance/oidc-client/commit/bf19dd0cc975ea4524b0f68f9315625b3789801b) - fix(oidc-client): tokens refresh conflict multiple tabs (alpha), 2023-11-17 by *Guillaume Chervet*
 
 

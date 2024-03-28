@@ -26,4 +26,5 @@ export const eventNames = {
     syncTokensAsync_lock_not_available: 'syncTokensAsync_lock_not_available',
     syncTokensAsync_end: 'syncTokensAsync_end',
     syncTokensAsync_error: 'syncTokensAsync_error',
+    tokensInvalidAndWaitingActionsToRefresh: 'tokensInvalidAndWaitingActionsToRefresh',
 };
