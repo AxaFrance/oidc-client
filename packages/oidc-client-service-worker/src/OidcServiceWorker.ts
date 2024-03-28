@@ -6,7 +6,7 @@ import {
 	TrustedDomains,
 } from './types';
 import {
-	checkDomain,
+	checkDomain, checkDomainBoolean,
 	getCurrentDatabaseDomain,
 	getDomains,
 	hideTokens,
@@ -385,6 +385,14 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 		case 'init': {
 			const oidcServerConfiguration = data.data.oidcServerConfiguration;
 			const trustedDomain = trustedDomains[configurationName];
+
+
+			const domainAccessTokens = getDomains(trustedDomain, 'accessToken');
+			if(checkDomainBoolean( domainAccessTokens, "http://localhost") || checkDomainBoolean(domainAccessTokens, "https://localhost")){ 
+				console.warn("Do not let localhost domain on trustedDomains file in production, it is a security risk")
+			}
+
+
 			const domains = getDomains(trustedDomain, 'oidc');
 			if (!domains.some((domain) => domain === acceptAnyDomainToken)) {
 				[
