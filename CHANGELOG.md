@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.20.1
+## 7.21.0
+
+- [8335b5a](https://github.com/AxaFrance/oidc-client/commit/8335b5a6f5c02d320d642a022ff3828513f5a43e) - feat(dpop): add extras (alpha) (#1325) (release), 2024-03-28 by *Guillaume Chervet*
+
+
+## v7.20.1
 
 - [9a3ad3a](https://github.com/AxaFrance/oidc-client/commit/9a3ad3a474a66cc77fa2c3eb3eafa42f167f1e45) - feature(oidc): token renew only when required (release) (#1327), 2024-03-24 by *Guillaume Chervet*
 
@@ -311,11 +316,5 @@
 ## v7.12.1
 
 - [2b5aa6a](https://github.com/AxaFrance/oidc-client/commit/2b5aa6aba61bb35c7ae95102a34a8517c37607e5) - fix(ci): changelog in another commit (release), 2023-11-29 by *Guillaume Chervet*
-
-
-## v7.12.0
-
-- [23217fe](https://github.com/AxaFrance/oidc-client/commit/23217fe3439500412eca9facc368e1ef5dfcb939) - feat(oidc-client): export OidcClient instance for client application (#1211) (release), 2023-11-29 by *Douglas Zaltron*
-- [2fdfcb5](https://github.com/AxaFrance/oidc-client/commit/2fdfcb5ec727f0c6f5f86c4648b95ba4f265fc57) - Update README.md (#1210), 2023-11-29 by *Guillaume Chervet*
 
 
