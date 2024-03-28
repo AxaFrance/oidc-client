@@ -3,6 +3,11 @@ import {ILOidcLocation} from "./location";
 export { getFetchDefault } from './oidc.js';
 export { TokenRenewMode } from './parseTokens.js';
 export { getParseQueryStringFromLocation, getPath } from './route-utils';
+
+export type {
+  Tokens
+} from './parseTokens.js';
+
 export type {
   AuthorityConfiguration,
   Fetch,
