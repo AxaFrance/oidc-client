@@ -402,9 +402,10 @@ export class OidcClient {
    * @param accessToken The access token to use.
    * @param url The url to use.
    * @param method The method to use.
+   * @param extras Additional parameters to send to the OIDC server during the demonstration of proof of possession request.
    * @returns A promise resolved with the proof of possession.
    */
-  async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string): Promise<string>;
+  async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string, extras:StringMap= {}): Promise<string>;
 }
 
 ```
