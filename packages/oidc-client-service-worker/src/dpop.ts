@@ -20,3 +20,16 @@ export const getDpopConfiguration = (trustedDomain: Domain[] | DomainDetails) =>
     
     return trustedDomain.demonstratingProofOfPossessionConfiguration ?? defaultDemonstratingProofOfPossessionConfiguration;
 }
+
+export const getDpopOnlyWhenDpopHeaderPresent = (trustedDomain: Domain[] | DomainDetails) => {
+
+    if(!isDpop(trustedDomain)) {
+        return null;
+    }
+
+    if (Array.isArray(trustedDomain)) {
+        return null;
+    }
+
+    return trustedDomain.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent ?? true;
+}

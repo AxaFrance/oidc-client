@@ -6,6 +6,7 @@ export type DomainDetails = {
     convertAllRequestsToCorsExceptNavigate?: boolean,
     setAccessTokenToNavigateRequests?: boolean,
     demonstratingProofOfPossession?:boolean;
+    demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent?:boolean;
     demonstratingProofOfPossessionConfiguration?: DemonstratingProofOfPossessionConfiguration;
 }
 
@@ -84,6 +85,7 @@ export type OidcConfig = {
     setAccessTokenToNavigateRequests: boolean,
     demonstratingProofOfPossessionNonce: string | null;
     demonstratingProofOfPossessionJwkJson: string | null;
+    demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: boolean;
 }
 
 export type IdTokenPayload = {

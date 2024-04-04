@@ -24,5 +24,7 @@ trustedDomains.config_separate_oidc_access_token_domains = {
 
 trustedDomains.config_with_dpop = { 
     domains: ["https://demo.duendesoftware.com"], 
-    demonstratingProofOfPossession: true };
+    demonstratingProofOfPossession: true,
+    demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true
+};
 //# sourceMappingURL=OidcTrustedDomains.js.map

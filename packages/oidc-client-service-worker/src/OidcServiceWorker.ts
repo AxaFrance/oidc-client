@@ -18,7 +18,7 @@ import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './u
 import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
 import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
-import {getDpopConfiguration} from "./dpop";
+import {getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent} from "./dpop";
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 
 // @ts-ignore
@@ -97,7 +97,11 @@ const keepAliveAsync = async (event: FetchEvent) => {
 
 async function generateDpopAsync(originalRequest: Request, currentDatabase:OidcConfig|null, url: string, extrasClaims={} ) {
 	const headersExtras = serializeHeaders(originalRequest.headers);
-	if (currentDatabase && currentDatabase.demonstratingProofOfPossessionConfiguration && currentDatabase.demonstratingProofOfPossessionJwkJson) {
+	if (currentDatabase && 
+		currentDatabase.demonstratingProofOfPossessionConfiguration && 
+		currentDatabase.demonstratingProofOfPossessionJwkJson &&
+		(!currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent || currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent && headersExtras['dpop'])
+	) {
 		const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
 		const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
 		headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
@@ -363,6 +367,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			demonstratingProofOfPossessionNonce: null,
 			demonstratingProofOfPossessionJwkJson: null,
 			demonstratingProofOfPossessionConfiguration: null,
+			demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
 		};
 		currentDatabase = database[configurationName];
 
@@ -379,6 +384,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			currentDatabase.demonstratingProofOfPossessionNonce = null;
 			currentDatabase.demonstratingProofOfPossessionJwkJson = null;
 			currentDatabase.demonstratingProofOfPossessionConfiguration = null;
+			currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent = false;
 			currentDatabase.status = data.data.status;
 			port.postMessage({ configurationName });
 			return;
@@ -398,6 +404,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			}
 			currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
 			currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
+			
 
 			if(currentDatabase.demonstratingProofOfPossessionConfiguration == null ){
 				const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomains[configurationName]);
@@ -407,6 +414,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 					}
 					currentDatabase.demonstratingProofOfPossessionConfiguration = demonstratingProofOfPossessionConfiguration;
 					currentDatabase.demonstratingProofOfPossessionJwkJson = await generateJwkAsync(self)(demonstratingProofOfPossessionConfiguration.generateKeyAlgorithm);
+					currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent = getDpopOnlyWhenDpopHeaderPresent(trustedDomains[configurationName]) ?? false;
 				}
 			}
 

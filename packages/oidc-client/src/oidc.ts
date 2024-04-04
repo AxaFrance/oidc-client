@@ -332,11 +332,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
      }
 
     userInfoPromise:Promise<any> = null;
-     userInfoAsync(noCache = false) {
+     userInfoAsync(noCache = false, demonstrating_proof_of_possession=false) {
          if (this.userInfoPromise !== null) {
              return this.userInfoPromise;
          }
-         this.userInfoPromise = userInfoAsync(this)(noCache);
+         this.userInfoPromise = userInfoAsync(this)(noCache, demonstrating_proof_of_possession);
          return this.userInfoPromise.then(result => {
              this.userInfoPromise = null;
              return result;

@@ -101,7 +101,8 @@ trustedDomains.config_show_access_token = {
 // DPoP (Demonstrating Proof of Possession) will be activated for the following domains
 trustedDomains.config_with_dpop = {
   domains: ["https://demo.duendesoftware.com"],
-  demonstratingProofOfPossession: true
+  demonstratingProofOfPossession: true,
+  demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true, // default value is false, inject DPOP token only when DPOP header is present
   // Optional, more details bellow
   /*demonstratingProofOfPossessionConfiguration: {  
    importKeyAlgorithm: {
