@@ -3,7 +3,7 @@ import {OidcClient} from "./oidcClient";
 import {getValidTokenAsync} from "./parseTokens";
 
 // @ts-ignore
-export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null) : Fetch => async (...params: Parameters<Fetch>) :Promise<Response> => {
+export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null, demonstrating_proof_of_possession:boolean=false) : Fetch => async (...params: Parameters<Fetch>) :Promise<Response> => {
     const [url, options, ...rest] = params;
     const optionTmp = options ? { ...options } : { method: 'GET' };
     let headers = new Headers();
@@ -21,7 +21,7 @@ export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null) : Fetch =
         headers.set('Accept', 'application/json');
     }
     if (accessToken) {
-        if(oidc.configuration.demonstrating_proof_of_possession) {
+        if(oidc.configuration.demonstrating_proof_of_possession && demonstrating_proof_of_possession) {
             const demonstrationOdProofOfPossession = await oidc.generateDemonstrationOfProofOfPossessionAsync(accessToken, url.toString(), optionTmp.method);
             headers.set('Authorization', `PoP ${accessToken}`);
             headers.set('DPoP', demonstrationOdProofOfPossession);

@@ -102,7 +102,8 @@ trustedDomains.config_show_access_token = {
 // DPoP (Demonstrating Proof of Possession) will be activated for the following domains
 trustedDomains.config_with_dpop = { 
      domains: ["https://demo.duendesoftware.com"], 
-     demonstratingProofOfPossession: true
+     demonstratingProofOfPossession: true,
+     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true, // default value is false, inject DPOP token only when DPOP header is present
      // Optional, more details bellow
      /*demonstratingProofOfPossessionConfiguration: {  
       importKeyAlgorithm: {
@@ -386,16 +387,18 @@ export class OidcClient {
   /**
    * Retrieves a new fetch function that inject bearer tokens (also DPOP tokens).
    * @param fetch The current fetch function to use
+   * @param demonstrating_proof_of_possession Indicates whether the demonstration of proof of possession should be used.
    * @returns Fetch A new fectch function that inject bearer tokens (also DPOP tokens).
    */
-  fetchWithTokens(fetch: Fetch): Fetch;
+  fetchWithTokens(fetch: Fetch, demonstrating_proof_of_possession=false): Fetch;
 
   /**
    * Retrieves OIDC user information.
    * @param noCache Indicates whether user information should be retrieved bypassing the cache.
+   * @param demonstrating_proof_of_possession Indicates whether the demonstration of proof of possession should be used.
    * @returns A promise resolved with the user information, or rejected with an error.
    */
-  async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false): Promise<T>;
+  async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false, demonstrating_proof_of_possession=false): Promise<T>;
 
   /**
    * Generate Demonstration of proof of possession.

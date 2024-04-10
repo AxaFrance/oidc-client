@@ -13,7 +13,7 @@ export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
     status: OidcUserStatus;
 }
 
-export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName = 'default') => {
+export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName = 'default', demonstrating_proof_of_possession=false) => {
     const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: null, status: OidcUserStatus.Unauthenticated });
     const [oidcUserId, setOidcUserId] = useState<string>('');
     
@@ -23,7 +23,7 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
         if (oidc && oidc.tokens) {
             setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
             const isNoCache = oidcUserId !== '';
-            oidc.userInfoAsync(isNoCache)
+            oidc.userInfoAsync(isNoCache, demonstrating_proof_of_possession)
                 .then((info) => {
                     if (isMounted) {
                         // @ts-ignore

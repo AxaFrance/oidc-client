@@ -129,6 +129,7 @@ class OidcConfigBuilder {
     demonstratingProofOfPossessionNonce: null,
     demonstratingProofOfPossessionJwkJson: null,
     demonstratingProofOfPossessionConfiguration: null,
+    demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
   };
 
   public withTestingDefault(): OidcConfigBuilder {
