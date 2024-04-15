@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.0
+## 7.22.1
+
+- [be24658](https://github.com/AxaFrance/oidc-client/commit/be2465852e837b749abd3a86c5c0caa57a2ea8b6) - refactor(all): update libs (release), 2024-04-15 by *Guillaume Chervet*
+
+
+## v7.22.0
 
 - [032a00b](https://github.com/AxaFrance/oidc-client/commit/032a00b501557fe6b5be48e83e4914051ee2c7f0) - feat(oidc): control dpop injection (release) (#1342), 2024-04-10 by *Guillaume Chervet*
 
@@ -311,10 +316,5 @@
 ## v7.12.3
 
 - [59a9c46](https://github.com/AxaFrance/oidc-client/commit/59a9c468b4fa9eb9694b1f3921eb545daf1f58f8) - fix(ci): exclude author GitHub from changelog (release), 2023-11-29 by *Guillaume Chervet*
-
-
-## v7.12.2
-
-- [cd575e7](https://github.com/AxaFrance/oidc-client/commit/cd575e716f4fbcb1ba09a76a1530a3ae23f08599) - fix(ci): last clean and test (release), 2023-11-29 by *Guillaume Chervet*
 
 
