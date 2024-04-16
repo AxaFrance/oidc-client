@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.1
+## 7.22.2
+
+- [b17217d](https://github.com/AxaFrance/oidc-client/commit/b17217d6b829dee3b28f444fda099fce9c94bc41) - fix(react-oidc): unused var in User.txs (release), 2024-04-16 by *Guillaume Chervet*
+
+
+## v7.22.1
 
 - [be24658](https://github.com/AxaFrance/oidc-client/commit/be2465852e837b749abd3a86c5c0caa57a2ea8b6) - refactor(all): update libs (release), 2024-04-15 by *Guillaume Chervet*
 
@@ -311,10 +316,5 @@
 - [59efae4](https://github.com/AxaFrance/oidc-client/commit/59efae45029593579d2dc377093777f8ef940537) - build(npm): bump eslint from 8.46.0 to 8.54.0 (#1219), 2023-11-29 by *dependabot[bot]*
 - [283e7d9](https://github.com/AxaFrance/oidc-client/commit/283e7d9e02dcd0795489c9c4d24b9abcbb0e4b39) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2023-11-29 by *Guillaume Chervet*
 - [9373765](https://github.com/AxaFrance/oidc-client/commit/9373765eafb4ef8dcba904772d558ab5bb40f17c) - fix(ci): remove duplicate, 2023-11-29 by *Guillaume Chervet*
-
-
-## v7.12.3
-
-- [59a9c46](https://github.com/AxaFrance/oidc-client/commit/59a9c468b4fa9eb9694b1f3921eb545daf1f58f8) - fix(ci): exclude author GitHub from changelog (release), 2023-11-29 by *Guillaume Chervet*
 
 
