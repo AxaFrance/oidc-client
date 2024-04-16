@@ -34,8 +34,7 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
         } else {
             setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
+        const newSubscriptionId = oidc.subscribeEvents((name: string) => {
             if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab) {
                 if (isMounted) {
                     setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
