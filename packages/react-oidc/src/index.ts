@@ -10,4 +10,5 @@ export type {
   StringMap,
   ILOidcLocation
 } from '@axa-fr/oidc-client';
-export { type OidcUserInfo, TokenRenewMode, OidcClient, TokenAutomaticRenewMode, OidcLocation } from '@axa-fr/oidc-client';
+export { TokenRenewMode, OidcClient, TokenAutomaticRenewMode, OidcLocation } from '@axa-fr/oidc-client';
+export type {  OidcUserInfo } from '@axa-fr/oidc-client';

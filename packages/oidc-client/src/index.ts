@@ -1,4 +1,3 @@
-import {ILOidcLocation} from "./location";
 
 export { getFetchDefault } from './oidc.js';
 export { TokenRenewMode } from './parseTokens.js';
@@ -18,4 +17,5 @@ export type {
 export { OidcLocation } from './location.js';
 export type { ILOidcLocation } from './location.js';
 export { TokenAutomaticRenewMode } from './types.js';
-export { type OidcUserInfo, OidcClient } from './oidcClient.js';
+export { OidcClient } from './oidcClient.js';
+export type { OidcUserInfo } from './oidcClient.js';
