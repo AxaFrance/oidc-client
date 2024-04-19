@@ -207,6 +207,9 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         }
 
         await oidc.startCheckSessionAsync(oidcServerConfiguration.checkSessionIframe, clientId, sessionState, isSilentSignin);
+        if(configuration.preload_user_info){
+            await oidc.userInfoAsync();
+        }
         oidc.publishEvent(eventNames.loginCallbackAsync_end, {});
         return {
             tokens: formattedTokens,

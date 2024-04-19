@@ -121,6 +121,7 @@ export class Oidc {
           service_worker_update_require_callback,
           service_worker_activate: configuration.service_worker_activate ?? activateServiceWorker,
           demonstrating_proof_of_possession_configuration: configuration.demonstrating_proof_of_possession_configuration ?? defaultDemonstratingProofOfPossessionConfiguration,
+          preload_user_info: configuration.preload_user_info ?? false,
       };
       
       this.getFetch = getFetch ?? getFetchDefault;
