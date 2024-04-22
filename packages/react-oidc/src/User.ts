@@ -15,18 +15,19 @@ export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
 
 export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName = 'default', demonstrating_proof_of_possession=false) => {
     const oidc = OidcClient.get(configurationName);
-    const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: oidc.userInfo<T>(), status: OidcUserStatus.Unauthenticated });
-    const [oidcUserId, setOidcUserId] = useState<string>('');
+    const user = oidc.userInfo<T>();
+    const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: user, status: user ? OidcUserStatus.Loaded :  OidcUserStatus.Unauthenticated });
+    const [oidcUserId, setOidcUserId] = useState<string>(user ? ' ' : '');
     
     useEffect(() => {
         const oidc = OidcClient.get(configurationName);
         let isMounted = true;
         if (oidc && oidc.tokens) {
-            setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
             const isNoCache = oidcUserId !== '';
             if(isNoCache && oidc.userInfo<T>()) {
                 return;
             }
+            setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
             oidc.userInfoAsync(isNoCache, demonstrating_proof_of_possession)
                 .then((info) => {
                     if (isMounted) {
