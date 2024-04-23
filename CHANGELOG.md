@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.3
+## 7.22.4
+
+- [64c76e0](https://github.com/AxaFrance/oidc-client/commit/64c76e0b1f4fccf1c0ed93269a0307212be9d661) - feature(oidc):preload user (release) (#1352), 2024-04-23 by *Guillaume Chervet*
+
+
+## v7.22.3
 
 - [5af8075](https://github.com/AxaFrance/oidc-client/commit/5af807548e35c64da74fc3547e35c8ec512399ba) - fix(all): types import in index.ts for all typescript (release), 2024-04-18 by *Guillaume Chervet*
 
@@ -309,10 +314,5 @@
 ## v7.12.6
 
 - [55b318e](https://github.com/AxaFrance/oidc-client/commit/55b318e1c31fe6a7d1be106e99b14db35e4f4229) - build(npm): bump @types/node from 18.17.1 to 20.10.1 (#1217), 2023-11-29 by *dependabot[bot]*
-
-
-## v7.12.5
-
-- [bf53fa8](https://github.com/AxaFrance/oidc-client/commit/bf53fa803a6414b99e1520154c11d66c4958e62b) - build(npm): bump tslib from 2.6.1 to 2.6.2 (#1218), 2023-11-29 by *dependabot[bot]*
 
 
