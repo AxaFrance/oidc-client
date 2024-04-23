@@ -14,16 +14,22 @@ export type OidcUser<T extends OidcUserInfo = OidcUserInfo> = {
 }
 
 export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configurationName = 'default', demonstrating_proof_of_possession=false) => {
-    const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: null, status: OidcUserStatus.Unauthenticated });
-    const [oidcUserId, setOidcUserId] = useState<string>('');
+    const oidc = OidcClient.get(configurationName);
+    const user = oidc.userInfo<T>();
+    const [oidcUser, setOidcUser] = useState<OidcUser<T>>({ user: user, status: user ? OidcUserStatus.Loaded :  OidcUserStatus.Unauthenticated });
+    const [oidcUserId, setOidcUserId] = useState<number>(user ? 1 : 0);
+    const [oidcPreviousUserId, setPreviousOidcUserId] = useState<number>(user ? 1 : 0);
     
     useEffect(() => {
         const oidc = OidcClient.get(configurationName);
         let isMounted = true;
         if (oidc && oidc.tokens) {
+            const isCache = oidcUserId === oidcPreviousUserId;
+            if(isCache && oidc.userInfo<T>()) {
+                return;
+            }
             setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
-            const isNoCache = oidcUserId !== '';
-            oidc.userInfoAsync(isNoCache, demonstrating_proof_of_possession)
+            oidc.userInfoAsync(!isCache, demonstrating_proof_of_possession)
                 .then((info) => {
                     if (isMounted) {
                         // @ts-ignore
@@ -31,6 +37,7 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
                     }
                 })
                 .catch(() => setOidcUser({ ...oidcUser, status: OidcUserStatus.LoadingError }));
+            setPreviousOidcUserId(oidcUserId);
         } else {
             setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
         }
@@ -48,7 +55,7 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(configuration
     }, [oidcUserId]);
 
     const reloadOidcUser = () => {
-        setOidcUserId(oidcUserId + ' ');
+        setOidcUserId(oidcUserId+1);
     };
 
     return { oidcUser: oidcUser.user, oidcUserLoadingState: oidcUser.status, reloadOidcUser };

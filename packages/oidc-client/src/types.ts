@@ -40,6 +40,7 @@ export type OidcConfiguration = {
     logout_tokens_to_invalidate?:Array<LogoutToken>;
     demonstrating_proof_of_possession?:boolean;
     demonstrating_proof_of_possession_configuration?: DemonstratingProofOfPossessionConfiguration;
+    preload_user_info?:boolean;
 };
 
 export interface DemonstratingProofOfPossessionConfiguration {

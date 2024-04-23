@@ -28,6 +28,9 @@ export const tryKeepSessionAsync = async (oidc: Oidc) =>{
                     const sessionState = await serviceWorker.getSessionStateAsync();
                     // @ts-ignore
                     await oidc.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
+                    if(configuration.preload_user_info){
+                        await oidc.userInfoAsync();
+                    }
                     oidc.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                         success: true,
                         message: 'tokens inside ServiceWorker are valid',
@@ -55,6 +58,9 @@ export const tryKeepSessionAsync = async (oidc: Oidc) =>{
                     const sessionState = await session.getSessionStateAsync();
                     // @ts-ignore
                     await oidc.startCheckSessionAsync(oidcServerConfiguration.check_session_iframe, configuration.client_id, sessionState);
+                    if(configuration.preload_user_info){
+                        await oidc.userInfoAsync();
+                    }
                     oidc.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
                         success: true,
                         message: 'tokens inside storage are valid',
