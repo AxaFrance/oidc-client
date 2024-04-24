@@ -12,7 +12,7 @@ export const sleepAsync = ({milliseconds}: { milliseconds: any }) => {
 
 const keepAlive = (service_worker_keep_alive_path='/') => {
     try {
-        const minSleepSeconds =  150;
+        const minSleepSeconds =  20;
         keepAliveController = new AbortController();
         const promise = fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`, { signal: keepAliveController.signal });
         promise.catch(error => { console.log(error); });
