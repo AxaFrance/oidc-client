@@ -44,7 +44,7 @@
     "eslint-plugin-testing-library": "6.2.2",
     "prettier": "3.2.5",
     "tslib": "^2.6.2",
-    "tsx": "4.7.2",
+    "tsx": "4.8.2",
     "typescript": "5.4.5",
     "vitest": "1.5.0"
   },
