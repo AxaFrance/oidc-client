@@ -1,4 +1,4 @@
-import { useOidc } from '@axa-fr/react-oidc';
+import {useOidc, useOidcUser} from '@axa-fr/react-oidc';
 import React, {useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
 
@@ -12,6 +12,8 @@ import {useNavigate} from "react-router-dom";
 
 export const Home = () => {
     const { login, logout, renewTokens, isAuthenticated } = useOidc();
+    const{ oidcUser, oidcUserLoadingState } = useOidcUser();
+    console.log(oidcUser, oidcUserLoadingState)
     const navigate = useNavigate();
 
     const navigateProfile = () => {

@@ -3,11 +3,12 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 const configuration = {
-  client_id: 'interactive.public.short',
+  client_id: 'interactive.public',
   redirect_uri: 'http://localhost:3001/#authentication/callback',
   silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
   scope: 'openid profile email api offline_access',
-  authority: 'https://demo.duendesoftware.com',
+  authority: 'https://demo.duendesoftware.com', 
+  preload_user_info: 'true',
 };
 
 const onEvent=(configurationName, eventName, data )=>{

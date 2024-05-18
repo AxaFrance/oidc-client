@@ -1,8 +1,19 @@
-import { OidcSecure, OidcUserStatus,useOidcAccessToken, useOidcIdToken, useOidcUser} from '@axa-fr/react-oidc';
+import {OidcSecure, OidcUserStatus, useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser} from '@axa-fr/react-oidc';
 import Head from 'next/head';
+
+const isBrowser = () => typeof window !== "undefined";
 
 const DisplayUserInfo = () => {
   const{ oidcUser, oidcUserLoadingState } = useOidcUser();
+    const { isAuthenticated } = useOidc();
+    console.log(
+        "isBrowser: " +
+        isBrowser() +
+        ", isAuthenticated: " +
+        isAuthenticated +
+        ", oidcUser: "
+    );
+    console.log(oidcUser);
 
   switch (oidcUserLoadingState){
       case OidcUserStatus.Loading:
