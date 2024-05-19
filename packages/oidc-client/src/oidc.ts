@@ -283,6 +283,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
                 session.setTokens(parsedTokens);
             }
             this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
+            if(this.configuration.preload_user_info){
+                await this.userInfoAsync();
+            }
             // @ts-ignore
             return { parsedTokens, state: response.state, callbackPath: response.callbackPath };
         };
