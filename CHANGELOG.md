@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.22.4
+## 7.22.5
+
+- [8d9fd95](https://github.com/AxaFrance/oidc-client/commit/8d9fd9550a74a771936f0e686eb31fe271cd912b) - fix(oidc): user loaded 401 when preload true and not serviceworder mode (release), 2024-05-19 by *Guillaume Chervet*
+- [d764b2b](https://github.com/AxaFrance/oidc-client/commit/d764b2bd7319711c49a393c1fd3496d054661065) - refatcor(all): update librairies, 2024-05-18 by *Guillaume Chervet*
+
+
+## v7.22.4
 
 - [64c76e0](https://github.com/AxaFrance/oidc-client/commit/64c76e0b1f4fccf1c0ed93269a0307212be9d661) - feature(oidc):preload user (release) (#1352), 2024-04-23 by *Guillaume Chervet*
 
@@ -309,10 +315,5 @@
 ## v7.12.7
 
 - [7a53f73](https://github.com/AxaFrance/oidc-client/commit/7a53f73bf03b85be9248379f21def37ee34bd415) - build(npm): bump @types/react from 18.2.17 to 18.2.39 (#1215), 2023-11-29 by *dependabot[bot]*
-
-
-## v7.12.6
-
-- [55b318e](https://github.com/AxaFrance/oidc-client/commit/55b318e1c31fe6a7d1be106e99b14db35e4f4229) - build(npm): bump @types/node from 18.17.1 to 20.10.1 (#1217), 2023-11-29 by *dependabot[bot]*
 
 
