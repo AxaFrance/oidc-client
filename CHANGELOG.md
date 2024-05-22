@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.22.5
+## 7.22.6
+
+- [bcba15b](https://github.com/AxaFrance/oidc-client/commit/bcba15b412063d139c0902de117b0516150c13a2) - fix(react-oidc): compatibility with react 19 (release) (#1372), 2024-05-22 by *Guillaume Chervet*
+- [c49a857](https://github.com/AxaFrance/oidc-client/commit/c49a8572702c485c9a089b0f9aa11eb4bc6e7f1d) - refactor(test): add missing logout test case, 2024-05-22 by *Guillaume Chervet*
+
+
+## v7.22.5
 
 - [8d9fd95](https://github.com/AxaFrance/oidc-client/commit/8d9fd9550a74a771936f0e686eb31fe271cd912b) - fix(oidc): user loaded 401 when preload true and not serviceworder mode (release), 2024-05-19 by *Guillaume Chervet*
 - [d764b2b](https://github.com/AxaFrance/oidc-client/commit/d764b2bd7319711c49a393c1fd3496d054661065) - refatcor(all): update librairies, 2024-05-18 by *Guillaume Chervet*
@@ -310,10 +316,5 @@
 ## v7.12.8
 
 - [53fd1f1](https://github.com/AxaFrance/oidc-client/commit/53fd1f1c093430f7e60eb43bc4a9a4fccebefe73) - build(npm): bump jsdom from 22.1.0 to 23.0.0 (#1220), 2023-11-29 by *dependabot[bot]*
-
-
-## v7.12.7
-
-- [7a53f73](https://github.com/AxaFrance/oidc-client/commit/7a53f73bf03b85be9248379f21def37ee34bd415) - build(npm): bump @types/react from 18.2.17 to 18.2.39 (#1215), 2023-11-29 by *dependabot[bot]*
 
 
