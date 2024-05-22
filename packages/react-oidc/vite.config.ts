@@ -17,7 +17,10 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: [...dependencies],
+      external: [
+          ...dependencies,
+        'react/jsx-runtime'
+      ],
       output: {
         globals: {
           react: 'React',

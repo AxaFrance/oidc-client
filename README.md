@@ -103,7 +103,7 @@ node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public
 # ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
 
-WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up to date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
+WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up-to-date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
 ```sh
   "scripts": {
     ...
