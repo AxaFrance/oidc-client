@@ -33,15 +33,15 @@
     "start": "pnpm run copy-service-worker && vite",
     "build": "vite build",
     "serve": "vite preview",
-    "test": "vitest --root . --coverage",
+    "test": "vitest",
     "clean": "rimraf dist",
     "postinstall": "echo 'WARNING keep sink OidcServiceWorker.js version file'",
     "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
     "lint": "eslint src"
   },
   "dependencies": {
-    "@axa-fr/oidc-client-service-worker": "workspace:*",
-    "@axa-fr/oidc-client": "workspace:*"
+    "@axa-fr/oidc-client": "workspace:*",
+    "@axa-fr/oidc-client-service-worker": "workspace:*"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0"
@@ -50,19 +50,19 @@
     "@testing-library/jest-dom": "6.4.5",
     "@testing-library/react": "15.0.7",
     "@testing-library/user-event": "14.5.2",
-    "@types/react": "18.3.2",
-    "@vitejs/plugin-react": "4.2.1",
+    "@types/react": "18.3.3",
+    "@vitejs/plugin-react": "4.3.0",
     "@vitest/coverage-v8": "1.6.0",
     "cpy": "11.0.1",
     "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
-    "jsdom": "24.0.0",
+    "jsdom": "24.1.0",
     "msw": "2.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",
-    "vite": "5.2.11",
+    "vite": "5.2.12",
     "vite-plugin-dts": "3.9.1",
     "vitest": "1.6.0"
   },
