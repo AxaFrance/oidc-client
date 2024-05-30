@@ -1,11 +1,8 @@
-﻿import { configDefaults } from 'vitest/config'
-import {defineConfig} from "vite";
+﻿import { configDefaults } from 'vitest/config';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
-    test: {
-        exclude:[
-            ...configDefaults.exclude,
-            'public/*'
-        ]
-    },
+	test: {
+		exclude: [...configDefaults.exclude, 'public/*'],
+	},
 });

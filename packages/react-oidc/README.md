@@ -63,12 +63,14 @@ node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public
 ```
 
 WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up to date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
+
 ```sh
   "scripts": {
     ...
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
 ```
+
 If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
 The only file you should edit is "OidcTrustedDomains.js".
 
@@ -82,25 +84,25 @@ The only file you should edit is "OidcTrustedDomains.js".
 // Domains used by OIDC server must be also declared here
 const trustedDomains = {
   default: {
-    oidcDomains :["https://demo.duendesoftware.com"],
-    accessTokenDomains : ["https://www.myapi.com/users"]
+    oidcDomains: ['https://demo.duendesoftware.com'],
+    accessTokenDomains: ['https://www.myapi.com/users'],
   },
 };
 
 // Service worker will continue to give access token to the JavaScript client
 // Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
 // scenarios which require it. For example, to send it via websocket connection.
-trustedDomains.config_show_access_token = { 
-    oidcDomains :["https://demo.duendesoftware.com"],
-    accessTokenDomains : ["https://www.myapi.com/users"], 
-    showAccessToken: true,
+trustedDomains.config_show_access_token = {
+  oidcDomains: ['https://demo.duendesoftware.com'],
+  accessTokenDomains: ['https://www.myapi.com/users'],
+  showAccessToken: true,
   // convertAllRequestsToCorsExceptNavigate: false, // default value is false
   // setAccessTokenToNavigateRequests: true, // default value is true
 };
 
 // DPoP (Demonstrating Proof of Possession) will be activated for the following domains
 trustedDomains.config_with_dpop = {
-  domains: ["https://demo.duendesoftware.com"],
+  domains: ['https://demo.duendesoftware.com'],
   demonstratingProofOfPossession: true,
   demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true, // default value is false, inject DPOP token only when DPOP header is present
   // Optional, more details bellow
@@ -119,8 +121,6 @@ trustedDomains.config_with_dpop = {
    jwtHeaderAlgorithm : 'ES256'
  }*/
 };
-
-
 ```
 
 ## Run The Demo
@@ -146,26 +146,25 @@ The default routes used internally :
 - www.your-app.fr/authentication/callback
 
 ```javascript
-import React from "react";
-import { render } from "react-dom";
-import { BrowserRouter as Router } from "react-router-dom";
-import { OidcProvider } from "@axa-fr/react-oidc";
-import Header from "./Layout/Header";
-import Routes from "./Router";
+import React from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { OidcProvider } from '@axa-fr/react-oidc';
+import Header from './Layout/Header';
+import Routes from './Router';
 
 // This configuration use hybrid mode
 // ServiceWorker are used if available (more secure) else tokens are given to the client
 // You need to give inside your code the "access_token" when using fetch
 const configuration = {
-  client_id: "interactive.public.short",
-  redirect_uri: window.location.origin + "/authentication/callback",
-  silent_redirect_uri:
-    window.location.origin + "/authentication/silent-callback",
-  scope: "openid profile email api offline_access", // offline_access scope allow your client to retrieve the refresh_token
-  authority: "https://demo.duendesoftware.com",
-  service_worker_relative_url: "/OidcServiceWorker.js", // just comment that line to disable service worker mode
+  client_id: 'interactive.public.short',
+  redirect_uri: window.location.origin + '/authentication/callback',
+  silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
+  scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
+  authority: 'https://demo.duendesoftware.com',
+  service_worker_relative_url: '/OidcServiceWorker.js', // just comment that line to disable service worker mode
   service_worker_only: false,
-  demonstrating_proof_of_possession: false, 
+  demonstrating_proof_of_possession: false,
 };
 
 const App = () => (
@@ -177,7 +176,7 @@ const App = () => (
   </OidcProvider>
 );
 
-render(<App />, document.getElementById("root"));
+render(<App />, document.getElementById('root'));
 ```
 
 ```javascript
@@ -211,7 +210,7 @@ const configuration = {
     refresh_time_before_tokens_expiration_in_second: Number, // default is 120 seconds
     service_worker_relative_url: String,
     service_worker_keep_alive_path: String, // default is "/"
-    service_worker_only: Boolean, // default false 
+    service_worker_only: Boolean, // default false
     service_worker_activate: () => boolean, // you can take the control of the service worker default activation which use user agent string
     service_worker_update_require_callback: (registration:any, stopKeepAlive:Function) => Promise<void>, // callback called when service worker need to be updated, you can take the control of the update process
     service_worker_register: (url: string) => Promise<ServiceWorkerRegistration>, // Optional, you can take the control of the service worker registration
@@ -271,44 +270,30 @@ const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPo
 "useOidc" returns all props from the Hook :
 
 ```javascript
-import React from "react";
-import { useOidc } from "./oidc";
+import React from 'react';
+import { useOidc } from './oidc';
 
 export const Home = () => {
   const { login, logout, renewTokens, isAuthenticated } = useOidc();
 
   return (
-    <div className="container-fluid mt-3">
-      <div className="card">
-        <div className="card-body">
-          <h5 className="card-title">Welcome !!!</h5>
-          <p className="card-text">
-            React Demo Application protected by OpenId Connect
-          </p>
+    <div className='container-fluid mt-3'>
+      <div className='card'>
+        <div className='card-body'>
+          <h5 className='card-title'>Welcome !!!</h5>
+          <p className='card-text'>React Demo Application protected by OpenId Connect</p>
           {!isAuthenticated && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => login("/profile")}
-            >
+            <button type='button' className='btn btn-primary' onClick={() => login('/profile')}>
               Login
             </button>
           )}
           {isAuthenticated && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => logout()}
-            >
+            <button type='button' className='btn btn-primary' onClick={() => logout()}>
               logout
             </button>
           )}
           {isAuthenticated && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => renewTokens()}
-            >
+            <button type='button' className='btn btn-primary' onClick={() => renewTokens()}>
               renewTokens
             </button>
           )}
@@ -331,8 +316,8 @@ The Hook method exposes :
 `OidcSecure` component trigger authentication in case user is not authenticated. So, the children of that component can be accessible only once you are connected.
 
 ```javascript
-import React from "react";
-import { OidcSecure } from "@axa-fr/react-oidc";
+import React from 'react';
+import { OidcSecure } from '@axa-fr/react-oidc';
 
 const AdminSecure = () => (
   <OidcSecure>
@@ -349,19 +334,19 @@ export default AdminSecure;
 "withOidcSecure" act the same as "OidcSecure" it also trigger authentication in case user is not authenticated.
 
 ```javascript
-import React from "react";
-import { Switch, Route } from "react-router-dom";
-import { withOidcSecure } from "@axa-fr/react-oidc";
-import Home from "../Pages/Home";
-import Dashboard from "../Pages/Dashboard";
-import Admin from "../Pages/Admin";
+import React from 'react';
+import { Switch, Route } from 'react-router-dom';
+import { withOidcSecure } from '@axa-fr/react-oidc';
+import Home from '../Pages/Home';
+import Dashboard from '../Pages/Dashboard';
+import Admin from '../Pages/Admin';
 
 const Routes = () => (
   <Switch>
-    <Route exact path="/" component={Home} />
-    <Route path="/dashboard" component={withOidcSecure(Dashboard)} />
-    <Route path="/admin" component={Admin} />
-    <Route path="/home" component={Home} />
+    <Route exact path='/' component={Home} />
+    <Route path='/dashboard' component={withOidcSecure(Dashboard)} />
+    <Route path='/admin' component={Admin} />
+    <Route path='/home' component={Home} />
   </Switch>
 );
 
@@ -371,7 +356,7 @@ export default Routes;
 ## How to get "Access Token" : Hook method
 
 ```javascript
-import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { useOidcAccessToken } from '@axa-fr/react-oidc';
 
 const DisplayAccessToken = () => {
   const { accessToken, accessTokenPayload } = useOidcAccessToken();
@@ -380,18 +365,17 @@ const DisplayAccessToken = () => {
     return <p>you are not authentified</p>;
   }
   return (
-    <div className="card text-white bg-info mb-3">
-      <div className="card-body">
-        <h5 className="card-title">Access Token</h5>
-        <p style={{ color: "red", backgroundColor: "white" }}>
-          Please consider to configure the ServiceWorker in order to protect
-          your application from XSRF attacks. ""access_token" and
-          "refresh_token" will never be accessible from your client side
-          javascript.
+    <div className='card text-white bg-info mb-3'>
+      <div className='card-body'>
+        <h5 className='card-title'>Access Token</h5>
+        <p style={{ color: 'red', backgroundColor: 'white' }}>
+          Please consider to configure the ServiceWorker in order to protect your application from
+          XSRF attacks. ""access_token" and "refresh_token" will never be accessible from your
+          client side javascript.
         </p>
-        {<p className="card-text">{JSON.stringify(accessToken)}</p>}
+        {<p className='card-text'>{JSON.stringify(accessToken)}</p>}
         {accessTokenPayload != null && (
-          <p className="card-text">{JSON.stringify(accessTokenPayload)}</p>
+          <p className='card-text'>{JSON.stringify(accessTokenPayload)}</p>
         )}
       </div>
     </div>
@@ -402,7 +386,7 @@ const DisplayAccessToken = () => {
 ## How to get IDToken : Hook method
 
 ```javascript
-import { useOidcIdToken } from "@axa-fr/react-oidc";
+import { useOidcIdToken } from '@axa-fr/react-oidc';
 
 const DisplayIdToken = () => {
   const { idToken, idTokenPayload } = useOidcIdToken();
@@ -412,13 +396,11 @@ const DisplayIdToken = () => {
   }
 
   return (
-    <div className="card text-white bg-info mb-3">
-      <div className="card-body">
-        <h5 className="card-title">ID Token</h5>
-        {<p className="card-text">{JSON.stringify(idToken)}</p>}
-        {idTokenPayload != null && (
-          <p className="card-text">{JSON.stringify(idTokenPayload)}</p>
-        )}
+    <div className='card text-white bg-info mb-3'>
+      <div className='card-body'>
+        <h5 className='card-title'>ID Token</h5>
+        {<p className='card-text'>{JSON.stringify(idToken)}</p>}
+        {idTokenPayload != null && <p className='card-text'>{JSON.stringify(idTokenPayload)}</p>}
       </div>
     </div>
   );
@@ -428,7 +410,7 @@ const DisplayIdToken = () => {
 ## How to get User Information : Hook method
 
 ```javascript
-import { useOidcUser, UserStatus } from "@axa-fr/react-oidc";
+import { useOidcUser, UserStatus } from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = () => {
   const { oidcUser, oidcUserLoadingState } = useOidcUser();
@@ -442,10 +424,10 @@ const DisplayUserInfo = () => {
       return <p>Fail to load user information</p>;
     default:
       return (
-        <div className="card text-white bg-success mb-3">
-          <div className="card-body">
-            <h5 className="card-title">User information</h5>
-            <p className="card-text">{JSON.stringify(oidcUser)}</p>
+        <div className='card text-white bg-success mb-3'>
+          <div className='card-body'>
+            <h5 className='card-title'>User information</h5>
+            <p className='card-text'>{JSON.stringify(oidcUser)}</p>
           </div>
         </div>
       );
@@ -459,8 +441,8 @@ If your are not using the service worker. Fetch function need to send AccessToke
 This Hook give you a wrapped fetch that add the access token for you.
 
 ```javascript
-import React, { useEffect, useState } from "react";
-import { useOidcFetch, OidcSecure } from "@axa-fr/react-oidc";
+import React, { useEffect, useState } from 'react';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = ({ fetch }) => {
   const [oidcUser, setOidcUser] = useState(null);
@@ -468,9 +450,7 @@ const DisplayUserInfo = ({ fetch }) => {
 
   useEffect(() => {
     const fetchUserInfoAsync = async () => {
-      const res = await fetch(
-        "https://demo.duendesoftware.com/connect/userinfo",
-      );
+      const res = await fetch('https://demo.duendesoftware.com/connect/userinfo');
       if (res.status != 200) {
         return null;
       }
@@ -493,13 +473,11 @@ const DisplayUserInfo = ({ fetch }) => {
   }
 
   return (
-    <div className="container mt-3">
-      <div className="card text-white bg-success mb-3">
-        <div className="card-body">
-          <h5 className="card-title">User information</h5>
-          {oidcUser != null && (
-            <p className="card-text">{JSON.stringify(oidcUser)}</p>
-          )}
+    <div className='container mt-3'>
+      <div className='card text-white bg-success mb-3'>
+        <div className='card-body'>
+          <h5 className='card-title'>User information</h5>
+          {oidcUser != null && <p className='card-text'>{JSON.stringify(oidcUser)}</p>}
         </div>
       </div>
     </div>
@@ -522,8 +500,8 @@ If your are not using the service worker. Fetch function need to send AccessToke
 This HOC give you a wrapped fetch that add the access token for you.
 
 ```javascript
-import React, { useEffect, useState } from "react";
-import { useOidcFetch, OidcSecure } from "@axa-fr/react-oidc";
+import React, { useEffect, useState } from 'react';
+import { useOidcFetch, OidcSecure } from '@axa-fr/react-oidc';
 
 const DisplayUserInfo = ({ fetch }) => {
   const [oidcUser, setOidcUser] = useState(null);
@@ -531,9 +509,7 @@ const DisplayUserInfo = ({ fetch }) => {
 
   useEffect(() => {
     const fetchUserInfoAsync = async () => {
-      const res = await fetch(
-        "https://demo.duendesoftware.com/connect/userinfo",
-      );
+      const res = await fetch('https://demo.duendesoftware.com/connect/userinfo');
       if (res.status != 200) {
         return null;
       }
@@ -556,13 +532,11 @@ const DisplayUserInfo = ({ fetch }) => {
   }
 
   return (
-    <div className="container mt-3">
-      <div className="card text-white bg-success mb-3">
-        <div className="card-body">
-          <h5 className="card-title">User information</h5>
-          {oidcUser != null && (
-            <p className="card-text">{JSON.stringify(oidcUser)}</p>
-          )}
+    <div className='container mt-3'>
+      <div className='card text-white bg-success mb-3'>
+        <div className='card-body'>
+          <h5 className='card-title'>User information</h5>
+          {oidcUser != null && <p className='card-text'>{JSON.stringify(oidcUser)}</p>}
         </div>
       </div>
     </div>
@@ -583,23 +557,23 @@ You can inject your own components.
 All components definition receive props `configurationName`. Please checkout the demo for more complete example.
 
 ```javascript
-import React from "react";
-import { render } from "react-dom";
-import { BrowserRouter as Router } from "react-router-dom";
-import { OidcProvider } from "@axa-fr/react-oidc";
-import Header from "./Layout/Header";
-import Routes from "./Router";
+import React from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { OidcProvider } from '@axa-fr/react-oidc';
+import Header from './Layout/Header';
+import Routes from './Router';
 
 // This configuration use hybrid mode
 // ServiceWorker are used if available (more secure) else tokens are given to the client
 // You need to give inside your code the "access_token" when using fetch
 const configuration = {
-  client_id: "interactive.public.short",
-  redirect_uri: "http://localhost:4200/authentication/callback",
-  silent_redirect_uri: "http://localhost:4200/authentication/silent-callback",
-  scope: "openid profile email api offline_access",
-  authority: "https://demo.identityserver.io",
-  service_worker_relative_url: "/OidcServiceWorker.js",
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:4200/authentication/callback',
+  silent_redirect_uri: 'http://localhost:4200/authentication/silent-callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.identityserver.io',
+  service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
 };
 
@@ -635,7 +609,7 @@ const App = () => (
   </OidcProvider>
 );
 
-render(<App />, document.getElementById("root"));
+render(<App />, document.getElementById('root'));
 ```
 
 ## How It Works
@@ -657,15 +631,15 @@ To work with NextJS you need to inject your own history surcharge like the sampl
 **component/layout.js**
 
 ```javascript
-import { OidcProvider } from "@axa-fr/react-oidc";
-import { useRouter } from "next/router";
+import { OidcProvider } from '@axa-fr/react-oidc';
+import { useRouter } from 'next/router';
 
 const configuration = {
-  client_id: "interactive.public.short",
-  redirect_uri: "http://localhost:3001/#authentication/callback",
-  silent_redirect_uri: "http://localhost:3001/#authentication/silent-callback", // Optional activate silent-login that use cookies between OIDC server and client javascript to restore the session
-  scope: "openid profile email api offline_access",
-  authority: "https://demo.duendesoftware.com",
+  client_id: 'interactive.public.short',
+  redirect_uri: 'http://localhost:3001/#authentication/callback',
+  silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-login that use cookies between OIDC server and client javascript to restore the session
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.duendesoftware.com',
 };
 
 const onEvent = (configurationName, eventName, data) => {
@@ -682,7 +656,7 @@ export default function Layout({ children }) {
             pathname: url,
           })
           .then(() => {
-            window.dispatchEvent(new Event("popstate"));
+            window.dispatchEvent(new Event('popstate'));
           });
       },
     };
@@ -710,14 +684,13 @@ For more information checkout the [NextJS React OIDC demo](https://github.com/Ax
 
 ```javascript
 export const configurationIdentityServerWithHash = {
-  client_id: "interactive.public.short",
-  redirect_uri: window.location.origin + "#authentication-callback",
-  silent_redirect_uri:
-    window.location.origin + "#authentication-silent-callback",
-  scope: "openid profile email api offline_access",
-  authority: "https://demo.duendesoftware.com",
+  client_id: 'interactive.public.short',
+  redirect_uri: window.location.origin + '#authentication-callback',
+  silent_redirect_uri: window.location.origin + '#authentication-silent-callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.duendesoftware.com',
   refresh_time_before_tokens_expiration_in_second: 70,
-  service_worker_relative_url: "/OidcServiceWorker.js",
+  service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
 };
 ```

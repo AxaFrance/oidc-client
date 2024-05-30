@@ -27,12 +27,7 @@
     "allowJs": true,
     "rootDir": "src"
   },
-  "exclude": [
-    "node_modules",
-    "**/*.spec.tsx",
-  ],
-  "include": [
-    "src/**/*"
-  ],
+  "exclude": ["node_modules", "**/*.spec.tsx"],
+  "include": ["src/**/*"]
   // "files": ["./src/index.ts"]
 }

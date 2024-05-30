@@ -20,14 +20,14 @@ export function checkDomain(domains: Domain[], endpoint: string) {
 	});
 	if (!domain) {
 		throw new Error(
-			'Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename,
+			'Domain ' + endpoint + ' is not trusted, please add domain in ' + scriptFilename
 		);
 	}
 }
 
 export const getDomains = (
 	trustedDomain: Domain[] | DomainDetails,
-	type: 'oidc' | 'accessToken',
+	type: 'oidc' | 'accessToken'
 ) => {
 	if (Array.isArray(trustedDomain)) {
 		return trustedDomain;
@@ -39,7 +39,7 @@ export const getDomains = (
 export const getCurrentDatabaseDomain = (
 	database: Database,
 	url: string,
-	trustedDomains: TrustedDomains,
+	trustedDomains: TrustedDomains
 ) => {
 	if (url.endsWith(openidWellknownUrlEndWith)) {
 		return null;
