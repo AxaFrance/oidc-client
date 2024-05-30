@@ -352,11 +352,11 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			: trustedDomain.convertAllRequestsToCorsExceptNavigate;
 		database[configurationName] = {
 			tokens: null,
-			state: null,
+			states: {},
 			codeVerifier: null,
 			oidcServerConfiguration: null,
 			oidcConfiguration: undefined,
-			nonce: null,
+			nonces: {},
 			status: null,
 			configurationName,
 			hideAccessToken: !showAccessToken,
@@ -379,7 +379,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 	switch (data.type) {
 		case 'clear':
 			currentDatabase.tokens = null;
-			currentDatabase.state = null;
+			currentDatabase.states = {};
 			currentDatabase.codeVerifier = null;
 			currentDatabase.demonstratingProofOfPossessionNonce = null;
 			currentDatabase.demonstratingProofOfPossessionJwkJson = null;
@@ -389,6 +389,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			port.postMessage({ configurationName });
 			return;
 		case 'init': {
+			const tabId = data.data.tabId;
 			const oidcServerConfiguration = data.data.oidcServerConfiguration;
 			const trustedDomain = trustedDomains[configurationName];
 			const domains = getDomains(trustedDomain, 'oidc');
@@ -438,7 +439,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 				if (
 					tokens.idTokenPayload &&
 					tokens.idTokenPayload.nonce &&
-					currentDatabase.nonce != null
+					currentDatabase.nonces[tabId]
 				) {
 					tokens.idTokenPayload.nonce =
 						TOKEN.NONCE_TOKEN + '_' + configurationName;
@@ -468,12 +469,15 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			return;
 		}
 		case 'setState': {
-			currentDatabase.state = data.data.state;
+			const newState = data.data.state;
+			const tabId = data.data.tabId;
+			currentDatabase.states[tabId] = newState;
 			port.postMessage({ configurationName });
 			return;
 		}
 		case 'getState': {
-			const state = currentDatabase.state;
+			const tabId = data.data.tabId;
+			const state = currentDatabase.states[tabId]
 			port.postMessage({ configurationName, state });
 			return;
 		}
@@ -504,15 +508,17 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 		}
 		case 'setNonce': {
 			const nonce = data.data.nonce;
+			const tabId = data.data.tabId;
 			if (nonce) {
-				currentDatabase.nonce = nonce;
+				currentDatabase.nonces[tabId] = nonce;
 			}
 			port.postMessage({ configurationName });
 			return;
 		}
 		case 'getNonce': {
+			const tabId = data.data.tabId;
 			const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName;
-			const nonce = currentDatabase.nonce ? keyNonce : null;
+			const nonce = currentDatabase.nonces[tabId] && keyNonce;
 			port.postMessage({ configurationName, nonce });
 			return;
 		}

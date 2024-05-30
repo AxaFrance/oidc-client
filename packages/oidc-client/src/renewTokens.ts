@@ -95,24 +95,27 @@ export const synchroniseTokensStatus ={
     REQUIRE_SYNC_TOKENS: 'REQUIRE_SYNC_TOKENS'
 };
 
-export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConfiguration, configurationName: string, currentTokens: Tokens, forceRefresh = false) => {
+export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConfiguration, configurationName: string, currentTokens: Tokens, forceRefresh = false): Promise<{
+    tokens: Tokens | null;
+    status: string;
+    nonce: string | undefined;
+}> => {
     // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
     // const configuration = this.configuration;
-    const nullNonce = { nonce: null };
     if (!currentTokens) {
-        return { tokens: null, status: 'NOT_CONNECTED', nonce: nullNonce };
+        return { tokens: null, status: 'NOT_CONNECTED', nonce: undefined };
     }
-    let nonce = nullNonce;
+    let nonce: string | undefined;
     const oidcServerConfiguration = await oidc.initAsync(configuration.authority, configuration.authority_configuration);
     const serviceWorker = await initWorkerAsync(configuration, configurationName);
     if (serviceWorker) {
         const { status, tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'syncTokensAsync', configuration);
         if (status === 'LOGGED_OUT') {
-            return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
+            return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: undefined };
         } else if (status === 'SESSIONS_LOST') {
-            return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
+            return { tokens: null, status: 'SESSIONS_LOST', nonce: undefined };
         } else if (!status || !tokens) {
-            return { tokens: null, status: 'REQUIRE_SYNC_TOKENS', nonce: nullNonce };
+            return { tokens: null, status: 'REQUIRE_SYNC_TOKENS', nonce: undefined };
         } else if (tokens.issuedAt !== currentTokens.issuedAt) {
             const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
             const status = (timeLeft > 0) ? 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID' : 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID';
@@ -127,9 +130,9 @@ export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConf
             tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
         }
         if (!tokens) {
-            return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
+            return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: undefined };
         } else if (status === 'SESSIONS_LOST') {
-            return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
+            return { tokens: null, status: 'SESSIONS_LOST', nonce: undefined };
         } else if (tokens.issuedAt !== currentTokens.issuedAt) {
             const timeLeft = computeTimeLeft(configuration.refresh_time_before_tokens_expiration_in_second, tokens.expiresAt);
             const status = (timeLeft > 0) ? 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID' : 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID';
@@ -293,7 +296,7 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
                         timeoutMs);
 
                     if (tokenResponse.success) {
-                        const { isValid, reason } = isTokensOidcValid(tokenResponse.data, nonce.nonce, oidcServerConfiguration);
+                        const { isValid, reason } = isTokensOidcValid(tokenResponse.data, nonce, oidcServerConfiguration);
                         if (!isValid) {
                             updateTokens(null);
                             oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: `refresh token return not valid tokens, reason: ${reason}` });

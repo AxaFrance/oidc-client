@@ -42,20 +42,19 @@ export const defaultLoginAsync = (configurationName:string, configuration:OidcCo
             if (!extraFinal.nonce) {
                 extraFinal.nonce = generateRandom(12);
             }
-            const nonce = { nonce: extraFinal.nonce };
             const serviceWorker = await initWorkerAsync(configuration, configurationName);
             const oidcServerConfiguration = await initAsync(configuration.authority, configuration.authority_configuration);
             let storage;
             if (serviceWorker) {
                 serviceWorker.setLoginParams({ callbackPath: url, extras: originExtras });
                 await serviceWorker.initAsync(oidcServerConfiguration, 'loginAsync', configuration);
-                await serviceWorker.setNonceAsync(nonce);
+                await serviceWorker.setNonceAsync(extraFinal.nonce);
                 serviceWorker.startKeepAliveServiceWorker();
                 storage = serviceWorker;
             } else {
                 const session = initSession(configurationName, configuration.storage ?? sessionStorage);
                 session.setLoginParams({ callbackPath: url, extras: originExtras });
-                await session.setNonceAsync(nonce);
+                await session.setNonceAsync(extraFinal.nonce);
                 storage = session;
             }
 
@@ -90,13 +89,13 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         const sessionState = queryParams.session_state;
         const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
         let storage;
-        let nonceData;
+        let nonce: string | undefined;
         let getLoginParams;
-        let state;
+        let state: string | undefined;
         if (serviceWorker) {
             await serviceWorker.initAsync(oidcServerConfiguration, 'loginCallbackAsync', configuration);
             await serviceWorker.setSessionStateAsync(sessionState);
-            nonceData = await serviceWorker.getNonceAsync();
+            nonce = await serviceWorker.getNonceAsync();
             getLoginParams = serviceWorker.getLoginParams();
             state = await serviceWorker.getStateAsync();
             serviceWorker.startKeepAliveServiceWorker();
@@ -104,7 +103,7 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         } else {
             const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
             await session.setSessionStateAsync(sessionState);
-            nonceData = await session.getNonceAsync();
+            nonce = await session.getNonceAsync();
             getLoginParams = session.getLoginParams();
             state = await session.getStateAsync();
             storage = session;
@@ -177,7 +176,7 @@ export const loginCallbackAsync = (oidc:Oidc) => async (isSilentSignin = false) 
         if (tokenResponse.data.state !== extras.state) {
             throw new Error('state is not valid');
         }
-        const { isValid, reason } = isTokensOidcValid(formattedTokens, nonceData.nonce, oidcServerConfiguration);
+        const { isValid, reason } = isTokensOidcValid(formattedTokens, nonce, oidcServerConfiguration);
         if (!isValid) {
             throw new Error(`Tokens are not OpenID valid, reason: ${reason}`);
         }

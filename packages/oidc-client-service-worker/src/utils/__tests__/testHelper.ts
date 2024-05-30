@@ -3,7 +3,6 @@ import { vi } from 'vitest';
 import {
   AccessTokenPayload,
   IdTokenPayload,
-  Nonce,
   OidcConfig,
   OidcConfiguration,
   OidcServerConfiguration,
@@ -116,9 +115,9 @@ class OidcConfigBuilder {
     configurationName: '',
     tokens: null,
     status: 'NOT_CONNECTED',
-    state: '',
+    states: {},
     codeVerifier: '',
-    nonce: null,
+    nonces: {},
     oidcServerConfiguration: null,
     oidcConfiguration: undefined,
     sessionState: null,
@@ -136,9 +135,9 @@ class OidcConfigBuilder {
     this.oidcConfig.configurationName = 'test';
     this.oidcConfig.tokens = new TokenBuilder().withNonExpiredToken().build();
     this.oidcConfig.status = 'NOT_CONNECTED';
-    this.oidcConfig.state = 'state';
+    this.oidcConfig.states = {tab1:'state'}
     this.oidcConfig.codeVerifier = 'codeVerifier';
-    this.oidcConfig.nonce = null;
+    this.oidcConfig.nonces = {}
     this.oidcConfig.oidcConfiguration = new OidcConfigurationBuilder().build();
     this.oidcConfig.oidcServerConfiguration = new OidcServerConfigBuilder()
       .withTestingDefault()
@@ -170,7 +169,7 @@ class OidcConfigBuilder {
   }
 
   public withState(state: string): OidcConfigBuilder {
-    this.oidcConfig.state = state;
+    this.oidcConfig.states.tab1 = state;
     return this;
   }
 
@@ -179,8 +178,8 @@ class OidcConfigBuilder {
     return this;
   }
 
-  public withNonce(nonce: Nonce): OidcConfigBuilder {
-    this.oidcConfig.nonce = nonce;
+  public withNonce(nonce: string): OidcConfigBuilder {
+    this.oidcConfig.nonces.tab1 = nonce;
     return this;
   }
 

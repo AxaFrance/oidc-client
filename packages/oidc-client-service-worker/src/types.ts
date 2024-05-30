@@ -5,13 +5,13 @@ export type DomainDetails = {
     showAccessToken: boolean;
     convertAllRequestsToCorsExceptNavigate?: boolean,
     setAccessTokenToNavigateRequests?: boolean,
-    demonstratingProofOfPossession?:boolean;
-    demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent?:boolean;
+    demonstratingProofOfPossession?: boolean;
+    demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent?: boolean;
     demonstratingProofOfPossessionConfiguration?: DemonstratingProofOfPossessionConfiguration;
 }
 
 export interface DemonstratingProofOfPossessionConfiguration {
-    generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
+    generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams,
     digestAlgorithm: AlgorithmIdentifier,
     importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
     signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
@@ -55,7 +55,8 @@ export type MessageData = {
     sessionState: string;
     demonstratingProofOfPossessionNonce: string;
     demonstratingProofOfPossessionJwkJson: string;
-    nonce: Nonce;
+    nonce: string;
+    tabId: string;
 }
 
 export type MessageEventData = {
@@ -64,18 +65,18 @@ export type MessageEventData = {
     data: MessageData;
 }
 
-export type Nonce = {
-    nonce: string;
-} | null;
-
 export type OidcConfig = {
     demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration | null;
     configurationName: string;
     tokens: Tokens | null;
     status: Status;
-    state: string | null;
+    states: {
+        [tabId: string]: string | undefined;
+    }
     codeVerifier: string | null;
-    nonce: Nonce;
+    nonces: {
+        [tabId: string]: string | undefined;
+    }
     oidcServerConfiguration: OidcServerConfiguration | null;
     oidcConfiguration?: OidcConfiguration;
     sessionState?: string | null;
