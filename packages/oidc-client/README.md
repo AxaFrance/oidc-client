@@ -24,15 +24,14 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
 - [Hash route](#Hash-route)
 - [Service Worker Support](#service-worker-support)
 
-
 ## About
 
 @axa-fr/oidc-client is:
 
 - **Secure** :
-    - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection) 
-    - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
-    - OIDC using client side Code Credential Grant with pkce only
+  - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
+  - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
+  - OIDC using client side Code Credential Grant with pkce only
 - **Lightweight** : Unpacked Size on npm is **274 kB**
 - **Simple**
   - refresh_token and access_token are auto refreshed in background
@@ -48,7 +47,6 @@ We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) a
 
 The service worker catch **access_token** and **refresh_token** that will never be accessible to the client.
 
-
 ### Getting Started
 
 ```sh
@@ -63,6 +61,7 @@ node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
 ```
 
 WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up to date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
+
 ```sh
   "scripts": {
     ...
@@ -83,8 +82,8 @@ The only file you should edit is "OidcTrustedDomains.js".
 // Domains used by OIDC server must be also declared here
 const trustedDomains = {
   default: {
-    oidcDomains :["https://demo.duendesoftware.com"], 
-    accessTokenDomains : ["https://www.myapi.com/users"]
+    oidcDomains: ['https://demo.duendesoftware.com'],
+    accessTokenDomains: ['https://www.myapi.com/users'],
   },
 };
 
@@ -92,20 +91,20 @@ const trustedDomains = {
 // Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
 // scenarios which require it. For example, to send it via websocket connection.
 trustedDomains.config_show_access_token = {
-  oidcDomains :["https://demo.duendesoftware.com"],
-  accessTokenDomains : ["https://www.myapi.com/users"],
+  oidcDomains: ['https://demo.duendesoftware.com'],
+  accessTokenDomains: ['https://www.myapi.com/users'],
   showAccessToken: false,
   // convertAllRequestsToCorsExceptNavigate: false, // default value is false
   // setAccessTokenToNavigateRequests: true, // default value is true
 };
 
 // DPoP (Demonstrating Proof of Possession) will be activated for the following domains
-trustedDomains.config_with_dpop = { 
-     domains: ["https://demo.duendesoftware.com"], 
-     demonstratingProofOfPossession: true,
-     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true, // default value is false, inject DPOP token only when DPOP header is present
-     // Optional, more details bellow
-     /*demonstratingProofOfPossessionConfiguration: {  
+trustedDomains.config_with_dpop = {
+  domains: ['https://demo.duendesoftware.com'],
+  demonstratingProofOfPossession: true,
+  demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true, // default value is false, inject DPOP token only when DPOP header is present
+  // Optional, more details bellow
+  /*demonstratingProofOfPossessionConfiguration: {  
       importKeyAlgorithm: {
         name: 'ECDSA',
         namedCurve: 'P-256',
@@ -120,13 +119,12 @@ trustedDomains.config_with_dpop = {
       jwtHeaderAlgorithm : 'ES256'
     }*/
 };
-
 ```
 
 The code of the demo :
 
 ```js
-import {OidcClient} from '@axa-fr/oidc-client'
+import { OidcClient } from '@axa-fr/oidc-client';
 
 export const configuration = {
   client_id: 'interactive.public.short',
@@ -136,7 +134,7 @@ export const configuration = {
   authority: 'https://demo.duendesoftware.com',
   service_worker_relative_url: '/OidcServiceWorker.js', // just comment that line to disable service worker mode
   service_worker_only: false,
-  demonstrating_proof_of_possession: false, 
+  demonstrating_proof_of_possession: false,
 };
 
 const href = window.location.href;
@@ -149,14 +147,12 @@ const oidcFetch = oidcClient.fetchWithTokens(fetch);
 // import {OidcLocation} from '@axa-fr/oidc-client'
 // const oidcClient = OidcClient.getOrCreate(() => fetch, new OidcLocation())(configuration);
 
-
-
 console.log(href);
 
 oidcClient.tryKeepExistingSessionAsync().then(() => {
   if (href.includes(configuration.redirect_uri)) {
     oidcClient.loginCallbackAsync().then(() => {
-      window.location.href = "/";
+      window.location.href = '/';
     });
     document.body.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
@@ -168,7 +164,6 @@ oidcClient.tryKeepExistingSessionAsync().then(() => {
   let tokens = oidcClient.tokens;
 
   if (tokens) {
-
     // @ts-ignore
     window.logout = () => oidcClient.logoutAsync();
     document.body.innerHTML = `<div>
@@ -176,19 +171,16 @@ oidcClient.tryKeepExistingSessionAsync().then(() => {
             <button onclick="window.logout()">Logout</button>
             <h2>Authenticated</h2>
             <pre>${JSON.stringify(tokens, null, '\t')}</pre>
-        </div>`
-
+        </div>`;
   } else {
     // @ts-ignore
-    window.login = () => oidcClient.loginAsync("/");
+    window.login = () => oidcClient.loginAsync('/');
     document.body.innerHTML = `<div>
             <h1>@axa-fr/oidc-client demo</h1>
             <button onclick="window.login()">Login</button>
-        </div>`
+        </div>`;
   }
-})
-
-
+});
 ```
 
 ## Configuration
@@ -339,7 +331,7 @@ export class OidcClient {
   /**
    * Starts the OIDC logout process with specified options.
    * @param callbackPathOrUrl The callback path or URL to use after logout.
-   * @param extras Additional parameters to send to the OIDC server during the logout request. 
+   * @param extras Additional parameters to send to the OIDC server during the logout request.
    * {"no_reload:oidc":"true"} to avoid the page reload after logout.
    * you can add extras like {"client_secret:revoke_refresh_token":"secret"} to revoke the refresh token with extra client secret. Any key ending with ":revoke_refresh_token" will be used to revoke the refresh token.
    * you can add extras like {"client_secret:revoke_access_token":"secret"} to revoke the access token with extra client secret. Any key ending with ":revoke_access_token" will be used to revoke the access token.
@@ -445,14 +437,13 @@ More information about OIDC
 
 ```javascript
 export const configurationIdentityServerWithHash = {
-  client_id: "interactive.public.short",
-  redirect_uri: window.location.origin + "#authentication-callback",
-  silent_redirect_uri:
-    window.location.origin + "#authentication-silent-callback",
-  scope: "openid profile email api offline_access",
-  authority: "https://demo.duendesoftware.com",
+  client_id: 'interactive.public.short',
+  redirect_uri: window.location.origin + '#authentication-callback',
+  silent_redirect_uri: window.location.origin + '#authentication-silent-callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.duendesoftware.com',
   refresh_time_before_tokens_expiration_in_second: 70,
-  service_worker_relative_url: "/OidcServiceWorker.js",
+  service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
 };
 ```

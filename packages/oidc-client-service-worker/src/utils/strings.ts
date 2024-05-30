@@ -5,5 +5,5 @@
  * @returns
  */
 export function countLetter(str: string, find: string) {
-  return str.split(find).length - 1;
+	return str.split(find).length - 1;
 }

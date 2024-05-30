@@ -1,10 +1,5 @@
 import { acceptAnyDomainToken, scriptFilename, TOKEN } from './constants';
-import {
-	Database,
-	MessageEventData,
-	OidcConfig,
-	TrustedDomains,
-} from './types';
+import { Database, MessageEventData, OidcConfig, TrustedDomains } from './types';
 import {
 	checkDomain,
 	getCurrentDatabaseDomain,
@@ -14,12 +9,15 @@ import {
 	serializeHeaders,
 	sleep,
 } from './utils';
-import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './utils/codeVerifier';
+import {
+	extractConfigurationNameFromCodeVerifier,
+	replaceCodeVerifier,
+} from './utils/codeVerifier';
 import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
-import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
-import {getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent} from "./dpop";
-import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
+import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
+import { getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent } from './dpop';
+import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 
 // @ts-ignore
 if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
@@ -67,9 +65,7 @@ const getCurrentDatabasesTokenEndpoint = (database: Database, url: string) => {
 		} else if (
 			value.oidcServerConfiguration != null &&
 			value.oidcServerConfiguration.revocationEndpoint &&
-			url.startsWith(
-				normalizeUrl(value.oidcServerConfiguration.revocationEndpoint),
-			)
+			url.startsWith(normalizeUrl(value.oidcServerConfiguration.revocationEndpoint))
 		) {
 			databases.push(value);
 		}
@@ -84,8 +80,7 @@ const keepAliveAsync = async (event: FetchEvent) => {
 	const response = new Response('{}', init);
 	if (!isFromVanilla) {
 		const originalRequestUrl = new URL(originalRequest.url);
-		const minSleepSeconds =
-			Number(originalRequestUrl.searchParams.get('minSleepSeconds')) || 240;
+		const minSleepSeconds = Number(originalRequestUrl.searchParams.get('minSleepSeconds')) || 240;
 		for (let i = 0; i < minSleepSeconds; i++) {
 			await sleep(1000 + Math.floor(Math.random() * 1000));
 			const cache = await caches.open('oidc_dummy_cache');
@@ -95,17 +90,27 @@ const keepAliveAsync = async (event: FetchEvent) => {
 	return response;
 };
 
-async function generateDpopAsync(originalRequest: Request, currentDatabase:OidcConfig|null, url: string, extrasClaims={} ) {
+async function generateDpopAsync(
+	originalRequest: Request,
+	currentDatabase: OidcConfig | null,
+	url: string,
+	extrasClaims = {}
+) {
 	const headersExtras = serializeHeaders(originalRequest.headers);
-	if (currentDatabase && 
-		currentDatabase.demonstratingProofOfPossessionConfiguration && 
+	if (
+		currentDatabase &&
+		currentDatabase.demonstratingProofOfPossessionConfiguration &&
 		currentDatabase.demonstratingProofOfPossessionJwkJson &&
-		(!currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent || currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent && headersExtras['dpop'])
+		(!currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent ||
+			(currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent &&
+				headersExtras['dpop']))
 	) {
 		const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
 		const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
-		headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(jwk, 'POST', url, extrasClaims);
-		if(currentDatabase.demonstratingProofOfPossessionNonce != null) {
+		headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(
+			dpopConfiguration
+		)(jwk, 'POST', url, extrasClaims);
+		if (currentDatabase.demonstratingProofOfPossessionNonce != null) {
 			headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
 		}
 	}
@@ -123,7 +128,7 @@ const handleFetch = async (event: FetchEvent) => {
 	const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(
 		database,
 		url,
-		trustedDomains,
+		trustedDomains
 	);
 	if (
 		currentDatabaseForRequestAccessToken &&
@@ -155,16 +160,15 @@ const handleFetch = async (event: FetchEvent) => {
 				...serializeHeaders(originalRequest.headers),
 			};
 		} else {
-			
 			const authorization = originalRequest.headers.get('authorization');
-			let authenticationMode = "Bearer"
-			if (authorization ) {
-				authenticationMode = authorization.split(" ")[0];
+			let authenticationMode = 'Bearer';
+			if (authorization) {
+				authenticationMode = authorization.split(' ')[0];
 			}
 			headers = {
 				...serializeHeaders(originalRequest.headers),
 				authorization:
-				 authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+					authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
 			};
 		}
 		let init: RequestInit;
@@ -197,41 +201,38 @@ const handleFetch = async (event: FetchEvent) => {
 		const maPromesse = new Promise<Response>((resolve, reject) => {
 			const clonedRequest = originalRequest.clone();
 			const response = clonedRequest.text().then(async (actualBody) => {
-				if (
-					actualBody.includes(TOKEN.REFRESH_TOKEN) ||
-					actualBody.includes(TOKEN.ACCESS_TOKEN)
-				) {
+				if (actualBody.includes(TOKEN.REFRESH_TOKEN) || actualBody.includes(TOKEN.ACCESS_TOKEN)) {
 					let headers = serializeHeaders(originalRequest.headers);
 					let newBody = actualBody;
 					for (let i = 0; i < numberDatabase; i++) {
 						const currentDb = currentDatabases[i];
 						if (currentDb && currentDb.tokens != null) {
-							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),};
+							const claimsExtras = {
+								ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),
+							};
 							headers = await generateDpopAsync(originalRequest, currentDb, url, claimsExtras);
-							const keyRefreshToken =
-								TOKEN.REFRESH_TOKEN + '_' + currentDb.configurationName;
+							const keyRefreshToken = TOKEN.REFRESH_TOKEN + '_' + currentDb.configurationName;
 							if (actualBody.includes(keyRefreshToken)) {
 								newBody = newBody.replace(
 									keyRefreshToken,
-									encodeURIComponent(currentDb.tokens.refresh_token as string),
+									encodeURIComponent(currentDb.tokens.refresh_token as string)
 								);
 								currentDatabase = currentDb;
-								
+
 								break;
 							}
-							const keyAccessToken =
-								TOKEN.ACCESS_TOKEN + '_' + currentDb.configurationName;
+							const keyAccessToken = TOKEN.ACCESS_TOKEN + '_' + currentDb.configurationName;
 							if (actualBody.includes(keyAccessToken)) {
 								newBody = newBody.replace(
 									keyAccessToken,
-									encodeURIComponent(currentDb.tokens.access_token),
+									encodeURIComponent(currentDb.tokens.access_token)
 								);
 								currentDatabase = currentDb;
 								break;
 							}
 						}
 					}
-					
+
 					const fetchPromise = fetch(originalRequest, {
 						body: newBody,
 						method: clonedRequest.method,
@@ -250,33 +251,25 @@ const handleFetch = async (event: FetchEvent) => {
 						currentDatabase &&
 						currentDatabase.oidcServerConfiguration != null &&
 						currentDatabase.oidcServerConfiguration.revocationEndpoint &&
-						url.startsWith(
-							normalizeUrl(
-								currentDatabase.oidcServerConfiguration.revocationEndpoint,
-							),
-						)
+						url.startsWith(normalizeUrl(currentDatabase.oidcServerConfiguration.revocationEndpoint))
 					) {
 						return fetchPromise.then(async (response) => {
 							const text = await response.text();
 							return new Response(text, response);
 						});
 					}
-					return fetchPromise.then(hideTokens(currentDatabase as OidcConfig)); 
+					return fetchPromise.then(hideTokens(currentDatabase as OidcConfig));
 				} else if (
 					actualBody.includes('code_verifier=') &&
 					extractConfigurationNameFromCodeVerifier(actualBody) != null
 				) {
-					const currentLoginCallbackConfigurationName = extractConfigurationNameFromCodeVerifier(
-						actualBody,
-					);
+					const currentLoginCallbackConfigurationName =
+						extractConfigurationNameFromCodeVerifier(actualBody);
 					// @ts-ignore
 					currentDatabase = database[currentLoginCallbackConfigurationName];
 					let newBody = actualBody;
 					if (currentDatabase && currentDatabase.codeVerifier != null) {
-						newBody = replaceCodeVerifier(
-							newBody,
-							currentDatabase.codeVerifier,
-						);
+						newBody = replaceCodeVerifier(newBody, currentDatabase.codeVerifier);
 					}
 
 					const headersExtras = await generateDpopAsync(originalRequest, currentDatabase, url);
@@ -341,9 +334,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 	}
 	if (!currentDatabase) {
 		const trustedDomain = trustedDomains[configurationName];
-		const showAccessToken = Array.isArray(trustedDomain)
-			? false
-			: trustedDomain.showAccessToken;
+		const showAccessToken = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
 		const doNotSetAccessTokenToNavigateRequests = Array.isArray(trustedDomain)
 			? true
 			: trustedDomain.setAccessTokenToNavigateRequests;
@@ -360,10 +351,8 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			status: null,
 			configurationName,
 			hideAccessToken: !showAccessToken,
-			setAccessTokenToNavigateRequests:
-				doNotSetAccessTokenToNavigateRequests ?? true,
-			convertAllRequestsToCorsExceptNavigate:
-				convertAllRequestsToCorsExceptNavigate ?? false,
+			setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests ?? true,
+			convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate ?? false,
 			demonstratingProofOfPossessionNonce: null,
 			demonstratingProofOfPossessionJwkJson: null,
 			demonstratingProofOfPossessionConfiguration: null,
@@ -375,7 +364,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			trustedDomains[configurationName] = [];
 		}
 	}
-	
+
 	switch (data.type) {
 		case 'clear':
 			currentDatabase.tokens = null;
@@ -404,17 +393,24 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			}
 			currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
 			currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
-			
 
-			if(currentDatabase.demonstratingProofOfPossessionConfiguration == null ){
-				const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomains[configurationName]);
-				if(demonstratingProofOfPossessionConfiguration != null){
-					if(currentDatabase.oidcConfiguration.demonstrating_proof_of_possession){
-						console.warn("In service worker, demonstrating_proof_of_possession must be configured from trustedDomains file")
+			if (currentDatabase.demonstratingProofOfPossessionConfiguration == null) {
+				const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(
+					trustedDomains[configurationName]
+				);
+				if (demonstratingProofOfPossessionConfiguration != null) {
+					if (currentDatabase.oidcConfiguration.demonstrating_proof_of_possession) {
+						console.warn(
+							'In service worker, demonstrating_proof_of_possession must be configured from trustedDomains file'
+						);
 					}
-					currentDatabase.demonstratingProofOfPossessionConfiguration = demonstratingProofOfPossessionConfiguration;
-					currentDatabase.demonstratingProofOfPossessionJwkJson = await generateJwkAsync(self)(demonstratingProofOfPossessionConfiguration.generateKeyAlgorithm);
-					currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent = getDpopOnlyWhenDpopHeaderPresent(trustedDomains[configurationName]) ?? false;
+					currentDatabase.demonstratingProofOfPossessionConfiguration =
+						demonstratingProofOfPossessionConfiguration;
+					currentDatabase.demonstratingProofOfPossessionJwkJson = await generateJwkAsync(self)(
+						demonstratingProofOfPossessionConfiguration.generateKeyAlgorithm
+					);
+					currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent =
+						getDpopOnlyWhenDpopHeaderPresent(trustedDomains[configurationName]) ?? false;
 				}
 			}
 
@@ -435,13 +431,8 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 				if (tokens.refresh_token) {
 					tokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName;
 				}
-				if (
-					tokens.idTokenPayload &&
-					tokens.idTokenPayload.nonce &&
-					currentDatabase.nonce != null
-				) {
-					tokens.idTokenPayload.nonce =
-						TOKEN.NONCE_TOKEN + '_' + configurationName;
+				if (tokens.idTokenPayload && tokens.idTokenPayload.nonce && currentDatabase.nonce != null) {
+					tokens.idTokenPayload.nonce = TOKEN.NONCE_TOKEN + '_' + configurationName;
 				}
 				port.postMessage({
 					tokens,

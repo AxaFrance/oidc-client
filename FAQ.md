@@ -1,6 +1,6 @@
 # FAQ (Frequently Asked Questions)
 
-## Condition to make silent signing work 
+## Condition to make silent signing work
 
 Third-party cookies are blocked by default on Safari and will be blocked on all browsers soon.
 Today, silent signing works on Safari only if the OIDC provider and the client application are on the same domain.
@@ -17,24 +17,24 @@ It opens an IFrame in the background, directed to a specific page on your OIDC p
 
 ## Condition to make Single Logout to work
 
-The same domain constraint for "silent signing" applies to Single Logout.  
+The same domain constraint for "silent signing" applies to Single Logout.
 
 Single Logout allows you to disconnect from multiple OIDC Client sessions in one action, even if you are connected to different applications.
 
 ## Condition to make Monitor Session to work
 
-Same domain constraint for "silent signing" applies to "monitorSession".  
+Same domain constraint for "silent signing" applies to "monitorSession".
 
 Monitor session notifies you when your session expires or when you are disconnected from your OIDC provider.
 
 ## Does Service Worker is mandatory ?
 
-Service Worker can be disable. 
+Service Worker can be disable.
 You can use classic mode without Service Worker.
 
 Just comment "service_worker_relative_url" like bellow:
 
-````javascript
+```javascript
 export const configuration = {
   client_id: 'interactive.public.short',
   redirect_uri: window.location.origin + '/#/authentication/callback',
@@ -44,24 +44,24 @@ export const configuration = {
   // service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
 };
-````
+```
 
-If your Service Worker file is already registered on your browser, your need to unregister it. For example from chrome dev tool. 
+If your Service Worker file is already registered on your browser, your need to unregister it. For example from chrome dev tool.
 
 ## Tokens are always refreshed in background every seconds
 
 The @axa-fr/oidc-client automatically refreshes tokens in the background.  
-It refreshes tokens before expiration to maintain valid tokens at all times.  
+It refreshes tokens before expiration to maintain valid tokens at all times.
 
 If your token session lifetime is too short, frequent refreshes will occur.  
-Token refreshing starts 120 seconds before expiration.  
+Token refreshing starts 120 seconds before expiration.
 
-Setting a session validity longer than 3 minutes is advisable.  
+Setting a session validity longer than 3 minutes is advisable.
 
 By default, @axa-fr/oidc-client chooses the shorter lifetime between access_token and id_token.  
 Use the "token_renew_mode" option to change this behavior.
 
- - **token_renew_mode**: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
+- **token_renew_mode**: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
 
 ## window.crypto.subtle is unavailable over HTTP
 
@@ -103,23 +103,22 @@ Quick time-to-market: Start with client-side OIDC, migrate to server-side if nee
   @axa-fr/oidc-client is the simplest and cheapest.
 </p>
 
-
 ## Good Security Practices : does a Hacker can unregister the Service Worker and retrieve tokens via an Iframe ?
 
 To block token retrieval via an Iframe call and prevent Service Worker unregistration, comply with these practices:
 
 1 - Correctly configure the CSP (Content Security Policy) on the server side.  
-Example: 
+Example:
 
-````bash
+```bash
 server: {
     headers: {
       "Content-Security-Policy": "script-src 'self';",
     },
   }
-````
+```
 
-This blocks dynamic script injection into an iframe.  
+This blocks dynamic script injection into an iframe.
 
 2 - Initialize `<OidcProvider>` for **React** or the redirect callback for **oidc-client** at the start of your application script.  
 Configure it before making any fetch calls to services.  
