@@ -150,9 +150,8 @@ export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConf
 
 const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) =>{
 
-    while (!navigator.onLine && document.hidden) {
-        await sleepAsync({milliseconds: 1000});
-        oidc.publishEvent(eventNames.refreshTokensAsync, { message: 'wait because navigator is offline and hidden' });
+    if (!navigator.onLine && document.hidden) {
+        return { tokens: oidc.tokens, status: 'GIVE_UP' };
     }
     let numberTryOnline = 6;
     while (!navigator.onLine && numberTryOnline > 0) {
@@ -206,16 +205,6 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
             return await synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
         }
     };
-
-    if (index > 4) {
-        if(isDocumentHidden){
-            return { tokens: oidc.tokens, status: 'GIVE_UP' };
-        } else{
-            updateTokens(null);
-            oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
-            return { tokens: null, status: 'SESSION_LOST' };
-        }
-    }
     
     try {
         const { status, tokens, nonce } = await syncTokensInfoAsync(oidc)(configuration, oidc.configurationName, oidc.tokens, forceRefresh);
