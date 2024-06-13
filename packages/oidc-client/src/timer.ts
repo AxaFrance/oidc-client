@@ -2,7 +2,7 @@ const timer = (function () {
     const workerPort = (function () {
         let worker;
         let blobURL;
-
+        
         const workerCode = function () {
             const innerIdsByOuterIds = {};
 
@@ -55,14 +55,17 @@ const timer = (function () {
                 };
             };
         }.toString();
-
+        const isInsideBrowser = (typeof process === 'undefined');
         try {
             const blob = new Blob(['(', workerCode, ')()'], { type: 'application/javascript' });
             blobURL = URL.createObjectURL(blob);
         } catch (error) {
+            if (isInsideBrowser) {
+                console.warn('BlobUrl not available');
+            }
             return null;
         }
-        const isInsideBrowser = (typeof process === 'undefined');
+      
         try {
             if (SharedWorker) {
                 worker = new SharedWorker(blobURL);
@@ -91,7 +94,7 @@ const timer = (function () {
         // In NextJS with SSR (Server Side Rendering) during rending in Node JS, the window object is undefined,
         // the global object is used instead as it is the closest approximation of a browsers window object.
         const bindContext = (typeof window === 'undefined') ? global : window;
-
+        console.log('Worker not available, using setTimeout' + (bindContext === global ? ' in NodeJS' : '') + '.');
         return {
             setTimeout: setTimeout.bind(bindContext),
             clearTimeout: clearTimeout.bind(bindContext),

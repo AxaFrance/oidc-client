@@ -77,9 +77,11 @@ export async function renewTokensAndStartTimerAsync(oidc, forceRefresh = false, 
 
 export const autoRenewTokens = (oidc:Oidc, expiresAt, extras:StringMap = null) => {
     const refreshTimeBeforeTokensExpirationInSecond = oidc.configuration.refresh_time_before_tokens_expiration_in_second;
+    console.log('autoRenewTokens', refreshTimeBeforeTokensExpirationInSecond, expiresAt)
     return timer.setTimeout(async () => {
         const timeLeft = computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond, expiresAt);
         const timeInfo = { timeLeft };
+        console.log('autoRenewTokens', timeInfo)
         oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
         await renewTokensAndStartTimerAsync(oidc, false, extras);
     }, 1000);
