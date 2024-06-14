@@ -21,12 +21,14 @@ import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "
 import {getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent} from "./dpop";
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 
+const finalScriptFilename = scriptFilename + '?v=' + version;
+
 // @ts-ignore
 if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
 	// @ts-ignore
 	trustedTypes.createPolicy('default', {
 		createScriptURL: function (url: string) {
-			if (url == scriptFilename) {
+			if (url == finalScriptFilename) {
 				return url;
 			} else {
 				throw new Error('Untrusted script URL blocked: ' + url);
@@ -39,7 +41,7 @@ const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
 declare let trustedDomains: TrustedDomains;
 
-_self.importScripts(scriptFilename);
+_self.importScripts(finalScriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();
 

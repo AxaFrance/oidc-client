@@ -76,7 +76,8 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     if(configuration.register) {
         registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
     } else {
-        registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);   
+        // TODO better
+        registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl + "?v=" + codeVersion);   
     }
 
     try {
