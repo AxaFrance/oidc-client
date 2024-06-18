@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.7
+## 7.22.8
+
+- [c4cf94b](https://github.com/AxaFrance/oidc-client/commit/c4cf94b62a7b2c45cf0f94438a02f0cb5f06b9b0) - fix(oidc): remove dynamic web worker blocked by policies (release) (#1386), 2024-06-18 by *Guillaume Chervet*
+
+
+## v7.22.7
 
 - [9f4cbf4](https://github.com/AxaFrance/oidc-client/commit/9f4cbf414e1b41f448b2a36d759a035786d26668) - fix(oidc): 2 readmes with the same name (release) (#1377), 2024-06-07 by *meesvandongen*
 - [0bfabd4](https://github.com/AxaFrance/oidc-client/commit/0bfabd41d67cad57415905b7ce729ee4fe85c8b4) - fix(oidc): session lost to quickly (alpha) (#1381), 2024-06-07 by *Guillaume Chervet*
@@ -311,11 +316,5 @@
 ## v7.12.10
 
 - [a9cd4d2](https://github.com/AxaFrance/oidc-client/commit/a9cd4d25ef8d66bd12e5c0e921b9fd1bc4a137ba) - build(npm): bump @testing-library/react from 13.3.0 to 14.1.2 (#1222), 2023-11-29 by *dependabot[bot]*
-
-
-## v7.12.9
-
-- [2975d4e](https://github.com/AxaFrance/oidc-client/commit/2975d4e826c94eb7202ab7bba39687d1a7b6820b) - build(npm): bump eslint-plugin-import from 2.28.0 to 2.29.0 (#1221), 2023-11-29 by *dependabot[bot]*
-- [f8be6ab](https://github.com/AxaFrance/oidc-client/commit/f8be6ab1096143c1a2eb35408669aef6df72d2d9) - doc(redame): fix service worker command to work with oidc-client standalone (#1200), 2023-11-29 by *Felix Roos*
 
 
