@@ -37,9 +37,8 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return JSON.parse(storage[`oidc.jwk.${configurationName}`]);
     };
 
-    const getNonceAsync = async () => {
-        // @ts-ignore
-        return { nonce: storage[`oidc.nonce.${configurationName}`] };
+    const getNonceAsync = async (): Promise<string | undefined> => {
+        return storage[`oidc.nonce.${configurationName}`];
     };
 
     const setDemonstratingProofOfPossessionNonce = async (dpopNonce:string) => {

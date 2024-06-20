@@ -2,31 +2,31 @@ import { parseOriginalTokens } from './parseTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
 import codeVersion from './version.js';
-import {ILOidcLocation} from "./location";
+import { ILOidcLocation } from "./location";
 
 let keepAliveServiceWorkerTimeoutId = null;
 let keepAliveController;
-export const sleepAsync = ({milliseconds}: { milliseconds: any }) => {
+export const sleepAsync = ({ milliseconds }: { milliseconds: any }) => {
     return new Promise(resolve => timer.setTimeout(resolve, milliseconds));
 };
 
-const keepAlive = (service_worker_keep_alive_path='/') => {
+const keepAlive = (service_worker_keep_alive_path = '/') => {
     try {
-        const minSleepSeconds =  150;
+        const minSleepSeconds = 150;
         keepAliveController = new AbortController();
         const promise = fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`, { signal: keepAliveController.signal });
         promise.catch(error => { console.log(error); });
-        sleepAsync({milliseconds: minSleepSeconds * 1000}).then(keepAlive);
+        sleepAsync({ milliseconds: minSleepSeconds * 1000 }).then(keepAlive);
     } catch (error) { console.log(error); }
 };
 
 const stopKeepAlive = () => {
-    if(keepAliveController) {
+    if (keepAliveController) {
         keepAliveController.abort();
     }
 };
 
-const isServiceWorkerProxyActiveAsync = (service_worker_keep_alive_path='/') => {
+const isServiceWorkerProxyActiveAsync = (service_worker_keep_alive_path = '/') => {
     return fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json`, {
         headers: {
             'oidc-vanilla': 'true',
@@ -36,19 +36,19 @@ const isServiceWorkerProxyActiveAsync = (service_worker_keep_alive_path='/') => 
     }).catch(error => { console.log(error); });
 };
 
-export const defaultServiceWorkerUpdateRequireCallback = (location:ILOidcLocation) => async (registration: any, stopKeepAlive: Function) => {
+export const defaultServiceWorkerUpdateRequireCallback = (location: ILOidcLocation) => async (registration: any, stopKeepAlive: Function) => {
     stopKeepAlive();
     await registration.update();
     const isSuccess = await registration.unregister();
     console.log(`Service worker unregistering ${isSuccess}`)
-    await sleepAsync({milliseconds: 2000});
+    await sleepAsync({ milliseconds: 2000 });
     location.reload();
 }
 
 
 
-const sendMessageAsync = (registration) => (data) : Promise<any> => {
-    return new Promise(function(resolve, reject) {
+const sendMessageAsync = (registration) => (data): Promise<any> => {
+    return new Promise(function (resolve, reject) {
         const messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function (event) {
             if (event.data && event.data.error) {
@@ -61,22 +61,35 @@ const sendMessageAsync = (registration) => (data) : Promise<any> => {
     });
 };
 
-export const initWorkerAsync = async(configuration, configurationName) => {
-    
+export const initWorkerAsync = async (configuration, configurationName) => {
+
+    const getTabId = () => {
+        const tabId = sessionStorage.getItem(`oidc.tabId.${configurationName}`);
+
+        if (tabId) {
+            return tabId;
+        }
+
+        const newTabId = globalThis.crypto.randomUUID();
+        sessionStorage.setItem(`oidc.tabId.${configurationName}`, newTabId);
+        return newTabId;
+    }
+
+
     const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
     if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.serviceWorker || !serviceWorkerRelativeUrl) {
         return null;
     }
-    
-    if(configuration.service_worker_activate() === false) {
+
+    if (configuration.service_worker_activate() === false) {
         return null;
     }
 
     let registration = null;
-    if(configuration.register) {
+    if (configuration.register) {
         registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
     } else {
-        registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);   
+        registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
     }
 
     try {
@@ -86,11 +99,11 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     } catch (err) {
         return null;
     }
-    
+
     const clearAsync = async (status) => {
         return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
     };
-    const initAsync = async (oidcServerConfiguration, where, oidcConfiguration:OidcConfiguration) => {
+    const initAsync = async (oidcServerConfiguration, where, oidcConfiguration: OidcConfiguration) => {
         const result = await sendMessageAsync(registration)({
             type: 'init',
             data: {
@@ -103,26 +116,26 @@ export const initWorkerAsync = async(configuration, configurationName) => {
             },
             configurationName,
         });
-        
+
         // @ts-ignore
         const serviceWorkerVersion = result.version;
-        if(serviceWorkerVersion !== codeVersion) {
+        if (serviceWorkerVersion !== codeVersion) {
             console.warn(`Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`);
             await oidcConfiguration.service_worker_update_require_callback(registration, stopKeepAlive);
         }
-        
+
         // @ts-ignore
         return { tokens: parseOriginalTokens(result.tokens, null, oidcConfiguration.token_renew_mode), status: result.status };
     };
 
-    const startKeepAliveServiceWorker = (service_worker_keep_alive_path='/') => {
+    const startKeepAliveServiceWorker = (service_worker_keep_alive_path = '/') => {
         if (keepAliveServiceWorkerTimeoutId == null) {
             keepAliveServiceWorkerTimeoutId = 'not_null';
             keepAlive(service_worker_keep_alive_path);
         }
     };
 
-    const setSessionStateAsync = (sessionState:string) => {
+    const setSessionStateAsync = (sessionState: string) => {
         return sendMessageAsync(registration)({ type: 'setSessionState', data: { sessionState }, configurationName });
     };
 
@@ -133,19 +146,20 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     };
 
     const setNonceAsync = (nonce) => {
-        sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
-        return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
+        const tabId = getTabId();
+        sessionStorage[`oidc.nonce.${configurationName}`] = nonce;
+        return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce, tabId }, configurationName });
     };
-    const getNonceAsync = async () => {
+    const getNonceAsync = async (): Promise<string | undefined> => {
+        const tabId = getTabId();
         // @ts-ignore
-        const result = await sendMessageAsync(registration)({ type: 'getNonce', data: null, configurationName });
+        let nonce = await sendMessageAsync(registration)({ type: 'getNonce', data: { tabId }, configurationName });
         // @ts-ignore
-        let nonce = result.nonce;
         if (!nonce) {
-            nonce = sessionStorage[`oidc.nonce.${configurationName}`];
             console.warn('nonce not found in service worker, using sessionStorage');
+            nonce = sessionStorage[`oidc.nonce.${configurationName}`];
         }
-        return { nonce };
+        return nonce;
     };
 
     let getLoginParamsCache = {};
@@ -167,26 +181,27 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     };
 
     const getDemonstratingProofOfPossessionNonce = async () => {
-        const result = await sendMessageAsync(registration)({type: 'getDemonstratingProofOfPossessionNonce', data: null, configurationName});
+        const result = await sendMessageAsync(registration)({ type: 'getDemonstratingProofOfPossessionNonce', data: null, configurationName });
         return result.demonstratingProofOfPossessionNonce;
     };
 
-    const setDemonstratingProofOfPossessionJwkAsync = async (demonstratingProofOfPossessionJwk:JsonWebKey) => {
+    const setDemonstratingProofOfPossessionJwkAsync = async (demonstratingProofOfPossessionJwk: JsonWebKey) => {
         const demonstratingProofOfPossessionJwkJson = JSON.stringify(demonstratingProofOfPossessionJwk);
         await sendMessageAsync(registration)({ type: 'setDemonstratingProofOfPossessionJwk', data: { demonstratingProofOfPossessionJwkJson }, configurationName });
     };
 
     const getDemonstratingProofOfPossessionJwkAsync = async () => {
-        const result = await sendMessageAsync(registration)({type: 'getDemonstratingProofOfPossessionJwk', data: null, configurationName});
-        if(!result.demonstratingProofOfPossessionJwkJson) {
+        const result = await sendMessageAsync(registration)({ type: 'getDemonstratingProofOfPossessionJwk', data: null, configurationName });
+        if (!result.demonstratingProofOfPossessionJwkJson) {
             return null;
         }
         return JSON.parse(result.demonstratingProofOfPossessionJwkJson);
     };
-    
-    const getStateAsync = async () => {
-        const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
-        // @ts-ignore
+
+    const getStateAsync = async (): Promise<string | undefined> => {
+        const tabId = getTabId();
+        const result = await sendMessageAsync(registration)({ type: 'getState', data: { tabId }, configurationName });
+
         let state = result.state;
         if (!state) {
             state = sessionStorage[`oidc.state.${configurationName}`];
@@ -195,9 +210,10 @@ export const initWorkerAsync = async(configuration, configurationName) => {
         return state;
     };
 
-    const setStateAsync = async (state:string) => {
+    const setStateAsync = async (state: string) => {
+        const tabId = getTabId();
         sessionStorage[`oidc.state.${configurationName}`] = state;
-        return sendMessageAsync(registration)({ type: 'setState', data: { state }, configurationName });
+        return sendMessageAsync(registration)({ type: 'setState', data: { state, tabId }, configurationName });
     };
 
     const getCodeVerifierAsync = async () => {
@@ -211,7 +227,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
         return codeVerifier;
     };
 
-    const setCodeVerifierAsync = async (codeVerifier:string) => {
+    const setCodeVerifierAsync = async (codeVerifier: string) => {
         sessionStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
         return sendMessageAsync(registration)({ type: 'setCodeVerifier', data: { codeVerifier }, configurationName });
     };
@@ -219,8 +235,8 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     return {
         clearAsync,
         initAsync,
-        startKeepAliveServiceWorker : () => startKeepAliveServiceWorker(configuration.service_worker_keep_alive_path),
-        isServiceWorkerProxyActiveAsync : () => isServiceWorkerProxyActiveAsync(configuration.service_worker_keep_alive_path),
+        startKeepAliveServiceWorker: () => startKeepAliveServiceWorker(configuration.service_worker_keep_alive_path),
+        isServiceWorkerProxyActiveAsync: () => isServiceWorkerProxyActiveAsync(configuration.service_worker_keep_alive_path),
         setSessionStateAsync,
         getSessionStateAsync,
         setNonceAsync,

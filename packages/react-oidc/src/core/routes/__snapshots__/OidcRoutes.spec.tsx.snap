@@ -5,9 +5,3 @@ exports[`Authenticating test suite > renders correctly 1`] = `
   http://url.com
 </DocumentFragment>
 `;
-
-exports[`Authenticating test suite renders correctly 1`] = `
-<DocumentFragment>
-  http://url.com
-</DocumentFragment>
-`;
