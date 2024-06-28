@@ -255,6 +255,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         if (this.logoutPromise) {
             await this.logoutPromise;
         }
+        
         if (this.loginPromise !== null) {
             return this.loginPromise;
         }
