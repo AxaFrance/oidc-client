@@ -56,6 +56,9 @@ const sendMessageAsync = (registration) => (data) : Promise<any> => {
             } else {
                 resolve(event.data);
             }
+
+            messageChannel.port1.close();
+            messageChannel.port2.close();
         };
         registration.active.postMessage(data, [messageChannel.port2]);
     });
