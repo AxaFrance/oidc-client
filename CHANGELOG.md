@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.8
+## 7.22.9
+
+- [77eb9e1](https://github.com/AxaFrance/oidc-client/commit/77eb9e1841814cfeb6c6672159740dad4c0a9d4d) - fix(oidc): MessageChannel is not closed after message is received (release) (#1396), 2024-07-02 by *radk0s*
+
+
+## v7.22.8
 
 - [c4cf94b](https://github.com/AxaFrance/oidc-client/commit/c4cf94b62a7b2c45cf0f94438a02f0cb5f06b9b0) - fix(oidc): remove dynamic web worker blocked by policies (release) (#1386), 2024-06-18 by *Guillaume Chervet*
 
@@ -311,10 +316,5 @@
 
 - [d1480fb](https://github.com/AxaFrance/oidc-client/commit/d1480fbe2c0e275f17775768f83b70d9adf00ee1) - fix(all): dependencies update break the build (release), 2023-11-30 by *Guillaume Chervet*
 - [6027511](https://github.com/AxaFrance/oidc-client/commit/6027511a0c8d2112d370d45cf42f144874112f77) - doc(readme) Update README.md, 2023-11-29 by *Guillaume Chervet*
-
-
-## v7.12.10
-
-- [a9cd4d2](https://github.com/AxaFrance/oidc-client/commit/a9cd4d25ef8d66bd12e5c0e921b9fd1bc4a137ba) - build(npm): bump @testing-library/react from 13.3.0 to 14.1.2 (#1222), 2023-11-29 by *dependabot[bot]*
 
 
