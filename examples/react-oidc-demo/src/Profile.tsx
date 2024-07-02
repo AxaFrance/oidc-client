@@ -1,4 +1,12 @@
-import { OidcSecure, type OidcUserInfo, OidcUserStatus, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc';
+import {
+    OidcSecure,
+    type OidcUserInfo,
+    OidcUserStatus,
+    useOidc,
+    useOidcAccessToken,
+    useOidcIdToken,
+    useOidcUser
+} from '@axa-fr/react-oidc';
 import React from 'react';
 
 interface OidcUserRoleInfo extends OidcUserInfo{
@@ -31,8 +39,10 @@ const DisplayUserInfo = () => {
 };
 
 export const Profile = () => {
+    const { logout, isAuthenticated } = useOidc();
     return (
-       <div className="container mt-3">
+       <div className="contaicner mt-3">
+           {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button></p>}
            <DisplayAccessToken/>
            <DisplayIdToken/>
            <DisplayUserInfo/>
