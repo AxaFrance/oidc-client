@@ -252,6 +252,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
     loginPromise: Promise<void> = null;
     async loginAsync(callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined, silentLoginOnly = false) {
+        if (this.logoutPromise) {
+            await this.logoutPromise;
+        }
+        
         if (this.loginPromise !== null) {
             return this.loginPromise;
         }
