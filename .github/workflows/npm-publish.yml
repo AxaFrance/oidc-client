@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 env:
-  PNPM_VERSION: 8.5.1
+  PNPM_VERSION: 8.6.11
   NODE_VERSION: 18
 jobs:
   skip_ci:
