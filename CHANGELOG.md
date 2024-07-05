@@ -1,6 +1,24 @@
 # Changelog
 
-## 7.22.9
+## 7.22.13
+
+- [95c814d](https://github.com/AxaFrance/oidc-client/commit/95c814dd9dd325a3a00c3a0dc049d301d983514e) - fix(ci): setup pnpm (release) (#1399), 2024-07-05 by *Guillaume Chervet*
+
+
+## v7.22.12
+
+
+
+## v7.22.11
+
+
+
+## v7.22.10
+
+- [6c80c5c](https://github.com/AxaFrance/oidc-client/commit/6c80c5cc77750aead50e62136a6594b05f21b42b) - fix(oidc): logout trigger login (release) (#1394), 2024-07-04 by *Guillaume Chervet*
+
+
+## v7.22.9
 
 - [77eb9e1](https://github.com/AxaFrance/oidc-client/commit/77eb9e1841814cfeb6c6672159740dad4c0a9d4d) - fix(oidc): MessageChannel is not closed after message is received (release) (#1396), 2024-07-02 by *radk0s*
 
@@ -295,26 +313,5 @@
 ## v7.13.2
 
 - [430a06b](https://github.com/AxaFrance/oidc-client/commit/430a06b27b2f7164bc1557a2e55e547b5af3d8d7) - build(npm): bump vite from 4.4.7 to 4.4.12 (#1231), 2023-12-07 by *dependabot[bot]*
-
-
-## v7.13.1
-
-- [96637a7](https://github.com/AxaFrance/oidc-client/commit/96637a73252e9ea34d8687409131f58f09633da6) - fix(oidc): sessions storage renew tokens (release) (#1230), 2023-12-05 by *Guillaume Chervet*
-
-
-## v7.13.0
-
-- [49c3d5e](https://github.com/AxaFrance/oidc-client/commit/49c3d5e5487d714ccd97272e37fc34f2a7bd0ff6) - feat(oidc-client): allow to take control on service-worker registration (release) (#1229), 2023-12-04 by *Guillaume Chervet*
-
-
-## v7.12.12
-
-- [b070c88](https://github.com/AxaFrance/oidc-client/commit/b070c8848582ac6f52ab7cb00f16b0fe9f702b5f) - fix(oidc-client): Update README.md (release), 2023-11-30 by *Guillaume Chervet*
-
-
-## v7.12.11
-
-- [d1480fb](https://github.com/AxaFrance/oidc-client/commit/d1480fbe2c0e275f17775768f83b70d9adf00ee1) - fix(all): dependencies update break the build (release), 2023-11-30 by *Guillaume Chervet*
-- [6027511](https://github.com/AxaFrance/oidc-client/commit/6027511a0c8d2112d370d45cf42f144874112f77) - doc(readme) Update README.md, 2023-11-29 by *Guillaume Chervet*
 
 
