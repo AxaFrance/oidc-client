@@ -41,7 +41,7 @@ const DisplayUserInfo = () => {
 export const Profile = () => {
     const { logout, isAuthenticated } = useOidc();
     return (
-       <div className="contaicner mt-3">
+       <div className="container mt-3">
            {isAuthenticated && <p><button type="button" className="btn btn-primary" onClick={() => logout()}>logout</button></p>}
            <DisplayAccessToken/>
            <DisplayIdToken/>
