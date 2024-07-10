@@ -97,8 +97,7 @@ const keepAliveAsync = async (event: FetchEvent) => {
 
 async function generateDpopAsync(originalRequest: Request, currentDatabase:OidcConfig|null, url: string, extrasClaims={} ) {
 	const headersExtras = serializeHeaders(originalRequest.headers);
-	if (currentDatabase && 
-		currentDatabase.demonstratingProofOfPossessionConfiguration && 
+	if (currentDatabase?.demonstratingProofOfPossessionConfiguration && 
 		currentDatabase.demonstratingProofOfPossessionJwkJson &&
 		(!currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent || currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent && headersExtras['dpop'])
 	) {
@@ -125,11 +124,7 @@ const handleFetch = async (event: FetchEvent) => {
 		url,
 		trustedDomains,
 	);
-	if (
-		currentDatabaseForRequestAccessToken &&
-		currentDatabaseForRequestAccessToken.tokens &&
-		currentDatabaseForRequestAccessToken.tokens.access_token
-	) {
+	if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
 		while (
 			currentDatabaseForRequestAccessToken.tokens &&
 			!isTokensValid(currentDatabaseForRequestAccessToken.tokens)
@@ -205,7 +200,7 @@ const handleFetch = async (event: FetchEvent) => {
 					let newBody = actualBody;
 					for (let i = 0; i < numberDatabase; i++) {
 						const currentDb = currentDatabases[i];
-						if (currentDb && currentDb.tokens != null) {
+						if (currentDb?.tokens != null) {
 							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),};
 							headers = await generateDpopAsync(originalRequest, currentDb, url, claimsExtras);
 							const keyRefreshToken =
@@ -246,10 +241,7 @@ const handleFetch = async (event: FetchEvent) => {
 						integrity: clonedRequest.integrity,
 					});
 
-					if (
-						currentDatabase &&
-						currentDatabase.oidcServerConfiguration != null &&
-						currentDatabase.oidcServerConfiguration.revocationEndpoint &&
+					if (currentDatabase?.oidcServerConfiguration?.revocationEndpoint &&
 						url.startsWith(
 							normalizeUrl(
 								currentDatabase.oidcServerConfiguration.revocationEndpoint,
@@ -272,7 +264,7 @@ const handleFetch = async (event: FetchEvent) => {
 					// @ts-ignore
 					currentDatabase = database[currentLoginCallbackConfigurationName];
 					let newBody = actualBody;
-					if (currentDatabase && currentDatabase.codeVerifier != null) {
+					if (currentDatabase?.codeVerifier != null) {
 						newBody = replaceCodeVerifier(
 							newBody,
 							currentDatabase.codeVerifier,
@@ -435,9 +427,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 				if (tokens.refresh_token) {
 					tokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName;
 				}
-				if (
-					tokens.idTokenPayload &&
-					tokens.idTokenPayload.nonce &&
+				if (tokens?.idTokenPayload?.nonce &&
 					currentDatabase.nonce != null
 				) {
 					tokens.idTokenPayload.nonce =
