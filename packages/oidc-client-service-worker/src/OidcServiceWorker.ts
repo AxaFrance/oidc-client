@@ -20,6 +20,7 @@ import version from './version';
 import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
 import {getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent} from "./dpop";
 import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
+import { getCurrentDatabasesTokenEndpoint } from './oidcConfig';
 
 // @ts-ignore
 if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
@@ -55,27 +56,6 @@ const handleActivate = (event: ExtendableEvent) => {
 };
 
 const database: Database = {};
-
-const getCurrentDatabasesTokenEndpoint = (database: Database, url: string) => {
-	const databases: OidcConfig[] = [];
-	for (const [, value] of Object.entries<OidcConfig>(database)) {
-		if (
-			value.oidcServerConfiguration != null &&
-			url.startsWith(normalizeUrl(value.oidcServerConfiguration.tokenEndpoint))
-		) {
-			databases.push(value);
-		} else if (
-			value.oidcServerConfiguration != null &&
-			value.oidcServerConfiguration.revocationEndpoint &&
-			url.startsWith(
-				normalizeUrl(value.oidcServerConfiguration.revocationEndpoint),
-			)
-		) {
-			databases.push(value);
-		}
-	}
-	return databases;
-};
 
 const keepAliveAsync = async (event: FetchEvent) => {
 	const originalRequest = event.request;
