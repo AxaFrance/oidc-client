@@ -23,7 +23,7 @@
     "lint": "eslint --cache .",
     "lint-fix": "eslint --cache --fix .",
     "outdated": "pnpm outdated -r",
-    "test": "pnpm run test --workspaces --if-present",
+    "test": "pnpm --if-present --recursive run test ",
     "build": "pnpm -r --filter=./packages/* run build"
   },
   "devDependencies": {

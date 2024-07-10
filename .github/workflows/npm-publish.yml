@@ -11,7 +11,7 @@ on:
 
 env:
   PNPM_VERSION: 8.6.11
-  NODE_VERSION: 18
+  NODE_VERSION: 20
 jobs:
   skip_ci:
     runs-on: ubuntu-latest
@@ -24,8 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -44,7 +44,7 @@ jobs:
         working-directory: ./packages/react-oidc
 
       - name: pnpm test
-        run: pnpm test -- --run
+        run: pnpm test
         working-directory: ./packages/react-oidc
 
       - name: pnpm install
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_TOKEN }}
           fetch-depth: 0
@@ -152,7 +152,7 @@ jobs:
         working-directory: ./packages/oidc-client-service-worker
         
       - name: pnpm test
-        run: pnpm test -- --run
+        run: pnpm test
         working-directory: ./packages/oidc-client-service-worker
         
       # oidc-client
@@ -196,7 +196,7 @@ jobs:
         working-directory: ./packages/react-oidc
 
       - name: pnpm test
-        run: pnpm test -- --run
+        run: pnpm test
         working-directory: ./packages/react-oidc
         
       # oidc-client-service-worker

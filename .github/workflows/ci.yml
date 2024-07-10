@@ -10,17 +10,17 @@ on:
 
 env:
   PNPM_VERSION: 8.6.11
-  NODE_VERSION: 18
+  NODE_VERSION: 20
 
 jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -40,7 +40,7 @@ jobs:
         working-directory: ./packages/oidc-client
 
       - name: Run test (oidc-client)
-        run: pnpm test -- --run
+        run: pnpm test
         working-directory: ./packages/oidc-client
 
       #react-oidc
@@ -53,5 +53,5 @@ jobs:
         working-directory: ./packages/react-oidc
 
       - name: Run test (react-oidc)
-        run: pnpm test -- --run
+        run: pnpm test
         working-directory: ./packages/react-oidc
