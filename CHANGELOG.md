@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.13
+## 7.22.14
+
+- [25c55ee](https://github.com/AxaFrance/oidc-client/commit/25c55eeb7682356c13987a91d7b8645cca1b0ad5) - refactor(oidc): null coalescing (#1404) (release), 2024-07-11 by *Jason Finch*
+
+
+## v7.22.13
 
 - [95c814d](https://github.com/AxaFrance/oidc-client/commit/95c814dd9dd325a3a00c3a0dc049d301d983514e) - fix(ci): setup pnpm (release) (#1399), 2024-07-05 by *Guillaume Chervet*
 
@@ -308,10 +313,5 @@
 ## v7.13.3
 
 - [43eac59](https://github.com/AxaFrance/oidc-client/commit/43eac59f1598ab6a5b07dc52deed95297c73f875) - build(npm): bump vite-plugin-dts from 3.4.0 to 3.6.4 (#1227), 2023-12-07 by *dependabot[bot]*
-
-
-## v7.13.2
-
-- [430a06b](https://github.com/AxaFrance/oidc-client/commit/430a06b27b2f7164bc1557a2e55e547b5af3d8d7) - build(npm): bump vite from 4.4.7 to 4.4.12 (#1231), 2023-12-07 by *dependabot[bot]*
 
 
