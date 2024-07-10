@@ -60,6 +60,7 @@ export type MessageData = {
 
 export type MessageEventData = {
     configurationName: string;
+    tabId: string;
     type: MessageEventType;
     data: MessageData;
 }
@@ -73,9 +74,9 @@ export type OidcConfig = {
     configurationName: string;
     tokens: Tokens | null;
     status: Status;
-    state: string | null;
-    codeVerifier: string | null;
-    nonce: Nonce;
+    state: Record<string, string | null>;
+    codeVerifier: Record<string, string | null>;
+    nonce: Record<string, Nonce>;
     oidcServerConfiguration: OidcServerConfiguration | null;
     oidcConfiguration?: OidcConfiguration;
     sessionState?: string | null;

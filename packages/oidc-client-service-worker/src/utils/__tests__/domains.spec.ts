@@ -38,9 +38,9 @@ describe('domains', () => {
 					configurationName: 'config',
 					tokens: {} as Tokens,
 					status: 'NOT_CONNECTED',
-					state: null,
-					codeVerifier: null,
-					nonce: null,
+					state: {},
+					codeVerifier: {},
+					nonce: {},
 					oidcServerConfiguration: {
 						authorizationEndpoint: 'https://demo.duendesoftware.com/connect/authorize',
 						issuer: 'https://demo.duendesoftware.com',

@@ -65,7 +65,18 @@ const sendMessageAsync = (registration) => (data) : Promise<any> => {
 };
 
 export const initWorkerAsync = async(configuration, configurationName) => {
-    
+    const getTabId = () => {
+        const tabId = sessionStorage.getItem(`oidc.tabId.${configurationName}`);
+
+        if (tabId) {
+            return tabId;
+        }
+
+        const newTabId = globalThis.crypto.randomUUID();
+        sessionStorage.setItem(`oidc.tabId.${configurationName}`, newTabId);
+        return newTabId;
+    }
+
     const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
     if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.serviceWorker || !serviceWorkerRelativeUrl) {
         return null;
@@ -89,7 +100,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     } catch (err) {
         return null;
     }
-    
+
     const clearAsync = async (status) => {
         return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
     };
@@ -105,6 +116,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
                 },
             },
             configurationName,
+            tabId: getTabId()
         });
         
         // @ts-ignore
@@ -136,12 +148,14 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     };
 
     const setNonceAsync = (nonce) => {
+        const tabId = getTabId();
         sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
-        return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName });
+        return sendMessageAsync(registration)({ type: 'setNonce', data: { nonce }, configurationName, tabId });
     };
     const getNonceAsync = async () => {
+        const tabId = getTabId();
         // @ts-ignore
-        const result = await sendMessageAsync(registration)({ type: 'getNonce', data: null, configurationName });
+        const result = await sendMessageAsync(registration)({ type: 'getNonce', data: null, configurationName, tabId });
         // @ts-ignore
         let nonce = result.nonce;
         if (!nonce) {
@@ -188,7 +202,8 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     };
     
     const getStateAsync = async () => {
-        const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName });
+        const tabId = getTabId();
+        const result = await sendMessageAsync(registration)({ type: 'getState', data: null, configurationName, tabId });
         // @ts-ignore
         let state = result.state;
         if (!state) {
@@ -199,12 +214,14 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     };
 
     const setStateAsync = async (state:string) => {
+        const tabId = getTabId();
         sessionStorage[`oidc.state.${configurationName}`] = state;
-        return sendMessageAsync(registration)({ type: 'setState', data: { state }, configurationName });
+        return sendMessageAsync(registration)({ type: 'setState', data: { state }, configurationName, tabId });
     };
 
     const getCodeVerifierAsync = async () => {
-        const result = await sendMessageAsync(registration)({ type: 'getCodeVerifier', data: null, configurationName });
+        const tabId = getTabId();
+        const result = await sendMessageAsync(registration)({ type: 'getCodeVerifier', data: null, configurationName, tabId });
         // @ts-ignore
         let codeVerifier = result.codeVerifier;
         if (!codeVerifier) {
@@ -215,8 +232,9 @@ export const initWorkerAsync = async(configuration, configurationName) => {
     };
 
     const setCodeVerifierAsync = async (codeVerifier:string) => {
+        const tabId = getTabId();
         sessionStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
-        return sendMessageAsync(registration)({ type: 'setCodeVerifier', data: { codeVerifier }, configurationName });
+        return sendMessageAsync(registration)({ type: 'setCodeVerifier', data: { codeVerifier }, configurationName, tabId });
     };
 
     return {

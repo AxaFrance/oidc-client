@@ -115,7 +115,7 @@ function extractedIssueAt(tokens: Tokens, accessTokenPayload: AccessTokenPayload
   return tokens.issued_at;
 }
 
-function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configurationName: string) {
+function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configurationName: string, currentTabId: string) {
   if (!tokens.issued_at) {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
     tokens.issued_at = currentTimeUnixSecond;
@@ -129,7 +129,7 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
     accessTokenPayload,
   };
   if (currentDatabaseElement.hideAccessToken) {
-    secureTokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName;
+    secureTokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName + '_' + currentTabId;
   }
   tokens.accessTokenPayload = accessTokenPayload;
 
@@ -149,14 +149,14 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
     tokens.idTokenPayload = _idTokenPayload !=null ? { ..._idTokenPayload }: null;
     if (_idTokenPayload && _idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
       const keyNonce =
-          TOKEN.NONCE_TOKEN + '_' + currentDatabaseElement.configurationName;
+          TOKEN.NONCE_TOKEN + '_' + currentDatabaseElement.configurationName + '_' + currentTabId;
       _idTokenPayload.nonce = keyNonce;
     }
     secureTokens.idTokenPayload = _idTokenPayload;
   }
   if (tokens.refresh_token) {
     secureTokens.refresh_token =
-        TOKEN.REFRESH_TOKEN + '_' + configurationName;
+        TOKEN.REFRESH_TOKEN + '_' + configurationName + '_' + currentTabId;
   }
 
   tokens.issued_at = extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload);
@@ -189,12 +189,12 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   secureTokens.expiresAt = expiresAt;
 
   tokens.expiresAt = expiresAt;
-  const nonce = currentDatabaseElement.nonce
-      ? currentDatabaseElement.nonce.nonce
+  const nonce = currentDatabaseElement.nonce[currentTabId]
+      ? currentDatabaseElement.nonce[currentTabId]?.nonce
       : null;
   const { isValid, reason } = isTokensOidcValid(
       tokens,
-      nonce,
+      nonce as string,
       currentDatabaseElement.oidcServerConfiguration as OidcServerConfiguration,
   ); // TODO: Type assertion, could be null.
   if (!isValid) {
@@ -222,7 +222,7 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
 }
 
 const demonstratingProofOfPossessionNonceResponseHeader = "DPoP-Nonce";
-function hideTokens(currentDatabaseElement: OidcConfig) {
+function hideTokens(currentDatabaseElement: OidcConfig, currentTabId: string) {
   const configurationName = currentDatabaseElement.configurationName;
   return (response: Response) => {
     if (response.status !== 200) {
@@ -235,7 +235,7 @@ function hideTokens(currentDatabaseElement: OidcConfig) {
     }
 
     return response.json().then<Response>((tokens: Tokens) => {
-      const secureTokens = _hideTokens(tokens, currentDatabaseElement, configurationName);
+      const secureTokens = _hideTokens(tokens, currentDatabaseElement, configurationName, currentTabId);
       const body = JSON.stringify(secureTokens);
       return new Response(body, {
         status: response.status,
