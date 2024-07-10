@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.22.14
+## 7.22.15
+
+- [73eae7e](https://github.com/AxaFrance/oidc-client/commit/73eae7e9d68dea6ebec0ed82ba7873941c0e371e) - refactor(oidcServiceWorker): Extract GetCurrentDatabaseTokenEndpoint, add tests. (#1405) (release), 2024-07-11 by *Jason Finch*
+- [e51aef2](https://github.com/AxaFrance/oidc-client/commit/e51aef268e783259c035e3ba58bf9aa16a111bea) - fix (Style): fix 'container' classname in demo. (#1401), 2024-07-11 by *Jason Finch*
+
+
+## v7.22.14
 
 - [25c55ee](https://github.com/AxaFrance/oidc-client/commit/25c55eeb7682356c13987a91d7b8645cca1b0ad5) - refactor(oidc): null coalescing (#1404) (release), 2024-07-11 by *Jason Finch*
 
@@ -308,10 +314,5 @@
 ## v7.13.4
 
 - [33a9c83](https://github.com/AxaFrance/oidc-client/commit/33a9c8349f23d98960fb4c60f49d7fd19572cca5) - build(npm): bump react-router-dom from 6.14.2 to 6.20.1 (#1234), 2023-12-07 by *dependabot[bot]*
-
-
-## v7.13.3
-
-- [43eac59](https://github.com/AxaFrance/oidc-client/commit/43eac59f1598ab6a5b07dc52deed95297c73f875) - build(npm): bump vite-plugin-dts from 3.4.0 to 3.6.4 (#1227), 2023-12-07 by *dependabot[bot]*
 
 
