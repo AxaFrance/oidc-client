@@ -34,14 +34,13 @@ Demos:
 - Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
-
 **@axa-fr/oidc-client** is:
 
 - **Secure** :
   - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
   - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
   - OIDC using client side Code Credential Grant with pkce only
-- **Lightweight** : Unpacked Size on npm is **274 kB**
+- **Lightweight** : Unpacked Size on npm is **274 kB**,  Minified `61.1kB`, Minified+GZIPPED `16.8kB` [Pkg stats via Bundlephobia.com](https://bundlephobia.com/package/@axa-fr/react-oidc)
 - **Simple**
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
@@ -56,6 +55,7 @@ Works perfectly well with:
 
 - [Auth0](https://auth0.com/)
 - [Duende Identity Server](https://duendesoftware.com/)
+- [Identity Server 4](https://github.com/IdentityServer/IdentityServer4) 
 - Azure AD
 - Google
 - AWS
@@ -78,8 +78,11 @@ node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
 # ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
 
-WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up to date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
-```sh
+
+> [!WARNING]
+> If you use `Service Worker` mode, the `OidcServiceWorker.js` file should always be up to date with the version of the library. You may setup a postinstall script in your `package.json` file to update it at each npm install. For example :
+
+```json
   "scripts": {
     ...
     "postinstall": "node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public"
@@ -103,15 +106,17 @@ node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public
 # ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
 
-WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up-to-date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
-```sh
+> [!WARNING]
+> If you use Service Worker mode, the OidcServiceWorker.js file should always be up-to-date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
+
+```json
   "scripts": {
     ...
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
 ```
 
-More documentation :
+More documentation:
 
 - [`@axa-fr/react-oidc`](./packages/react-oidc#readme)
 
