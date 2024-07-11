@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.22.15
+## 7.22.16
+
+- [72a6373](https://github.com/AxaFrance/oidc-client/commit/72a6373402a53aaaf01ad7fac22f8ad8c6feaff0) - fix(oidc): improve error handling (release) (#1403), 2024-07-11 by *Miya*
+- [c56ceb8](https://github.com/AxaFrance/oidc-client/commit/c56ceb815b28dd5990fe4a1679a61bcebc7e525a) - docs(readme): Update README.md (#1407), 2024-07-12 by *Jason Finch*
+
+
+## v7.22.15
 
 - [73eae7e](https://github.com/AxaFrance/oidc-client/commit/73eae7e9d68dea6ebec0ed82ba7873941c0e371e) - refactor(oidcServiceWorker): Extract GetCurrentDatabaseTokenEndpoint, add tests. (#1405) (release), 2024-07-11 by *Jason Finch*
 - [e51aef2](https://github.com/AxaFrance/oidc-client/commit/e51aef268e783259c035e3ba58bf9aa16a111bea) - fix (Style): fix 'container' classname in demo. (#1401), 2024-07-11 by *Jason Finch*
@@ -309,10 +315,5 @@
 ## v7.13.5
 
 - [8f5f888](https://github.com/AxaFrance/oidc-client/commit/8f5f888fe34d739ded51f611e194d77a2e788830) - build(npm): bump eslint-plugin-regexp from 1.15.0 to 2.1.2 (#1233), 2023-12-07 by *dependabot[bot]*
-
-
-## v7.13.4
-
-- [33a9c83](https://github.com/AxaFrance/oidc-client/commit/33a9c8349f23d98960fb4c60f49d7fd19572cca5) - build(npm): bump react-router-dom from 6.14.2 to 6.20.1 (#1234), 2023-12-07 by *dependabot[bot]*
 
 
