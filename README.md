@@ -40,7 +40,7 @@ Demos:
   - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
   - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
   - OIDC using client side Code Credential Grant with pkce only
-- **Lightweight** : Unpacked Size on npm is **274 kB**
+- **Lightweight** : Unpacked Size on npm is **274 kB**,  Minified `61.1kB`, Minified+GZIPPED `16.8kB` [Pkg stats via Bundlephobia.com](https://bundlephobia.com/package/@axa-fr/react-oidc)
 - **Simple**
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
