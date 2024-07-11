@@ -34,7 +34,6 @@ Demos:
 - Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
-
 **@axa-fr/oidc-client** is:
 
 - **Secure** :
@@ -56,6 +55,7 @@ Works perfectly well with:
 
 - [Auth0](https://auth0.com/)
 - [Duende Identity Server](https://duendesoftware.com/)
+- [Identity Server 4](https://github.com/IdentityServer/IdentityServer4) 
 - Azure AD
 - Google
 - AWS
@@ -78,8 +78,11 @@ node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
 # ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
 
-WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up to date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
-```sh
+
+> [!WARNING]
+> If you use `Service Worker` mode, the `OidcServiceWorker.js` file should always be up to date with the version of the library. You may setup a postinstall script in your `package.json` file to update it at each npm install. For example :
+
+```json
   "scripts": {
     ...
     "postinstall": "node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public"
@@ -103,15 +106,17 @@ node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public
 # ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
 
-WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up-to-date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
-```sh
+> [!WARNING]
+> If you use Service Worker mode, the OidcServiceWorker.js file should always be up-to-date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
+
+```json
   "scripts": {
     ...
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
 ```
 
-More documentation :
+More documentation:
 
 - [`@axa-fr/react-oidc`](./packages/react-oidc#readme)
 
