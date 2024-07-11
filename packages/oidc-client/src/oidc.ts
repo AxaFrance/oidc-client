@@ -228,9 +228,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return await fetchFromIssuer(this.getFetch())(authority, this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60, storage, this.configuration.authority_timeout_wellknowurl_in_millisecond);
         };
         this.initPromise = localFuncAsync();
-        return this.initPromise.then((result) => {
+        return this.initPromise.finally(() => {
+            // in case if anything went wrong with the promise, we should reset the initPromise to null too
+            // otherwise client can't re-init the OIDC client
+            // as the promise is already fulfilled with rejected state, so could not ever reach this point again,
+            // so that leads to infinite loop of calls, when client tries to re-init the OIDC client after error
             this.initPromise = null;
-            return result;
         });
     }
 

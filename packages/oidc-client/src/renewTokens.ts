@@ -321,7 +321,19 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
         }
     } catch (exception: any) {
         console.error(exception);
-        oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, { message: 'exception', exception: exception.message });
-        return synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
+        oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
+            message: 'exception',
+            exception: exception.message,
+        });
+        // we need to break the loop or errors, as direct call of synchroniseTokensAsync
+        // inside of synchroniseTokensAsync will cause an infinite loop and kill the browser stack
+        // so we need to brake calls chain and delay next call
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens)
+                    .then(resolve)
+                    .catch(reject);
+            }, 1000);
+        });
     }
 }
