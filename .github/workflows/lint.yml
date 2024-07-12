@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -38,8 +38,13 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-          eslint: true
-          prettier: false #runs part of eslint
+      - name: Run lint
+        run: pnpm run lint
+
+      # Currently incompatible with ESlint 9 (https://github.com/wearerequired/lint-action/pull/799)
+      # - name: Run linters
+      #   uses: wearerequired/lint-action@v2
+      #   with:
+      #     eslint: true
+      #     prettier: false #runs part of eslint
+      #     autofix: false  #does not work well with pull requests https://github.com/wearerequired/lint-action?tab=readme-ov-file#limitations
