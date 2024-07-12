@@ -5,7 +5,7 @@ import {
     useOidc,
     useOidcAccessToken,
     useOidcIdToken,
-    useOidcUser
+    useOidcUser,
 } from '@axa-fr/react-oidc';
 import React from 'react';
 

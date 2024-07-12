@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
-import { getCurrentDatabasesTokenEndpoint } from '../oidcConfig'
-import { Database } from '../types'
+import { describe, expect, it } from 'vitest';
+
+import { getCurrentDatabasesTokenEndpoint } from '../oidcConfig';
+import { Database } from '../types';
 
 const oidcConfigDefaults = {
   demonstratingProofOfPossessionConfiguration: null,
@@ -16,16 +17,16 @@ const oidcConfigDefaults = {
   demonstratingProofOfPossessionNonce: null,
   demonstratingProofOfPossessionJwkJson: null,
   demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
-  allowMultiTabLogin: true
-}
+  allowMultiTabLogin: true,
+};
 
 const oidcServerConfigDefault = {
   revocationEndpoint: '',
   tokenEndpoint: '', 
   issuer: '', 
   userInfoEndpoint: '',
-  authorizationEndpoint: ''
-}
+  authorizationEndpoint: '',
+};
 
 describe('getCurrentDatabasesTokenEndpoint', () => {
   it('should return configs with matching token endpoint', () => {
@@ -51,14 +52,14 @@ describe('getCurrentDatabasesTokenEndpoint', () => {
           revocationEndpoint: 'https://example.net/revoke',
         },
       },
-    }
+    };
 
-    const url = 'https://example.com/token'
-    const result = getCurrentDatabasesTokenEndpoint(database, url)
+    const url = 'https://example.com/token';
+    const result = getCurrentDatabasesTokenEndpoint(database, url);
 
-    expect(result).toHaveLength(1)
-    expect(result[0]).toBe(database.config1)
-  })
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBe(database.config1);
+  });
 
   it('should return configs with matching revocation endpoint', () => {
     const database = {
@@ -83,14 +84,14 @@ describe('getCurrentDatabasesTokenEndpoint', () => {
           tokenEndpoint: 'https://example.net/token',
         },
       },
-    }
+    };
 
-    const url = 'https://example.com/revoke'
-    const result = getCurrentDatabasesTokenEndpoint(database, url)
+    const url = 'https://example.com/revoke';
+    const result = getCurrentDatabasesTokenEndpoint(database, url);
 
-    expect(result).toHaveLength(1)
-    expect(result[0]).toBe(database.config1)
-  })
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBe(database.config1);
+  });
 
   it('should return multiple matching configs', () => {
     const database = {
@@ -117,15 +118,15 @@ describe('getCurrentDatabasesTokenEndpoint', () => {
           revocationEndpoint: 'https://example.com/revoke',
         },
       },
-    }
+    };
 
-    const url = 'https://example.com/token'
-    const result = getCurrentDatabasesTokenEndpoint(database, url)
+    const url = 'https://example.com/token';
+    const result = getCurrentDatabasesTokenEndpoint(database, url);
 
-    expect(result).toHaveLength(2)
-    expect(result).toContain(database.config1)
-    expect(result).toContain(database.config3)
-  })
+    expect(result).toHaveLength(2);
+    expect(result).toContain(database.config1);
+    expect(result).toContain(database.config3);
+  });
 
   it('should return empty array for no matching configs', () => {
     const database = {
@@ -143,11 +144,11 @@ describe('getCurrentDatabasesTokenEndpoint', () => {
           revocationEndpoint: 'https://example.org/revoke',
         },
       },
-    }
+    };
 
-    const url = 'https://example.net/other'
-    const result = getCurrentDatabasesTokenEndpoint(database, url)
+    const url = 'https://example.net/other';
+    const result = getCurrentDatabasesTokenEndpoint(database, url);
 
-    expect(result).toHaveLength(0)
-  })
-})
+    expect(result).toHaveLength(0);
+  });
+});

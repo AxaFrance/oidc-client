@@ -1,9 +1,9 @@
 import { getFromCache, setCache } from './cache.js';
 import { deriveChallengeAsync, generateRandom } from './crypto.js';
+import {ILOidcLocation} from "./location";
 import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
 import { Fetch, StringMap } from './types.js';
-import {ILOidcLocation} from "./location";
 
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer = (fetch) => async (openIdIssuerUrl: string, timeCacheSecond = oneHourSecond, storage = window.sessionStorage, timeoutMs = 10000):
@@ -128,7 +128,7 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url:string,
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            ...headersExtras
+            ...headersExtras,
         },
         body: formBodyString,
     }, timeoutMs);
@@ -136,7 +136,7 @@ export const performTokenRequestAsync = (fetch:Fetch) => async (url:string,
         return { 
             success: false, 
             status: response.status, 
-            demonstratingProofOfPossessionNonce:null 
+            demonstratingProofOfPossessionNonce:null, 
         };
     }
     const tokens = await response.json();

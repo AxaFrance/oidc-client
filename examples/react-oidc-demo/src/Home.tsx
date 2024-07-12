@@ -8,12 +8,12 @@ import {useNavigate} from "react-router-dom";
     const html = '<body>Foo<script>alert("youhou");</script></body>';
     iframe.srcdoc = html;
     document.body.appendChild(iframe);
-}
+};
 
 export const Home = () => {
     const { login, logout, renewTokens, isAuthenticated } = useOidc();
     const{ oidcUser, oidcUserLoadingState } = useOidcUser();
-    console.log(oidcUser, oidcUserLoadingState)
+    console.log(oidcUser, oidcUserLoadingState);
     const navigate = useNavigate();
 
     const navigateProfile = () => {

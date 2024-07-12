@@ -1,6 +1,5 @@
-﻿import {Fetch} from "./types";
-import {OidcClient} from "./oidcClient";
-import {getValidTokenAsync} from "./parseTokens";
+﻿import {getValidTokenAsync} from "./parseTokens";
+import {Fetch} from "./types";
 
 // @ts-ignore
 export const fetchWithTokens = (fetch: Fetch, oidcClient: Oidc | null, demonstrating_proof_of_possession:boolean=false) : Fetch => async (...params: Parameters<Fetch>) :Promise<Response> => {

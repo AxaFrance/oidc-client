@@ -2,16 +2,16 @@ import {generateRandom} from './crypto.js';
 import {eventNames} from './events.js';
 import {initSession} from './initSession.js';
 import {initWorkerAsync} from './initWorker.js';
-import {isTokensOidcValid} from './parseTokens.js';
-import {
-    performAuthorizationRequestAsync,
-    performFirstTokenRequestAsync
-} from './requests.js';
-import {getParseQueryStringFromLocation} from './route-utils.js';
-import {OidcConfiguration, StringMap} from './types.js';
 import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
 import {ILOidcLocation} from "./location";
 import Oidc from "./oidc";
+import {isTokensOidcValid} from './parseTokens.js';
+import {
+    performAuthorizationRequestAsync,
+    performFirstTokenRequestAsync,
+} from './requests.js';
+import {getParseQueryStringFromLocation} from './route-utils.js';
+import {OidcConfiguration, StringMap} from './types.js';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const defaultLoginAsync = (configurationName:string, configuration:OidcConfiguration, publishEvent :(string, any)=>void, initAsync:Function, oidcLocation: ILOidcLocation) => (callbackPath:string = undefined, extras:StringMap = null, isSilentSignin = false, scope:string = undefined) => {

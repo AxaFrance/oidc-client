@@ -1,5 +1,5 @@
 import {sleepAsync} from './initWorker.js';
-import {OidcConfiguration, StringMap, TokenAutomaticRenewMode} from "./types";
+import {StringMap, TokenAutomaticRenewMode} from "./types";
 
 const b64DecodeUnicode = (str) =>
     decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
@@ -175,7 +175,7 @@ export type ValidToken = {
 
 export interface OidcToken{
     tokens?: Tokens;
-    configuration: {  token_automatic_renew_mode?: TokenAutomaticRenewMode; },
+    configuration: {  token_automatic_renew_mode?: TokenAutomaticRenewMode };
     renewTokensAsync: (extras: StringMap) => Promise<void>;
 }
 

@@ -39,7 +39,7 @@ describe('tokens', () => {
         "name": "ƴǢÁìÇ 小名-ホルヘ",
         "preferred_username": "testingcharacters@inventedmail.com",
         "given_name": "ƴǢÁìÇ",
-        "family_name": "小名-ホルヘ"
+        "family_name": "小名-ホルヘ",
       }],
     [
       "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCI_IjoiYWE_In0",
@@ -48,8 +48,8 @@ describe('tokens', () => {
         "iat": 1516239022,
         "name": "John Doe",
         "sub": "1234567890",
-      }
-    ]
+      },
+    ],
   ])('parseJwtShouldExtractData', (claimsPart, expectedResult) => {
     it('should parseJwtShouldExtractData ', async () => {
       const result = parseJwt(claimsPart);

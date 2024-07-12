@@ -47,7 +47,7 @@ export const uint8ToUrlBase64 =(uint8: Uint8Array) => {
         bin += String.fromCharCode(code);
     });
     return binToUrlBase64(bin);
-}
+};
 
 // UCS-2 String to URL-Safe Base64
 //
@@ -61,16 +61,16 @@ export const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingPr
     importKeyAlgorithm: {
         name: 'ECDSA',
         namedCurve: 'P-256',
-        hash: {name: 'ES256'}
+        hash: {name: 'ES256'},
     },
     signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
     generateKeyAlgorithm: {
         name: 'ECDSA',
-        namedCurve: 'P-256'
+        namedCurve: 'P-256',
     },
     digestAlgorithm: { name: 'SHA-256' },
-    jwtHeaderAlgorithm : 'ES256' 
-}
+    jwtHeaderAlgorithm : 'ES256', 
+};
 
 
 // @ts-ignore
@@ -101,7 +101,7 @@ const sign = (w:any) => async (jwk, headers, claims, demonstratingProofOfPossess
         protected: strToUrlBase64(JSON.stringify(headers)),
         // @ts-ignore
         // JWT "claims" are really a JSON-defined JWS "payload"
-        payload: strToUrlBase64(JSON.stringify(claims))
+        payload: strToUrlBase64(JSON.stringify(claims)),
     };
 
     // To import as EC (ECDSA, P-256, SHA-256, ES256)
@@ -134,8 +134,7 @@ const sign = (w:any) => async (jwk, headers, claims, demonstratingProofOfPossess
     return `${jws.protected}.${jws.payload}.${jws.signature}`;
 };
 
-export var JWT = {sign};
-
+export const JWT = {sign};
 
 // @ts-ignore
 const generate = (w:any) => async (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
@@ -162,7 +161,7 @@ const neuter = jwk => {
 
 const EC = {
     generate,
-    neuter
+    neuter,
 };
 // @ts-ignore
 const thumbprint = (w:any) => async (jwk, digestAlgorithm: AlgorithmIdentifier) => {
@@ -187,9 +186,9 @@ const thumbprint = (w:any) => async (jwk, digestAlgorithm: AlgorithmIdentifier) 
     // but we're only dealing with P-256
     const hash = await w.crypto.subtle.digest(digestAlgorithm, strToUint8(sortedPub));
     return uint8ToUrlBase64(new Uint8Array(hash));
-}
+};
 
-export var JWK = {thumbprint};
+export const JWK = {thumbprint};
 
 export const generateJwkAsync = (w:any) => async (generateKeyAlgorithm: RsaHashedKeyGenParams | EcKeyGenParams) => {
     // @ts-ignore
@@ -198,7 +197,7 @@ export const generateJwkAsync = (w:any) => async (generateKeyAlgorithm: RsaHashe
     // @ts-ignore
     // console.info('Public Key:', JSON.stringify(EC.neuter(jwk)));
     return jwk;
-}
+};
 
 export const generateJwtDemonstratingProofOfPossessionAsync = (w:any) => (demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration) => async (jwk:any, method = 'POST', url: string, extrasClaims={}) => {
 
@@ -213,10 +212,10 @@ export const generateJwtDemonstratingProofOfPossessionAsync = (w:any) => (demons
     // @ts-ignore
     const kid = await JWK.thumbprint(w)(jwk, demonstratingProofOfPossessionConfiguration.digestAlgorithm);
     // @ts-ignore
-    const jwt = await JWT.sign(w)(jwk, { kid: kid }, claims, demonstratingProofOfPossessionConfiguration)
+    const jwt = await JWT.sign(w)(jwk, { kid: kid }, claims, demonstratingProofOfPossessionConfiguration);
     // console.info('JWT:', jwt);
     return jwt;
-}
+};
 
 const guid = () => {
     // RFC4122: The version 4 UUID is meant for generating UUIDs from truly-random or

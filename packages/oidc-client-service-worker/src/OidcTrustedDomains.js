@@ -3,7 +3,7 @@
 // then all subroute like https://www.myapi.com/useers/1 will be authorized to send access_token to.
 
 // Domains used by OIDC server must be also declared here
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const trustedDomains = {
     default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
     config_classic: ['https://demo.duendesoftware.com'],

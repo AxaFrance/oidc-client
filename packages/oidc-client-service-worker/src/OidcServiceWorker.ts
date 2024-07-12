@@ -1,4 +1,8 @@
 import { acceptAnyDomainToken, scriptFilename, TOKEN } from './constants';
+import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
+import {getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent} from "./dpop";
+import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
+import { getCurrentDatabasesTokenEndpoint } from './oidcConfig';
 import {
 	Database,
 	MessageEventData,
@@ -17,10 +21,6 @@ import {
 import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './utils/codeVerifier';
 import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
-import {generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync} from "./jwt";
-import {getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent} from "./dpop";
-import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
-import { getCurrentDatabasesTokenEndpoint } from './oidcConfig';
 
 // @ts-ignore
 if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
@@ -132,7 +132,7 @@ const handleFetch = async (event: FetchEvent) => {
 		} else {
 			
 			const authorization = originalRequest.headers.get('authorization');
-			let authenticationMode = "Bearer"
+			let authenticationMode = "Bearer";
 			if (authorization ) {
 				authenticationMode = authorization.split(" ")[0];
 			}
@@ -184,7 +184,7 @@ const handleFetch = async (event: FetchEvent) => {
 						const currentDbTabs = Object.keys(currentDb.state);
 
 						if (currentDb?.tokens != null) {
-							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),};
+							const claimsExtras = {ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token)};
 							headers = await generateDpopAsync(originalRequest, currentDb, url, claimsExtras);
 
 							for(let j = 0; j < currentDbTabs.length; j++) {
@@ -401,7 +401,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 				const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomains[configurationName]);
 				if(demonstratingProofOfPossessionConfiguration != null){
 					if(currentDatabase.oidcConfiguration.demonstrating_proof_of_possession){
-						console.warn("In service worker, demonstrating_proof_of_possession must be configured from trustedDomains file")
+						console.warn("In service worker, demonstrating_proof_of_possession must be configured from trustedDomains file");
 					}
 					currentDatabase.demonstratingProofOfPossessionConfiguration = demonstratingProofOfPossessionConfiguration;
 					currentDatabase.demonstratingProofOfPossessionJwkJson = await generateJwkAsync(self)(demonstratingProofOfPossessionConfiguration.generateKeyAlgorithm);

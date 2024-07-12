@@ -1,5 +1,7 @@
-﻿import path from 'path';
+﻿/* global console, process */
+/* eslint no-console: "off" */
 import fs from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
 try {
@@ -24,7 +26,7 @@ try {
     }
     await fs.promises.copyFile(src, dest);
     console.log(`[${script_prefix}:copy] ${dest}`);
-    return true
+    return true;
   };
 
   const fileExists = (path) => {
@@ -53,13 +55,13 @@ try {
     const success = await copyFile(
         path.join(srcDir, file.fileName),
         path.join(destinationDir, file.fileName),
-        file.overwrite
+        file.overwrite,
     );
     if(!success){
       await copyFile(
           path.join(srcDirFallback, file.fileName),
           path.join(destinationDir, file.fileName),
-          file.overwrite
+          file.overwrite,
       );
     }
   }

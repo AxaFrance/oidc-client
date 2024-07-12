@@ -130,4 +130,4 @@ export const activateServiceWorker : ServiceWorkerActivate = () : boolean =>{
     const operatingSystem = getOperatingSystem(navigator);
     return !excludeOs(operatingSystem);
     
-}
+};

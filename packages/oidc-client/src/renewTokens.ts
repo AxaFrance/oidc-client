@@ -1,12 +1,12 @@
+import {eventNames} from "./events";
 import {initSession} from './initSession.js';
 import {initWorkerAsync, sleepAsync} from './initWorker.js';
 import Oidc from './oidc.js';
 import {computeTimeLeft, isTokensOidcValid, setTokens, Tokens} from './parseTokens.js';
+import {performTokenRequestAsync} from "./requests";
+import {_silentLoginAsync} from "./silentLogin";
 import timer from './timer.js';
 import {OidcConfiguration, StringMap, TokenAutomaticRenewMode} from './types.js';
-import {_silentLoginAsync} from "./silentLogin";
-import {performTokenRequestAsync} from "./requests";
-import {eventNames} from "./events";
 
 async function syncTokens(oidc:Oidc, forceRefresh: boolean, extras: StringMap) {
     const updateTokens = (tokens) => {
@@ -40,7 +40,7 @@ const loadLatestTokensAsync = async (oidc:Oidc, configuration:OidcConfiguration)
         tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
         return tokens;
     }
-}
+};
 
 export async function renewTokensAndStartTimerAsync(oidc, forceRefresh = false, extras:StringMap = null) {
 
@@ -92,7 +92,7 @@ export const synchroniseTokensStatus ={
     TOKENS_VALID:'TOKENS_VALID',
     TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID: 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID',
     LOGOUT_FROM_ANOTHER_TAB: 'LOGOUT_FROM_ANOTHER_TAB',
-    REQUIRE_SYNC_TOKENS: 'REQUIRE_SYNC_TOKENS'
+    REQUIRE_SYNC_TOKENS: 'REQUIRE_SYNC_TOKENS',
 };
 
 export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConfiguration, configurationName: string, currentTokens: Tokens, forceRefresh = false) => {
@@ -122,7 +122,9 @@ export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConf
         nonce = await serviceWorker.getNonceAsync();
     } else {
         const session = initSession(configurationName, configuration.storage ?? sessionStorage);
-        let { tokens, status } = await session.initAsync();
+        const initAsyncResponse = await session.initAsync();
+        let { tokens } = initAsyncResponse;
+        const { status } = initAsyncResponse;
         if(tokens){
             tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
         }
@@ -145,7 +147,7 @@ export const syncTokensInfoAsync = (oidc: Oidc) => async (configuration:OidcConf
         return { tokens: currentTokens, status: 'FORCE_REFRESH', nonce };
     }
     return { tokens: currentTokens, status, nonce };
-}
+};
 
 
 const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = false, extras:StringMap = null, updateTokens) =>{
@@ -159,7 +161,6 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
         numberTryOnline--;
         oidc.publishEvent(eventNames.refreshTokensAsync, { message: `wait because navigator is offline try ${numberTryOnline}` });
     }
-    const isDocumentHidden = document.hidden;
     const nextIndex = index + 1;
     if (!extras) {
         extras = {};
@@ -336,4 +337,4 @@ const synchroniseTokensAsync = (oidc:Oidc) => async (index = 0, forceRefresh = f
             }, 1000);
         });
     }
-}
+};

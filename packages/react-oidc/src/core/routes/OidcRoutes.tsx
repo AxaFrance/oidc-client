@@ -26,7 +26,6 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   silent_login_uri,
   children, configurationName,
   withCustomHistory = null, 
-  location,
 }) => {
   // This exist because in next.js window outside useEffect is null
   const pathname = window ? getPath(window.location.href) : '';

@@ -2,8 +2,8 @@
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { ILOidcLocation } from "./location";
 import { logoutAsync } from "./logout";
-import {ILOidcLocation, OidcLocation} from "./location";
 
 describe('Logout test suite', () => {
     const expectedFinalUrl = "http://api/connect/endsession?id_token_hint=abcd&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Flogged_out";

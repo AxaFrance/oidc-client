@@ -2,13 +2,13 @@ import { Fetch, OidcProvider, useOidc, useOidcAccessToken, useOidcIdToken } from
 import React, { useReducer, useState } from 'react';
 
 import { configurationGoogle, configurationIdentityServer, configurationIdentityServerWithHash } from './configurations';
+import {FetchUserHook} from "./FetchUser";
 import AuthenticatingError from './override/AuthenticateError.component';
 import Authenticating from './override/Authenticating.component';
 import { CallBackSuccess } from './override/Callback.component';
 import Loading from './override/Loading.component';
 import ServiceWorkerNotSupported from './override/ServiceWorkerNotSupported.component';
 import SessionLost from './override/SessionLost.component';
-import {FetchUserHook} from "./FetchUser";
 
 const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => {
     const [url, options, ...rest] = params;

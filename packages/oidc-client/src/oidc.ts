@@ -1,14 +1,22 @@
 import {startCheckSessionAsync as defaultStartCheckSessionAsync} from './checkSession.js';
 import {CheckSessionIFrame} from './checkSessionIFrame.js';
+import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
 import {eventNames} from './events.js';
 import {initSession} from './initSession.js';
-import {defaultServiceWorkerUpdateRequireCallback, initWorkerAsync, sleepAsync} from './initWorker.js';
+import {defaultServiceWorkerUpdateRequireCallback, initWorkerAsync } from './initWorker.js';
+import {activateServiceWorker} from "./initWorkerOption";
+import {
+    defaultDemonstratingProofOfPossessionConfiguration,
+    generateJwtDemonstratingProofOfPossessionAsync,
+} from "./jwt";
+import {tryKeepSessionAsync} from "./keepSession";
+import {ILOidcLocation, OidcLocation} from "./location";
 import {defaultLoginAsync, loginCallbackAsync} from './login.js';
 import {destroyAsync, logoutAsync} from './logout.js';
-import {TokenRenewMode, Tokens,} from './parseTokens.js';
+import {TokenRenewMode, Tokens} from './parseTokens.js';
 import {
     autoRenewTokens,
-    renewTokensAndStartTimerAsync
+    renewTokensAndStartTimerAsync,
 } from './renewTokens.js';
 import {fetchFromIssuer} from './requests.js';
 import {getParseQueryStringFromLocation} from './route-utils.js';
@@ -16,14 +24,6 @@ import defaultSilentLoginAsync from './silentLogin.js';
 import timer from './timer.js';
 import {AuthorityConfiguration, Fetch, OidcConfiguration, StringMap, TokenAutomaticRenewMode} from './types.js';
 import {userInfoAsync} from './user.js';
-import {base64urlOfHashOfASCIIEncodingAsync} from "./crypto";
-import {
-    defaultDemonstratingProofOfPossessionConfiguration,
-    generateJwtDemonstratingProofOfPossessionAsync
-} from "./jwt";
-import {ILOidcLocation, OidcLocation} from "./location";
-import {activateServiceWorker} from "./initWorkerOption";
-import {tryKeepSessionAsync} from "./keepSession";
 
 
 
@@ -305,20 +305,18 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const configuration = this.configuration;
         const claimsExtras = {
             ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),
-            ...extras
+            ...extras,
         };
 
         const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
-        let demonstratingProofOfPossessionNonce:string;
         
         if (serviceWorker) {
             return `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${this.configurationName}`;
         }
         
         const session = initSession(this.configurationName, configuration.storage);
-        let jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
-        demonstratingProofOfPossessionNonce = await session.getDemonstratingProofOfPossessionNonce();
-        
+        const jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
+        const demonstratingProofOfPossessionNonce = await session.getDemonstratingProofOfPossessionNonce();
 
         if (demonstratingProofOfPossessionNonce) {
             claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;

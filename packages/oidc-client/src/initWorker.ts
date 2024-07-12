@@ -1,8 +1,8 @@
+import {ILOidcLocation} from "./location";
 import { parseOriginalTokens } from './parseTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
 import codeVersion from './version.js';
-import {ILOidcLocation} from "./location";
 
 let keepAliveServiceWorkerTimeoutId = null;
 let keepAliveController;
@@ -36,14 +36,14 @@ const isServiceWorkerProxyActiveAsync = (service_worker_keep_alive_path='/') => 
     }).catch(error => { console.log(error); });
 };
 
-export const defaultServiceWorkerUpdateRequireCallback = (location:ILOidcLocation) => async (registration: any, stopKeepAlive: Function) => {
+export const defaultServiceWorkerUpdateRequireCallback = (location:ILOidcLocation) => async (registration: any, stopKeepAlive: ()=>void) => {    
     stopKeepAlive();
     await registration.update();
     const isSuccess = await registration.unregister();
-    console.log(`Service worker unregistering ${isSuccess}`)
+    console.log(`Service worker unregistration ${isSuccess ? 'successful' : 'failed'}`);
     await sleepAsync({milliseconds: 2000});
     location.reload();
-}
+};
 
 
 
@@ -165,7 +165,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
         return { nonce };
     };
 
-    let getLoginParamsCache = {};
+    const getLoginParamsCache = {};
     const setLoginParams = (data) => {
         getLoginParamsCache[configurationName] = data;
         localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);

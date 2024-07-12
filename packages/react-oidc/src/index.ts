@@ -6,9 +6,8 @@ export { OidcUserStatus, useOidcUser } from './User.js';
 export type {
   AuthorityConfiguration,
   Fetch,
+  ILOidcLocation,
   OidcConfiguration,
-  StringMap,
-  ILOidcLocation
-} from '@axa-fr/oidc-client';
-export { TokenRenewMode, OidcClient, TokenAutomaticRenewMode, OidcLocation } from '@axa-fr/oidc-client';
+  StringMap} from '@axa-fr/oidc-client';
 export type {  OidcUserInfo } from '@axa-fr/oidc-client';
+export { OidcClient, OidcLocation,TokenAutomaticRenewMode, TokenRenewMode } from '@axa-fr/oidc-client';

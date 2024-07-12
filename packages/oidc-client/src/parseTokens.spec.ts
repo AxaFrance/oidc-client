@@ -1,15 +1,15 @@
 ﻿import { describe, expect,it } from 'vitest';
 
+import {sleepAsync} from "./initWorker";
 import {
     getValidTokenAsync,
     isTokensOidcValid,
     parseJwt,
     parseOriginalTokens,
     setTokens,
-    TokenRenewMode
+    TokenRenewMode,
 } from "./parseTokens";
 import {StringMap, TokenAutomaticRenewMode} from "./types";
-import {sleepAsync} from "./initWorker";
 
 describe('ParseTokens test Suite', () => {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -29,9 +29,9 @@ describe('ParseTokens test Suite', () => {
                     issuedAt,
                 },
                 configuration: { token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration},
-                renewTokensAsync: async (extras: StringMap) => {
+                renewTokensAsync: async (_extras: StringMap) => {
                     await sleepAsync({milliseconds:10});
-                }
+                },
             };
             const result = await getValidTokenAsync(oidc, 1, 1);
             expect(result.isTokensValid).toEqual(expectIsValidToken);
@@ -47,7 +47,7 @@ describe('ParseTokens test Suite', () => {
                 "name": "ƴǢÁìÇ 小名-ホルヘ",
                 "preferred_username": "testingcharacters@inventedmail.com",
                 "given_name": "ƴǢÁìÇ",
-                "family_name": "小名-ホルヘ"
+                "family_name": "小名-ホルヘ",
             }],
         [
             "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCI_IjoiYWE_In0",
@@ -56,8 +56,8 @@ describe('ParseTokens test Suite', () => {
                 "iat": 1516239022,
                 "name": "John Doe",
                 "sub": "1234567890",
-            }
-        ]
+            },
+        ],
     ])('parseJwtShouldExtractData', (claimsPart, expectedResult) => {
         it('should parseJwtShouldExtractData ', async () => {
             const result = parseJwt(claimsPart);
@@ -74,14 +74,14 @@ describe('ParseTokens test Suite', () => {
                 "token_type": "Bearer",
                 "expires_in": "900", // Here a string instead of a number
                 "refresh_token": refresh_token,
-                "id_token": id_token
+                "id_token": id_token,
             }],
             [{
                 "access_token": access_token,
                 "token_type": "Bearer",
                 "expires_in": 900,
                 "refresh_token": refresh_token,
-                "id_token": id_token
+                "id_token": id_token,
             }],
             [{
                 "access_token": access_token,
@@ -89,7 +89,7 @@ describe('ParseTokens test Suite', () => {
                 "expires_in": 900,
                 "expiresAt": 1609987454, // Here expiresAt that come from Service Worker
                 "refresh_token": refresh_token,
-                "id_token": id_token
+                "id_token": id_token,
             }],
         ])('getValidTokenAsync', (tokens) => {
             it('should parseOriginalTokens', async () => {
@@ -141,10 +141,10 @@ describe('ParseTokens test Suite', () => {
                 "profile",
                 "email",
                 "api",
-                "offline_access"
+                "offline_access",
             ],
             "amr": [
-                "pwd"
+                "pwd",
             ],
             "client_id": "interactive.public.short",
             "sub": "2",
@@ -153,7 +153,7 @@ describe('ParseTokens test Suite', () => {
             "name": "Bob Smith",
             "email": "BobSmith@email.com",
             "sid": "345ABC88E6E50AF1273ED415A7FD6A23",
-            "jti": "E3CF3853D77AC90ABC774266CD381C43"
+            "jti": "E3CF3853D77AC90ABC774266CD381C43",
         },
         "idTokenPayload": {
             "iss": "https://demo.duendesoftware.com",
@@ -162,17 +162,17 @@ describe('ParseTokens test Suite', () => {
             "exp": 1706540558,
             "aud": "interactive.public.short",
             "amr": [
-                "pwd"
+                "pwd",
             ],
             "nonce": "NONCE_SECURED_BY_OIDC_SERVICE_WORKER_default",
             "at_hash": "NZvaGGYbXhzTMZUqR9MbNg",
             "sid": "345ABC88E6E50AF1273ED415A7FD6A23",
             "sub": "2",
             "auth_time": 1706531665,
-            "idp": "local"
+            "idp": "local",
         },
-        "expiresAt": 1706540333
-    }
+        "expiresAt": 1706540333,
+    };
 
     describe.each([
         [testTokens, null, TokenRenewMode.access_token_invalid, () => {}],
@@ -182,11 +182,8 @@ describe('ParseTokens test Suite', () => {
         }],
     ])('setTokens', (tokens,  oldTokens, tokenRenewMode, validationFunction) => {
         it('should setTokens return updatedTokens' , async () => {
-            const oidc = {
-                idTokenPayload,
-            };
             const newTokens = setTokens(tokens, oldTokens, tokenRenewMode);
-            validationFunction(newTokens)
+            validationFunction(newTokens);
         });
     });
     

@@ -6,7 +6,7 @@ import {
   OidcConfig,
   OidcConfiguration,
   OidcServerConfiguration,
-  Tokens
+  Tokens,
 } from '../types';
 import {countLetter} from './strings';
 
@@ -14,7 +14,7 @@ export const parseJwt = (payload: string) => {
   return JSON.parse(
     b64DecodeUnicode(payload.replaceAll(/-/g, '+').replaceAll(/_/g, '/')),
   );
-}
+};
 function b64DecodeUnicode(str: string) {
   return decodeURIComponent(
     Array.prototype.map
@@ -240,7 +240,7 @@ function hideTokens(currentDatabaseElement: OidcConfig, currentTabId: string) {
       return new Response(body, {
         status: response.status,
         statusText: response.statusText,
-        headers: newHeaders
+        headers: newHeaders,
       });
     });
   };

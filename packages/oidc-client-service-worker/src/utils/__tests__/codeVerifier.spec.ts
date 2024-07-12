@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { replaceCodeVerifier, extractConfigurationNameFromCodeVerifier } from '../codeVerifier';
+import { extractConfigurationNameFromCodeVerifier,replaceCodeVerifier } from '../codeVerifier';
 
 describe('replaceCodeVerifier should', () => {
     it.each([

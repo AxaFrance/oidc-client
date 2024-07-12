@@ -46,7 +46,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         storage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
     };
 
-    const getDemonstratingProofOfPossessionNonce = () => {
+    const getDemonstratingProofOfPossessionNonce = (): string => {
         return storage[`oidc.dpop_nonce.${configurationName}`];
     };
 
@@ -57,7 +57,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
         return JSON.stringify({ tokens: JSON.parse(storage[`oidc.${configurationName}`]).tokens });
     };
 
-    let getLoginParamsCache = {};
+    const getLoginParamsCache = {};
     const setLoginParams = (data) => {
         getLoginParamsCache[configurationName] = data;
         storage[`oidc.login.${configurationName}`] = JSON.stringify(data);

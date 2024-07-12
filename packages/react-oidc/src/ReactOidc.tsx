@@ -1,4 +1,4 @@
-import { StringMap, OidcClient, Tokens } from '@axa-fr/oidc-client';
+import { OidcClient, StringMap, Tokens } from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
 
 const defaultConfigurationName = 'default';
@@ -24,7 +24,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
         let isMounted = true;
         const oidc = getOidc(configurationName);
         setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
             if (name === OidcClient.eventNames.logout_from_another_tab || name === OidcClient.eventNames.logout_from_same_tab || name === OidcClient.eventNames.token_aquired) {
                 if (isMounted) {
@@ -36,7 +36,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
             isMounted = false;
             oidc.removeEventSubscription(newSubscriptionId);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     }, [configurationName]);
 
     const login = (callbackPath:string | undefined = undefined, extras:StringMap = null, silentLoginOnly = false) => {
@@ -99,7 +99,7 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
             const tokens = oidc.tokens;
             setAccessToken({ accessToken: tokens.accessToken, accessTokenPayload: tokens.accessTokenPayload });
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
             if (name === OidcClient.eventNames.token_renewed ||
                 name === OidcClient.eventNames.token_aquired ||
@@ -121,7 +121,7 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
             isMounted = false;
             oidc.removeEventSubscription(newSubscriptionId);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     }, [configurationName]);
     return state;
 };
@@ -155,7 +155,7 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
             const tokens = oidc.tokens;
             setIDToken({ idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload });
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         
         const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
             if (name === OidcClient.eventNames.token_renewed ||
                 name === OidcClient.eventNames.token_aquired ||
@@ -173,7 +173,7 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
             isMounted = false;
             oidc.removeEventSubscription(newSubscriptionId);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     }, [configurationName]);
     return state;
 };

@@ -12,4 +12,4 @@ export const extractConfigurationNameFromCodeVerifier = (chaine:string):string[]
     } else {
         return null;
     }
-}
+};
