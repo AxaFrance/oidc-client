@@ -1,10 +1,10 @@
+import {eventNames} from "./events";
 import { initSession } from './initSession.js';
 import { initWorkerAsync } from './initWorker.js';
+import {ILOidcLocation} from "./location";
 import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
-import {ILOidcLocation} from "./location";
-import {eventNames} from "./events";
 
 export const oidcLogoutTokens = {
     access_token: 'access_token',
@@ -23,7 +23,7 @@ const extractExtras = (extras: StringMap, postKey: string):StringMap => {
         return postExtras;
     }
     return postExtras;
-}
+};
 
 const keepExtras = (extras: StringMap):StringMap => {
     const postExtras : StringMap = {};
@@ -36,7 +36,7 @@ const keepExtras = (extras: StringMap):StringMap => {
         return postExtras;
     }
     return postExtras;
-}
+};
 
 export const destroyAsync = (oidc) => async (status) => {
     timer.clearTimeout(oidc.timeoutId);
@@ -70,7 +70,7 @@ export const logoutAsync = (oidc,
     if (callbackPathOrUrl) {
         isUri = callbackPathOrUrl.includes('https://') || callbackPathOrUrl.includes('http://');
     }
-    const url = isUri ? callbackPathOrUrl : oicLocation.getOrigin() + path 
+    const url = isUri ? callbackPathOrUrl : oicLocation.getOrigin() + path; 
     // @ts-ignore
     const idToken = oidc.tokens ? oidc.tokens.idToken : '';
     try {
@@ -105,12 +105,10 @@ export const logoutAsync = (oidc,
         console.warn('logoutAsync: error when revoking tokens, if the error persist, you ay configure property logout_tokens_to_invalidate from configuration to avoid this error');
         console.warn(exception);
     }
-    // @ts-ignore
-    const sub = oidc.tokens && oidc.tokens.idTokenPayload ? oidc.tokens.idTokenPayload.sub : null;
-    
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const sub = oidc.tokens?.idTokenPayload?.sub ?? null;
+
     await oidc.destroyAsync('LOGGED_OUT');
-    for (const [key, itemOidc] of Object.entries(oidcDatabase)) {
+    for (const [, itemOidc] of Object.entries(oidcDatabase)) {
         if (itemOidc !== oidc) {
             // @ts-ignore
             await oidc.logoutSameTabAsync(oidc.configuration.client_id, sub);
@@ -120,7 +118,7 @@ export const logoutAsync = (oidc,
     }
     
     const oidcExtras = extractExtras(extras, ':oidc');
-    let noReload = oidcExtras && oidcExtras['no_reload'] === 'true';
+    const noReload = oidcExtras && oidcExtras['no_reload'] === 'true';
     
     if(noReload) {
         return;

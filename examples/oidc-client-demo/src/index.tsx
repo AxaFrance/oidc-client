@@ -105,9 +105,9 @@ const display = (element:any) => {
     // @ts-ignore
     window.document.getElementById('buttonxsshack').addEventListener('click',()=> {
         // @ts-ignore
-        eval(document.getElementById('xsshack').value)
+        eval(document.getElementById('xsshack').value);
     });
-}
+};
 
 // @ts-ignore
 export const execute = () => {

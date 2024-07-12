@@ -2,7 +2,7 @@ export type Fetch = typeof window.fetch;
 
 export type LogoutToken = 'access_token' | 'refresh_token';
 
-export type ServiceWorkerUpdateRequireCallback = (registration:any, stopKeepAlive:Function) => Promise<void>;
+export type ServiceWorkerUpdateRequireCallback = (registration:any, stopKeepAlive:()=>void) => Promise<void>;
 export type ServiceWorkerRegister = (serviceWorkerRelativeUrl:string) => Promise<ServiceWorkerRegistration>;
 export type ServiceWorkerActivate = () => boolean;
 
@@ -44,11 +44,11 @@ export type OidcConfiguration = {
 };
 
 export interface DemonstratingProofOfPossessionConfiguration {
-    generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
-    digestAlgorithm: AlgorithmIdentifier,
-    importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
-    signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
-    jwtHeaderAlgorithm: string
+    generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams;
+    digestAlgorithm: AlgorithmIdentifier;
+    importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm;
+    signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams;
+    jwtHeaderAlgorithm: string;
 }
 
 export interface StringMap {

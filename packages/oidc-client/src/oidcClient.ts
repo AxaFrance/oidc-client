@@ -1,8 +1,8 @@
+import {fetchWithTokens} from "./fetch";
+import {ILOidcLocation, OidcLocation} from "./location";
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
-import {ILOidcLocation, OidcLocation} from "./location";
-import {fetchWithTokens} from "./fetch";
 
 export interface EventSubscriber {
     (name: string, data:any);

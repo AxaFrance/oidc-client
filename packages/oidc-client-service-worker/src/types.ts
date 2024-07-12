@@ -3,8 +3,8 @@ export type DomainDetails = {
     oidcDomains?: Domain[];
     accessTokenDomains?: Domain[];
     showAccessToken: boolean;
-    convertAllRequestsToCorsExceptNavigate?: boolean,
-    setAccessTokenToNavigateRequests?: boolean,
+    convertAllRequestsToCorsExceptNavigate?: boolean;
+    setAccessTokenToNavigateRequests?: boolean;
     demonstratingProofOfPossession?:boolean;
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent?:boolean;
     demonstratingProofOfPossessionConfiguration?: DemonstratingProofOfPossessionConfiguration;
@@ -12,11 +12,11 @@ export type DomainDetails = {
 }
 
 export interface DemonstratingProofOfPossessionConfiguration {
-    generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
-    digestAlgorithm: AlgorithmIdentifier,
-    importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
-    signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
-    jwtHeaderAlgorithm: string
+    generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams;
+    digestAlgorithm: AlgorithmIdentifier;
+    importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm;
+    signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams;
+    jwtHeaderAlgorithm: string;
 }
 
 export type Domain = string | RegExp;
@@ -83,8 +83,8 @@ export type OidcConfig = {
     sessionState?: string | null;
     items?: MessageData;
     hideAccessToken: boolean;
-    convertAllRequestsToCorsExceptNavigate: boolean,
-    setAccessTokenToNavigateRequests: boolean,
+    convertAllRequestsToCorsExceptNavigate: boolean;
+    setAccessTokenToNavigateRequests: boolean;
     demonstratingProofOfPossessionNonce: string | null;
     demonstratingProofOfPossessionJwkJson: string | null;
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: boolean;

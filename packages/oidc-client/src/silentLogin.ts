@@ -117,7 +117,7 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
     }
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+ 
 export const defaultSilentLoginAsync = (window, configurationName, configuration:OidcConfiguration, publishEvent :(string, any)=>void, oidc:any) => (extras:StringMap = null, scope:string = undefined) => {
     extras = { ...extras };
 

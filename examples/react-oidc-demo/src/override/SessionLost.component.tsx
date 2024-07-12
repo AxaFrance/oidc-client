@@ -1,8 +1,8 @@
 import { useOidc } from '@axa-fr/react-oidc';
 import { ComponentType } from 'react';
+import {useNavigate} from "react-router-dom";
 
 import { style } from './style.js';
-import {useNavigate} from "react-router-dom";
 
 export const SessionLost: ComponentType<any> = ({ configurationName }) => {
     const { login } = useOidc(configurationName);

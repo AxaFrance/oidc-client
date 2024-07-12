@@ -1,12 +1,12 @@
-﻿import {Domain, DomainDetails} from "./types.js";
-import {defaultDemonstratingProofOfPossessionConfiguration} from "./jwt";
+﻿import {defaultDemonstratingProofOfPossessionConfiguration} from "./jwt";
+import {Domain, DomainDetails} from "./types.js";
 
 const isDpop= (trustedDomain: Domain[] | DomainDetails) : boolean => {
     if (Array.isArray(trustedDomain)) {
         return false;
     }
     return trustedDomain.demonstratingProofOfPossession ?? false;
-}
+};
 
 export const getDpopConfiguration = (trustedDomain: Domain[] | DomainDetails) => {
 
@@ -19,7 +19,7 @@ export const getDpopConfiguration = (trustedDomain: Domain[] | DomainDetails) =>
     }
     
     return trustedDomain.demonstratingProofOfPossessionConfiguration ?? defaultDemonstratingProofOfPossessionConfiguration;
-}
+};
 
 export const getDpopOnlyWhenDpopHeaderPresent = (trustedDomain: Domain[] | DomainDetails) => {
 
@@ -32,4 +32,4 @@ export const getDpopOnlyWhenDpopHeaderPresent = (trustedDomain: Domain[] | Domai
     }
 
     return trustedDomain.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent ?? true;
-}
+};

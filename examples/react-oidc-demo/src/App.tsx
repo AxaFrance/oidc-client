@@ -28,7 +28,7 @@ function reducer(state, action) {
 
 
 function App() {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+   
   const [show, setShow] = React.useState(false);
   const [events, dispatch] = useReducer(reducer, []);
 

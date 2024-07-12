@@ -1,4 +1,4 @@
-import {Fetch, getFetchDefault, OidcConfiguration, OidcClient, ILOidcLocation, OidcLocation} from '@axa-fr/oidc-client';
+import {Fetch, getFetchDefault, ILOidcLocation, OidcClient, OidcConfiguration, OidcLocation} from '@axa-fr/oidc-client';
 import { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import AuthenticatingError from './core/default-component/AuthenticateError.component.js';
@@ -29,7 +29,7 @@ export type OidcProviderProps = {
     withCustomHistory?: () => CustomHistory;
     onEvent?: (configuration: string, name: string, data: any) => void;
     getFetch?: () => Fetch;
-    location?: ILOidcLocation
+    location?: ILOidcLocation;
 };
 
 export type OidcSessionProps = {
@@ -53,7 +53,7 @@ const OidcSession: FC<PropsWithChildren<OidcSessionProps>> = ({ loadingComponent
         return () => {
             isMounted = false;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [configurationName]);
     const LoadingComponent = loadingComponent;
     return (
@@ -98,7 +98,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     const getOidc = (configurationName = 'default') => {
         return OidcClient.getOrCreate(getFetch ?? getFetchDefault, location ?? new OidcLocation())(configuration, configurationName);
     };
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+     
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(defaultEventState);
     const [currentConfigurationName, setConfigurationName] = useState('default');
@@ -154,7 +154,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
             previousOidc.removeEventSubscription(newSubscriptionId);
             setEvent(defaultEventState);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [configuration, configurationName]);
 
     const SessionLostComponent = sessionLostComponent;

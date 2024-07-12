@@ -1,9 +1,9 @@
-﻿import {initWorkerAsync} from "./initWorker";
-import {autoRenewTokens} from "./renewTokens";
+﻿import {eventNames} from "./events";
 import {initSession} from "./initSession";
-import {setTokens} from "./parseTokens";
-import {eventNames} from "./events";
+import {initWorkerAsync} from "./initWorker";
 import Oidc from "./oidc";
+import {setTokens} from "./parseTokens";
+import {autoRenewTokens} from "./renewTokens";
 
 export const tryKeepSessionAsync = async (oidc: Oidc) =>{
     
@@ -81,4 +81,4 @@ export const tryKeepSessionAsync = async (oidc: Oidc) =>{
             oidc.publishEvent(eventNames.tryKeepExistingSessionAsync_error, 'tokens inside ServiceWorker are invalid');
             return false;
         }
-} 
+}; 

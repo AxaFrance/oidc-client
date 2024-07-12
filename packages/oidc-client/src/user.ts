@@ -1,5 +1,5 @@
-import Oidc from "./oidc";
 import {fetchWithTokens} from "./fetch";
+import Oidc from "./oidc";
 
 export const userInfoAsync = (oidc:Oidc) => async (noCache = false, demonstrating_proof_of_possession=false) => {
     if (oidc.userInfo != null && !noCache) {

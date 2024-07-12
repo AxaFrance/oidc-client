@@ -1,9 +1,9 @@
 import { CheckSessionIFrame } from './checkSessionIFrame.js';
+import Oidc from "./oidc";
 import { _silentLoginAsync, SilentLoginResponse } from './silentLogin.js';
 import { OidcConfiguration } from './types.js';
-import Oidc from "./oidc";
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+ 
 export const startCheckSessionAsync = (oidc:Oidc, oidcDatabase:any, configuration :OidcConfiguration) => (checkSessionIFrameUri, clientId, sessionState, isSilentSignin = false) => {
     const silentLoginAsync = (extras, state = undefined, scope = undefined):Promise<SilentLoginResponse> => {
         return _silentLoginAsync(oidc.configurationName, configuration, oidc.publishEvent.bind(oidc))(extras, state, scope);
@@ -39,7 +39,7 @@ export const startCheckSessionAsync = (oidc:Oidc, oidcDatabase:any, configuratio
                     } else {
                         console.debug('SessionMonitor._callback: Different subject signed into OP:', iFrameIdTokenPayload.sub);
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                     
                 }).catch(async (e) => {
                     console.warn('SessionMonitor._callback: Silent login failed, logging out other tabs:', e);
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars

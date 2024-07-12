@@ -19,7 +19,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
           ...dependencies,
-        'react/jsx-runtime'
+        'react/jsx-runtime',
       ],
       output: {
         globals: {
