@@ -8,6 +8,7 @@ export type DomainDetails = {
     demonstratingProofOfPossession?:boolean;
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent?:boolean;
     demonstratingProofOfPossessionConfiguration?: DemonstratingProofOfPossessionConfiguration;
+    allowMultiTabLogin?: boolean;
 }
 
 export interface DemonstratingProofOfPossessionConfiguration {
@@ -87,6 +88,7 @@ export type OidcConfig = {
     demonstratingProofOfPossessionNonce: string | null;
     demonstratingProofOfPossessionJwkJson: string | null;
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: boolean;
+    allowMultiTabLogin: boolean;
 }
 
 export type IdTokenPayload = {

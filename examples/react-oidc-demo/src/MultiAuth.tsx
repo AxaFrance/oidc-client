@@ -47,6 +47,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {;
                         <option value="config_show_access_token">config_show_access_token</option>
                         <option value="config_separate_oidc_access_token_domains">config_separate_oidc_access_token_domains</option>
                         <option value="config_with_dpop">config_with_dpop</option>
+                        <option value="config_multi_tab_login">config_multi_tab_login</option>
                     </select>
                     {!isAuthenticated && <button type="button" className="btn btn-primary" onClick={() => login()}>Login</button>}
                     {isAuthenticatedDefault && <button type="button" className="btn btn-primary" onClick={() => login(undefined, { 'test:token_request': 'test', youhou: 'youhou', grant_type: 'tenant', tenantId: '1234' }, true)}>Silent Login</button>}
@@ -140,7 +141,14 @@ export const MultiAuthContainer = () => {
                 digestAlgorithm: { name: "SHA-256" },
                 jwtHeaderAlgorithm: "RS256",
             },*/
-        }
+        },
+        config_multi_tab_login: {
+            ...configurationIdentityServer,
+            redirect_uri: callBack,
+            silent_redirect_uri,
+            scope: 'openid profile email api offline_access',
+            client_id: 'interactive.public.short',
+        },
     };
     const handleConfigurationChange = (event) => {
         const configurationName = event.target.value;

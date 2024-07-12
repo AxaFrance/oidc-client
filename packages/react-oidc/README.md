@@ -120,6 +120,12 @@ trustedDomains.config_with_dpop = {
  }*/
 };
 
+// Setting allowMultiTabLogin to true will enable storing login-specific parameters (state, nonce, code verifier)
+// separately for each tab. This will prevent errors when logins are initiated from multiple tabs.
+trustedDomains.config_multi_tab_login = {
+  domains: ["https://demo.duendesoftware.com"],
+  allowMultiTabLogin: true
+};
 
 ```
 

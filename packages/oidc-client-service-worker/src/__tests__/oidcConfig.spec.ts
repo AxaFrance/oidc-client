@@ -16,6 +16,7 @@ const oidcConfigDefaults = {
   demonstratingProofOfPossessionNonce: null,
   demonstratingProofOfPossessionJwkJson: null,
   demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
+  allowMultiTabLogin: true
 }
 
 const oidcServerConfigDefault = {

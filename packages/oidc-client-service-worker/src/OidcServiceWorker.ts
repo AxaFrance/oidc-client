@@ -335,6 +335,9 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 		const convertAllRequestsToCorsExceptNavigate = Array.isArray(trustedDomain)
 			? false
 			: trustedDomain.convertAllRequestsToCorsExceptNavigate;
+		const allowMultiTabLogin = Array.isArray(trustedDomain)
+			? false
+			: trustedDomain.allowMultiTabLogin;
 		database[configurationName] = {
 			tokens: null,
 			state: {},
@@ -353,6 +356,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			demonstratingProofOfPossessionJwkJson: null,
 			demonstratingProofOfPossessionConfiguration: null,
 			demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
+			allowMultiTabLogin: allowMultiTabLogin ?? false
 		};
 		currentDatabase = database[configurationName];
 
@@ -360,6 +364,8 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			trustedDomains[configurationName] = [];
 		}
 	}
+
+	const tabId = currentDatabase.allowMultiTabLogin ? data.tabId : 'default';
 	
 	switch (data.type) {
 		case 'clear':
@@ -415,16 +421,16 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 					...currentDatabase.tokens,
 				};
 				if (currentDatabase.hideAccessToken) {
-					tokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName + '_' + data.tabId;
+					tokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName + '_' + tabId;
 				}
 				if (tokens.refresh_token) {
-					tokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName + '_' + data.tabId;
+					tokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName + '_' + tabId;
 				}
 				if (tokens?.idTokenPayload?.nonce &&
 					currentDatabase.nonce != null
 				) {
 					tokens.idTokenPayload.nonce =
-						TOKEN.NONCE_TOKEN + '_' + configurationName + '_' + data.tabId;
+						TOKEN.NONCE_TOKEN + '_' + configurationName + '_' + tabId;
 				}
 				port.postMessage({
 					tokens,
@@ -451,17 +457,17 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			return;
 		}
 		case 'setState': {
-			currentDatabase.state[data.tabId] = data.data.state;
+			currentDatabase.state[tabId] = data.data.state;
 			port.postMessage({ configurationName });
 			return;
 		}
 		case 'getState': {
-			const state = currentDatabase.state[data.tabId];
+			const state = currentDatabase.state[tabId];
 			port.postMessage({ configurationName, state });
 			return;
 		}
 		case 'setCodeVerifier': {
-			currentDatabase.codeVerifier[data.tabId] = data.data.codeVerifier;
+			currentDatabase.codeVerifier[tabId] = data.data.codeVerifier;
 			port.postMessage({ configurationName });
 			return;
 		}
@@ -470,7 +476,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 				configurationName,
 				codeVerifier:
 					currentDatabase.codeVerifier != null
-						? TOKEN.CODE_VERIFIER + '_' + configurationName + '_' + data.tabId
+						? TOKEN.CODE_VERIFIER + '_' + configurationName + '_' + tabId
 						: null,
 			});
 			return;
@@ -488,13 +494,13 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 		case 'setNonce': {
 			const nonce = data.data.nonce;
 			if (nonce) {
-				currentDatabase.nonce[data.tabId] = nonce;
+				currentDatabase.nonce[tabId] = nonce;
 			}
 			port.postMessage({ configurationName });
 			return;
 		}
 		case 'getNonce': {
-			const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName + '_' + data.tabId;
+			const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName + '_' + tabId
 			const nonce = currentDatabase.nonce ? keyNonce : null;
 			port.postMessage({ configurationName, nonce });
 			return;

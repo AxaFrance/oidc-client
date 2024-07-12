@@ -55,6 +55,7 @@ describe('domains', () => {
 					demonstratingProofOfPossessionJwkJson: null,
 					demonstratingProofOfPossessionConfiguration: null,
 					demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
+					allowMultiTabLogin: true
 				},
 			};
 		});

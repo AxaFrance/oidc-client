@@ -27,4 +27,9 @@ trustedDomains.config_with_dpop = {
     demonstratingProofOfPossession: true,
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true
 };
+
+trustedDomains.config_multi_tab_login = {
+    domains: ["https://demo.duendesoftware.com"],
+    allowMultiTabLogin: true
+}
 //# sourceMappingURL=OidcTrustedDomains.js.map
