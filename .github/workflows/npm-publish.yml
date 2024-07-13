@@ -24,8 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_TOKEN }}
           fetch-depth: 0
@@ -120,7 +120,7 @@ jobs:
             echo "new_version=$version-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
       
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
