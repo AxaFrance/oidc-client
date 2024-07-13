@@ -8,14 +8,11 @@
 
 We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) and we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
 
-- Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
+- Try the React demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
-<p align="center">
-    <img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/introduction.gif"
-     alt="Sample React Oicd"
-      />
-</p>
+
+<img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/introduction.gif" alt="Sample React Oicd"/>
 
 - [About](#about)
 - [Getting Started](#getting-started)
@@ -139,7 +136,7 @@ pnpm start
 
 ### Application startup
 
-The library is router agnostic and use native History API.
+The library is router agnostic and will use native History API.
 
 The default routes used internally :
 
@@ -238,8 +235,8 @@ const configuration = {
 demonstrating_proof_of_possession_configuration: DemonstratingProofOfPossessionConfiguration // Optional, more details bellow
 };
 
-
-interface DemonstratingProofOfPossessionConfiguration {
+interface DemonstratingProofOfPossessionConfiguration 
+{
   generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
           digestAlgorithm: AlgorithmIdentifier,
           importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
@@ -336,7 +333,7 @@ import { OidcSecure } from "@axa-fr/react-oidc";
 
 const AdminSecure = () => (
   <OidcSecure>
-    <h1>My sub component</h1>}
+    <h1>My sub component</h1>
   </OidcSecure>
 );
 
@@ -344,9 +341,9 @@ const AdminSecure = () => (
 export default AdminSecure;
 ```
 
-## How to secure a component : HOC method
+## How to secure a component: HOC method
 
-"withOidcSecure" act the same as "OidcSecure" it also trigger authentication in case user is not authenticated.
+`withOidcSecure` will act the same as `OidcSecure`,it will also trigger authentication in case the user is not authenticated.
 
 ```javascript
 import React from "react";
@@ -368,7 +365,7 @@ const Routes = () => (
 export default Routes;
 ```
 
-## How to get "Access Token" : Hook method
+## How to get "Access Token": Hook method
 
 ```javascript
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
@@ -399,7 +396,7 @@ const DisplayAccessToken = () => {
 };
 ```
 
-## How to get IDToken : Hook method
+## How to get IDToken: Hook method
 
 ```javascript
 import { useOidcIdToken } from "@axa-fr/react-oidc";
@@ -425,7 +422,7 @@ const DisplayIdToken = () => {
 };
 ```
 
-## How to get User Information : Hook method
+## How to get User Information: Hook method
 
 ```javascript
 import { useOidcUser, UserStatus } from "@axa-fr/react-oidc";
@@ -453,10 +450,10 @@ const DisplayUserInfo = () => {
 };
 ```
 
-## How to get a fetch that inject Access_Token : Hook method
+## How to get a fetch that inject Access_Token: Hook method
 
-If your are not using the service worker. Fetch function need to send AccessToken.
-This Hook give you a wrapped fetch that add the access token for you.
+If you are not using the service worker. The Fetch function needs to send AccessToken.
+This hook will give you a wrapped fetch that adds the access token for you.
 
 ```javascript
 import React, { useEffect, useState } from "react";
