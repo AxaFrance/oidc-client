@@ -1,17 +1,24 @@
 import { OidcClient } from '@axa-fr/oidc-client';
-import { ComponentType, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 
-const SilentCallbackManager: ComponentType<any> = ({ configurationName }) => {
+export interface SilentCallbackProps {
+    configurationName: string;
+  }
+
+const SilentCallbackManager: FC<SilentCallbackProps> = ({ configurationName }) => {
     useEffect(() => {
         const playCallbackAsync = async () => {
-            const getOidc = OidcClient.get;
-            const oidc = getOidc(configurationName);
+            const oidc = OidcClient.get(configurationName);
             oidc.silentLoginCallbackAsync();
         };
-        playCallbackAsync();
-    }, []);
 
-    return <></>;
+        playCallbackAsync().catch(error => {
+            console.error('Error during silent login callback:', error);
+        });
+
+    }, [configurationName]);
+
+    return null;
 };
 
 export default SilentCallbackManager;
