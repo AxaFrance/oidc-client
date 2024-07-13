@@ -7,7 +7,7 @@ export interface ComponentWithOidcFetchProps {
 
 const defaultConfigurationName = 'default';
 
-const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => OidcClient | null, demonstrating_proof_of_possession=false) => async (...params: Parameters<Fetch>) => {
+const fetchWithToken = (fetch: Fetch, getOidcWithConfigurationName: () => OidcClient | null, demonstrating_proof_of_possession: boolean = false) => async (...params: Parameters<Fetch>) => {
   const oidc = getOidcWithConfigurationName();
   const newFetch = oidc.fetchWithTokens(fetch, demonstrating_proof_of_possession);
   return await newFetch(...params);
