@@ -16,7 +16,7 @@ const fetchWithLogs = (fetch: Fetch) => async (...params: Parameters<Fetch>) => 
     return await fetch(url, options, ...rest);
 };
 
-const MultiAuth = ({ configurationName, handleConfigurationChange }) => {;
+const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
     const { login, logout, isAuthenticated } = useOidc(configurationName);
     const { isAuthenticated: isAuthenticatedDefault } = useOidc('default');
     const [fname, setFname] = useState('');

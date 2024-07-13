@@ -9,7 +9,7 @@ export interface EventSubscriber {
 }
 
 export class OidcClient {
-    private _oidc: Oidc;
+    private readonly _oidc: Oidc;
     constructor(oidc: Oidc) {
         this._oidc = oidc;
     }
