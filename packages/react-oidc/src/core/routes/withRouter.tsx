@@ -1,7 +1,7 @@
 const generateKey = () =>
   Math.random()
     .toString(36)
-    .substr(2, 6);
+    .slice(2, 8);
 
 // Exported only for test
 export type WindowInternal = Window & {

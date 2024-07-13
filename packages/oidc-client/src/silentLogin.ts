@@ -61,7 +61,7 @@ export const _silentLoginAsync = (configurationName:string, configuration:OidcCo
                 isResolved = true;
             };
 
-            const listener = (e: MessageEvent<any>) => {
+            const listener = (e: MessageEvent) => {
                 if (e.origin === iFrameOrigin &&
                     e.source === iframe.contentWindow
                 ) {

@@ -15,11 +15,11 @@ import {
 	getDomains,
 	hideTokens,
 	isTokensValid,
+	normalizeUrl,
 	serializeHeaders,
 	sleep,
 } from './utils';
 import {extractConfigurationNameFromCodeVerifier, replaceCodeVerifier} from './utils/codeVerifier';
-import { normalizeUrl } from './utils/normalizeUrl';
 import version from './version';
 
 // @ts-ignore

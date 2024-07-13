@@ -19,7 +19,7 @@ export class CheckSessionIFrame {
         this._interval = interval || DefaultInterval;
         this._stopOnError = stopOnError;
         const idx = url.indexOf('/', url.indexOf('//') + 2);
-        this._frame_origin = url.substr(0, idx);
+        this._frame_origin = url.substring(0, idx);
         this._frame = window.document.createElement('iframe');
         this._frame.style.visibility = 'hidden';
         this._frame.style.position = 'absolute';

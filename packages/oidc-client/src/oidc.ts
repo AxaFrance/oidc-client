@@ -316,7 +316,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         
         const session = initSession(this.configurationName, configuration.storage);
         const jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
-        const demonstratingProofOfPossessionNonce = await session.getDemonstratingProofOfPossessionNonce();
+        const demonstratingProofOfPossessionNonce = session.getDemonstratingProofOfPossessionNonce();
 
         if (demonstratingProofOfPossessionNonce) {
             claimsExtras['nonce'] = demonstratingProofOfPossessionNonce;
