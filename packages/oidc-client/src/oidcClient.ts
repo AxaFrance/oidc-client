@@ -75,7 +75,7 @@ export class OidcClient {
         return getValidTokenAsync(this._oidc, waitMs, numberWait);
     }
     
-    fetchWithTokens(fetch: Fetch, demonstrating_proof_of_possession:false): Fetch {
+    fetchWithTokens(fetch: Fetch, demonstrating_proof_of_possession:boolean = false): Fetch {
         return fetchWithTokens(fetch, this, demonstrating_proof_of_possession);
     }
 
