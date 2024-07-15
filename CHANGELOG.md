@@ -1,6 +1,16 @@
 # Changelog
 
-## 7.22.16
+## 7.22.17
+
+- [b099078](https://github.com/AxaFrance/oidc-client/commit/b099078f9d4b61dffd03034f511a4f32e80977a8) - fix(oidc): clenup client internal promises when requests are finished (release) (#1417), 2024-07-15 by *wermanoid*
+- [01f0714](https://github.com/AxaFrance/oidc-client/commit/01f0714241e6442e6b58fcba8b86804ed75cec09) - tests(domain): Be more explicit about intent of test, is to not throw, not return undefined. (#1413), 2024-07-15 by *Jason Finch*
+- [b94fa5c](https://github.com/AxaFrance/oidc-client/commit/b94fa5ca90bd366c4f59a870c428f42872bfacaa) - docs: Minor language change. (#1412), 2024-07-15 by *Jason Finch*
+- [7caee91](https://github.com/AxaFrance/oidc-client/commit/7caee919b4854526dad83203216965746baecabe) - build(job): Update job scripts to v4. (earlier versions are marked deprecated) (#1411), 2024-07-15 by *Jason Finch*
+- [a46b1aa](https://github.com/AxaFrance/oidc-client/commit/a46b1aabe19db70beac342c557ae2c986d16eae7) - fix (FetchToken): Fix FetchToken param to be boolean (#1414), 2024-07-15 by *Jason Finch*
+- [a989ed2](https://github.com/AxaFrance/oidc-client/commit/a989ed29f46b66483bc2c7c51e73bcc19b2c9736) - build(lint): Update lint step to run. (#1409), 2024-07-13 by *Jason Finch*
+
+
+## v7.22.16
 
 - [72a6373](https://github.com/AxaFrance/oidc-client/commit/72a6373402a53aaaf01ad7fac22f8ad8c6feaff0) - fix(oidc): improve error handling (release) (#1403), 2024-07-11 by *Miya*
 - [c56ceb8](https://github.com/AxaFrance/oidc-client/commit/c56ceb815b28dd5990fe4a1679a61bcebc7e525a) - docs(readme): Update README.md (#1407), 2024-07-12 by *Jason Finch*
@@ -310,10 +320,5 @@
 ## v7.13.6
 
 - [da77bb9](https://github.com/AxaFrance/oidc-client/commit/da77bb912b61e5aad93c53e84ce4fbea2a503fb2) - build(npm): bump typescript from 5.1.6 to 5.3.3 (#1232), 2023-12-07 by *dependabot[bot]*
-
-
-## v7.13.5
-
-- [8f5f888](https://github.com/AxaFrance/oidc-client/commit/8f5f888fe34d739ded51f611e194d77a2e788830) - build(npm): bump eslint-plugin-regexp from 1.15.0 to 2.1.2 (#1233), 2023-12-07 by *dependabot[bot]*
 
 
