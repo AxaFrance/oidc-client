@@ -243,9 +243,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return this.tryKeepExistingSessionPromise;
         }        
         this.tryKeepExistingSessionPromise = tryKeepSessionAsync(this);
-        return this.tryKeepExistingSessionPromise.then((result) => {
+        return this.tryKeepExistingSessionPromise.finally(() => {
             this.tryKeepExistingSessionPromise = null;
-            return result;
         });
     }
 
@@ -266,9 +265,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return defaultSilentLoginAsync(window, this.configurationName, this.configuration, this.publishEvent.bind(this), this)(extras, scope);
         }
         this.loginPromise = defaultLoginAsync(this.configurationName, this.configuration, this.publishEvent.bind(this), this.initAsync.bind(this), this.location)(callbackPath, extras, isSilentSignin, scope);
-        return this.loginPromise.then(result => {
+        return this.loginPromise.finally(() => {
             this.loginPromise = null;
-            return result;
         });
     }
 
@@ -297,9 +295,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return { parsedTokens, state: response.state, callbackPath: response.callbackPath };
         };
         this.loginCallbackPromise = loginCallbackLocalAsync();
-        return this.loginCallbackPromise.then(result => {
+        return this.loginCallbackPromise.finally(() => {
             this.loginCallbackPromise = null;
-            return result;
         });
     }
 
@@ -336,9 +333,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
              return this.loginCallbackWithAutoTokensRenewPromise;
          }
          this.loginCallbackWithAutoTokensRenewPromise = loginCallbackWithAutoTokensRenewAsync(this);
-         return this.loginCallbackWithAutoTokensRenewPromise.then(result => {
+         return this.loginCallbackWithAutoTokensRenewPromise.finally(() => {
              this.loginCallbackWithAutoTokensRenewPromise = null;
-             return result;
          });
      }
 
@@ -348,9 +344,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
              return this.userInfoPromise;
          }
          this.userInfoPromise = userInfoAsync(this)(noCache, demonstrating_proof_of_possession);
-         return this.userInfoPromise.then(result => {
+         return this.userInfoPromise.finally(() => {
              this.userInfoPromise = null;
-             return result;
          });
      }
 
@@ -366,9 +361,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
          timer.clearTimeout(this.timeoutId);
          // @ts-ignore
          this.renewTokensPromise = renewTokensAndStartTimerAsync(this, true, extras);
-         return this.renewTokensPromise.then(result => {
+         return this.renewTokensPromise.finally(() => {
              this.renewTokensPromise = null;
-             return result;
          });
      }
 
@@ -398,9 +392,8 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
             return this.logoutPromise;
         }
         this.logoutPromise = logoutAsync(this, oidcDatabase, this.getFetch(), console, this.location)(callbackPathOrUrl, extras);
-        return this.logoutPromise.then(result => {
+        return this.logoutPromise.finally(() => {
             this.logoutPromise = null;
-            return result;
         });
     }
   }
