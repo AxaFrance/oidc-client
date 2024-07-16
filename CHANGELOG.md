@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.17
+## 7.22.18
+
+- [5ee0cc8](https://github.com/AxaFrance/oidc-client/commit/5ee0cc8f6d823056da221ad081c3821ba9fac343) - fix(oidc): separate state, nonce and codeVerifier for each tab (release) (#1402), 2024-07-16 by *Miya*
+
+
+## v7.22.17
 
 - [b099078](https://github.com/AxaFrance/oidc-client/commit/b099078f9d4b61dffd03034f511a4f32e80977a8) - fix(oidc): clenup client internal promises when requests are finished (release) (#1417), 2024-07-15 by *wermanoid*
 - [01f0714](https://github.com/AxaFrance/oidc-client/commit/01f0714241e6442e6b58fcba8b86804ed75cec09) - tests(domain): Be more explicit about intent of test, is to not throw, not return undefined. (#1413), 2024-07-15 by *Jason Finch*
@@ -315,10 +320,5 @@
 - [23c8715](https://github.com/AxaFrance/oidc-client/commit/23c87152e55c8d7f1c51a33032d48c751b15c4c5) - fix(ci): clean changelog generation, 2023-12-15 by *Guillaume Chervet*
 - [9f1f7f6](https://github.com/AxaFrance/oidc-client/commit/9f1f7f684a6b344f59221caf3e3a14faef73a6bc) - fix(oidc): session storage for next (#1240) (alpha), 2023-12-12 by *Guillaume Chervet*
 - [64a8df3](https://github.com/AxaFrance/oidc-client/commit/64a8df3281f95159a60e5f9ec61db315a8d20c7d) - fix(oidc-client): make locks work only ifAvailable (#1237)(alpha), 2023-12-09 by *abhilashlr*
-
-
-## v7.13.6
-
-- [da77bb9](https://github.com/AxaFrance/oidc-client/commit/da77bb912b61e5aad93c53e84ce4fbea2a503fb2) - build(npm): bump typescript from 5.1.6 to 5.3.3 (#1232), 2023-12-07 by *dependabot[bot]*
 
 
