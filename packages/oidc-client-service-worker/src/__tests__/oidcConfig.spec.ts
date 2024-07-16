@@ -7,15 +7,16 @@ const oidcConfigDefaults = {
   configurationName: '',
   tokens: null,
   status: null,
-  state: null,
-  codeVerifier: null,
-  nonce: null,
+  state: {},
+  codeVerifier: {},
+  nonce: {},
   hideAccessToken: false,
   convertAllRequestsToCorsExceptNavigate: true,
   setAccessTokenToNavigateRequests: true,
   demonstratingProofOfPossessionNonce: null,
   demonstratingProofOfPossessionJwkJson: null,
   demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
+  allowMultiTabLogin: true
 }
 
 const oidcServerConfigDefault = {

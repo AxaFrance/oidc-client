@@ -71,6 +71,9 @@ const trustedDomains = {
 // scenarios which require it. For example, to send it via websocket connection.
 trustedDomains.config_show_access_token = { domains : ["https://demo.duendesoftware.com"], showAccessToken: true };
 
+// Setting allowMultiTabLogin to true will enable storing login-specific parameters (state, nonce, code verifier)
+// separately for each tab. This will prevent errors when logins are initiated from multiple tabs.
+trustedDomains.config_multi_tab_login = { domains : ["https://demo.duendesoftware.com"], allowMultiTabLogin: true };
 ```
 
 ## Run The Demo

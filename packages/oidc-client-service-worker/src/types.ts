@@ -8,6 +8,7 @@ export type DomainDetails = {
     demonstratingProofOfPossession?:boolean;
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent?:boolean;
     demonstratingProofOfPossessionConfiguration?: DemonstratingProofOfPossessionConfiguration;
+    allowMultiTabLogin?: boolean;
 }
 
 export interface DemonstratingProofOfPossessionConfiguration {
@@ -60,6 +61,7 @@ export type MessageData = {
 
 export type MessageEventData = {
     configurationName: string;
+    tabId: string;
     type: MessageEventType;
     data: MessageData;
 }
@@ -73,9 +75,9 @@ export type OidcConfig = {
     configurationName: string;
     tokens: Tokens | null;
     status: Status;
-    state: string | null;
-    codeVerifier: string | null;
-    nonce: Nonce;
+    state: Record<string, string | null>;
+    codeVerifier: Record<string, string | null>;
+    nonce: Record<string, Nonce>;
     oidcServerConfiguration: OidcServerConfiguration | null;
     oidcConfiguration?: OidcConfiguration;
     sessionState?: string | null;
@@ -86,6 +88,7 @@ export type OidcConfig = {
     demonstratingProofOfPossessionNonce: string | null;
     demonstratingProofOfPossessionJwkJson: string | null;
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: boolean;
+    allowMultiTabLogin: boolean;
 }
 
 export type IdTokenPayload = {
