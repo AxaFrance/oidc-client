@@ -75,7 +75,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
         const newTabId = globalThis.crypto.randomUUID();
         sessionStorage.setItem(`oidc.tabId.${configurationName}`, newTabId);
         return newTabId;
-    }
+    };
 
     const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
     if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.serviceWorker || !serviceWorkerRelativeUrl) {
@@ -116,7 +116,7 @@ export const initWorkerAsync = async(configuration, configurationName) => {
                 },
             },
             configurationName,
-            tabId: getTabId()
+            tabId: getTabId(),
         });
         
         // @ts-ignore

@@ -130,7 +130,7 @@ class OidcConfigBuilder {
     demonstratingProofOfPossessionJwkJson: null,
     demonstratingProofOfPossessionConfiguration: null,
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
-    allowMultiTabLogin: true
+    allowMultiTabLogin: true,
   };
 
   public withTestingDefault(): OidcConfigBuilder {
