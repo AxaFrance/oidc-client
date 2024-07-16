@@ -356,7 +356,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			demonstratingProofOfPossessionJwkJson: null,
 			demonstratingProofOfPossessionConfiguration: null,
 			demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
-			allowMultiTabLogin: allowMultiTabLogin ?? false
+			allowMultiTabLogin: allowMultiTabLogin ?? false,
 		};
 		currentDatabase = database[configurationName];
 
@@ -500,7 +500,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 			return;
 		}
 		case 'getNonce': {
-			const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName + '_' + tabId
+			const keyNonce = TOKEN.NONCE_TOKEN + '_' + configurationName + '_' + tabId;
 			const nonce = currentDatabase.nonce ? keyNonce : null;
 			port.postMessage({ configurationName, nonce });
 			return;
