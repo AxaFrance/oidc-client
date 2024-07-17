@@ -65,12 +65,10 @@ const keepAliveAsync = async (event: FetchEvent) => {
 	if (!isFromVanilla) {
 		const originalRequestUrl = new URL(originalRequest.url);
 		const minSleepSeconds =
-			Number(originalRequestUrl.searchParams.get('minSleepSeconds')) || 240;
-		for (let i = 0; i < minSleepSeconds; i++) {
-			await sleep(1000 + Math.floor(Math.random() * 1000));
-			const cache = await caches.open('oidc_dummy_cache');
-			await cache.put(event.request, response.clone());
-		}
+			Number(originalRequestUrl.searchParams.get('minSleepSeconds')) || 20;
+		await sleep(minSleepSeconds * 1000 + Math.floor(Math.random() * 2000));
+		const cache = await caches.open('oidc_dummy_cache');
+		await cache.put(event.request, response.clone());
 	}
 	return response;
 };
