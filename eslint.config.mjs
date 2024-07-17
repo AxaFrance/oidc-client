@@ -6,7 +6,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import prettier from "eslint-plugin-prettier";
+import prettier from "eslint-plugin-prettier/recommended";
 import react from "eslint-plugin-react";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 //import testingLibrary from "eslint-plugin-testing-library";
@@ -38,7 +38,6 @@ export default [{
         "**/.changeset",
         "**/vite.config.js",
         "**/webpack-runtime.js",
-        "**/.prettierrc.cjs",
     ],
 }, ...fixupConfigRules(compat.extends(
     "plugin:react/recommended",
@@ -48,16 +47,13 @@ export default [{
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "plugin:jsx-a11y/recommended",
-    "prettier",
 )), {
     plugins: {
         "@typescript-eslint": fixupPluginRules(typescriptEslint),
         "simple-import-sort": simpleImportSort,
         //"testing-library": testingLibrary,  //Not compatible with ESLint9 yet https://github.com/jsx-eslint/eslint-plugin-react/issues/3699
         react: fixupPluginRules(react),
-        prettier,
     },
-
     languageOptions: {
         parser: tsParser,
         ecmaVersion: 2022,
@@ -179,6 +175,7 @@ export default [{
         }],
     },
 }, 
+prettier,
 //Not compatible with ESLint9 yet https://github.com/jsx-eslint/eslint-plugin-react/issues/3699
 // ...compat.extends("plugin:testing-library/react").map(config => ({
 //     ...config,
