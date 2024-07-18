@@ -4,14 +4,21 @@ import { ComponentType, useEffect, useState } from 'react';
 import { getCustomHistory } from '../routes/withRouter.js';
 import AuthenticatingError from './AuthenticateError.component.js';
 
-export const CallBackSuccess: ComponentType<any> = () => (<div className="oidc-callback">
-  <div className="oidc-callback__container">
-    <h1 className="oidc-callback__title">Authentication complete</h1>
-    <p className="oidc-callback__content">You will be redirected to your application.</p>
+export const CallBackSuccess: ComponentType<any> = () => (
+  <div className="oidc-callback">
+    <div className="oidc-callback__container">
+      <h1 className="oidc-callback__title">Authentication complete</h1>
+      <p className="oidc-callback__content">You will be redirected to your application.</p>
+    </div>
   </div>
-</div>);
+);
 
-const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, configurationName, withCustomHistory }) => {
+const CallbackManager: ComponentType<any> = ({
+  callBackError,
+  callBackSuccess,
+  configurationName,
+  withCustomHistory,
+}) => {
   const [isError, setIsError] = useState(false);
   useEffect(() => {
     let isMounted = true;
@@ -19,13 +26,13 @@ const CallbackManager: ComponentType<any> = ({ callBackError, callBackSuccess, c
       const getOidc = OidcClient.get;
       try {
         const { callbackPath } = await getOidc(configurationName).loginCallbackAsync();
-        const history = (withCustomHistory) ? withCustomHistory() : getCustomHistory();
+        const history = withCustomHistory ? withCustomHistory() : getCustomHistory();
         history.replaceState(callbackPath || '/');
       } catch (error) {
-          if (isMounted) {
-            console.warn(error);
-            setIsError(true);
-          }
+        if (isMounted) {
+          console.warn(error);
+          setIsError(true);
+        }
       }
     };
     playCallbackAsync();

@@ -3,7 +3,6 @@
 [![Continuous Integration](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
-
 <p align="center">
     <img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/introduction.gif"
      alt="Sample React Oicd"
@@ -31,6 +30,7 @@
 **@axa-fr/react-oidc** is for **React** (compatible next.js, etc.), we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
 
 Demos:
+
 - Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
 - Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
 
@@ -40,7 +40,7 @@ Demos:
   - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
   - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
   - OIDC using client side Code Credential Grant with pkce only
-- **Lightweight** : Unpacked Size on npm is **274 kB**,  Minified `61.1kB`, Minified+GZIPPED `16.8kB` [Pkg stats via Bundlephobia.com](https://bundlephobia.com/package/@axa-fr/react-oidc)
+- **Lightweight** : Unpacked Size on npm is **274 kB**, Minified `61.1kB`, Minified+GZIPPED `16.8kB` [Pkg stats via Bundlephobia.com](https://bundlephobia.com/package/@axa-fr/react-oidc)
 - **Simple**
   - refresh_token and access_token are auto refreshed in background
   - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
@@ -48,20 +48,19 @@ Demos:
   - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
   - You can authenticate to multiple different providers inside the same SPA (single page application) website
 - **Flexible** :
-  - Work with Service Worker (more secure) and without for older browser (less secure). 
+  - Work with Service Worker (more secure) and without for older browser (less secure).
   - You can disable Service Worker if you want (but less secure) and just use SessionStorage or LocalStorage mode.
 
 Works perfectly well with:
 
 - [Auth0](https://auth0.com/)
 - [Duende Identity Server](https://duendesoftware.com/)
-- [Identity Server 4](https://github.com/IdentityServer/IdentityServer4) 
+- [Identity Server 4](https://github.com/IdentityServer/IdentityServer4)
 - Azure AD
 - Google
 - AWS
 - [Keycloak](https://www.keycloak.org/)
 - etc., all OIDC providers
-
 
 ## Getting Started
 
@@ -77,7 +76,6 @@ node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
 # ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
 # ./public/OidcTrustedDomains.js <-- won't be updated if already exist
 ```
-
 
 > [!WARNING]
 > If you use `Service Worker` mode, the `OidcServiceWorker.js` file should always be up to date with the version of the library. You may setup a postinstall script in your `package.json` file to update it at each npm install. For example :
@@ -157,7 +155,6 @@ pnpm run dev
   The service worker catch <b>access_token</b> and <b>refresh_token</b> that will never be accessible to the client.
 </p>
 
-
 These components encapsulate the use of "`@axa-fr/oidc-client`" in order to hide workflow complexity.
 Internally for "`@axa-fr/react-oidc`", native History API is used to be router library agnostic.
 
@@ -170,7 +167,7 @@ More information about OIDC :
 
 ## FAQ
 
--  Frequented Asked Question [`FAQ`](./FAQ.md)
+- Frequented Asked Question [`FAQ`](./FAQ.md)
 
 ## Migrations
 

@@ -1,9 +1,7 @@
-﻿
-import { describe, expect,it } from 'vitest';
-
+﻿import { describe, expect, it } from 'vitest';
 
 describe('Requests test Suite', () => {
-    it('performAuthorizationRequestAsync', async () => {
-        expect(true).toBe(true);
-    });
+  it('performAuthorizationRequestAsync', async () => {
+    expect(true).toBe(true);
+  });
 });

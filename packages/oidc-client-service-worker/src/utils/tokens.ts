@@ -1,5 +1,5 @@
 /* eslint-disable simple-import-sort/exports */
-import {TOKEN, TokenRenewMode} from '../constants';
+import { TOKEN, TokenRenewMode } from '../constants';
 import {
   AccessTokenPayload,
   IdTokenPayload,
@@ -8,34 +8,22 @@ import {
   OidcServerConfiguration,
   Tokens,
 } from '../types';
-import {countLetter} from './strings';
+import { countLetter } from './strings';
 
 export const parseJwt = (payload: string) => {
-  return JSON.parse(
-    b64DecodeUnicode(payload.replaceAll(/-/g, '+').replaceAll(/_/g, '/')),
-  );
+  return JSON.parse(b64DecodeUnicode(payload.replaceAll(/-/g, '+').replaceAll(/_/g, '/')));
 };
 function b64DecodeUnicode(str: string) {
   return decodeURIComponent(
     Array.prototype.map
-      .call(
-        atob(str),
-        (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2),
-      )
+      .call(atob(str), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
       .join(''),
   );
 }
 
-function computeTimeLeft(
-  refreshTimeBeforeTokensExpirationInSecond: number,
-  expiresAt: number,
-) {
+function computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond: number, expiresAt: number) {
   const currentTimeUnixSecond = new Date().getTime() / 1000;
-  return Math.round(
-    expiresAt -
-      refreshTimeBeforeTokensExpirationInSecond -
-      currentTimeUnixSecond,
-  );
+  return Math.round(expiresAt - refreshTimeBeforeTokensExpirationInSecond - currentTimeUnixSecond);
 }
 
 function isTokensValid(tokens: Tokens | null) {
@@ -72,7 +60,10 @@ const isTokensOidcValid = (
     const idTokenPayload = tokens.idTokenPayload;
     // 2: The Issuer Identifier for the OpenID Provider (which is typically obtained during Discovery) MUST exactly match the value of the iss (issuer) Claim.
     if (idTokenPayload && oidcServerConfiguration.issuer !== idTokenPayload.iss) {
-      return { isValid: false, reason: `Issuer does not match (oidcServerConfiguration issuer) ${oidcServerConfiguration.issuer} !== (idTokenPayload issuer) ${idTokenPayload.iss}` };
+      return {
+        isValid: false,
+        reason: `Issuer does not match (oidcServerConfiguration issuer) ${oidcServerConfiguration.issuer} !== (idTokenPayload issuer) ${idTokenPayload.iss}`,
+      };
     }
     // 3: The Client MUST validate that the aud (audience) Claim contains its client_id value registered at the Issuer identified by the iss (issuer) Claim as an audience. The aud (audience) Claim MAY contain an array with more than one element. The ID Token MUST be rejected if the ID Token does not list the Client as a valid audience, or if it contains additional audiences not trusted by the Client.
 
@@ -81,25 +72,39 @@ const isTokensOidcValid = (
     // 9: The current time MUST be before the time represented by the exp Claim.
     const currentTimeUnixSecond = new Date().getTime() / 1000;
     if (idTokenPayload && idTokenPayload.exp && idTokenPayload.exp < currentTimeUnixSecond) {
-      return { isValid: false, reason: `Token expired at (idTokenPayload exp) ${idTokenPayload.exp} < (currentTimeUnixSecond) ${currentTimeUnixSecond}` };
+      return {
+        isValid: false,
+        reason: `Token expired at (idTokenPayload exp) ${idTokenPayload.exp} < (currentTimeUnixSecond) ${currentTimeUnixSecond}`,
+      };
     }
     // 10: The iat Claim can be used to reject tokens that were issued too far away from the current time, limiting the amount of time that nonces need to be stored to prevent attacks. The acceptable range is Client specific.
     const timeInSevenDays = 60 * 60 * 24 * 7;
     if (
-        idTokenPayload && idTokenPayload.iat &&
+      idTokenPayload &&
+      idTokenPayload.iat &&
       idTokenPayload.iat + timeInSevenDays < currentTimeUnixSecond
     ) {
-      return { isValid: false, reason: `Token is used from too long time (idTokenPayload iat + timeInSevenDays) ${idTokenPayload.iat + timeInSevenDays} < (currentTimeUnixSecond) ${currentTimeUnixSecond}` };
+      return {
+        isValid: false,
+        reason: `Token is used from too long time (idTokenPayload iat + timeInSevenDays) ${idTokenPayload.iat + timeInSevenDays} < (currentTimeUnixSecond) ${currentTimeUnixSecond}`,
+      };
     }
     // 11: If a nonce value was sent in the Authentication Request, a nonce Claim MUST be present and its value checked to verify that it is the same value as the one that was sent in the Authentication Request. The Client SHOULD check the nonce value for replay attacks. The precise method for detecting replay attacks is Client specific.
     if (idTokenPayload && nonce && idTokenPayload.nonce && idTokenPayload.nonce !== nonce) {
-      return { isValid: false, reason: `Nonce does not match (nonce) ${nonce} !== (idTokenPayload nonce) ${idTokenPayload.nonce}` };
+      return {
+        isValid: false,
+        reason: `Nonce does not match (nonce) ${nonce} !== (idTokenPayload nonce) ${idTokenPayload.nonce}`,
+      };
     }
   }
   return { isValid: true, reason: '' };
 };
 
-function extractedIssueAt(tokens: Tokens, accessTokenPayload: AccessTokenPayload | null, _idTokenPayload : IdTokenPayload)  {
+function extractedIssueAt(
+  tokens: Tokens,
+  accessTokenPayload: AccessTokenPayload | null,
+  _idTokenPayload: IdTokenPayload,
+) {
   if (!tokens.issued_at) {
     if (accessTokenPayload && accessTokenPayload.iat) {
       return accessTokenPayload.iat;
@@ -109,17 +114,22 @@ function extractedIssueAt(tokens: Tokens, accessTokenPayload: AccessTokenPayload
       const currentTimeUnixSecond = new Date().getTime() / 1000;
       return currentTimeUnixSecond;
     }
-  } else if (typeof tokens.issued_at == "string") {
+  } else if (typeof tokens.issued_at == 'string') {
     return parseInt(tokens.issued_at, 10);
   }
   return tokens.issued_at;
 }
 
-function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configurationName: string, currentTabId: string) {
+function _hideTokens(
+  tokens: Tokens,
+  currentDatabaseElement: OidcConfig,
+  configurationName: string,
+  currentTabId: string,
+) {
   if (!tokens.issued_at) {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
     tokens.issued_at = currentTimeUnixSecond;
-  } else if (typeof tokens.issued_at == "string") {
+  } else if (typeof tokens.issued_at == 'string') {
     tokens.issued_at = parseInt(tokens.issued_at, 10);
   }
 
@@ -142,71 +152,61 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
     id_token = tokens.id_token;
   }
   tokens.id_token = id_token;
-  
+
   let _idTokenPayload = null;
   if (id_token) {
     _idTokenPayload = extractTokenPayload(id_token);
-    tokens.idTokenPayload = _idTokenPayload !=null ? { ..._idTokenPayload }: null;
+    tokens.idTokenPayload = _idTokenPayload != null ? { ..._idTokenPayload } : null;
     if (_idTokenPayload && _idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
       const keyNonce =
-          TOKEN.NONCE_TOKEN + '_' + currentDatabaseElement.configurationName + '_' + currentTabId;
+        TOKEN.NONCE_TOKEN + '_' + currentDatabaseElement.configurationName + '_' + currentTabId;
       _idTokenPayload.nonce = keyNonce;
     }
     secureTokens.idTokenPayload = _idTokenPayload;
   }
   if (tokens.refresh_token) {
-    secureTokens.refresh_token =
-        TOKEN.REFRESH_TOKEN + '_' + configurationName + '_' + currentTabId;
+    secureTokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName + '_' + currentTabId;
   }
 
   tokens.issued_at = extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload);
 
-  const expireIn = typeof tokens.expires_in == "string" ? parseInt(tokens.expires_in, 10) : tokens.expires_in;
+  const expireIn =
+    typeof tokens.expires_in == 'string' ? parseInt(tokens.expires_in, 10) : tokens.expires_in;
 
   const idTokenExpiresAt =
-      _idTokenPayload && _idTokenPayload.exp
-          ? _idTokenPayload.exp
-          : Number.MAX_VALUE;
+    _idTokenPayload && _idTokenPayload.exp ? _idTokenPayload.exp : Number.MAX_VALUE;
   const accessTokenExpiresAt =
-      accessTokenPayload && accessTokenPayload.exp
-          ? accessTokenPayload.exp
-          : tokens.issued_at + expireIn;
+    accessTokenPayload && accessTokenPayload.exp
+      ? accessTokenPayload.exp
+      : tokens.issued_at + expireIn;
 
   let expiresAt: number;
-  const tokenRenewMode = (
-      currentDatabaseElement.oidcConfiguration as OidcConfiguration
-  ).token_renew_mode;
+  const tokenRenewMode = (currentDatabaseElement.oidcConfiguration as OidcConfiguration)
+    .token_renew_mode;
   if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
     expiresAt = accessTokenExpiresAt;
   } else if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
     expiresAt = idTokenExpiresAt;
   } else {
-    expiresAt =
-        idTokenExpiresAt < accessTokenExpiresAt
-            ? idTokenExpiresAt
-            : accessTokenExpiresAt;
+    expiresAt = idTokenExpiresAt < accessTokenExpiresAt ? idTokenExpiresAt : accessTokenExpiresAt;
   }
   secureTokens.expiresAt = expiresAt;
 
   tokens.expiresAt = expiresAt;
   const nonce = currentDatabaseElement.nonce[currentTabId]
-      ? currentDatabaseElement.nonce[currentTabId]?.nonce
-      : null;
+    ? currentDatabaseElement.nonce[currentTabId]?.nonce
+    : null;
   const { isValid, reason } = isTokensOidcValid(
-      tokens,
-      nonce as string,
-      currentDatabaseElement.oidcServerConfiguration as OidcServerConfiguration,
+    tokens,
+    nonce as string,
+    currentDatabaseElement.oidcServerConfiguration as OidcServerConfiguration,
   ); // TODO: Type assertion, could be null.
   if (!isValid) {
     throw Error(`Tokens are not OpenID valid, reason: ${reason}`);
   }
 
   // When refresh_token is not rotated we reuse ald refresh_token
-  if (
-      oldTokens != null &&
-      'refresh_token' in oldTokens &&
-      !('refresh_token' in tokens)
-  ) {
+  if (oldTokens != null && 'refresh_token' in oldTokens && !('refresh_token' in tokens)) {
     const refreshToken = oldTokens.refresh_token;
 
     currentDatabaseElement.tokens = {
@@ -221,7 +221,7 @@ function _hideTokens(tokens: Tokens, currentDatabaseElement: OidcConfig, configu
   return secureTokens;
 }
 
-const demonstratingProofOfPossessionNonceResponseHeader = "DPoP-Nonce";
+const demonstratingProofOfPossessionNonceResponseHeader = 'DPoP-Nonce';
 function hideTokens(currentDatabaseElement: OidcConfig, currentTabId: string) {
   const configurationName = currentDatabaseElement.configurationName;
   return (response: Response) => {
@@ -229,13 +229,20 @@ function hideTokens(currentDatabaseElement: OidcConfig, currentTabId: string) {
       return response;
     }
     const newHeaders = new Headers(response.headers);
-    if( response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)){
-      currentDatabaseElement.demonstratingProofOfPossessionNonce = response.headers.get(demonstratingProofOfPossessionNonceResponseHeader);
+    if (response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)) {
+      currentDatabaseElement.demonstratingProofOfPossessionNonce = response.headers.get(
+        demonstratingProofOfPossessionNonceResponseHeader,
+      );
       newHeaders.delete(demonstratingProofOfPossessionNonceResponseHeader);
     }
 
     return response.json().then<Response>((tokens: Tokens) => {
-      const secureTokens = _hideTokens(tokens, currentDatabaseElement, configurationName, currentTabId);
+      const secureTokens = _hideTokens(
+        tokens,
+        currentDatabaseElement,
+        configurationName,
+        currentTabId,
+      );
       const body = JSON.stringify(secureTokens);
       return new Response(body, {
         status: response.status,

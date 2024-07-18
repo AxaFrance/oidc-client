@@ -1,10 +1,10 @@
-import { beforeEach,describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CreateEvent, WindowInternal } from './withRouter';
 
 describe('WithRouter test Suite', () => {
   const paramsMock = { bubbles: false, cancelable: false, detail: 'detail' };
-  beforeEach(() => { });
+  beforeEach(() => {});
   it('should CreateEvent return correct Event if not on IE', () => {
     const windowMock = {
       CustomEvent: vi.fn().mockImplementation((event, params) => {
@@ -12,7 +12,7 @@ describe('WithRouter test Suite', () => {
       }),
     };
     const documentMock = {} as Document;
-    const res = CreateEvent((windowMock as unknown) as WindowInternal, documentMock)(
+    const res = CreateEvent(windowMock as unknown as WindowInternal, documentMock)(
       'event test',
       paramsMock,
     );
@@ -34,8 +34,8 @@ describe('WithRouter test Suite', () => {
     const documentMock = {
       createEvent: vi.fn(() => evtMock),
     };
-    const typedDocumentMock = (documentMock as unknown) as Document;
-    const res = CreateEvent((windowMock as unknown) as WindowInternal, typedDocumentMock)(
+    const typedDocumentMock = documentMock as unknown as Document;
+    const res = CreateEvent(windowMock as unknown as WindowInternal, typedDocumentMock)(
       'event test',
       paramsMock,
     );
@@ -43,5 +43,4 @@ describe('WithRouter test Suite', () => {
     expect(documentMock.createEvent).toHaveBeenCalledWith('CustomEvent');
     expect(evtMock.initCustomEvent).toHaveBeenCalledWith('event test', false, false, 'detail');
   });
-
 });
