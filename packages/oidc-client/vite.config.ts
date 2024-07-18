@@ -2,7 +2,6 @@
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-
 export default defineConfig({
   build: {
     lib: {
@@ -20,4 +19,3 @@ export default defineConfig({
     preserveSymlinks: true, // https://github.com/vitejs/vite/issues/11657
   },
 });
-

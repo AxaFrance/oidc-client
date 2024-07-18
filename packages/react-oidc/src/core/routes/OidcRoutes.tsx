@@ -1,4 +1,4 @@
-import {getPath, ILOidcLocation} from '@axa-fr/oidc-client';
+import { getPath, ILOidcLocation } from '@axa-fr/oidc-client';
 import React, { ComponentType, FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import CallbackComponent from '../default-component/Callback.component.js';
@@ -24,8 +24,9 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   redirect_uri,
   silent_redirect_uri,
   silent_login_uri,
-  children, configurationName,
-  withCustomHistory = null, 
+  children,
+  configurationName,
+  withCustomHistory = null,
 }) => {
   // This exist because in next.js window outside useEffect is null
   const pathname = window ? getPath(window.location.href) : '';
@@ -55,7 +56,14 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
 
   switch (path) {
     case callbackPath:
-      return <CallbackComponent callBackError={callbackErrorComponent} callBackSuccess={callbackSuccessComponent} configurationName={configurationName} withCustomHistory={withCustomHistory} />;
+      return (
+        <CallbackComponent
+          callBackError={callbackErrorComponent}
+          callBackSuccess={callbackSuccessComponent}
+          configurationName={configurationName}
+          withCustomHistory={withCustomHistory}
+        />
+      );
     default:
       return <>{children}</>;
   }

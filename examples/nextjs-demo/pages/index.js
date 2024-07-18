@@ -1,90 +1,97 @@
-import {OidcSecure, OidcUserStatus, useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser} from '@axa-fr/react-oidc';
+import {
+  OidcSecure,
+  OidcUserStatus,
+  useOidc,
+  useOidcAccessToken,
+  useOidcIdToken,
+  useOidcUser,
+} from '@axa-fr/react-oidc';
 import Head from 'next/head';
 
-const isBrowser = () => typeof window !== "undefined";
+const isBrowser = () => typeof window !== 'undefined';
 
 const DisplayUserInfo = () => {
-  const{ oidcUser, oidcUserLoadingState } = useOidcUser();
-    const { isAuthenticated } = useOidc();
-    console.log(
-        "isBrowser: " +
-        isBrowser() +
-        ", isAuthenticated: " +
-        isAuthenticated +
-        ", oidcUser: "
-    );
-    console.log(oidcUser);
+  const { oidcUser, oidcUserLoadingState } = useOidcUser();
+  const { isAuthenticated } = useOidc();
+  console.log(
+    'isBrowser: ' + isBrowser() + ', isAuthenticated: ' + isAuthenticated + ', oidcUser: ',
+  );
+  console.log(oidcUser);
 
-  switch (oidcUserLoadingState){
-      case OidcUserStatus.Loading:
-          return <p>User Information are loading</p>;
-      case OidcUserStatus.Unauthenticated:
-          return <p>you are not authenticated</p>;
-      case OidcUserStatus.LoadingError:
-          return <p>Fail to load user information</p>;
-      default:
-          return (
-              <div className="card text-white bg-success mb-3">
-                  <div className="card-body">
-                      <h5 className="card-title">User information</h5>
-                      <p className="card-text">{JSON.stringify(oidcUser)}</p>
-                  </div>
-              </div>
-          );
+  switch (oidcUserLoadingState) {
+    case OidcUserStatus.Loading:
+      return <p>User Information are loading</p>;
+    case OidcUserStatus.Unauthenticated:
+      return <p>you are not authenticated</p>;
+    case OidcUserStatus.LoadingError:
+      return <p>Fail to load user information</p>;
+    default:
+      return (
+        <div className="card text-white bg-success mb-3">
+          <div className="card-body">
+            <h5 className="card-title">User information</h5>
+            <p className="card-text">{JSON.stringify(oidcUser)}</p>
+          </div>
+        </div>
+      );
   }
 };
 
 export const Profile = () => {
-
   return (
-     <div className="container mt-3">
-         <DisplayAccessToken/>
-         <DisplayIdToken/>
-         <DisplayUserInfo/>
-      </div>
+    <div className="container mt-3">
+      <DisplayAccessToken />
+      <DisplayIdToken />
+      <DisplayUserInfo />
+    </div>
   );
 };
 
 const DisplayAccessToken = () => {
-  const{ accessToken, accessTokenPayload } = useOidcAccessToken();
+  const { accessToken, accessTokenPayload } = useOidcAccessToken();
 
-  if(!accessToken){
-      return <p>you are not authenticated</p>;
+  if (!accessToken) {
+    return <p>you are not authenticated</p>;
   }
   return (
-      <div className="card text-white bg-info mb-3">
-          <div className="card-body">
-              <h5 className="card-title">Access Token</h5>
-              <p style={{color:'red', "backgroundColor": 'white'}}>
-                Please consider to configure the ServiceWorker in order to protect your application from XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be accessible from your client side javascript.</p>
-              {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
-              {accessTokenPayload != null && <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>}
-          </div>
+    <div className="card text-white bg-info mb-3">
+      <div className="card-body">
+        <h5 className="card-title">Access Token</h5>
+        <p style={{ color: 'red', backgroundColor: 'white' }}>
+          Please consider to configure the ServiceWorker in order to protect your application from
+          XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be
+          accessible from your client side javascript.
+        </p>
+        {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
+        {accessTokenPayload != null && (
+          <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>
+        )}
       </div>
+    </div>
   );
 };
 
+const DisplayIdToken = () => {
+  const { idToken, idTokenPayload } = useOidcIdToken();
 
-const DisplayIdToken =() => {
-  const{ idToken, idTokenPayload } = useOidcIdToken();
-
-  if(!idToken){
-      return <p>you are not authenticated</p>;
+  if (!idToken) {
+    return <p>you are not authenticated</p>;
   }
 
   return (
-      <div className="card text-white bg-info mb-3">
-          <div className="card-body">
-              <h5 className="card-title">ID Token</h5>
-              {<p className="card-text">IdToken: {JSON.stringify(idToken)}</p>}
-              {idTokenPayload != null && <p className="card-text">IdToken Payload: {JSON.stringify(idTokenPayload)}</p>}
-          </div>
+    <div className="card text-white bg-info mb-3">
+      <div className="card-body">
+        <h5 className="card-title">ID Token</h5>
+        {<p className="card-text">IdToken: {JSON.stringify(idToken)}</p>}
+        {idTokenPayload != null && (
+          <p className="card-text">IdToken Payload: {JSON.stringify(idTokenPayload)}</p>
+        )}
       </div>
+    </div>
   );
 };
 
 export default function Home() {
-
   return (
     <div className="container">
       <Head>
@@ -93,18 +100,16 @@ export default function Home() {
       </Head>
 
       <main>
-      
         <h1 className="title">
-          Welcome to <a href="https://github.com/AxaGuilDEv/react-oidc">Next.js @axa-fr/react-oidc demo!</a>
+          Welcome to{' '}
+          <a href="https://github.com/AxaGuilDEv/react-oidc">Next.js @axa-fr/react-oidc demo!</a>
         </h1>
         <OidcSecure>
-           <Profile/>
+          <Profile />
         </OidcSecure>
       </main>
-          
-      <footer>
 
-      </footer>
+      <footer></footer>
 
       <style jsx>{`
         .container {
@@ -181,8 +186,15 @@ export default function Home() {
           border-radius: 5px;
           padding: 0.75rem;
           font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+          font-family:
+            Menlo,
+            Monaco,
+            Lucida Console,
+            Liberation Mono,
+            DejaVu Sans Mono,
+            Bitstream Vera Sans Mono,
+            Courier New,
+            monospace;
         }
 
         .grid {
@@ -204,7 +216,9 @@ export default function Home() {
           text-decoration: none;
           border: 1px solid #eaeaea;
           border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
+          transition:
+            color 0.15s ease,
+            border-color 0.15s ease;
         }
 
         .card:hover,
@@ -242,8 +256,17 @@ export default function Home() {
         body {
           padding: 0;
           margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+          font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            Segoe UI,
+            Roboto,
+            Oxygen,
+            Ubuntu,
+            Cantarell,
+            Fira Sans,
+            Droid Sans,
+            Helvetica Neue,
             sans-serif;
         }
 
@@ -258,9 +281,5 @@ export default function Home() {
 import Layout from '../components/layout';
 
 Home.getLayout = function getLayout(page) {
-  return (
-    <Layout>
-      {page}
-    </Layout>
-  );
+  return <Layout>{page}</Layout>;
 };

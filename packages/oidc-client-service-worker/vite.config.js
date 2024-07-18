@@ -3,9 +3,11 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
-  plugins: [dts({
-    insertTypesEntry: true,
-  })],
+  plugins: [
+    dts({
+      insertTypesEntry: true,
+    }),
+  ],
   build: {
     minify: false, //default esbuild
     sourcemap: true,
@@ -24,8 +26,7 @@ export default defineConfig({
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
-        globals: {
-        },
+        globals: {},
       },
     },
   },

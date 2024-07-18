@@ -22,8 +22,8 @@ const oidcConfigDefaults = {
 
 const oidcServerConfigDefault = {
   revocationEndpoint: '',
-  tokenEndpoint: '', 
-  issuer: '', 
+  tokenEndpoint: '',
+  issuer: '',
   userInfoEndpoint: '',
   authorizationEndpoint: '',
 };

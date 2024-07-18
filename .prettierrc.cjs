@@ -1,12 +1,14 @@
 module.exports = {
   printWidth: 100,
-  semi: true,
-  singleQuote: true,
-  jsxSingleQuote: true,
   tabWidth: 2,
-  trailingComma: 'es5',
-  useTabs: true,
-  plugins: [],
+  trailingComma: 'all',
+  arrowParens: 'avoid',
+  endOfLine: 'auto',
+  bracketSameLine: false,
+  bracketSpacing: true,
+  singleQuote: true,
+  useTabs: false,
+  semi: true,
   overrides: [
     {
       files: ['.*', '*.json', '*.md', '*.toml', '*.yml'],

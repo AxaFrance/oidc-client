@@ -8,6 +8,12 @@ export type {
   Fetch,
   ILOidcLocation,
   OidcConfiguration,
-  StringMap} from '@axa-fr/oidc-client';
-export type {  OidcUserInfo } from '@axa-fr/oidc-client';
-export { OidcClient, OidcLocation,TokenAutomaticRenewMode, TokenRenewMode } from '@axa-fr/oidc-client';
+  StringMap,
+} from '@axa-fr/oidc-client';
+export type { OidcUserInfo } from '@axa-fr/oidc-client';
+export {
+  OidcClient,
+  OidcLocation,
+  TokenAutomaticRenewMode,
+  TokenRenewMode,
+} from '@axa-fr/oidc-client';

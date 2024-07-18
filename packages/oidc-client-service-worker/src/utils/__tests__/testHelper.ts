@@ -71,9 +71,7 @@ class TokenBuilder {
     return this;
   }
 
-  public withAccessTokenPayload(
-    accessTokenPayload: AccessTokenPayload,
-  ): TokenBuilder {
+  public withAccessTokenPayload(accessTokenPayload: AccessTokenPayload): TokenBuilder {
     this.tokens.accessTokenPayload = accessTokenPayload;
     return this;
   }
@@ -99,13 +97,11 @@ class OidcConfigurationBuilder {
     demonstrating_proof_of_possession: false,
   };
 
-  public withTokenRenewMode(
-    token_renew_mode: string,
-  ): OidcConfigurationBuilder {
+  public withTokenRenewMode(token_renew_mode: string): OidcConfigurationBuilder {
     this.oidcConfiguration.token_renew_mode = token_renew_mode;
     return this;
   }
-  
+
   public build(): OidcConfiguration {
     return this.oidcConfiguration;
   }
@@ -192,9 +188,7 @@ class OidcConfigBuilder {
     return this;
   }
 
-  public withOidcConfiguration(
-      oidcConfiguration: OidcConfiguration,
-  ): OidcConfigBuilder {
+  public withOidcConfiguration(oidcConfiguration: OidcConfiguration): OidcConfigBuilder {
     this.oidcConfig.oidcConfiguration = oidcConfiguration;
     return this;
   }
@@ -214,19 +208,15 @@ class OidcServerConfigBuilder {
   };
 
   public withTestingDefault(): OidcServerConfigBuilder {
-    this.oidcServerConfig.revocationEndpoint =
-      'http://localhost:3000/revocation';
+    this.oidcServerConfig.revocationEndpoint = 'http://localhost:3000/revocation';
     this.oidcServerConfig.issuer = 'http://localhost:3000';
-    this.oidcServerConfig.authorizationEndpoint =
-      'http://localhost:3000/authorization';
+    this.oidcServerConfig.authorizationEndpoint = 'http://localhost:3000/authorization';
     this.oidcServerConfig.tokenEndpoint = 'http://localhost:3000/token';
     this.oidcServerConfig.userInfoEndpoint = 'http://localhost:3000/userinfo';
     return this;
   }
 
-  public withRevocationEndpoint(
-    revocationEndpoint: string,
-  ): OidcServerConfigBuilder {
+  public withRevocationEndpoint(revocationEndpoint: string): OidcServerConfigBuilder {
     this.oidcServerConfig.revocationEndpoint = revocationEndpoint;
     return this;
   }
@@ -236,9 +226,7 @@ class OidcServerConfigBuilder {
     return this;
   }
 
-  public withAuthorizationEndpoint(
-    authorizationEndpoint: string,
-  ): OidcServerConfigBuilder {
+  public withAuthorizationEndpoint(authorizationEndpoint: string): OidcServerConfigBuilder {
     this.oidcServerConfig.authorizationEndpoint = authorizationEndpoint;
     return this;
   }
@@ -248,9 +236,7 @@ class OidcServerConfigBuilder {
     return this;
   }
 
-  public withUserInfoEndpoint(
-    userInfoEndpoint: string,
-  ): OidcServerConfigBuilder {
+  public withUserInfoEndpoint(userInfoEndpoint: string): OidcServerConfigBuilder {
     this.oidcServerConfig.userInfoEndpoint = userInfoEndpoint;
     return this;
   }
@@ -329,7 +315,7 @@ class ResponseBuilder {
           throw new Error('Function not implemented.');
         },
         json: function (): Promise<any> {
-          return new Promise<any>((resolve) => {
+          return new Promise<any>(resolve => {
             resolve(this.bodyContent);
           });
         },

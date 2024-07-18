@@ -1,7 +1,4 @@
-const generateKey = () =>
-  Math.random()
-    .toString(36)
-    .slice(2, 8);
+const generateKey = () => Math.random().toString(36).slice(2, 8);
 
 // Exported only for test
 export type WindowInternal = Window & {
@@ -20,19 +17,23 @@ type InitCustomEventParams<T = any> = {
 };
 
 // IE Polyfill for CustomEvent
-export const CreateEvent = (windowInternal: WindowInternal, documentInternal: Document) => (
-  event: string,
-  params: InitCustomEventParams,
-): CustomEvent => {
-  if (typeof windowInternal.CustomEvent === 'function') {
-    return new windowInternal.CustomEvent(event, params);
-  }
-  const paramsToFunction = params || { bubbles: false, cancelable: false, detail: undefined };
-  const evt: CustomEvent = documentInternal.createEvent('CustomEvent');
-  evt.initCustomEvent(event, paramsToFunction.bubbles, paramsToFunction.cancelable, paramsToFunction.detail);
-  (evt as CustomEvent & IPrototype).prototype = windowInternal.Event.prototype;
-  return evt;
-};
+export const CreateEvent =
+  (windowInternal: WindowInternal, documentInternal: Document) =>
+  (event: string, params: InitCustomEventParams): CustomEvent => {
+    if (typeof windowInternal.CustomEvent === 'function') {
+      return new windowInternal.CustomEvent(event, params);
+    }
+    const paramsToFunction = params || { bubbles: false, cancelable: false, detail: undefined };
+    const evt: CustomEvent = documentInternal.createEvent('CustomEvent');
+    evt.initCustomEvent(
+      event,
+      paramsToFunction.bubbles,
+      paramsToFunction.cancelable,
+      paramsToFunction.detail,
+    );
+    (evt as CustomEvent & IPrototype).prototype = windowInternal.Event.prototype;
+    return evt;
+  };
 
 type WindowHistoryState = typeof window.history.state;
 
@@ -42,7 +43,7 @@ export interface ReactOidcHistory {
 
 export type CustomHistory = {
   replaceState(url?: string | null, stateHistory?: WindowHistoryState): void;
-}
+};
 
 const getHistory = (
   windowInternal: WindowInternal,
@@ -59,4 +60,5 @@ const getHistory = (
   };
 };
 
-export const getCustomHistory = () => getHistory(window, CreateEvent(window, document), generateKey);
+export const getCustomHistory = () =>
+  getHistory(window, CreateEvent(window, document), generateKey);

@@ -18,24 +18,25 @@ Main provider component have been renamed
 ```javascript
 import { AuthenticationProvider } from '@axa-fr/react-oidc-context';
 
-// old v3 
+// old v3
 
-<AuthenticationProvider configuration={oidcConfiguration} loggerLevel={oidcLog.DEBUG}>
-</AuthenticationProvider>
+<AuthenticationProvider
+  configuration={oidcConfiguration}
+  loggerLevel={oidcLog.DEBUG}
+></AuthenticationProvider>;
 
 // in v4 becomes
 
 import { OidcProvider } from '@axa-fr/react-oidc-context';
 
 // loggerLevel : Logger property has been removed in v4
-<OidcProvider configuration={oidcConfiguration}>
-</OidcProvider>
+<OidcProvider configuration={oidcConfiguration}></OidcProvider>;
 ```
 
 Provider properties have changed, you need to keep only required properties for v4 else it won't work.
 
 ```javascript
-// old v3 
+// old v3
 const propTypes = {
   notAuthenticated: PropTypes.elementType, // react component displayed during authentication
   notAuthorized: PropTypes.elementType, // react component displayed in case user is not Authorised
@@ -75,7 +76,7 @@ const propTypes = {
   UserStore: PropTypes.func,
 };
 
-// new v4 
+// new v4
 const propTypes = {
   loadingComponent: PropTypes.elementType, // you can inject your own loading component
   sessionLostComponent: PropTypes.elementType, // you can inject your own session lost component
@@ -100,25 +101,27 @@ const propTypes = {
 Manage Oidc actions and information
 
 ```javascript
-
-// old v3 
+// old v3
 import { useReactOidc } from '@axa-fr/react-oidc-context';
-const  { isEnabled, login, logout, oidcUser, events } = useReactOidc(); 
+const { isEnabled, login, logout, oidcUser, events } = useReactOidc();
 
-
-// new v4 
-import { useOidc, useOidcAccessToken, useOidcIdToken, useOidcUser } from '@axa-fr/react-oidc-context';
+// new v4
+import {
+  useOidc,
+  useOidcAccessToken,
+  useOidcIdToken,
+  useOidcUser,
+} from '@axa-fr/react-oidc-context';
 
 const { login, logout, isAuthenticated } = useOidc(); // login and logout return a Promise
 const { oidcUser, isOidcUserLoading } = useOidcUser(); // Return user_info endpoint data
 const { accessToken, accessTokenPayload } = useOidcAccessToken(); // Contain access_token metadata acess_token is a JWK
 const { idToken, idTokenPayload } = useOidcIdToken(); // contain IDToken metadata
- 
 ```
 
 ```javascript
 
-// old v3 
+// old v3
 import { withFetchRedirectionOn401,
          withFetchSilentAuthenticateAndRetryOn401,
          withFetchRedirectionOn403,
@@ -160,7 +163,7 @@ Then edit `OidcTrustedDomains.js` in "public" folder for your need
 // OidcTrustedDomains.js
 // Add here trusted domains, access tokens will be send to
 const trustedDomains = {
-    default:["http://localhost:4200"],
+  default: ['http://localhost:4200'],
 };
 ```
 
