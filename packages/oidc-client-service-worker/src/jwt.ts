@@ -74,9 +74,9 @@ export const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingPr
 const sign =
   (w: any) =>
   async (
-    jwk,
-    headers,
-    claims,
+    jwk: any,
+    headers: any,
+    claims: any,
     demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration,
     jwtHeaderType = 'dpop+jwt',
   ) => {

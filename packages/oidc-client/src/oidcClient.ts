@@ -97,7 +97,7 @@ export class OidcClient {
   }
 
   fetchWithTokens(fetch: Fetch, demonstrating_proof_of_possession: boolean = false): Fetch {
-    return fetchWithTokens(fetch, this, demonstrating_proof_of_possession);
+    return fetchWithTokens(fetch, this._oidc, demonstrating_proof_of_possession);
   }
 
   async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(
