@@ -22,7 +22,7 @@ export const fetchWithTokens =
     const oidcToken : OidcToken = {
       tokens: oidc.tokens,
       configuration: { token_automatic_renew_mode: oidc.configuration.token_automatic_renew_mode },
-      renewTokensAsync: oidc.renewTokensAsync,
+      renewTokensAsync: oidc.renewTokensAsync.bind(oidc),
     }
 
     // @ts-ignore
