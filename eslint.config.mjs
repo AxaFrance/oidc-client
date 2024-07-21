@@ -39,6 +39,7 @@ export default [
       '**/.changeset',
       '**/vite.config.js',
       '**/webpack-runtime.js',
+      '.prettierrc.cjs',
     ],
   },
   ...fixupConfigRules(

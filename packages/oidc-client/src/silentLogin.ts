@@ -9,9 +9,14 @@ export type SilentLoginResponse = {
   error: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+export type PublishEventFunction = (eventName: string, eventData: any) => void;
+
 export const _silentLoginAsync =
-  (configurationName: string, configuration: OidcConfiguration, publishEvent: Function) =>
+  (
+    configurationName: string,
+    configuration: OidcConfiguration,
+    publishEvent: PublishEventFunction,
+  ) =>
   (
     extras: StringMap = null,
     state: string = null,
