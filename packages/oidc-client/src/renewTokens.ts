@@ -13,10 +13,10 @@ async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap) 
     oidc.tokens = tokens;
   };
   const { tokens, status } = await synchroniseTokensAsync(oidc)(
+    updateTokens,
     0,
     forceRefresh,
     extras,
-    updateTokens,
   );
 
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
@@ -200,7 +200,7 @@ export const syncTokensInfoAsync =
 
 const synchroniseTokensAsync =
   (oidc: Oidc) =>
-  async (index = 0, forceRefresh = false, extras: StringMap = null, updateTokens) => {
+  async (updateTokens, index = 0, forceRefresh = false, extras: StringMap = null) => {
     if (!navigator.onLine && document.hidden) {
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
     }
@@ -264,7 +264,7 @@ const synchroniseTokensAsync =
           message: 'exceptionSilent',
           exception: exceptionSilent.message,
         });
-        return await synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens);
+        return await synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras);
       }
     };
 
@@ -422,10 +422,10 @@ const synchroniseTokensAsync =
               }
 
               return await synchroniseTokensAsync(oidc)(
+                updateTokens,
                 nextIndex,
                 forceRefresh,
                 extras,
-                updateTokens,
               );
             }
           };
@@ -443,7 +443,7 @@ const synchroniseTokensAsync =
       // so we need to brake calls chain and delay next call
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          synchroniseTokensAsync(oidc)(nextIndex, forceRefresh, extras, updateTokens)
+          synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras)
             .then(resolve)
             .catch(reject);
         }, 1000);
