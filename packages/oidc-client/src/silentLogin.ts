@@ -168,7 +168,7 @@ export const defaultSilentLoginAsync =
 
         if (silentResult) {
           oidc.tokens = silentResult.tokens;
-          publishEvent(eventNames.token_aquired, {});
+          publishEvent(eventNames.token_acquired, {});
           // @ts-ignore
           oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras);
           return {};

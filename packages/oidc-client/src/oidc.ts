@@ -349,7 +349,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         const session = initSession(this.configurationName, this.configuration.storage);
         session.setTokens(parsedTokens);
       }
-      this.publishEvent(Oidc.eventNames.token_aquired, parsedTokens);
+      this.publishEvent(Oidc.eventNames.token_acquired, parsedTokens);
       if (this.configuration.preload_user_info) {
         await this.userInfoAsync();
       }

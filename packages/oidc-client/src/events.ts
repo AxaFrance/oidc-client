@@ -1,6 +1,6 @@
 export const eventNames = {
   service_worker_not_supported_by_browser: 'service_worker_not_supported_by_browser',
-  token_aquired: 'token_aquired',
+  token_acquired: 'token_acquired',
   logout_from_another_tab: 'logout_from_another_tab',
   logout_from_same_tab: 'logout_from_same_tab',
   token_renewed: 'token_renewed',

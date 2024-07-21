@@ -31,7 +31,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
       if (
         name === OidcClient.eventNames.logout_from_another_tab ||
         name === OidcClient.eventNames.logout_from_same_tab ||
-        name === OidcClient.eventNames.token_aquired
+        name === OidcClient.eventNames.token_acquired
       ) {
         if (isMounted) {
           setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
@@ -131,7 +131,7 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (
         name === OidcClient.eventNames.token_renewed ||
-        name === OidcClient.eventNames.token_aquired ||
+        name === OidcClient.eventNames.token_acquired ||
         name === OidcClient.eventNames.logout_from_another_tab ||
         name === OidcClient.eventNames.logout_from_same_tab ||
         name === OidcClient.eventNames.refreshTokensAsync_error ||
@@ -193,7 +193,7 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (
         name === OidcClient.eventNames.token_renewed ||
-        name === OidcClient.eventNames.token_aquired ||
+        name === OidcClient.eventNames.token_acquired ||
         name === OidcClient.eventNames.logout_from_another_tab ||
         name === OidcClient.eventNames.logout_from_same_tab ||
         name === OidcClient.eventNames.refreshTokensAsync_error ||
