@@ -1,14 +1,10 @@
 ﻿import Oidc from './oidc';
-import {getValidTokenAsync, OidcToken, Tokens} from './parseTokens';
-import {Fetch, StringMap, TokenAutomaticRenewMode} from './types';
+import { getValidTokenAsync, OidcToken } from './parseTokens';
+import { Fetch } from './types';
 
 // @ts-ignore
 export const fetchWithTokens =
-  (
-    fetch: Fetch,
-    oidc: Oidc | null,
-    demonstrating_proof_of_possession: boolean = false,
-  ): Fetch =>
+  (fetch: Fetch, oidc: Oidc | null, demonstrating_proof_of_possession: boolean = false): Fetch =>
   async (...params: Parameters<Fetch>): Promise<Response> => {
     const [url, options, ...rest] = params;
     const optionTmp = options ? { ...options } : { method: 'GET' };
@@ -18,12 +14,12 @@ export const fetchWithTokens =
         ? new Headers(optionTmp.headers)
         : optionTmp.headers;
     }
-    
-    const oidcToken : OidcToken = {
+
+    const oidcToken: OidcToken = {
       tokens: oidc.tokens,
       configuration: { token_automatic_renew_mode: oidc.configuration.token_automatic_renew_mode },
       renewTokensAsync: oidc.renewTokensAsync.bind(oidc),
-    }
+    };
 
     // @ts-ignore
     const getValidToken = await getValidTokenAsync(oidcToken);

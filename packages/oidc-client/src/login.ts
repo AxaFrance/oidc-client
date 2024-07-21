@@ -10,13 +10,14 @@ import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from 
 import { getParseQueryStringFromLocation } from './route-utils.js';
 import { OidcConfiguration, StringMap } from './types.js';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+export type InitAsyncFunction = (authority: string, authorityConfiguration: any) => Promise<any>;
+
 export const defaultLoginAsync =
   (
     configurationName: string,
     configuration: OidcConfiguration,
     publishEvent: (string, any) => void,
-    initAsync: Function,
+    initAsync: InitAsyncFunction,
     oidcLocation: ILOidcLocation,
   ) =>
   (
@@ -168,7 +169,7 @@ export const loginCallbackAsync =
           extras[key] = value;
         }
       }
-      if (getLoginParams && getLoginParams.extras) {
+      if (getLoginParams?.extras) {
         for (const [key, value] of Object.entries(getLoginParams.extras)) {
           if (key.endsWith(':token_request')) {
             extras[key.replace(':token_request', '')] = value;
@@ -233,8 +234,7 @@ export const loginCallbackAsync =
 
         if (
           demonstratingProofOfPossessionNonce &&
-          formattedTokens.accessToken &&
-          formattedTokens.accessToken.includes('SECURED_BY_OIDC_SERVICE_WORKER')
+          formattedTokens?.accessToken.includes('SECURED_BY_OIDC_SERVICE_WORKER')
         ) {
           throw new Error(
             'Demonstration of proof of possession require Access token not hidden by service worker',
