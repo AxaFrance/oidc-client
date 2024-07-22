@@ -111,6 +111,7 @@ class OidcConfigBuilder {
   private oidcConfig: OidcConfig = {
     configurationName: '',
     tokens: null,
+    tabIds: [],
     status: 'NOT_CONNECTED',
     state: { tab1: '' },
     codeVerifier: { tab1: '' },

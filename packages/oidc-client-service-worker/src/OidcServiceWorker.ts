@@ -184,7 +184,7 @@ const handleFetch = async (event: FetchEvent) => {
           let newBody = actualBody;
           for (let i = 0; i < numberDatabase; i++) {
             const currentDb = currentDatabases[i];
-            const currentDbTabs = Object.keys(currentDb.state);
+            const currentDbTabs = currentDb.tabIds;
 
             if (currentDb?.tokens != null) {
               const claimsExtras = {
@@ -338,6 +338,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       : trustedDomain.allowMultiTabLogin;
     database[configurationName] = {
       tokens: null,
+      tabIds: [],
       state: {},
       codeVerifier: {},
       oidcServerConfiguration: null,
@@ -366,6 +367,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
   switch (data.type) {
     case 'clear':
       currentDatabase.tokens = null;
+      currentDatabase.tabIds = [];
       currentDatabase.state = {};
       currentDatabase.codeVerifier = {};
       currentDatabase.demonstratingProofOfPossessionNonce = null;
@@ -391,6 +393,9 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       }
       currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
       currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
+      if (!currentDatabase.tabIds.includes(tabId)) {
+        currentDatabase.tabIds.push(tabId);
+      }
 
       if (currentDatabase.demonstratingProofOfPossessionConfiguration == null) {
         const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(
