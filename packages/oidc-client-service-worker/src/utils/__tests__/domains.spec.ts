@@ -38,6 +38,7 @@ describe('domains', () => {
         default: {
           configurationName: 'config',
           tokens: {} as Tokens,
+          tabIds: [],
           status: 'NOT_CONNECTED',
           state: {},
           codeVerifier: {},

@@ -101,6 +101,7 @@ export type Nonce = {
 export type OidcConfig = {
   demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration | null;
   configurationName: string;
+  tabIds: string[];
   tokens: Tokens | null;
   status: Status;
   state: Record<string, string | null>;

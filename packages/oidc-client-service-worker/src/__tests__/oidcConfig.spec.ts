@@ -7,6 +7,7 @@ const oidcConfigDefaults = {
   demonstratingProofOfPossessionConfiguration: null,
   configurationName: '',
   tokens: null,
+  tabIds: [],
   status: null,
   state: {},
   codeVerifier: {},
