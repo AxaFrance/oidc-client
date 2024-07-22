@@ -1,6 +1,15 @@
 # Changelog
 
-## 7.22.19
+## 7.22.20
+
+- [05ace2d](https://github.com/AxaFrance/oidc-client/commit/05ace2dce4a36493b1d127d049c3ef7d5ebd90b4) - fix(oidc): record tabIds when service worker receives init event (release), 2024-07-22 by *mkrzempek*
+- [6b5f6b4](https://github.com/AxaFrance/oidc-client/commit/6b5f6b428aba70b32d5264b0de89752a00b352e3) - refactor(initWorker): null coalescing, 2024-07-21 by *Jason Finch*
+- [34bd8e4](https://github.com/AxaFrance/oidc-client/commit/34bd8e4b3388761b2127a9c73980d74edac7b3ad) - refactor(parameters): Default parameters should be last.sonarlint(typescript:S1788), 2024-07-21 by *Jason Finch*
+- [44fa6f2](https://github.com/AxaFrance/oidc-client/commit/44fa6f2678f989ee23a84a506aea3caf159b9c2c) - fix spelling `token_acquired`, 2024-07-21 by *Jason Finch*
+- [32a2af3](https://github.com/AxaFrance/oidc-client/commit/32a2af3028cd69581d1ab0ee183c7b3146998b41) - chore(lint): Fix lint warnings., 2024-07-21 by *Jason Finch*
+
+
+## v7.22.19
 
 - [2cf0b62](https://github.com/AxaFrance/oidc-client/commit/2cf0b6243b39f3927d75fb80a96030259b7c16a2) - fix(oidc): autorenew from custom fetch was broken (release), 2024-07-20 by *Guillaume Chervet*
 - [f1d9da4](https://github.com/AxaFrance/oidc-client/commit/f1d9da44647d5b754df9c73cadb899179a98982b) - fix(oidc): lint (alpha), 2024-07-19 by *Guillaume Chervet*
@@ -321,10 +330,5 @@
 ## v7.13.9
 
 - [819962b](https://github.com/AxaFrance/oidc-client/commit/819962bae1d7c1e7fd997ede7bb42cce27ba76f3) - fix(oidc): renew with simple storage (#1246) (release), 2023-12-19 by *Guillaume Chervet*
-
-
-## v7.13.8
-
-- [b0cf4ad](https://github.com/AxaFrance/oidc-client/commit/b0cf4ad52df9c16c130cce791b05ceea7c4370c4) - fix(oidc): temp renew token fix (#1245) (release), 2023-12-18 by *Guillaume Chervet*
 
 
