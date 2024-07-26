@@ -46,7 +46,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
 
   const login = (
     callbackPath: string | undefined = undefined,
-    extras: StringMap = null,
+    extras: StringMap | null = null,
     silentLoginOnly = false,
   ) => {
     return getOidc(configurationName).loginAsync(
@@ -59,11 +59,13 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
   };
   const logout = (
     callbackPath: string | null | undefined = undefined,
-    extras: StringMap = null,
+    extras: StringMap | null = null,
   ) => {
     return getOidc(configurationName).logoutAsync(callbackPath, extras);
   };
-  const renewTokens = async (extras: StringMap = null): Promise<OidcAccessToken | OidcIdToken> => {
+  const renewTokens = async (
+    extras: StringMap | null = null,
+  ): Promise<OidcAccessToken | OidcIdToken> => {
     const tokens = await getOidc(configurationName).renewTokensAsync(extras);
 
     return {
