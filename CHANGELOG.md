@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.20
+## 7.22.21
+
+- [318de92](https://github.com/AxaFrance/oidc-client/commit/318de922980c167dd9fc1a743d2dedd106b9a02d) - fix(oidc): Add null as union type into arguments for login, logout, renewTokens functions (#1427) (release), 2024-07-26 by *ShimpeiKamiguchi*
+
+
+## v7.22.20
 
 - [05ace2d](https://github.com/AxaFrance/oidc-client/commit/05ace2dce4a36493b1d127d049c3ef7d5ebd90b4) - fix(oidc): record tabIds when service worker receives init event (release), 2024-07-22 by *mkrzempek*
 - [6b5f6b4](https://github.com/AxaFrance/oidc-client/commit/6b5f6b428aba70b32d5264b0de89752a00b352e3) - refactor(initWorker): null coalescing, 2024-07-21 by *Jason Finch*
@@ -325,10 +330,5 @@
 ## v7.13.10
 
 - [4b1a9a2](https://github.com/AxaFrance/oidc-client/commit/4b1a9a26eba51e24dd1c9c9fd0087ef0b3b1ce8b) - fix(oidc): crash when regex on userAgent empty result iOS (#1248) (release), 2023-12-20 by *Guillaume Chervet*
-
-
-## v7.13.9
-
-- [819962b](https://github.com/AxaFrance/oidc-client/commit/819962bae1d7c1e7fd997ede7bb42cce27ba76f3) - fix(oidc): renew with simple storage (#1246) (release), 2023-12-19 by *Guillaume Chervet*
 
 
