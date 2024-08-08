@@ -57,6 +57,18 @@ export const defaultServiceWorkerUpdateRequireCallback =
     location.reload();
   };
 
+const getTabId = (configurationName: string) => {
+  const tabId = sessionStorage.getItem(`oidc.tabId.${configurationName}`);
+
+  if (tabId) {
+    return tabId;
+  }
+
+  const newTabId = globalThis.crypto.randomUUID();
+  sessionStorage.setItem(`oidc.tabId.${configurationName}`, newTabId);
+  return newTabId;
+};
+
 const sendMessageAsync =
   registration =>
   (data): Promise<any> => {
@@ -72,23 +84,13 @@ const sendMessageAsync =
         messageChannel.port1.close();
         messageChannel.port2.close();
       };
-      registration.active.postMessage(data, [messageChannel.port2]);
+      registration.active.postMessage({ ...data, tabId: getTabId(data.configurationName) }, [
+        messageChannel.port2,
+      ]);
     });
   };
 
 export const initWorkerAsync = async (configuration, configurationName) => {
-  const getTabId = () => {
-    const tabId = sessionStorage.getItem(`oidc.tabId.${configurationName}`);
-
-    if (tabId) {
-      return tabId;
-    }
-
-    const newTabId = globalThis.crypto.randomUUID();
-    sessionStorage.setItem(`oidc.tabId.${configurationName}`, newTabId);
-    return newTabId;
-  };
-
   const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
   if (
     typeof window === 'undefined' ||
@@ -138,7 +140,6 @@ export const initWorkerAsync = async (configuration, configurationName) => {
         },
       },
       configurationName,
-      tabId: getTabId(),
     });
 
     // @ts-ignore
@@ -183,23 +184,19 @@ export const initWorkerAsync = async (configuration, configurationName) => {
   };
 
   const setNonceAsync = nonce => {
-    const tabId = getTabId();
     sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
     return sendMessageAsync(registration)({
       type: 'setNonce',
       data: { nonce },
       configurationName,
-      tabId,
     });
   };
   const getNonceAsync = async () => {
-    const tabId = getTabId();
     // @ts-ignore
     const result = await sendMessageAsync(registration)({
       type: 'getNonce',
       data: null,
       configurationName,
-      tabId,
     });
     // @ts-ignore
     let nonce = result.nonce;
@@ -267,12 +264,10 @@ export const initWorkerAsync = async (configuration, configurationName) => {
   };
 
   const getStateAsync = async () => {
-    const tabId = getTabId();
     const result = await sendMessageAsync(registration)({
       type: 'getState',
       data: null,
       configurationName,
-      tabId,
     });
     // @ts-ignore
     let state = result.state;
@@ -284,23 +279,19 @@ export const initWorkerAsync = async (configuration, configurationName) => {
   };
 
   const setStateAsync = async (state: string) => {
-    const tabId = getTabId();
     sessionStorage[`oidc.state.${configurationName}`] = state;
     return sendMessageAsync(registration)({
       type: 'setState',
       data: { state },
       configurationName,
-      tabId,
     });
   };
 
   const getCodeVerifierAsync = async () => {
-    const tabId = getTabId();
     const result = await sendMessageAsync(registration)({
       type: 'getCodeVerifier',
       data: null,
       configurationName,
-      tabId,
     });
     // @ts-ignore
     let codeVerifier = result.codeVerifier;
@@ -312,13 +303,11 @@ export const initWorkerAsync = async (configuration, configurationName) => {
   };
 
   const setCodeVerifierAsync = async (codeVerifier: string) => {
-    const tabId = getTabId();
     sessionStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
     return sendMessageAsync(registration)({
       type: 'setCodeVerifier',
       data: { codeVerifier },
       configurationName,
-      tabId,
     });
   };
 
