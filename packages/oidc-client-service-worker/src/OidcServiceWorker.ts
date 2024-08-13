@@ -367,9 +367,11 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
   switch (data.type) {
     case 'clear':
       currentDatabase.tokens = null;
-      currentDatabase.tabIds = [];
-      currentDatabase.state = {};
-      currentDatabase.codeVerifier = {};
+      currentDatabase.tabIds = currentDatabase.tabIds.filter(id => id !== tabId);
+      delete currentDatabase.state[tabId];
+      delete currentDatabase.codeVerifier[tabId];
+      delete currentDatabase.nonce[tabId];
+
       currentDatabase.demonstratingProofOfPossessionNonce = null;
       currentDatabase.demonstratingProofOfPossessionJwkJson = null;
       currentDatabase.demonstratingProofOfPossessionConfiguration = null;
