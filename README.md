@@ -23,7 +23,7 @@
 - [Migrations](#migrations)
 - [Contribute](#contribute)
 
-## About
+## About 
 
 **@axa-fr/oidc-client** the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
 **@axa-fr/oidc-client** is a pure javascript library. It works with any JavaScript framework or library.
