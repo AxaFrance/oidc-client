@@ -1,6 +1,13 @@
 # Changelog
 
-## 7.22.21
+## 7.22.22
+
+- [d213de1](https://github.com/AxaFrance/oidc-client/commit/d213de1a49d891cc1c0f399621f696ed861c145e) - doc(oidc) :Update README.md (release), 2024-08-20 by *Guillaume Chervet*
+- [1159262](https://github.com/AxaFrance/oidc-client/commit/115926280965cffc5a4f7ea2234bf1a0017ff896) - fix(logout): should work correctly with multiple tabs (alpha) (#1435), 2024-08-13 by *wermanoid*
+- [23ae6ba](https://github.com/AxaFrance/oidc-client/commit/23ae6ba287a85cc879c92228feb3855dcbe2930e) - fix(oidc): Add undefined as union type into arguments for login, logout, renewTokens (#1429) (alpha), 2024-08-02 by *ShimpeiKamiguchi*
+
+
+## v7.22.21
 
 - [318de92](https://github.com/AxaFrance/oidc-client/commit/318de922980c167dd9fc1a743d2dedd106b9a02d) - fix(oidc): Add null as union type into arguments for login, logout, renewTokens functions (#1427) (release), 2024-07-26 by *ShimpeiKamiguchi*
 
@@ -325,10 +332,5 @@
 ## v7.13.11
 
 - [529cabf](https://github.com/AxaFrance/oidc-client/commit/529cabfbe7ee602325ba0f70844c969176371746) - fix(oidc): DPOP type jit instead of jti (#1249) (release), 2023-12-20 by *Guillaume Chervet*
-
-
-## v7.13.10
-
-- [4b1a9a2](https://github.com/AxaFrance/oidc-client/commit/4b1a9a26eba51e24dd1c9c9fd0087ef0b3b1ce8b) - fix(oidc): crash when regex on userAgent empty result iOS (#1248) (release), 2023-12-20 by *Guillaume Chervet*
 
 
