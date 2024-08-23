@@ -106,7 +106,7 @@ export const initWorkerAsync = async (configuration, configurationName) => {
   }
 
   let registration = null;
-  if (configuration.register) {
+  if (configuration.register || configuration.service_worker_register) {
     registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
   } else {
     registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
