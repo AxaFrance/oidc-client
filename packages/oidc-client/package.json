@@ -23,7 +23,7 @@
     "@axa-fr/oidc-client-service-worker": "workspace:*"
   },
   "devDependencies": {
-    "@testing-library/dom": "10.1.0",
+    "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.4.5",
     "@testing-library/react": "15.0.7",
     "@vitest/coverage-v8": "1.6.0",
