@@ -90,7 +90,10 @@ const sendMessageAsync =
     });
   };
 
-export const initWorkerAsync = async (configuration: OidcConfiguration, configurationName: string) => {
+export const initWorkerAsync = async (
+  configuration: OidcConfiguration,
+  configurationName: string,
+) => {
   const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
   if (
     typeof window === 'undefined' ||
