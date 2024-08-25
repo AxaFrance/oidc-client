@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.22
+## 7.22.23
+
+- [d15a57d](https://github.com/AxaFrance/oidc-client/commit/d15a57d98309db99d3bcd8d1a6a4fbeffe1b5402) - Fix(oidc): usage of config option service_worker_register (#1440) (release), 2024-08-25 by *Thomas Miliopoulos*
+
+
+## v7.22.22
 
 - [d213de1](https://github.com/AxaFrance/oidc-client/commit/d213de1a49d891cc1c0f399621f696ed861c145e) - doc(oidc) :Update README.md (release), 2024-08-20 by *Guillaume Chervet*
 - [1159262](https://github.com/AxaFrance/oidc-client/commit/115926280965cffc5a4f7ea2234bf1a0017ff896) - fix(logout): should work correctly with multiple tabs (alpha) (#1435), 2024-08-13 by *wermanoid*
@@ -327,10 +332,5 @@
 ## v7.13.12
 
 - [9ef56f1](https://github.com/AxaFrance/oidc-client/commit/9ef56f17793e1bfbd668d6f001125a8f773c2370) - fix(oidc): Handling of errors returned from authorize endpoint (#1250) (release), 2023-12-28 by *Guillaume Chervet*
-
-
-## v7.13.11
-
-- [529cabf](https://github.com/AxaFrance/oidc-client/commit/529cabfbe7ee602325ba0f70844c969176371746) - fix(oidc): DPOP type jit instead of jti (#1249) (release), 2023-12-20 by *Guillaume Chervet*
 
 
