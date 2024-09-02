@@ -23,17 +23,17 @@
     "@axa-fr/oidc-client-service-worker": "workspace:*"
   },
   "devDependencies": {
-    "@testing-library/dom": "10.1.0",
-    "@testing-library/jest-dom": "6.4.5",
-    "@testing-library/react": "15.0.7",
-    "@vitest/coverage-v8": "1.6.0",
-    "cpy": "11.0.1",
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/jest-dom": "6.5.0",
+    "@testing-library/react": "16.0.1",
+    "@vitest/coverage-v8": "2.0.5",
+    "cpy": "11.1.0",
     "cpy-cli": "^5.0.0",
-    "rimraf": "5.0.7",
-    "typescript": "5.4.5",
-    "vite": "5.2.11",
-    "vite-plugin-dts": "3.9.1",
-    "vitest": "1.6.0"
+    "rimraf": "6.0.1",
+    "typescript": "5.5.4",
+    "vite": "5.4.2",
+    "vite-plugin-dts": "4.1.0",
+    "vitest": "2.0.5"
   },
   "keywords": [
     "oidc",
