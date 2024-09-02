@@ -1,6 +1,14 @@
 # Changelog
 
-## 7.22.23
+## 7.22.24
+
+- [b34eabf](https://github.com/AxaFrance/oidc-client/commit/b34eabf39ce108f8de93a49f1a4d9ec6e46d642c) - refactor(all): update dependencies (#1446) (release), 2024-09-02 by *Guillaume Chervet*
+- [35081e1](https://github.com/AxaFrance/oidc-client/commit/35081e16b947ebd490b83a1f6d6b9dc101363736) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client into HEAD, 2024-08-25 by *Guillaume Chervet*
+- [70dd233](https://github.com/AxaFrance/oidc-client/commit/70dd233f69f2b2a9c5da4a2514e2cc657cf435a2) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-08-25 by *Guillaume Chervet*
+- [47f9de1](https://github.com/AxaFrance/oidc-client/commit/47f9de1f648838ae085c45a5dcd55687f80829c5) - fix(oidc): remove no-existing property add typings (release), 2024-08-25 by *Guillaume Chervet*
+
+
+## v7.22.23
 
 - [d15a57d](https://github.com/AxaFrance/oidc-client/commit/d15a57d98309db99d3bcd8d1a6a4fbeffe1b5402) - Fix(oidc): usage of config option service_worker_register (#1440) (release), 2024-08-25 by *Thomas Miliopoulos*
 
@@ -327,10 +335,5 @@
 
 - [1faaab4](https://github.com/AxaFrance/oidc-client/commit/1faaab4ecb86144ed6f3c1ed68b938804854bd36) - build(npm): bump next from 14.0.3 to 14.0.4 (#1255), 2024-01-02 by *dependabot[bot]*
 - [d009de8](https://github.com/AxaFrance/oidc-client/commit/d009de8091ac256d1384466df9b3fe7de75a5629) - chore(ci): Update npm-publish.yml, 2023-12-28 by *Guillaume Chervet*
-
-
-## v7.13.12
-
-- [9ef56f1](https://github.com/AxaFrance/oidc-client/commit/9ef56f17793e1bfbd668d6f001125a8f773c2370) - fix(oidc): Handling of errors returned from authorize endpoint (#1250) (release), 2023-12-28 by *Guillaume Chervet*
 
 
