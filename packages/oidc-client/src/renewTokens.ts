@@ -19,6 +19,7 @@ async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap) 
     extras,
   );
 
+  await oidc.ensureUniqueTabId();
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if (!serviceWorker) {
     const session = initSession(oidc.configurationName, oidc.configuration.storage);
@@ -41,6 +42,7 @@ export async function renewTokensAndStartTimerAsync(
   const lockResourcesName = `${configuration.client_id}_${oidc.configurationName}_${configuration.authority}`;
 
   let tokens: null;
+  await oidc.ensureUniqueTabId();
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
 
   if ((configuration?.storage === window?.sessionStorage && !serviceWorker) || !navigator.locks) {
@@ -120,6 +122,7 @@ export const syncTokensInfoAsync =
       configuration.authority,
       configuration.authority_configuration,
     );
+    await oidc.ensureUniqueTabId();
     const serviceWorker = await initWorkerAsync(configuration, configurationName);
     if (serviceWorker) {
       const { status, tokens } = await serviceWorker.initAsync(
@@ -214,6 +217,7 @@ const synchroniseTokensAsync =
     const localsilentLoginAsync = async () => {
       try {
         let loginParams;
+        await oidc.ensureUniqueTabId();
         const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
         if (serviceWorker) {
           loginParams = serviceWorker.getLoginParams();
@@ -376,6 +380,7 @@ const synchroniseTokensAsync =
               }
               updateTokens(tokenResponse.data);
               if (tokenResponse.demonstratingProofOfPossessionNonce) {
+                await oidc.ensureUniqueTabId();
                 const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
                 if (serviceWorker) {
                   await serviceWorker.setDemonstratingProofOfPossessionNonce(

@@ -57,17 +57,8 @@ export const defaultServiceWorkerUpdateRequireCallback =
     location.reload();
   };
 
-const getTabId = (configurationName: string) => {
-  const tabId = sessionStorage.getItem(`oidc.tabId.${configurationName}`);
-
-  if (tabId) {
-    return tabId;
-  }
-
-  const newTabId = globalThis.crypto.randomUUID();
-  sessionStorage.setItem(`oidc.tabId.${configurationName}`, newTabId);
-  return newTabId;
-};
+const getTabId = (configurationName: string) =>
+  sessionStorage.getItem(`oidc.tabId.${configurationName}`);
 
 const sendMessageAsync =
   registration =>
