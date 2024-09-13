@@ -11,7 +11,8 @@
     "url": "https://github.com/AxaGuilDEv/react-oidc.git"
   },
   "scripts": {
-    "start": "vite",
+    "start": "pnpm prestart && pnpm vite",
+    "prestart": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public",
     "build": "vite build",
     "serve": "vite preview",
     "clean": "rimraf dist",
