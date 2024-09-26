@@ -97,7 +97,7 @@ export async function renewTokensAndStartTimerAsync(
 export const autoRenewTokens = (oidc: Oidc, expiresAt, extras: StringMap = null) => {
   const refreshTimeBeforeTokensExpirationInSecond =
     oidc.configuration.refresh_time_before_tokens_expiration_in_second;
-  if(oidc.timeoutId) {
+  if (oidc.timeoutId) {
     timer.clearTimeout(oidc.timeoutId);
   }
   return timer.setTimeout(async () => {
