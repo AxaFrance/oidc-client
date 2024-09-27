@@ -46,17 +46,21 @@ export async function renewTokensAndStartTimerAsync(
   if (configuration?.storage === window?.sessionStorage && !serviceWorker) {
     tokens = await syncTokens(oidc, forceRefresh, extras);
   } else {
-    let status : any = "retry";
-    while (status === "retry") {
-      status = await navigator.locks.request(lockResourcesName, {ifAvailable: true}, async lock => {
-        if (!lock) {
-          oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, {
-            lock: 'lock not available',
-          });
-          return "retry"
-        }
-        return await syncTokens(oidc, forceRefresh, extras);
-      });
+    let status: any = 'retry';
+    while (status === 'retry') {
+      status = await navigator.locks.request(
+        lockResourcesName,
+        { ifAvailable: true },
+        async lock => {
+          if (!lock) {
+            oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, {
+              lock: 'lock not available',
+            });
+            return 'retry';
+          }
+          return await syncTokens(oidc, forceRefresh, extras);
+        },
+      );
     }
     tokens = status;
   }
