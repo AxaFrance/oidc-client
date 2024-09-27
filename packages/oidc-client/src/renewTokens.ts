@@ -32,31 +32,6 @@ async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap) 
   return tokens;
 }
 
-const loadLatestTokensAsync = async (
-  oidc: Oidc,
-  configuration: OidcConfiguration,
-): Promise<Tokens> => {
-  const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
-  if (serviceWorker) {
-    const oidcServerConfiguration = await oidc.initAsync(
-      configuration.authority,
-      configuration.authority_configuration,
-    );
-    const { tokens } = await serviceWorker.initAsync(
-      oidcServerConfiguration,
-      'tryKeepExistingSessionAsync',
-      configuration,
-    );
-    return tokens;
-  } else {
-    const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
-    let { tokens } = await session.initAsync();
-    // @ts-ignore
-    tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
-    return tokens;
-  }
-};
-
 export async function renewTokensAndStartTimerAsync(
   oidc,
   forceRefresh = false,
@@ -71,15 +46,23 @@ export async function renewTokensAndStartTimerAsync(
   if (configuration?.storage === window?.sessionStorage && !serviceWorker) {
     tokens = await syncTokens(oidc, forceRefresh, extras);
   } else {
-    tokens = await navigator.locks.request(lockResourcesName, { ifAvailable: true }, async lock => {
-      if (!lock) {
-        oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, {
-          lock: 'lock not available',
-        });
-        return await loadLatestTokensAsync(oidc, configuration);
-      }
-      return await syncTokens(oidc, forceRefresh, extras);
-    });
+    let status: any = 'retry';
+    while (status === 'retry') {
+      status = await navigator.locks.request(
+        lockResourcesName,
+        { ifAvailable: true },
+        async lock => {
+          if (!lock) {
+            oidc.publishEvent(Oidc.eventNames.syncTokensAsync_lock_not_available, {
+              lock: 'lock not available',
+            });
+            return 'retry';
+          }
+          return await syncTokens(oidc, forceRefresh, extras);
+        },
+      );
+    }
+    tokens = status;
   }
 
   if (!tokens) {
