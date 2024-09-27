@@ -268,19 +268,19 @@ jobs:
           git commit -m "[skip ci] Generate changelog to version ${{ steps.tag.outputs.new_version }}"
           git push --set-upstream origin "HEAD:main" --follow-tags -f
       
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.head.repo.fork
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.organization=axaguildev
-            -Dsonar.projectKey=AxaGuilDEv_react-oidc
-            -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
-            -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
-
+     #  - name: SonarCloud Scan
+     #    uses: sonarsource/sonarcloud-github-action@master
+     #    if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.head.repo.fork
+     #    env:
+     #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+     #      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+     #    with:
+     #      args: >
+     #        -Dsonar.organization=axaguildev
+     #        -Dsonar.projectKey=AxaGuilDEv_react-oidc
+     #        -Dsonar.exclusions=**/*.spec.js,**/*.stories.js,Scripts/**,**/*.scss,**/__snapshots__/**,**/*[Tt]ests.cs,**/node_modules/**,**/ClientApp/build/**,**/ClientApp/.storybook/**,**/ClientApp/storybook-static/**,**/obj/**,**/__mocks__/**,**/ClientApp/src/serviceWorker.ts
+     #        -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
+ #
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
