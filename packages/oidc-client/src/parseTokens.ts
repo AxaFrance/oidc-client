@@ -168,7 +168,10 @@ export const parseOriginalTokens = (tokens, oldTokens, tokenRenewMode: string) =
   return setTokens(data, oldTokens, tokenRenewMode);
 };
 
-export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond:number, expiresAt:number) => {
+export const computeTimeLeft = (
+  refreshTimeBeforeTokensExpirationInSecond: number,
+  expiresAt: number,
+) => {
   const currentTimeUnixSecond = new Date().getTime() / 1000;
 
   const timeLeftSecond = expiresAt - currentTimeUnixSecond;
@@ -176,7 +179,7 @@ export const computeTimeLeft = (refreshTimeBeforeTokensExpirationInSecond:number
   return Math.round(timeLeftSecond - refreshTimeBeforeTokensExpirationInSecond);
 };
 
-export const isTokensValid = (tokens, refreshTimeBeforeTokensExpirationInSecond:number = 0) => {
+export const isTokensValid = (tokens, refreshTimeBeforeTokensExpirationInSecond: number = 0) => {
   if (!tokens) {
     return false;
   }
@@ -191,9 +194,9 @@ export type ValidToken = {
 
 export interface OidcToken {
   tokens?: Tokens;
-  configuration: { 
-    token_automatic_renew_mode?: TokenAutomaticRenewMode,
-    refresh_time_before_tokens_expiration_in_second?: number,
+  configuration: {
+    token_automatic_renew_mode?: TokenAutomaticRenewMode;
+    refresh_time_before_tokens_expiration_in_second?: number;
   };
   renewTokensAsync: (extras: StringMap) => Promise<void>;
 }
@@ -207,7 +210,13 @@ export const getValidTokenAsync = async (
   if (!oidc.tokens) {
     return null;
   }
-  while (!isTokensValid(oidc.tokens, oidc.configuration.refresh_time_before_tokens_expiration_in_second ) && numberWaitTemp > 0) {
+  while (
+    !isTokensValid(
+      oidc.tokens,
+      oidc.configuration.refresh_time_before_tokens_expiration_in_second,
+    ) &&
+    numberWaitTemp > 0
+  ) {
     if (
       oidc.configuration.token_automatic_renew_mode ==
       TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted
