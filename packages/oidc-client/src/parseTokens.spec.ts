@@ -30,6 +30,7 @@ describe('ParseTokens test Suite', () => {
         },
         configuration: {
           token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
+          refresh_time_before_tokens_expiration_in_second: 0,
         },
         renewTokensAsync: async (_extras: StringMap) => {
           await sleepAsync({ milliseconds: 10 });
