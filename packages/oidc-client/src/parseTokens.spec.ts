@@ -19,14 +19,16 @@ describe('ParseTokens test Suite', () => {
   ])('getValidTokenAsync', (expiresAt, issuedAt, expectIsValidToken) => {
     it('should getValidTokenAsync wait and return value', async () => {
       const oidc = {
-        tokens: {
-          refreshToken: 'youhou',
-          idTokenPayload: null,
-          idToken: 'youhou',
-          accessTokenPayload: null,
-          accessToken: 'youhou',
-          expiresAt,
-          issuedAt,
+        getTokens: () => {
+          return {
+            refreshToken: 'youhou',
+            idTokenPayload: null,
+            idToken: 'youhou',
+            accessTokenPayload: null,
+            accessToken: 'youhou',
+            expiresAt,
+            issuedAt,
+          };
         },
         configuration: {
           token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,

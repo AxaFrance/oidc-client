@@ -193,7 +193,7 @@ export type ValidToken = {
 };
 
 export interface OidcToken {
-  tokens?: Tokens;
+  getTokens: () => Tokens | null;
   configuration: {
     token_automatic_renew_mode?: TokenAutomaticRenewMode;
     refresh_time_before_tokens_expiration_in_second?: number;
@@ -207,16 +207,18 @@ export const getValidTokenAsync = async (
   numberWait = 50,
 ): Promise<ValidToken> => {
   let numberWaitTemp = numberWait;
-  if (!oidc.tokens) {
+  if (!oidc.getTokens()) {
     return null;
   }
   while (
     !isTokensValid(
-      oidc.tokens,
+      oidc.getTokens(),
       oidc.configuration.refresh_time_before_tokens_expiration_in_second,
     ) &&
     numberWaitTemp > 0
   ) {
+    console.log('getValidTokenAsync wait and return value');
+    console.log(oidc.getTokens());
     if (
       oidc.configuration.token_automatic_renew_mode ==
       TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted
@@ -228,10 +230,10 @@ export const getValidTokenAsync = async (
     }
     numberWaitTemp = numberWaitTemp - 1;
   }
-  const isValid = isTokensValid(oidc.tokens);
+  const isValid = isTokensValid(oidc.getTokens());
   return {
     isTokensValid: isValid,
-    tokens: oidc.tokens,
+    tokens: oidc.getTokens(),
     numberWaited: numberWaitTemp - numberWait,
   };
 };
