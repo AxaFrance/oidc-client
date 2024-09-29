@@ -16,7 +16,7 @@ export const fetchWithTokens =
     }
 
     const oidcToken: OidcToken = {
-      tokens: oidc.tokens,
+      getTokens: () => oidc.tokens,
       configuration: {
         token_automatic_renew_mode: oidc.configuration.token_automatic_renew_mode,
         refresh_time_before_tokens_expiration_in_second:
@@ -27,6 +27,10 @@ export const fetchWithTokens =
 
     // @ts-ignore
     const getValidToken = await getValidTokenAsync(oidcToken);
+
+    console.log('getValidTokenAsync');
+    console.log(getValidToken);
+    
     const accessToken = getValidToken?.tokens?.accessToken;
     if (!headers.has('Accept')) {
       headers.set('Accept', 'application/json');

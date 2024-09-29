@@ -1,7 +1,7 @@
 import { fetchWithTokens } from './fetch';
 import { ILOidcLocation, OidcLocation } from './location';
 import { LoginCallback, Oidc } from './oidc.js';
-import { getValidTokenAsync, Tokens, ValidToken } from './parseTokens.js';
+import {getValidTokenAsync, OidcToken, Tokens, ValidToken} from './parseTokens.js';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
 
 export interface EventSubscriber {
@@ -93,7 +93,17 @@ export class OidcClient {
   }
 
   async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken> {
-    return getValidTokenAsync(this._oidc, waitMs, numberWait);
+    const oidc = this._oidc;
+    const oidcToken: OidcToken = {
+      getTokens: () => oidc.tokens,
+      configuration: {
+        token_automatic_renew_mode: oidc.configuration.token_automatic_renew_mode,
+        refresh_time_before_tokens_expiration_in_second:
+        oidc.configuration.refresh_time_before_tokens_expiration_in_second,
+      },
+      renewTokensAsync: oidc.renewTokensAsync.bind(oidc),
+    };
+    return getValidTokenAsync(oidcToken, waitMs, numberWait);
   }
 
   fetchWithTokens(fetch: Fetch, demonstrating_proof_of_possession: boolean = false): Fetch {
