@@ -43,7 +43,7 @@ export async function renewTokensAndStartTimerAsync(
   let tokens: null;
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
 
-  if (configuration?.storage === window?.sessionStorage && !serviceWorker) {
+  if ((configuration?.storage === window?.sessionStorage && !serviceWorker) || !navigator.locks) {
     tokens = await syncTokens(oidc, forceRefresh, extras);
   } else {
     let status: any = 'retry';
