@@ -30,7 +30,7 @@ export const fetchWithTokens =
 
     console.log('getValidTokenAsync');
     console.log(getValidToken);
-    
+
     const accessToken = getValidToken?.tokens?.accessToken;
     if (!headers.has('Accept')) {
       headers.set('Accept', 'application/json');
