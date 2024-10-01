@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.29
+## 7.22.30
+
+- [8c98b27](https://github.com/AxaFrance/oidc-client/commit/8c98b2701e1118538455816ca458062cfc07d716) - fix(oidc): remove missing console.log (#1472) (release), 2024-10-01 by *Guillaume Chervet*
+
+
+## v7.22.29
 
 - [e297a7b](https://github.com/AxaFrance/oidc-client/commit/e297a7b5bd9d3eebb7cea443185039a7cb74d2f4) - fix(oidc): navigator locks null (#1466) (release), 2024-09-29 by *Guillaume Chervet*
 
@@ -326,13 +331,5 @@
 ## v7.15.0
 
 - [1676881](https://github.com/AxaFrance/oidc-client/commit/1676881f1db53cff6652ee7fe9658a437682231f) - feat(oidc): idToken can be null on a refresh (release) (#1271), 2024-01-29 by *Guillaume Chervet*
-
-
-## v7.14.1
-
-- [0fe53a6](https://github.com/AxaFrance/oidc-client/commit/0fe53a6b870c13c71330806a045896ea1e0a57e2) - fix(oidc): remove console.log (release), 2024-01-28 by *Guillaume Chervet*
-- [b23d6a7](https://github.com/AxaFrance/oidc-client/commit/b23d6a7e1fc04ce43f489ac8977de9fe5affff73) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-01-28 by *Guillaume Chervet*
-- [14ccbeb](https://github.com/AxaFrance/oidc-client/commit/14ccbeb83f1d7e790b496e571d424f615a39b43f) - fix(oidc): demo and remove console.log, 2024-01-28 by *Guillaume Chervet*
-- [15eb259](https://github.com/AxaFrance/oidc-client/commit/15eb2592d9582cb43798a5d7fc988b3c349e5b43) - doc(oidc): Update README.md, 2024-01-26 by *Guillaume Chervet*
 
 
