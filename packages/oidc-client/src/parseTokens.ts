@@ -217,8 +217,6 @@ export const getValidTokenAsync = async (
     ) &&
     numberWaitTemp > 0
   ) {
-    console.log('getValidTokenAsync wait and return value');
-    console.log(oidc.getTokens());
     if (
       oidc.configuration.token_automatic_renew_mode ==
       TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted
