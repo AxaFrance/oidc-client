@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.22.30
+## 7.22.31
+
+- [cc731c1](https://github.com/AxaFrance/oidc-client/commit/cc731c15f1d72ce4d21a7958ca15128ae1dcdd89) - fix(oidc): force sw update when new registration appears (release) (#1449), 2024-10-02 by *wermanoid*
+
+
+## v7.22.30
 
 - [8c98b27](https://github.com/AxaFrance/oidc-client/commit/8c98b2701e1118538455816ca458062cfc07d716) - fix(oidc): remove missing console.log (#1472) (release), 2024-10-01 by *Guillaume Chervet*
 
@@ -326,10 +331,5 @@
 ## v7.15.1
 
 - [5094e36](https://github.com/AxaFrance/oidc-client/commit/5094e36c1435684c5863e8d27eca59093aaec7b7) - fix(service-worker): unit test broken (release), 2024-01-30 by *Guillaume Chervet*
-
-
-## v7.15.0
-
-- [1676881](https://github.com/AxaFrance/oidc-client/commit/1676881f1db53cff6652ee7fe9658a437682231f) - feat(oidc): idToken can be null on a refresh (release) (#1271), 2024-01-29 by *Guillaume Chervet*
 
 
