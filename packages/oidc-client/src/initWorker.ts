@@ -113,6 +113,11 @@ export const initWorkerAsync = async (
     registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
   } else {
     registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
+
+    if (registration.active && registration.waiting) {
+      console.log('Detected new service worker waiting, unregistering and reloading');
+      await configuration.service_worker_update_require_callback?.(registration, stopKeepAlive);
+    }
   }
 
   try {
@@ -151,7 +156,7 @@ export const initWorkerAsync = async (
       console.warn(
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
-      await oidcConfiguration.service_worker_update_require_callback(registration, stopKeepAlive);
+      await oidcConfiguration.service_worker_update_require_callback?.(registration, stopKeepAlive);
     }
 
     // @ts-ignore
