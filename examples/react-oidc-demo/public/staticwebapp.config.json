@@ -4,7 +4,7 @@
     "exclude": ["*.{svg,png,jpg,gif}", "*.{css,scss}", "*.js"]
   },
   "globalHeaders": {
-    "content-security-policy": "script-src 'self'",
+    "content-security-policy": "script-src 'self' 'unsafe-eval'  ",
     "Access-Control-Allow-Origin": "*",
     "X-Frame-Options": "SAMEORIGIN",
     "X-Permitted-Cross-Domain-Policies": "none",

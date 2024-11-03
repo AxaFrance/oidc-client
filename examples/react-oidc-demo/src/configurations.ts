@@ -16,7 +16,7 @@ export const configurationIdentityServer = {
   // monitor_session: true,
   extras: { youhou_demo: 'youhou' },
   token_renew_mode: TokenRenewMode.access_token_invalid,
-  token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted,
+  token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
   demonstrating_proof_of_possession: false,
   preload_user_info: true,
 };

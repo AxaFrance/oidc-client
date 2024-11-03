@@ -128,7 +128,7 @@ export const execute = () => {
   const href = window.location.href;
 
   const vanillaOidc = OidcClient.getOrCreate(() => fetch)(configuration);
-
+    
   // @ts-ignore
   function logout() {
     vanillaOidc.logoutAsync();

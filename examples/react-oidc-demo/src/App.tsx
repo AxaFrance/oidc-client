@@ -7,6 +7,7 @@ import { FetchUserHoc, FetchUserHook } from './FetchUser.js';
 import { Home } from './Home.js';
 import { MultiAuthContainer } from './MultiAuth.js';
 import { Profile, SecureProfile } from './Profile.js';
+import CodeExecutor from "./CodeExecutor";
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
@@ -111,6 +112,7 @@ function App() {
           </div>
         </BrowserRouter>
       </OidcProvider>
+
       <div className="container-fluid mt-3">
         <div className="card">
           <div className="card-body">
@@ -129,6 +131,7 @@ function App() {
           </div>
         </div>
       </div>
+      <CodeExecutor/>
     </>
   );
 }
