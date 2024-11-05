@@ -1,5 +1,5 @@
-import { useOidc, useOidcUser } from '@axa-fr/react-oidc';
-import React, { useEffect } from 'react';
+import { useOidc } from '@axa-fr/react-oidc';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const Home = () => {

@@ -289,7 +289,10 @@ const DisplayAccessToken = ({ configurationName }) => {
           )}
         </div>
       </div>
-      <FetchUserHook configurationName={configurationName} demonstratingProofOfPossession={demonstratingProofOfPossession}  />
+      <FetchUserHook
+        configurationName={configurationName}
+        demonstratingProofOfPossession={demonstratingProofOfPossession}
+      />
     </>
   );
 };

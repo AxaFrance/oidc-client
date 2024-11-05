@@ -50,7 +50,11 @@ export const FetchUserHoc = () => (
 );
 
 export const FetchUserHook = (props: any) => {
-  const { fetch } = useOidcFetch(window.fetch, props.configurationName, props.demonstratingProofOfPossession ?? false);
+  const { fetch } = useOidcFetch(
+    window.fetch,
+    props.configurationName,
+    props.demonstratingProofOfPossession ?? false,
+  );
   return (
     <OidcSecure configurationName={props.configurationName}>
       <DisplayUserInfo fetch={fetch} />

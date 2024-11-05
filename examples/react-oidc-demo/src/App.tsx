@@ -2,12 +2,12 @@ import { OidcProvider, withOidcSecure } from '@axa-fr/react-oidc';
 import React, { useReducer } from 'react';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 
+import CodeExecutor from './CodeExecutor';
 import { configurationIdentityServer } from './configurations.js';
 import { FetchUserHoc, FetchUserHook } from './FetchUser.js';
 import { Home } from './Home.js';
 import { MultiAuthContainer } from './MultiAuth.js';
 import { Profile, SecureProfile } from './Profile.js';
-import CodeExecutor from "./CodeExecutor";
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
@@ -131,7 +131,7 @@ function App() {
           </div>
         </div>
       </div>
-      <CodeExecutor/>
+      <CodeExecutor />
     </>
   );
 }

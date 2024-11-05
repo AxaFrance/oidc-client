@@ -15,7 +15,7 @@ interface OidcUserRoleInfo extends OidcUserInfo {
 
 const DisplayUserInfo = () => {
   const { oidcUser, oidcUserLoadingState, reloadOidcUser } = useOidcUser<OidcUserRoleInfo>();
-  
+
   switch (oidcUserLoadingState) {
     case OidcUserStatus.Loading:
       return <p>User Information are loading</p>;
