@@ -1,8 +1,5 @@
-﻿import { OidcClient } from '@axa-fr/oidc-client';
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
-// @ts-ignore
-window.OidcClient = OidcClient;
 const CodeExecutor: React.FC = () => {
     const [code, setCode] = useState<string>('');
     const [output, setOutput] = useState<string>('');
