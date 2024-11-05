@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 export const Home = () => {
   const { login, logout, renewTokens, isAuthenticated } = useOidc();
-  const { oidcUser, oidcUserLoadingState } = useOidcUser();
   const navigate = useNavigate();
 
   const navigateProfile = () => {

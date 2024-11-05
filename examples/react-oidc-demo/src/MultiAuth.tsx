@@ -56,7 +56,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
           </p>
           <select value={configurationName} onChange={handleConfigurationChange}>
             <option value="config_classic">config_classic</option>
-            <option value="config_with_monitor_session">config_classic_monitor_session</option>
+            <option value="config_with_monitor_session">config_with_monitor_session</option>
             <option value="config_without_refresh_token">config_without_refresh_token</option>
             <option value="config_without_silent_login">config_without_silent_login</option>
             <option value="config_without_refresh_token_silent_login">
@@ -153,6 +153,9 @@ export const MultiAuthContainer = () => {
       scope: 'openid profile email api offline_access',
     },
     config_with_monitor_session: {
+      ...configurationIdentityServer,
+      redirect_uri: callBack,
+      silent_redirect_uri,
       monitor_session: true,
     },
     config_without_refresh_token_silent_login: {
@@ -262,7 +265,7 @@ export const MultiAuthContainer = () => {
 const DisplayAccessToken = ({ configurationName }) => {
   const { accessToken, accessTokenPayload } = useOidcAccessToken(configurationName);
   const { idTokenPayload } = useOidcIdToken(configurationName);
-
+  const demonstratingProofOfPossession = configurationName == 'config_with_dpop';
   if (!accessToken) {
     return <p>you are not authentified</p>;
   }
@@ -286,7 +289,7 @@ const DisplayAccessToken = ({ configurationName }) => {
           )}
         </div>
       </div>
-      <FetchUserHook configurationName={configurationName} />
+      <FetchUserHook configurationName={configurationName} demonstratingProofOfPossession={demonstratingProofOfPossession}  />
     </>
   );
 };
