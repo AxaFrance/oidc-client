@@ -22,25 +22,25 @@ class Router {
 
     // IE Polyfill for CustomEvent
     const CreateEvent =
-        (windowInternal: Window, documentInternal: Document) =>
-            (event: string, params: InitCustomEventParams): CustomEvent => {
-              // @ts-ignore
-              if (typeof windowInternal.CustomEvent === 'function') {
-                // @ts-ignore
-                return new windowInternal.CustomEvent(event, params);
-              }
-              const paramsToFunction = params || { bubbles: false, cancelable: false, detail: undefined };
-              const evt: CustomEvent = documentInternal.createEvent('CustomEvent');
-              evt.initCustomEvent(
-                  event,
-                  paramsToFunction.bubbles,
-                  paramsToFunction.cancelable,
-                  paramsToFunction.detail,
-              );
-              // @ts-ignore
-              (evt as CustomEvent & IPrototype).prototype = windowInternal.Event.prototype;
-              return evt;
-            };
+      (windowInternal: Window, documentInternal: Document) =>
+      (event: string, params: InitCustomEventParams): CustomEvent => {
+        // @ts-ignore
+        if (typeof windowInternal.CustomEvent === 'function') {
+          // @ts-ignore
+          return new windowInternal.CustomEvent(event, params);
+        }
+        const paramsToFunction = params || { bubbles: false, cancelable: false, detail: undefined };
+        const evt: CustomEvent = documentInternal.createEvent('CustomEvent');
+        evt.initCustomEvent(
+          event,
+          paramsToFunction.bubbles,
+          paramsToFunction.cancelable,
+          paramsToFunction.detail,
+        );
+        // @ts-ignore
+        (evt as CustomEvent & IPrototype).prototype = windowInternal.Event.prototype;
+        return evt;
+      };
 
     type WindowHistoryState = typeof window.history.state;
 
@@ -49,9 +49,9 @@ class Router {
     };
 
     const getHistory = (
-        windowInternal: WindowInternal,
-        CreateEventInternal: (event: string, params?: InitCustomEventParams) => CustomEvent,
-        generateKeyInternal: typeof generateKey,
+      windowInternal: WindowInternal,
+      CreateEventInternal: (event: string, params?: InitCustomEventParams) => CustomEvent,
+      generateKeyInternal: typeof generateKey,
     ): CustomHistory => {
       return {
         replaceState: (url?: string | null, stateHistory?: WindowHistoryState): void => {
