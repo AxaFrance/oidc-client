@@ -4,7 +4,7 @@
     "exclude": ["*.{svg,png,jpg,gif}", "*.{css,scss}", "*.js"]
   },
   "globalHeaders": {
-    "content-security-policy": "script-src 'self' 'unsafe-eval'  ",
+    "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://demo.duendesoftware.com; media-src 'self'; object-src 'none'; frame-src 'self' https://demo.duendesoftware.com; base-uri 'self'; form-action 'self'; frame-ancestors 'self' https://demo.duendesoftware.com; block-all-mixed-content; upgrade-insecure-requests;",
     "Access-Control-Allow-Origin": "*",
     "X-Frame-Options": "SAMEORIGIN",
     "X-Permitted-Cross-Domain-Policies": "none",
