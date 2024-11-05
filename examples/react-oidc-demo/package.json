@@ -19,7 +19,6 @@
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
   "dependencies": {
-    "@axa-fr/oidc-client": "workspace:*",
     "@axa-fr/react-oidc": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

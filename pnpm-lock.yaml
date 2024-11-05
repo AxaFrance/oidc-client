@@ -120,9 +120,6 @@ importers:
 
   examples/react-oidc-demo:
     dependencies:
-      '@axa-fr/oidc-client':
-        specifier: workspace:*
-        version: link:../../packages/oidc-client
       '@axa-fr/react-oidc':
         specifier: workspace:*
         version: link:../../packages/react-oidc
