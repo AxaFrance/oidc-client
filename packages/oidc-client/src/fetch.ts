@@ -43,7 +43,7 @@ export const fetchWithTokens =
             url.toString(),
             optionTmp.method,
           );
-        headers.set('Authorization', `PoP ${accessToken}`);
+        headers.set('Authorization', `DPoP ${accessToken}`);
         headers.set('DPoP', demonstrationOdProofOfPossession);
       } else {
         headers.set('Authorization', `Bearer ${accessToken}`);
