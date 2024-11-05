@@ -6,6 +6,7 @@
 const trustedDomains = {
   default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
   config_classic: ['https://demo.duendesoftware.com'],
+  config_with_monitor_session: ['https://demo.duendesoftware.com'],
   config_without_silent_login: ['https://demo.duendesoftware.com'],
   config_without_refresh_token: ['https://demo.duendesoftware.com'],
   config_without_refresh_token_silent_login: ['https://demo.duendesoftware.com'],

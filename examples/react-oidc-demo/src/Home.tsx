@@ -1,27 +1,14 @@
-import { useOidc, useOidcUser } from '@axa-fr/react-oidc';
-import React, { useEffect } from 'react';
+import { useOidc } from '@axa-fr/react-oidc';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const createIframeHack = () => {
-  const iframe = document.createElement('iframe');
-  const html = '<body>Foo<script>alert("youhou");</script></body>';
-  iframe.srcdoc = html;
-  document.body.appendChild(iframe);
-};
 
 export const Home = () => {
   const { login, logout, renewTokens, isAuthenticated } = useOidc();
-  const { oidcUser, oidcUserLoadingState } = useOidcUser();
-  console.log(oidcUser, oidcUserLoadingState);
   const navigate = useNavigate();
 
   const navigateProfile = () => {
     navigate('/profile');
   };
-
-  useEffect(() => {
-    createIframeHack();
-  }, []);
 
   return (
     <div className="container-fluid mt-3">
@@ -30,7 +17,7 @@ export const Home = () => {
           <h5 className="card-title">Home</h5>
           <p className="card-text">
             React Demo Application protected by OpenId Connect. More info on about oidc on{' '}
-            <a href="https://github.com/AxaGuilDEv/react-oidc">GitHub @axa-fr/react-oidc</a>
+            <a href="https://github.com/AXAFrance/oidc-client">GitHub @axa-fr/react-oidc</a>
           </p>
           {!isAuthenticated && (
             <p>

@@ -4,38 +4,13 @@ export const configurationIdentityServer = {
   client_id: 'interactive.public.short',
   redirect_uri: window.location.origin + '/authentication/callback',
   silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
-  // silent_login_uri: window.location.origin + '/authentication/silent-login',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
-  // authority_time_cache_wellknowurl_in_second: 60* 60,
   refresh_time_before_tokens_expiration_in_second: 40,
+  token_renew_mode: TokenRenewMode.access_token_invalid,
+  token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
   service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
-  // storage: localStorage,
-  // silent_login_timeout: 3333000
-  // monitor_session: true,
-  extras: { youhou_demo: 'youhou' },
-  token_renew_mode: TokenRenewMode.access_token_invalid,
-  token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted,
-  demonstrating_proof_of_possession: false,
-  preload_user_info: true,
-};
-
-export const configurationIdentityServer1 = {
-  client_id: 'balosar-blazo',
-  redirect_uri: window.location.origin + '/authentication/callback',
-  silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
-  // silent_login_uri: window.location.origin + '/authentication/silent-login',
-  scope: 'openid offline_access profile email',
-  authority: 'https://localhost:44310',
-  // authority_time_cache_wellknowurl_in_second: 60* 60,
-  refresh_time_before_tokens_expiration_in_second: 40,
-  // service_worker_relative_url: '/OidcServiceWorker.js',
-  service_worker_only: false,
-  // storage: localStorage,
-  // silent_login_timeout: 3333000
-  // monitor_session: true,
-  token_renew_mode: TokenRenewMode.access_token_invalid,
 };
 
 export const configurationIdentityServerWithHash = {
@@ -66,16 +41,6 @@ export const configurationIdentityServerWithoutDiscovery = {
     revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
     check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession',
   },
-  refresh_time_before_tokens_expiration_in_second: 10,
-  service_worker_relative_url: '/OidcServiceWorker.js',
-  service_worker_only: false,
-};
-
-export const configurationAuth0 = {
-  client_id: 'xGZxEAJhzlkuQUlWl90y1ntIX-0UDWHx',
-  redirect_uri: window.location.origin + '/callback',
-  scope: 'openid profile email api offline_access',
-  authority: 'https://kdhttps.auth0.com',
   refresh_time_before_tokens_expiration_in_second: 10,
   service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
