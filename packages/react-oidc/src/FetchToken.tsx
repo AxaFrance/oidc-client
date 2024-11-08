@@ -30,7 +30,7 @@ export const withOidcFetch =
     const { fetch: newFetch } = useOidcFetch(
       fetch || props.fetch,
       configurationName,
-        demonstratingProofOfPossession,
+      demonstratingProofOfPossession,
     );
     return <WrappedComponent {...props} fetch={newFetch} />;
   };
@@ -49,7 +49,7 @@ export const useOidcFetch = (
       const newFetch = fetchWithToken(
         previousFetch,
         getOidcWithConfigurationName,
-          demonstratingProofOfPossession,
+        demonstratingProofOfPossession,
       );
       return newFetch(input, init);
     },
