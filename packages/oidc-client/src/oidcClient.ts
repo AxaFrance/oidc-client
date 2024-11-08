@@ -106,15 +106,15 @@ export class OidcClient {
     return getValidTokenAsync(oidcToken, waitMs, numberWait);
   }
 
-  fetchWithTokens(fetch: Fetch, demonstrating_proof_of_possession: boolean = false): Fetch {
-    return fetchWithTokens(fetch, this._oidc, demonstrating_proof_of_possession);
+  fetchWithTokens(fetch: Fetch, demonstratingProofOfPossession: boolean = false): Fetch {
+    return fetchWithTokens(fetch, this._oidc, demonstratingProofOfPossession);
   }
 
   async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(
     noCache = false,
-    demonstrating_proof_of_possession: boolean = false,
+    demonstratingProofOfPossession: boolean = false,
   ): Promise<T> {
-    return this._oidc.userInfoAsync(noCache, demonstrating_proof_of_possession);
+    return this._oidc.userInfoAsync(noCache, demonstratingProofOfPossession);
   }
 
   userInfo<T extends OidcUserInfo = OidcUserInfo>(): T {
