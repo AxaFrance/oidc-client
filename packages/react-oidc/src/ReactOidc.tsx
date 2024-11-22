@@ -48,12 +48,13 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
     callbackPath: string | undefined = undefined,
     extras: StringMap | undefined = undefined,
     silentLoginOnly = false,
+    scope: string = undefined,
   ) => {
     return getOidc(configurationName).loginAsync(
       callbackPath,
       extras,
       false,
-      undefined,
+      scope,
       silentLoginOnly,
     );
   };
