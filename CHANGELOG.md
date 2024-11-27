@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.23.0
+## 7.23.1
+
+- [0f69a11](https://github.com/AxaFrance/oidc-client/commit/0f69a114564134dee63f78654b9af82f0b291ec9) - fix(oidc): login async promise (release), 2024-11-27 by *Guillaume Chervet*
+
+
+## v7.23.0
 
 - [30fda23](https://github.com/AxaFrance/oidc-client/commit/30fda231324b18bb026de30e537e0bce7cc3bbc1) - feat(oidc-react): add missing scope property in login route (release), 2024-11-22 by *Guillaume Chervet*
 - [4d77aae](https://github.com/AxaFrance/oidc-client/commit/4d77aae5ec4564f1866ebc9ba5e9f2ad1bd51b63) - fix(oidc): dpop typo (#1482), 2024-11-08 by *Guillaume Chervet*
@@ -326,10 +331,5 @@
 ## v7.15.4
 
 - [f2d74fb](https://github.com/AxaFrance/oidc-client/commit/f2d74fba6d2e48e6d478aa69d261fe9cceb69bfa) - fix(oidc): eternal lock when refresh_token invalid and multiple tabs (#1281) (release), 2024-02-03 by *Guillaume Chervet*
-
-
-## v7.15.3
-
-- [7a5d32c](https://github.com/AxaFrance/oidc-client/commit/7a5d32cf650870a5b1c2910ceb0a3e6db4cec0b7) - fix(oidc): storage empty update message (release), 2024-02-03 by *Guillaume Chervet*
 
 
