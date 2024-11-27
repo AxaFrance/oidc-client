@@ -296,7 +296,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     );
   }
 
-  loginPromise: Promise<void> = null;
+  loginPromise: Promise<unknown> = null;
   async loginAsync(
     callbackPath: string = undefined,
     extras: StringMap = null,
@@ -312,21 +312,22 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
       return this.loginPromise;
     }
     if (silentLoginOnly) {
-      return defaultSilentLoginAsync(
+      this.loginPromise = defaultSilentLoginAsync(
         window,
         this.configurationName,
         this.configuration,
         this.publishEvent.bind(this),
         this,
       )(extras, scope);
+    } else {
+      this.loginPromise = defaultLoginAsync(
+        this.configurationName,
+        this.configuration,
+        this.publishEvent.bind(this),
+        this.initAsync.bind(this),
+        this.location,
+      )(callbackPath, extras, isSilentSignin, scope);
     }
-    this.loginPromise = defaultLoginAsync(
-      this.configurationName,
-      this.configuration,
-      this.publishEvent.bind(this),
-      this.initAsync.bind(this),
-      this.location,
-    )(callbackPath, extras, isSilentSignin, scope);
     return this.loginPromise.finally(() => {
       this.loginPromise = null;
     });

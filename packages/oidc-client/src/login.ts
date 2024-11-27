@@ -25,7 +25,7 @@ export const defaultLoginAsync =
     extras: StringMap = null,
     isSilentSignin = false,
     scope: string = undefined,
-  ) => {
+  ): Promise<unknown> => {
     const originExtras = extras;
     extras = { ...extras };
     const loginLocalAsync = async () => {
