@@ -1,7 +1,10 @@
 import { getFromCache, setCache } from './cache.js';
 import { deriveChallengeAsync, generateRandom } from './crypto.js';
 import { ILOidcLocation } from './location';
-import { OidcAuthorizationServiceConfiguration } from './oidc.js';
+import {
+  OidcAuthorizationServiceConfiguration,
+  OidcAuthorizationServiceConfigurationResponse,
+} from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
 import { Fetch, StringMap } from './types.js';
 
@@ -17,7 +20,11 @@ export const fetchFromIssuer =
     const fullUrl = `${openIdIssuerUrl}/.well-known/openid-configuration`;
 
     const localStorageKey = `oidc.server:${openIdIssuerUrl}`;
-    const data = getFromCache(localStorageKey, storage, timeCacheSecond);
+    const data = getFromCache<OidcAuthorizationServiceConfigurationResponse>(
+      localStorageKey,
+      storage,
+      timeCacheSecond,
+    );
     if (data) {
       return new OidcAuthorizationServiceConfiguration(data);
     }
@@ -27,7 +34,7 @@ export const fetchFromIssuer =
       return null;
     }
 
-    const result = await response.json();
+    const result: OidcAuthorizationServiceConfigurationResponse = await response.json();
 
     setCache(localStorageKey, result, storage);
     return new OidcAuthorizationServiceConfiguration(result);
