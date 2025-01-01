@@ -8,7 +8,7 @@ import { _silentLoginAsync } from './silentLogin';
 import timer from './timer.js';
 import { OidcConfiguration, StringMap, TokenAutomaticRenewMode } from './types.js';
 
-async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap) {
+async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap, scope:string=null) {
   const updateTokens = tokens => {
     oidc.tokens = tokens;
   };
@@ -17,6 +17,7 @@ async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap) 
     0,
     forceRefresh,
     extras,
+    scope
   );
 
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
@@ -36,6 +37,7 @@ export async function renewTokensAndStartTimerAsync(
   oidc,
   forceRefresh = false,
   extras: StringMap = null,
+  scope:string=null
 ) {
   const configuration = oidc.configuration;
   const lockResourcesName = `${configuration.client_id}_${oidc.configurationName}_${configuration.authority}`;
@@ -44,7 +46,7 @@ export async function renewTokensAndStartTimerAsync(
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
 
   if ((configuration?.storage === window?.sessionStorage && !serviceWorker) || !navigator.locks) {
-    tokens = await syncTokens(oidc, forceRefresh, extras);
+    tokens = await syncTokens(oidc, forceRefresh, extras, scope);
   } else {
     let status: any = 'retry';
     while (status === 'retry') {
@@ -58,7 +60,7 @@ export async function renewTokensAndStartTimerAsync(
             });
             return 'retry';
           }
-          return await syncTokens(oidc, forceRefresh, extras);
+          return await syncTokens(oidc, forceRefresh, extras, scope);
         },
       );
     }
@@ -71,13 +73,13 @@ export async function renewTokensAndStartTimerAsync(
 
   if (oidc.timeoutId) {
     // @ts-ignore
-    oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras);
+    oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
   }
 
   return oidc.tokens;
 }
 
-export const autoRenewTokens = (oidc: Oidc, expiresAt, extras: StringMap = null) => {
+export const autoRenewTokens = (oidc: Oidc, expiresAt, extras: StringMap = null, scope:string=null) => {
   const refreshTimeBeforeTokensExpirationInSecond =
     oidc.configuration.refresh_time_before_tokens_expiration_in_second;
   if (oidc.timeoutId) {
@@ -87,7 +89,7 @@ export const autoRenewTokens = (oidc: Oidc, expiresAt, extras: StringMap = null)
     const timeLeft = computeTimeLeft(refreshTimeBeforeTokensExpirationInSecond, expiresAt);
     const timeInfo = { timeLeft };
     oidc.publishEvent(Oidc.eventNames.token_timer, timeInfo);
-    await renewTokensAndStartTimerAsync(oidc, false, extras);
+    await renewTokensAndStartTimerAsync(oidc, false, extras, scope);
   }, 1000);
 };
 
@@ -107,7 +109,7 @@ export const syncTokensInfoAsync =
     configuration: OidcConfiguration,
     configurationName: string,
     currentTokens: Tokens,
-    forceRefresh = false,
+    forceRefresh = false
   ) => {
     // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
     // const configuration = this.configuration;
@@ -186,7 +188,7 @@ export const syncTokensInfoAsync =
 
 const synchroniseTokensAsync =
   (oidc: Oidc) =>
-  async (updateTokens, index = 0, forceRefresh = false, extras: StringMap = null) => {
+  async (updateTokens, index = 0, forceRefresh = false, extras: StringMap = null, scope:string=null) => {
     if (!navigator.onLine && document.hidden) {
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
     }
@@ -211,7 +213,7 @@ const synchroniseTokensAsync =
         oidc.publishEvent.bind(oidc),
       )(extras, state, scope);
     };
-    const localsilentLoginAsync = async () => {
+    const localSilentLoginAsync = async () => {
       try {
         let loginParams;
         const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
@@ -225,6 +227,7 @@ const synchroniseTokensAsync =
           ...loginParams.extras,
           ...extras,
           prompt: 'none',
+          scope
         });
         if (!silent_token_response) {
           updateTokens(null);
@@ -250,7 +253,7 @@ const synchroniseTokensAsync =
           message: 'exceptionSilent',
           exception: exceptionSilent.message,
         });
-        return await synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras);
+        return await synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras, scope);
       }
     };
 
@@ -297,7 +300,7 @@ const synchroniseTokensAsync =
           }
 
           oidc.publishEvent(eventNames.refreshTokensAsync_begin, { tryNumber: index });
-          return await localsilentLoginAsync();
+          return await localSilentLoginAsync();
         default: {
           if (
             configuration.token_automatic_renew_mode ==
@@ -314,7 +317,7 @@ const synchroniseTokensAsync =
             tryNumber: index,
           });
           if (!tokens.refreshToken) {
-            return await localsilentLoginAsync();
+            return await localSilentLoginAsync();
           }
 
           const clientId = configuration.client_id;
@@ -412,6 +415,7 @@ const synchroniseTokensAsync =
                 nextIndex,
                 forceRefresh,
                 extras,
+                scope
               );
             }
           };
@@ -429,7 +433,7 @@ const synchroniseTokensAsync =
       // so we need to brake calls chain and delay next call
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras)
+          synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras, scope)
             .then(resolve)
             .catch(reject);
         }, 1000);

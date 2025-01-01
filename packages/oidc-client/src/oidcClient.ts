@@ -62,8 +62,8 @@ export class OidcClient {
     return this._oidc.silentLoginCallbackAsync();
   }
 
-  renewTokensAsync(extras: StringMap = null): Promise<void> {
-    return this._oidc.renewTokensAsync(extras);
+  renewTokensAsync(extras: StringMap = null, scope: string=null): Promise<void> {
+    return this._oidc.renewTokensAsync(extras, scope);
   }
 
   loginCallbackAsync(): Promise<LoginCallback> {
