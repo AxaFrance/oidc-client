@@ -90,6 +90,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
                     tenantId: '1234',
                   },
                   true,
+                  'openid profile email',
                 )
               }
             >

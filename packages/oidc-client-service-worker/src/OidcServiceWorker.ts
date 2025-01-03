@@ -88,9 +88,14 @@ async function generateDpopAsync(
   ) {
     const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
     const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
-    headersExtras['dpop'] = await generateJwtDemonstratingProofOfPossessionAsync(self)(
-      dpopConfiguration,
-    )(jwk, 'POST', url, extrasClaims);
+    const method = originalRequest.method;
+    const dpop = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(
+      jwk,
+      method,
+      url,
+      extrasClaims,
+    );
+    headersExtras['dpop'] = dpop;
     if (currentDatabase.demonstratingProofOfPossessionNonce != null) {
       headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
     }
@@ -127,7 +132,6 @@ const handleFetch = async (event: FetchEvent) => {
     ) {
       requestMode = 'cors';
     }
-
     let headers: { [p: string]: string };
     if (
       originalRequest.mode == 'navigate' &&
@@ -142,11 +146,31 @@ const handleFetch = async (event: FetchEvent) => {
       if (authorization) {
         authenticationMode = authorization.split(' ')[0];
       }
-      headers = {
-        ...serializeHeaders(originalRequest.headers),
-        authorization:
-          authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
-      };
+
+      if (authenticationMode.toLowerCase() == 'dpop') {
+        const claimsExtras = {
+          ath: await base64urlOfHashOfASCIIEncodingAsync(
+            currentDatabaseForRequestAccessToken.tokens.access_token,
+          ),
+        };
+        const dpopHeaders = await generateDpopAsync(
+          originalRequest,
+          currentDatabaseForRequestAccessToken,
+          url,
+          claimsExtras,
+        );
+        headers = {
+          ...dpopHeaders,
+          authorization:
+            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+        };
+      } else {
+        headers = {
+          ...serializeHeaders(originalRequest.headers),
+          authorization:
+            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+        };
+      }
     }
     let init: RequestInit;
     if (originalRequest.mode === 'navigate') {

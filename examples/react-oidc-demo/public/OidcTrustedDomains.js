@@ -33,7 +33,8 @@ trustedDomains.config_separate_oidc_access_token_domains = {
 trustedDomains.config_with_dpop = {
   domains: ['https://demo.duendesoftware.com'],
   demonstratingProofOfPossession: true,
-  demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true,
+  demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
+  // allowMultiTabLogin: true,
 };
 
 trustedDomains.config_multi_tab_login = {

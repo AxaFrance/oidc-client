@@ -37,7 +37,7 @@ export const _silentLoginAsync =
         extras.state = state;
       }
 
-      if (scope) {
+      if (scope != null) {
         if (extras == null) {
           extras = {};
         }
@@ -136,11 +136,11 @@ export const defaultSilentLoginAsync =
   (extras: StringMap = null, scope: string = undefined) => {
     extras = { ...extras };
 
-    const silentLoginAsync = (extras, state, scope) => {
+    const silentLoginAsync = (extras, state, scopeInternal) => {
       return _silentLoginAsync(configurationName, configuration, publishEvent.bind(oidc))(
         extras,
         state,
-        scope,
+        scopeInternal,
       );
     };
 
@@ -170,7 +170,7 @@ export const defaultSilentLoginAsync =
           oidc.tokens = silentResult.tokens;
           publishEvent(eventNames.token_acquired, {});
           // @ts-ignore
-          oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras);
+          oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
           return {};
         }
       } catch (e) {

@@ -418,7 +418,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
   renewTokensPromise: Promise<any> = null;
 
-  async renewTokensAsync(extras: StringMap = null) {
+  async renewTokensAsync(extras: StringMap = null, scope: string = null) {
     if (this.renewTokensPromise !== null) {
       return this.renewTokensPromise;
     }
@@ -427,7 +427,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
     timer.clearTimeout(this.timeoutId);
     // @ts-ignore
-    this.renewTokensPromise = renewTokensAndStartTimerAsync(this, true, extras);
+    this.renewTokensPromise = renewTokensAndStartTimerAsync(this, true, extras, scope);
     return this.renewTokensPromise.finally(() => {
       this.renewTokensPromise = null;
     });
