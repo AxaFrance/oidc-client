@@ -89,9 +89,12 @@ async function generateDpopAsync(
     const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
     const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
     const method = originalRequest.method;
-    const dpop = await generateJwtDemonstratingProofOfPossessionAsync(self)(
-        dpopConfiguration,
-    )(jwk, method, url, extrasClaims);
+    const dpop = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(
+      jwk,
+      method,
+      url,
+      extrasClaims,
+    );
     headersExtras['dpop'] = dpop;
     if (currentDatabase.demonstratingProofOfPossessionNonce != null) {
       headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
@@ -129,7 +132,7 @@ const handleFetch = async (event: FetchEvent) => {
     ) {
       requestMode = 'cors';
     }
-    console.log("url : ", url);
+    console.log('url : ', url);
     let headers: { [p: string]: string };
     if (
       originalRequest.mode == 'navigate' &&
@@ -148,24 +151,30 @@ const handleFetch = async (event: FetchEvent) => {
 
       if (authenticationMode.toLowerCase() == 'dpop') {
         const claimsExtras = {
-          ath: await base64urlOfHashOfASCIIEncodingAsync(currentDatabaseForRequestAccessToken.tokens.access_token),
+          ath: await base64urlOfHashOfASCIIEncodingAsync(
+            currentDatabaseForRequestAccessToken.tokens.access_token,
+          ),
         };
-        const dpopHeaders = await generateDpopAsync(originalRequest, currentDatabaseForRequestAccessToken, url, claimsExtras);
+        const dpopHeaders = await generateDpopAsync(
+          originalRequest,
+          currentDatabaseForRequestAccessToken,
+          url,
+          claimsExtras,
+        );
         console.log('dpopHeaders', dpopHeaders);
         headers = {
           ...dpopHeaders,
           authorization:
-              authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
         };
-      } else{
+      } else {
         headers = {
           ...serializeHeaders(originalRequest.headers),
           authorization:
-              authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
         };
       }
       console.log('headers', headers);
-
     }
     let init: RequestInit;
     if (originalRequest.mode === 'navigate') {

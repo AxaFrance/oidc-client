@@ -8,7 +8,12 @@ import { _silentLoginAsync } from './silentLogin';
 import timer from './timer.js';
 import { OidcConfiguration, StringMap, TokenAutomaticRenewMode } from './types.js';
 
-async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap, scope:string=null) {
+async function syncTokens(
+  oidc: Oidc,
+  forceRefresh: boolean,
+  extras: StringMap,
+  scope: string = null,
+) {
   const updateTokens = tokens => {
     oidc.tokens = tokens;
   };
@@ -17,7 +22,7 @@ async function syncTokens(oidc: Oidc, forceRefresh: boolean, extras: StringMap, 
     0,
     forceRefresh,
     extras,
-    scope
+    scope,
   );
 
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
@@ -37,7 +42,7 @@ export async function renewTokensAndStartTimerAsync(
   oidc,
   forceRefresh = false,
   extras: StringMap = null,
-  scope:string=null
+  scope: string = null,
 ) {
   const configuration = oidc.configuration;
   const lockResourcesName = `${configuration.client_id}_${oidc.configurationName}_${configuration.authority}`;
@@ -79,7 +84,12 @@ export async function renewTokensAndStartTimerAsync(
   return oidc.tokens;
 }
 
-export const autoRenewTokens = (oidc: Oidc, expiresAt, extras: StringMap = null, scope:string=null) => {
+export const autoRenewTokens = (
+  oidc: Oidc,
+  expiresAt,
+  extras: StringMap = null,
+  scope: string = null,
+) => {
   const refreshTimeBeforeTokensExpirationInSecond =
     oidc.configuration.refresh_time_before_tokens_expiration_in_second;
   if (oidc.timeoutId) {
@@ -109,7 +119,7 @@ export const syncTokensInfoAsync =
     configuration: OidcConfiguration,
     configurationName: string,
     currentTokens: Tokens,
-    forceRefresh = false
+    forceRefresh = false,
   ) => {
     // Service Worker can be killed by the browser (when it wants,for example after 10 seconds of inactivity, so we retreieve the session if it happen)
     // const configuration = this.configuration;
@@ -188,7 +198,13 @@ export const syncTokensInfoAsync =
 
 const synchroniseTokensAsync =
   (oidc: Oidc) =>
-  async (updateTokens, index = 0, forceRefresh = false, extras: StringMap = null, scope:string=null) => {
+  async (
+    updateTokens,
+    index = 0,
+    forceRefresh = false,
+    extras: StringMap = null,
+    scope: string = null,
+  ) => {
     if (!navigator.onLine && document.hidden) {
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
     }
@@ -227,7 +243,7 @@ const synchroniseTokensAsync =
           ...loginParams.extras,
           ...extras,
           prompt: 'none',
-          scope
+          scope,
         });
         if (!silent_token_response) {
           updateTokens(null);
@@ -253,7 +269,13 @@ const synchroniseTokensAsync =
           message: 'exceptionSilent',
           exception: exceptionSilent.message,
         });
-        return await synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras, scope);
+        return await synchroniseTokensAsync(oidc)(
+          updateTokens,
+          nextIndex,
+          forceRefresh,
+          extras,
+          scope,
+        );
       }
     };
 
@@ -415,7 +437,7 @@ const synchroniseTokensAsync =
                 nextIndex,
                 forceRefresh,
                 extras,
-                scope
+                scope,
               );
             }
           };

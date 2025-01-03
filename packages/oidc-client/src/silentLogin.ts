@@ -140,7 +140,7 @@ export const defaultSilentLoginAsync =
       return _silentLoginAsync(configurationName, configuration, publishEvent.bind(oidc))(
         extras,
         state,
-          scopeInternal,
+        scopeInternal,
       );
     };
 
