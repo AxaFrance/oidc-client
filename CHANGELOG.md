@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.23.1
+## 7.24.0
+
+- [de5da36](https://github.com/AxaFrance/oidc-client/commit/de5da362de4e3f10d46ffdfafd324e14e173b78c) - feat(scope): scope can be change dynamically (release) (#1489), 2025-01-03 by *Guillaume Chervet*
+
+
+## v7.23.1
 
 - [0f69a11](https://github.com/AxaFrance/oidc-client/commit/0f69a114564134dee63f78654b9af82f0b291ec9) - fix(oidc): login async promise (release), 2024-11-27 by *Guillaume Chervet*
 
@@ -326,10 +331,5 @@
 ## v7.15.5
 
 - [d79af9a](https://github.com/AxaFrance/oidc-client/commit/d79af9aba023faf78e9816c4d681413618bdd843) - refactor(all): updates dev libraries (release) (#1284), 2024-02-09 by *Guillaume Chervet*
-
-
-## v7.15.4
-
-- [f2d74fb](https://github.com/AxaFrance/oidc-client/commit/f2d74fba6d2e48e6d478aa69d261fe9cceb69bfa) - fix(oidc): eternal lock when refresh_token invalid and multiple tabs (#1281) (release), 2024-02-03 by *Guillaume Chervet*
 
 
