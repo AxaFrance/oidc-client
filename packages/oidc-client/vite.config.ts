@@ -18,4 +18,8 @@ export default defineConfig({
   resolve: {
     preserveSymlinks: true, // https://github.com/vitejs/vite/issues/11657
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
 });
