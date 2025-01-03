@@ -132,7 +132,6 @@ const handleFetch = async (event: FetchEvent) => {
     ) {
       requestMode = 'cors';
     }
-    console.log('url : ', url);
     let headers: { [p: string]: string };
     if (
       originalRequest.mode == 'navigate' &&
@@ -147,7 +146,6 @@ const handleFetch = async (event: FetchEvent) => {
       if (authorization) {
         authenticationMode = authorization.split(' ')[0];
       }
-      console.log('authenticationMode', authenticationMode);
 
       if (authenticationMode.toLowerCase() == 'dpop') {
         const claimsExtras = {
@@ -161,7 +159,6 @@ const handleFetch = async (event: FetchEvent) => {
           url,
           claimsExtras,
         );
-        console.log('dpopHeaders', dpopHeaders);
         headers = {
           ...dpopHeaders,
           authorization:
@@ -174,7 +171,6 @@ const handleFetch = async (event: FetchEvent) => {
             authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
         };
       }
-      console.log('headers', headers);
     }
     let init: RequestInit;
     if (originalRequest.mode === 'navigate') {
