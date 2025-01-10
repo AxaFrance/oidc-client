@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.24.0
+## 7.24.1
+
+- [3fe0511](https://github.com/AxaFrance/oidc-client/commit/3fe05117c29704f9be56604eb9ffa7195bcdc517) - refactor(react-oidc): react 19 compatibility (#1493) (release), 2025-01-10 by *Guillaume Chervet*
+
+
+## v7.24.0
 
 - [de5da36](https://github.com/AxaFrance/oidc-client/commit/de5da362de4e3f10d46ffdfafd324e14e173b78c) - feat(scope): scope can be change dynamically (release) (#1489), 2025-01-03 by *Guillaume Chervet*
 
@@ -326,10 +331,5 @@
 ## v7.16.0
 
 - [6b9b524](https://github.com/AxaFrance/oidc-client/commit/6b9b524c54a18dca9cc5bab34f0d058716e9d116) - feat(react): expose dpop method generation (#1291) (release), 2024-02-10 by *Guillaume Chervet*
-
-
-## v7.15.5
-
-- [d79af9a](https://github.com/AxaFrance/oidc-client/commit/d79af9aba023faf78e9816c4d681413618bdd843) - refactor(all): updates dev libraries (release) (#1284), 2024-02-09 by *Guillaume Chervet*
 
 
