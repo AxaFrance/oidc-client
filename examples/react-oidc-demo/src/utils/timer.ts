@@ -60,6 +60,7 @@ const timer = (function () {
       const blob = new Blob(['(', workerCode, ')()'], { type: 'application/javascript' });
       blobURL = URL.createObjectURL(blob);
     } catch (error) {
+      console.warn(`Blob not available ${error.toString()}`);
       return null;
     }
     const isInsideBrowser = typeof process === 'undefined';
@@ -70,7 +71,7 @@ const timer = (function () {
       }
     } catch (error) {
       if (isInsideBrowser) {
-        console.warn('SharedWorker not available');
+        console.warn(`SharedWorker not available ${error.toString()}`);
       }
     }
     try {
@@ -80,7 +81,7 @@ const timer = (function () {
       }
     } catch (error) {
       if (isInsideBrowser) {
-        console.warn('Worker not available');
+        console.warn(`Worker not available ${error.toString()}`);
       }
     }
 
