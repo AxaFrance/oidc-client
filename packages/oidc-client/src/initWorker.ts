@@ -125,6 +125,7 @@ export const initWorkerAsync = async (
     if (!navigator.serviceWorker.controller)
       await sendMessageAsync(registration)({ type: 'claim' });
   } catch (err) {
+    console.warn(`Failed init ServiceWorker ${err.toString()}`);
     return null;
   }
 

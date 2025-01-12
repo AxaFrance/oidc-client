@@ -34,14 +34,14 @@
     "lint": "eslint src"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "2.0.5",
+    "@vitest/coverage-v8": "2.1.8",
     "cpy": "11.1.0",
     "cpy-cli": "^5.0.0",
     "rimraf": "6.0.1",
-    "typescript": "5.5.4",
-    "vite": "5.4.2",
-    "vite-plugin-dts": "4.1.0",
-    "vitest": "2.0.5"
+    "typescript": "5.7.3",
+    "vite": "6.0.7",
+    "vite-plugin-dts": "4.5.0",
+    "vitest": "2.1.8"
   },
   "publishConfig": {
     "access": "public",
