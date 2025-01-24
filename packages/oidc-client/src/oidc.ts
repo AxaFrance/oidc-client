@@ -73,7 +73,10 @@ export type LoginCallback = {
 
 export type InternalLoginCallback = {
   callbackPath: string;
+  state: string;
   parsedTokens: Tokens;
+  scope: string;
+  extras: StringMap;
 };
 
 const loginCallbackWithAutoTokensRenewAsync = async (oidc): Promise<LoginCallback> => {
