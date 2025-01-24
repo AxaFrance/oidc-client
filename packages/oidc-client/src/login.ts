@@ -138,9 +138,11 @@ export const loginCallbackAsync =
         state = await session.getStateAsync();
         storage = session;
       }
-      
+
       if (queryParams.error || queryParams.error_description) {
-        throw new Error(`Error from OIDC server: ${queryParams.error} - ${queryParams.error_description}`);
+        throw new Error(
+          `Error from OIDC server: ${queryParams.error} - ${queryParams.error_description}`,
+        );
       }
 
       if (queryParams.iss && queryParams.iss !== oidcServerConfiguration.issuer) {
