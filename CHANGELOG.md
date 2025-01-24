@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.24.1
+## 7.25.0
+
+- [07754f5](https://github.com/AxaFrance/oidc-client/commit/07754f5643cbe21e6e6eb248b8a6398bd0de2fd7) - fix(oidc): refresh silent signin scope=null (release) (#1503), 2025-01-24 by *Guillaume Chervet*
+- [2c08373](https://github.com/AxaFrance/oidc-client/commit/2c0837357b341eeeabbe16b40857240e7d2a596b) - feat(all): update libraries (#1494), 2025-01-12 by *Guillaume Chervet*
+
+
+## v7.24.1
 
 - [3fe0511](https://github.com/AxaFrance/oidc-client/commit/3fe05117c29704f9be56604eb9ffa7195bcdc517) - refactor(react-oidc): react 19 compatibility (#1493) (release), 2025-01-10 by *Guillaume Chervet*
 
@@ -326,10 +332,5 @@
 ## v7.17.0
 
 - [a09e6fd](https://github.com/AxaFrance/oidc-client/commit/a09e6fda64aa210fe7f63d70b6c64af559012640) - feat(oidc): logout add extras parameter to avoid the page reload (release) (#1290), 2024-02-10 by *Guillaume Chervet*
-
-
-## v7.16.0
-
-- [6b9b524](https://github.com/AxaFrance/oidc-client/commit/6b9b524c54a18dca9cc5bab34f0d058716e9d116) - feat(react): expose dpop method generation (#1291) (release), 2024-02-10 by *Guillaume Chervet*
 
 
