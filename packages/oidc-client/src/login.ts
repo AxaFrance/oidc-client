@@ -63,14 +63,14 @@ export const defaultLoginAsync =
         );
         let storage;
         if (serviceWorker) {
-          serviceWorker.setLoginParams({ callbackPath: url, extras: originExtras });
+          serviceWorker.setLoginParams({ callbackPath: url, extras: originExtras, scope: scope });
           await serviceWorker.initAsync(oidcServerConfiguration, 'loginAsync', configuration);
           await serviceWorker.setNonceAsync(nonce);
           serviceWorker.startKeepAliveServiceWorker();
           storage = serviceWorker;
         } else {
           const session = initSession(configurationName, configuration.storage ?? sessionStorage);
-          session.setLoginParams({ callbackPath: url, extras: originExtras });
+          session.setLoginParams({ callbackPath: url, extras: originExtras, scope: scope });
           await session.setNonceAsync(nonce);
           storage = session;
         }
@@ -139,24 +139,24 @@ export const loginCallbackAsync =
         storage = session;
       }
 
-      const params = getParseQueryStringFromLocation(href);
-
-      if (params.error || params.error_description) {
-        throw new Error(`Error from OIDC server: ${params.error} - ${params.error_description}`);
-      }
-
-      if (params.iss && params.iss !== oidcServerConfiguration.issuer) {
-        console.error();
+      if (queryParams.error || queryParams.error_description) {
         throw new Error(
-          `Issuer not valid (expected: ${oidcServerConfiguration.issuer}, received: ${params.iss})`,
+          `Error from OIDC server: ${queryParams.error} - ${queryParams.error_description}`,
         );
       }
-      if (params.state && params.state !== state) {
-        throw new Error(`State not valid (expected: ${state}, received: ${params.state})`);
+
+      if (queryParams.iss && queryParams.iss !== oidcServerConfiguration.issuer) {
+        console.error();
+        throw new Error(
+          `Issuer not valid (expected: ${oidcServerConfiguration.issuer}, received: ${queryParams.iss})`,
+        );
+      }
+      if (queryParams.state && queryParams.state !== state) {
+        throw new Error(`State not valid (expected: ${state}, received: ${queryParams.state})`);
       }
 
       const data = {
-        code: params.code,
+        code: queryParams.code,
         grant_type: 'authorization_code',
         client_id: configuration.client_id,
         redirect_uri: redirectUri,
@@ -269,6 +269,8 @@ export const loginCallbackAsync =
         tokens: formattedTokens,
         state: 'request.state',
         callbackPath: loginParams.callbackPath,
+        scope: queryParams.scope,
+        extras: loginParams.extras,
       };
     } catch (exception) {
       console.error(exception);

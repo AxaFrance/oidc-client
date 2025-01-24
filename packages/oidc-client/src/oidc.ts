@@ -73,12 +73,15 @@ export type LoginCallback = {
 
 export type InternalLoginCallback = {
   callbackPath: string;
+  state: string;
   parsedTokens: Tokens;
+  scope: string;
+  extras: StringMap;
 };
 
 const loginCallbackWithAutoTokensRenewAsync = async (oidc): Promise<LoginCallback> => {
-  const { parsedTokens, callbackPath } = await oidc.loginCallbackAsync();
-  oidc.timeoutId = autoRenewTokens(oidc, parsedTokens.expiresAt);
+  const { parsedTokens, callbackPath, extras, scope } = await oidc.loginCallbackAsync();
+  oidc.timeoutId = autoRenewTokens(oidc, parsedTokens.expiresAt, extras, scope);
   return { callbackPath };
 };
 
@@ -355,7 +358,13 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         await this.userInfoAsync();
       }
       // @ts-ignore
-      return { parsedTokens, state: response.state, callbackPath: response.callbackPath };
+      return {
+        parsedTokens,
+        state: response.state,
+        callbackPath: response.callbackPath,
+        scope: response.scope,
+        extras: response.extras,
+      };
     };
     this.loginCallbackPromise = loginCallbackLocalAsync();
     return this.loginCallbackPromise.finally(() => {
@@ -427,6 +436,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
     timer.clearTimeout(this.timeoutId);
     // @ts-ignore
+
     this.renewTokensPromise = renewTokensAndStartTimerAsync(this, true, extras, scope);
     return this.renewTokensPromise.finally(() => {
       this.renewTokensPromise = null;

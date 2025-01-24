@@ -30,7 +30,12 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         oidc.tokens = tokens;
         const getLoginParams = serviceWorker.getLoginParams(oidc.configurationName);
         // @ts-ignore
-        oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, getLoginParams.extras);
+        oidc.timeoutId = autoRenewTokens(
+          oidc,
+          oidc.tokens.expiresAt,
+          getLoginParams.extras,
+          getLoginParams.scope,
+        );
         const sessionState = await serviceWorker.getSessionStateAsync();
         // @ts-ignore
         await oidc.startCheckSessionAsync(
@@ -64,7 +69,12 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         oidc.tokens = setTokens(tokens, null, configuration.token_renew_mode);
         const getLoginParams = session.getLoginParams();
         // @ts-ignore
-        oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, getLoginParams.extras);
+        oidc.timeoutId = autoRenewTokens(
+          oidc,
+          oidc.tokens.expiresAt,
+          getLoginParams.extras,
+          getLoginParams.scope,
+        );
         const sessionState = await session.getSessionStateAsync();
         // @ts-ignore
         await oidc.startCheckSessionAsync(

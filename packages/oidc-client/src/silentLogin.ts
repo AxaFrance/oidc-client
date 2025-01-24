@@ -25,7 +25,6 @@ export const _silentLoginAsync =
     if (!configuration.silent_redirect_uri || !configuration.silent_login_uri) {
       return Promise.resolve(null);
     }
-
     try {
       publishEvent(eventNames.silentLoginAsync_begin, {});
       let queries = '';
