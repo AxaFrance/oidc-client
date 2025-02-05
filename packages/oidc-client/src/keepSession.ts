@@ -39,7 +39,7 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         const sessionState = await serviceWorker.getSessionStateAsync();
         // @ts-ignore
         await oidc.startCheckSessionAsync(
-          oidcServerConfiguration.check_session_iframe,
+          oidcServerConfiguration.checkSessionIframe,
           configuration.client_id,
           sessionState,
         );
@@ -78,7 +78,7 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         const sessionState = await session.getSessionStateAsync();
         // @ts-ignore
         await oidc.startCheckSessionAsync(
-          oidcServerConfiguration.check_session_iframe,
+          oidcServerConfiguration.checkSessionIframe,
           configuration.client_id,
           sessionState,
         );
