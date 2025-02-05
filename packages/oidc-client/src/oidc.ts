@@ -256,7 +256,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
       }
 
       const serviceWorker = await initWorkerAsync(this.configuration, this.configurationName);
-      const storage = serviceWorker ? window.localStorage : null;
+      const storage = serviceWorker ? window.sessionStorage : null;
       return await fetchFromIssuer(this.getFetch())(
         authority,
         this.configuration.authority_time_cache_wellknowurl_in_second ?? 60 * 60,
