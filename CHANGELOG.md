@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.0
+## 7.25.1
+
+- [f0641a6](https://github.com/AxaFrance/oidc-client/commit/f0641a6ff21a7cf600ee5e782a3e3114b462551c) - fix(oidc): remove use of localStorage for cache (release), 2025-02-05 by *Guillaume Chervet*
+
+
+## v7.25.0
 
 - [07754f5](https://github.com/AxaFrance/oidc-client/commit/07754f5643cbe21e6e6eb248b8a6398bd0de2fd7) - fix(oidc): refresh silent signin scope=null (release) (#1503), 2025-01-24 by *Guillaume Chervet*
 - [2c08373](https://github.com/AxaFrance/oidc-client/commit/2c0837357b341eeeabbe16b40857240e7d2a596b) - feat(all): update libraries (#1494), 2025-01-12 by *Guillaume Chervet*
@@ -327,10 +332,5 @@
 ## v7.17.1
 
 - [2511648](https://github.com/AxaFrance/oidc-client/commit/251164830a9a1b976e8d6c743490795a028afa16) - refactor(oidc): remove base64.js dependency (#1292) (release), 2024-02-10 by *Guillaume Chervet*
-
-
-## v7.17.0
-
-- [a09e6fd](https://github.com/AxaFrance/oidc-client/commit/a09e6fda64aa210fe7f63d70b6c64af559012640) - feat(oidc): logout add extras parameter to avoid the page reload (release) (#1290), 2024-02-10 by *Guillaume Chervet*
 
 
