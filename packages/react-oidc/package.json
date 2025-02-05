@@ -64,7 +64,7 @@
     "typescript": "5.7.3",
     "vite": "6.0.7",
     "vite-plugin-dts": "4.5.0",
-    "vitest": "2.1.8"
+    "vitest": "2.1.9"
   },
   "license": "MIT",
   "publishConfig": {
