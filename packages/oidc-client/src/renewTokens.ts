@@ -216,7 +216,17 @@ const synchroniseTokensAsync =
         message: `wait because navigator is offline try ${numberTryOnline}`,
       });
     }
-    const nextIndex = index + 1;
+    const isDocumentHidden = document.hidden;
+    const nextIndex = isDocumentHidden ? index : index + 1;
+    if (index > 4) {
+      if(isDocumentHidden){
+        return { tokens: oidc.tokens, status: 'GIVE_UP' };
+      } else {
+        updateTokens(null);
+        oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
+        return { tokens: null, status: 'SESSION_LOST' };
+      }
+    }
     if (!extras) {
       extras = {};
     }
