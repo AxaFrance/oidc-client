@@ -99,6 +99,8 @@ export class Oidc {
   public checkSessionIFrame: CheckSessionIFrame;
   public getFetch: () => Fetch;
   public location: ILOidcLocation;
+  public tabId: string;
+  private channel: BroadcastChannel;
   constructor(
     configuration: OidcConfiguration,
     configurationName = 'default',
@@ -161,7 +163,50 @@ export class Oidc {
     this.destroyAsync.bind(this);
     this.logoutAsync.bind(this);
     this.renewTokensAsync.bind(this);
+    this.ensureUniqueTabId.bind(this);
     this.initAsync(this.configuration.authority, this.configuration.authority_configuration);
+  }
+
+  async ensureUniqueTabId() {
+    const generateUniqueTabId = () => {
+      const newTabId = globalThis.crypto.randomUUID();
+      sessionStorage.setItem(`oidc.tabId.${this.configurationName}`, newTabId);
+      this.tabId = newTabId;
+    };
+
+    if (!this.channel) {
+      this.channel = new BroadcastChannel(`oidc.broadcast-channel.${this.configurationName}`);
+      this.channel.onmessage = msg => {
+        const type = msg?.data?.type;
+        const tabId = msg?.data?.tabId;
+
+        if (tabId === this.tabId) {
+          if (type === 'SEARCH') {
+            this.channel.postMessage({ type: 'FOUND', tabId });
+          } else if (type === 'FOUND') {
+            generateUniqueTabId();
+          }
+        }
+      };
+    }
+
+    const tabId = sessionStorage.getItem(`oidc.tabId.${this.configurationName}`);
+
+    if (!tabId) {
+      generateUniqueTabId();
+      return;
+    }
+
+    this.channel.postMessage({ type: 'SEARCH', tabId });
+    await new Promise<void>(resolve =>
+      setTimeout(() => {
+        // if there is no tabId, it means that duplicate wasn't found
+        if (!this.tabId) {
+          this.tabId = tabId;
+        }
+        resolve();
+      }, 500),
+    );
   }
 
   subscribeEvents(func): string {
@@ -255,6 +300,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         });
       }
 
+      await this.ensureUniqueTabId();
       const serviceWorker = await initWorkerAsync(this.configuration, this.configurationName);
       const storage = serviceWorker ? window.sessionStorage : null;
       return await fetchFromIssuer(this.getFetch())(
@@ -314,6 +360,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     if (this.loginPromise !== null) {
       return this.loginPromise;
     }
+    await this.ensureUniqueTabId();
     if (silentLoginOnly) {
       this.loginPromise = defaultSilentLoginAsync(
         window,

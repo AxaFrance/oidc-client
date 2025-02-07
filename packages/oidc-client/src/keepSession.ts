@@ -17,6 +17,7 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
       configuration.authority,
       configuration.authority_configuration,
     );
+    await oidc.ensureUniqueTabId();
     serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
     if (serviceWorker) {
       const { tokens } = await serviceWorker.initAsync(

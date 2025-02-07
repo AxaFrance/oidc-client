@@ -114,6 +114,7 @@ export const loginCallbackAsync =
       const href = oidc.location.getCurrentHref();
       const queryParams = getParseQueryStringFromLocation(href);
       const sessionState = queryParams.session_state;
+      await oidc.ensureUniqueTabId();
       const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
       let storage;
       let nonceData;
