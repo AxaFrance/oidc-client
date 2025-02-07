@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.2
+## 7.25.3
+
+- [ca0f064](https://github.com/AxaFrance/oidc-client/commit/ca0f0645c52dd827b97912d5ee6f1836e05f56e1) - fix(oidc): lost session back (release) (#1514), 2025-02-06 by *Guillaume Chervet*
+
+
+## v7.25.2
 
 - [15900f4](https://github.com/AxaFrance/oidc-client/commit/15900f42e42539a5b12a4c23959ec95c695426d9) - fix(oidc): MonitorSession/CheckSession initializes only on one tab (release) (#1513), 2025-02-05 by *Guillaume Chervet*
 
@@ -324,13 +329,5 @@
 ## v7.17.3
 
 - [dbaf602](https://github.com/AxaFrance/oidc-client/commit/dbaf602d31e0b437285496e2711ff7cce5d8d3f7) - fix(react-oidc): typings user can be null (release), 2024-02-11 by *Guillaume Chervet*
-
-
-## v7.17.2
-
-- [c3d5c6b](https://github.com/AxaFrance/oidc-client/commit/c3d5c6b1a6a2a82450d134134513634031c1c338) - refactor(react-oidc): remove base64js dependencies (release), 2024-02-11 by *Guillaume Chervet*
-- [2a7031b](https://github.com/AxaFrance/oidc-client/commit/2a7031bfdd5a7c638940ece97778988ead73cbdc) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-02-11 by *Guillaume Chervet*
-- [3973497](https://github.com/AxaFrance/oidc-client/commit/397349749e9abb75a6910b3824786f3c688447fe) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-02-10 by *Guillaume Chervet*
-- [d20953a](https://github.com/AxaFrance/oidc-client/commit/d20953a0180bdf3b8b6dd3247a025e3b4fc389f8) - refactor(oidc): remove base64.js dependencies (alpha), 2024-02-10 by *Guillaume Chervet*
 
 
