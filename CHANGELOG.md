@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.3
+## 7.25.4
+
+- [1b2fa1d](https://github.com/AxaFrance/oidc-client/commit/1b2fa1da513b419c2c28e67a331d12670b07a94d) - refactor(oidc): update librairie (release), 2025-03-25 by *Guillaume Chervet*
+
+
+## v7.25.3
 
 - [ca0f064](https://github.com/AxaFrance/oidc-client/commit/ca0f0645c52dd827b97912d5ee6f1836e05f56e1) - fix(oidc): lost session back (release) (#1514), 2025-02-06 by *Guillaume Chervet*
 
@@ -324,10 +329,5 @@
 ## v7.17.4
 
 - [91b11af](https://github.com/AxaFrance/oidc-client/commit/91b11afa983bf4bee8def95c4ee101ede5447dc9) - fix(oidc): resfreshTokenError not triggered when silentsignin disabled (release), 2024-02-11 by *Guillaume Chervet*
-
-
-## v7.17.3
-
-- [dbaf602](https://github.com/AxaFrance/oidc-client/commit/dbaf602d31e0b437285496e2711ff7cce5d8d3f7) - fix(react-oidc): typings user can be null (release), 2024-02-11 by *Guillaume Chervet*
 
 
