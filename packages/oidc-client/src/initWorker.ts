@@ -1,4 +1,5 @@
 import { ILOidcLocation } from './location';
+import { OidcAuthorizationServiceConfiguration } from './oidc';
 import { parseOriginalTokens } from './parseTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
@@ -133,7 +134,7 @@ export const initWorkerAsync = async (
     return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
   };
   const initAsync = async (
-    oidcServerConfiguration,
+    oidcServerConfiguration: OidcAuthorizationServiceConfiguration,
     where,
     oidcConfiguration: OidcConfiguration,
   ) => {

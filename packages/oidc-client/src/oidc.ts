@@ -3,7 +3,7 @@ import { CheckSessionIFrame } from './checkSessionIFrame.js';
 import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { eventNames } from './events.js';
 import { initSession } from './initSession.js';
-import { defaultServiceWorkerUpdateRequireCallback, initWorkerAsync } from './initWorker.js';
+import { defaultServiceWorkerUpdateRequireCallback, initWorkerAsync } from './initWorker';
 import { activateServiceWorker } from './initWorkerOption';
 import {
   defaultDemonstratingProofOfPossessionConfiguration,
@@ -37,16 +37,26 @@ export interface OidcAuthorizationServiceConfigurationJson {
   issuer: string;
 }
 
-export class OidcAuthorizationServiceConfiguration {
-  private checkSessionIframe: string;
-  private issuer: string;
-  private authorizationEndpoint: string;
-  private tokenEndpoint: string;
-  private revocationEndpoint: string;
-  private userInfoEndpoint: string;
-  private endSessionEndpoint: string;
+export type OidcAuthorizationServiceConfigurationResponse = {
+  authorization_endpoint: string;
+  end_session_endpoint: string;
+  revocation_endpoint: string;
+  token_endpoint: string;
+  userinfo_endpoint: string;
+  check_session_iframe: string;
+  issuer: string;
+};
 
-  constructor(request: any) {
+export class OidcAuthorizationServiceConfiguration {
+  public checkSessionIframe: string;
+  public issuer: string;
+  public authorizationEndpoint: string;
+  public tokenEndpoint: string;
+  public revocationEndpoint: string;
+  public userInfoEndpoint: string;
+  public endSessionEndpoint: string;
+
+  constructor(request: OidcAuthorizationServiceConfigurationResponse) {
     this.authorizationEndpoint = request.authorization_endpoint;
     this.tokenEndpoint = request.token_endpoint;
     this.revocationEndpoint = request.revocation_endpoint;
@@ -237,8 +247,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
   }
 
-  initPromise = null;
-  async initAsync(authority: string, authorityConfiguration: AuthorityConfiguration) {
+  initPromise: null | Promise<OidcAuthorizationServiceConfiguration> = null;
+  async initAsync(
+    authority: string,
+    authorityConfiguration?: AuthorityConfiguration,
+  ): Promise<OidcAuthorizationServiceConfiguration> {
     if (this.initPromise !== null) {
       return this.initPromise;
     }
