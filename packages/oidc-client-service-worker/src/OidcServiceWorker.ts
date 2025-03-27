@@ -196,10 +196,7 @@ const handleFetch = async (event: FetchEvent) => {
   }
 
   let currentDatabase: OidcConfig | null = null;
-  console.log("datadase", database)
   const currentDatabases = getCurrentDatabasesTokenEndpoint(database, url);
-  console.log("url: "+url);
-  console.log("currentDatabases=",currentDatabases);
   const numberDatabase = currentDatabases.length;
   if (numberDatabase > 0) {
     const responsePromise = new Promise<Response>((resolve, reject) => {
@@ -265,8 +262,7 @@ const handleFetch = async (event: FetchEvent) => {
               return new Response(text, response);
             });
           }
-          console.log("ICIC hideTokens(currentDatabase as OidcConfig),")
-          console.log(currentDatabase)
+
           return fetchPromise.then(
             hideTokens(currentDatabase as OidcConfig),
           );
@@ -347,8 +343,6 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       : trustedDomain.allowMultiTabLogin;
   const tabId = allowMultiTabLogin ? data.tabId : 'default';
   const configurationNameWithTabId = `${configurationName}#tabId=${tabId}`;
-  console.log(configurationNameWithTabId);
-  console.log(data);
   let currentDatabase = database[configurationNameWithTabId];
   if (!currentDatabase) {
     

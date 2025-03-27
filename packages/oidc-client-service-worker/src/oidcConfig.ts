@@ -7,7 +7,6 @@ const getMatchingOidcConfigurations = (database: Database, url: string): OidcCon
     const { tokenEndpoint, revocationEndpoint } = oidcServerConfiguration || {};
 
     const normalizedUrl = normalizeUrl(url);
-    console.log('normalizedUrl', normalizedUrl);
     return (
       (tokenEndpoint && normalizedUrl.startsWith(normalizeUrl(tokenEndpoint))) ||
       (revocationEndpoint && normalizedUrl.startsWith(normalizeUrl(revocationEndpoint)))

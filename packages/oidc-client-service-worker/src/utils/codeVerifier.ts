@@ -6,10 +6,7 @@ export function replaceCodeVerifier(codeVerifier: string, newCodeVerifier: strin
 export const extractConfigurationNameFromCodeVerifier = (chaine: string): string => {
   const regex = /[?&]code_verifier=CODE_VERIFIER_SECURED_BY_OIDC_SERVICE_WORKER_([^&]+)/;
   const match = chaine.match(regex);
-  console.log("match:" + match);
-  console.log("chaine:" + chaine);
-  
-  
+
   if (match && match.length > 0) {
     return decodeURIComponent(match[1]);
   } else {

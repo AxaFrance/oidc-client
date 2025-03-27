@@ -32,10 +32,7 @@ export const getDomains = (
   if (Array.isArray(trustedDomain)) {
     return trustedDomain;
   }
-
-  console.log("trustedDomain");
-  console.log(trustedDomain);
-  console.log(`${type}Domains`)
+  
   return trustedDomain[`${type}Domains`] ?? trustedDomain.domains ?? [];
 };
 

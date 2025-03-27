@@ -96,7 +96,7 @@ describe('tokens', () => {
     it.each([
       {
         hideAccessToken: true,
-        expectedAccessToken: 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_test#tabId=tab1',
+        expectedAccessToken: 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_test',
         issued_at: '0',
         expires_in: '2',
       },
