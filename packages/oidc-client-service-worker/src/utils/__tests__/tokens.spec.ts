@@ -96,7 +96,7 @@ describe('tokens', () => {
     it.each([
       {
         hideAccessToken: true,
-        expectedAccessToken: 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_test_tab1',
+        expectedAccessToken: 'ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_test#tabId=tab1',
         issued_at: '0',
         expires_in: '2',
       },
@@ -125,7 +125,7 @@ describe('tokens', () => {
           .withTestingDefault()
           .withHideAccessToken(hideAccessToken)
           .build();
-        const secureTokens = _hideTokens(token, oidcConfiguration, 'test', 'tab1');
+        const secureTokens = _hideTokens(token, oidcConfiguration, 'test');
         expect(secureTokens.access_token).toBe(expectedAccessToken);
         expect(typeof secureTokens.expiresAt).toBe('number');
       },
@@ -162,7 +162,7 @@ describe('tokens', () => {
             .build(),
         )
         .build();
-      _hideTokens(token, oidcConfiguration, 'test', 'tab1');
+      _hideTokens(token, oidcConfiguration, 'test');
       expect(token.id_token).toBe('old_id_token');
     });
   });

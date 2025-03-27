@@ -111,11 +111,10 @@ class OidcConfigBuilder {
   private oidcConfig: OidcConfig = {
     configurationName: '',
     tokens: null,
-    tabIds: [],
     status: 'NOT_CONNECTED',
-    state: { tab1: '' },
-    codeVerifier: { tab1: '' },
-    nonce: { tab1: null },
+    state: null,
+    codeVerifier: null,
+    nonce: null,
     oidcServerConfiguration: null,
     oidcConfiguration: undefined,
     sessionState: null,
@@ -134,9 +133,9 @@ class OidcConfigBuilder {
     this.oidcConfig.configurationName = 'test';
     this.oidcConfig.tokens = new TokenBuilder().withNonExpiredToken().build();
     this.oidcConfig.status = 'NOT_CONNECTED';
-    this.oidcConfig.state = { tab1: 'state' };
-    this.oidcConfig.codeVerifier = { tab1: 'codeVerifier' };
-    this.oidcConfig.nonce = { tab1: null };
+    this.oidcConfig.state = 'state';
+    this.oidcConfig.codeVerifier = 'codeVerifier';
+    this.oidcConfig.nonce = null;
     this.oidcConfig.oidcConfiguration = new OidcConfigurationBuilder().build();
     this.oidcConfig.oidcServerConfiguration = new OidcServerConfigBuilder()
       .withTestingDefault()
@@ -168,17 +167,17 @@ class OidcConfigBuilder {
   }
 
   public withState(state: string): OidcConfigBuilder {
-    this.oidcConfig.state = { tab1: state };
+    this.oidcConfig.state = state;
     return this;
   }
 
   public withCodeVerifier(codeVerifier: string): OidcConfigBuilder {
-    this.oidcConfig.codeVerifier = { tab1: codeVerifier };
+    this.oidcConfig.codeVerifier = codeVerifier;
     return this;
   }
 
   public withNonce(nonce: Nonce): OidcConfigBuilder {
-    this.oidcConfig.nonce = { tab1: nonce };
+    this.oidcConfig.nonce = nonce;
     return this;
   }
 

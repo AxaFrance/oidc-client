@@ -124,7 +124,6 @@ function _hideTokens(
   tokens: Tokens,
   currentDatabaseElement: OidcConfig,
   configurationName: string,
-  currentTabId: string,
 ) {
   if (!tokens.issued_at) {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
@@ -139,7 +138,7 @@ function _hideTokens(
     accessTokenPayload,
   };
   if (currentDatabaseElement.hideAccessToken) {
-    secureTokens.access_token = TOKEN.ACCESS_TOKEN + '_' + configurationName + '_' + currentTabId;
+    secureTokens.access_token = `${TOKEN.ACCESS_TOKEN}_${configurationName}`;
   }
   tokens.accessTokenPayload = accessTokenPayload;
 
@@ -159,13 +158,13 @@ function _hideTokens(
     tokens.idTokenPayload = _idTokenPayload != null ? { ..._idTokenPayload } : null;
     if (_idTokenPayload && _idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
       const keyNonce =
-        TOKEN.NONCE_TOKEN + '_' + currentDatabaseElement.configurationName + '_' + currentTabId;
+        `${TOKEN.NONCE_TOKEN}_${currentDatabaseElement.configurationName}`;
       _idTokenPayload.nonce = keyNonce;
     }
     secureTokens.idTokenPayload = _idTokenPayload;
   }
   if (tokens.refresh_token) {
-    secureTokens.refresh_token = TOKEN.REFRESH_TOKEN + '_' + configurationName + '_' + currentTabId;
+    secureTokens.refresh_token = `${TOKEN.REFRESH_TOKEN}_${configurationName}`;
   }
 
   tokens.issued_at = extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload);
@@ -193,8 +192,8 @@ function _hideTokens(
   secureTokens.expiresAt = expiresAt;
 
   tokens.expiresAt = expiresAt;
-  const nonce = currentDatabaseElement.nonce[currentTabId]
-    ? currentDatabaseElement.nonce[currentTabId]?.nonce
+  const nonce = currentDatabaseElement.nonce
+    ? currentDatabaseElement.nonce.nonce
     : null;
   const { isValid, reason } = isTokensOidcValid(
     tokens,
@@ -205,7 +204,7 @@ function _hideTokens(
     throw Error(`Tokens are not OpenID valid, reason: ${reason}`);
   }
 
-  // When refresh_token is not rotated we reuse ald refresh_token
+  // When refresh_token is not rotated we reuse old refresh_token
   if (oldTokens != null && 'refresh_token' in oldTokens && !('refresh_token' in tokens)) {
     const refreshToken = oldTokens.refresh_token;
 
@@ -222,7 +221,7 @@ function _hideTokens(
 }
 
 const demonstratingProofOfPossessionNonceResponseHeader = 'DPoP-Nonce';
-function hideTokens(currentDatabaseElement: OidcConfig, currentTabId: string) {
+function hideTokens(currentDatabaseElement: OidcConfig) {
   const configurationName = currentDatabaseElement.configurationName;
   return (response: Response) => {
     if (response.status !== 200) {
@@ -241,7 +240,6 @@ function hideTokens(currentDatabaseElement: OidcConfig, currentTabId: string) {
         tokens,
         currentDatabaseElement,
         configurationName,
-        currentTabId,
       );
       const body = JSON.stringify(secureTokens);
       return new Response(body, {
