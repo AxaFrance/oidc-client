@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.4
+## 7.25.5
+
+- [d7567ba](https://github.com/AxaFrance/oidc-client/commit/d7567ba28c0dfe9b248be52ecfac4df6f98b397b) - feature(oidc-service-worker): multi tab auth (#1528) (release), 2025-03-27 by *Guillaume Chervet*
+
+
+## v7.25.4
 
 - [1b2fa1d](https://github.com/AxaFrance/oidc-client/commit/1b2fa1da513b419c2c28e67a331d12670b07a94d) - refactor(oidc): update librairie (release), 2025-03-25 by *Guillaume Chervet*
 
@@ -324,10 +329,5 @@
 ## v7.18.0
 
 - [5e35346](https://github.com/AxaFrance/oidc-client/commit/5e35346bfa477b560f5bde1afb2125a2c5f6e9c4) - feat(oidc): add extras to revoke access_token and refresh_tokens (#1295) (release), 2024-02-13 by *Guillaume Chervet*
-
-
-## v7.17.4
-
-- [91b11af](https://github.com/AxaFrance/oidc-client/commit/91b11afa983bf4bee8def95c4ee101ede5447dc9) - fix(oidc): resfreshTokenError not triggered when silentsignin disabled (release), 2024-02-11 by *Guillaume Chervet*
 
 
