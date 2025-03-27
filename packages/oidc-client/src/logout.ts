@@ -44,6 +44,7 @@ export const destroyAsync = oidc => async status => {
   if (oidc.checkSessionIFrame) {
     oidc.checkSessionIFrame.stop();
   }
+  await oidc.ensureUniqueTabId();
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if (!serviceWorker) {
     const session = initSession(oidc.configurationName, oidc.configuration.storage);
