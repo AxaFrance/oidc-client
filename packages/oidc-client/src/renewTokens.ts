@@ -219,7 +219,7 @@ const synchroniseTokensAsync =
     const isDocumentHidden = document.hidden;
     const nextIndex = isDocumentHidden ? index : index + 1;
     if (index > 4) {
-      if(isDocumentHidden){
+      if (isDocumentHidden) {
         return { tokens: oidc.tokens, status: 'GIVE_UP' };
       } else {
         updateTokens(null);

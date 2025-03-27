@@ -1,15 +1,15 @@
 export function replaceCodeVerifier(codeVerifier: string, newCodeVerifier: string): string {
-  const regex = /code_verifier=[A-Za-z0-9_-]+/i;
-  return codeVerifier.replace(regex, `code_verifier=${newCodeVerifier}`);
+  const regex = /[?&]code_verifier=([^&]+)/i;
+  return codeVerifier.replace(regex, `&code_verifier=${newCodeVerifier}`);
 }
 
-export const extractConfigurationNameFromCodeVerifier = (chaine: string): string[] | null => {
-  const regex = /CODE_VERIFIER_SECURED_BY_OIDC_SERVICE_WORKER_([^&\s]+)_([^&\s]+)/;
-  const result = chaine.match(regex);
+export const extractConfigurationNameFromCodeVerifier = (chaine: string): string => {
+  const regex = /[?&]code_verifier=CODE_VERIFIER_SECURED_BY_OIDC_SERVICE_WORKER_([^&]+)/;
+  const match = chaine.match(regex);
 
-  if (result && result.length > 2) {
-    return [result[1], result[2]];
+  if (match && match.length > 0) {
+    return decodeURIComponent(match[1]);
   } else {
-    return null;
+    return '';
   }
 };

@@ -101,12 +101,11 @@ export type Nonce = {
 export type OidcConfig = {
   demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration | null;
   configurationName: string;
-  tabIds: string[];
   tokens: Tokens | null;
   status: Status;
-  state: Record<string, string | null>;
-  codeVerifier: Record<string, string | null>;
-  nonce: Record<string, Nonce>;
+  state: string | null;
+  codeVerifier: string | null;
+  nonce: Nonce;
   oidcServerConfiguration: OidcServerConfiguration | null;
   oidcConfiguration?: OidcConfiguration;
   sessionState?: string | null;

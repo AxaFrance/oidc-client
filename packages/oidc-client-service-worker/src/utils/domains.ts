@@ -63,7 +63,7 @@ export const getCurrentDatabaseDomain = (
     ) {
       continue;
     }
-    const trustedDomain = trustedDomains == null ? [] : trustedDomains[key];
+    const trustedDomain = trustedDomains == null ? [] : trustedDomains[key.split('#')[0]];
 
     const domains = getDomains(trustedDomain, 'accessToken');
     const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint
