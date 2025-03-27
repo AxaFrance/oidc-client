@@ -214,28 +214,29 @@ const handleFetch = async (event: FetchEvent) => {
               };
               headers = await generateDpopAsync(originalRequest, currentDb, url, claimsExtras);
 
-                const keyRefreshToken =
-                    encodeURIComponent(`${TOKEN.REFRESH_TOKEN}_${currentDb.configurationName}`);
-                if (actualBody.includes(keyRefreshToken)) {
-                  newBody = newBody.replace(
-                    keyRefreshToken,
-                    encodeURIComponent(currentDb.tokens.refresh_token as string),
-                  );
-                  currentDatabase = currentDb;
-                  break;
-                }
+              const keyRefreshToken = encodeURIComponent(
+                `${TOKEN.REFRESH_TOKEN}_${currentDb.configurationName}`,
+              );
+              if (actualBody.includes(keyRefreshToken)) {
+                newBody = newBody.replace(
+                  keyRefreshToken,
+                  encodeURIComponent(currentDb.tokens.refresh_token as string),
+                );
+                currentDatabase = currentDb;
+                break;
+              }
 
-                const keyAccessToken =
-                    encodeURIComponent(`${TOKEN.ACCESS_TOKEN}_${currentDb.configurationName}`);
-                if (actualBody.includes(keyAccessToken)) {
-                  newBody = newBody.replace(
-                    keyAccessToken,
-                    encodeURIComponent(currentDb.tokens.access_token),
-                  );
-                  currentDatabase = currentDb;
-                  break;
-                }
-                
+              const keyAccessToken = encodeURIComponent(
+                `${TOKEN.ACCESS_TOKEN}_${currentDb.configurationName}`,
+              );
+              if (actualBody.includes(keyAccessToken)) {
+                newBody = newBody.replace(
+                  keyAccessToken,
+                  encodeURIComponent(currentDb.tokens.access_token),
+                );
+                currentDatabase = currentDb;
+                break;
+              }
             }
           }
 
@@ -263,14 +264,13 @@ const handleFetch = async (event: FetchEvent) => {
             });
           }
 
-          return fetchPromise.then(
-            hideTokens(currentDatabase as OidcConfig),
-          );
+          return fetchPromise.then(hideTokens(currentDatabase as OidcConfig));
         } else if (
           actualBody.includes('code_verifier=') &&
           extractConfigurationNameFromCodeVerifier(actualBody) != null
         ) {
-          const currentLoginCallbackConfigurationName = extractConfigurationNameFromCodeVerifier(actualBody);
+          const currentLoginCallbackConfigurationName =
+            extractConfigurationNameFromCodeVerifier(actualBody);
           currentDatabase = database[currentLoginCallbackConfigurationName];
           let newBody = actualBody;
           const codeVerifier = currentDatabase.codeVerifier;
@@ -332,20 +332,19 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
     _self.clients.claim().then(() => port.postMessage({}));
     return;
   }
-  const configurationName = data.configurationName.split("#")[0];
+  const configurationName = data.configurationName.split('#')[0];
 
   if (trustedDomains == null) {
     trustedDomains = {};
   }
   const trustedDomain = trustedDomains[configurationName];
   const allowMultiTabLogin = Array.isArray(trustedDomain)
-      ? false
-      : trustedDomain.allowMultiTabLogin;
+    ? false
+    : trustedDomain.allowMultiTabLogin;
   const tabId = allowMultiTabLogin ? data.tabId : 'default';
   const configurationNameWithTabId = `${configurationName}#tabId=${tabId}`;
   let currentDatabase = database[configurationNameWithTabId];
   if (!currentDatabase) {
-    
     const showAccessToken = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
     const doNotSetAccessTokenToNavigateRequests = Array.isArray(trustedDomain)
       ? true
@@ -353,7 +352,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
     const convertAllRequestsToCorsExceptNavigate = Array.isArray(trustedDomain)
       ? false
       : trustedDomain.convertAllRequestsToCorsExceptNavigate;
-    
+
     database[configurationNameWithTabId] = {
       tokens: null,
       state: null,
@@ -362,7 +361,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       oidcConfiguration: undefined,
       nonce: null,
       status: null,
-      configurationName : configurationNameWithTabId,
+      configurationName: configurationNameWithTabId,
       hideAccessToken: !showAccessToken,
       setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests ?? true,
       convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate ?? false,
@@ -373,7 +372,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       allowMultiTabLogin: allowMultiTabLogin ?? false,
     };
     currentDatabase = database[configurationNameWithTabId];
-    
+
     if (!trustedDomains[configurationName]) {
       trustedDomains[configurationName] = [];
     }

@@ -157,8 +157,7 @@ function _hideTokens(
     _idTokenPayload = extractTokenPayload(id_token);
     tokens.idTokenPayload = _idTokenPayload != null ? { ..._idTokenPayload } : null;
     if (_idTokenPayload && _idTokenPayload.nonce && currentDatabaseElement.nonce != null) {
-      const keyNonce =
-        `${TOKEN.NONCE_TOKEN}_${currentDatabaseElement.configurationName}`;
+      const keyNonce = `${TOKEN.NONCE_TOKEN}_${currentDatabaseElement.configurationName}`;
       _idTokenPayload.nonce = keyNonce;
     }
     secureTokens.idTokenPayload = _idTokenPayload;
@@ -192,9 +191,7 @@ function _hideTokens(
   secureTokens.expiresAt = expiresAt;
 
   tokens.expiresAt = expiresAt;
-  const nonce = currentDatabaseElement.nonce
-    ? currentDatabaseElement.nonce.nonce
-    : null;
+  const nonce = currentDatabaseElement.nonce ? currentDatabaseElement.nonce.nonce : null;
   const { isValid, reason } = isTokensOidcValid(
     tokens,
     nonce as string,
@@ -236,11 +233,7 @@ function hideTokens(currentDatabaseElement: OidcConfig) {
     }
 
     return response.json().then<Response>((tokens: Tokens) => {
-      const secureTokens = _hideTokens(
-        tokens,
-        currentDatabaseElement,
-        configurationName,
-      );
+      const secureTokens = _hideTokens(tokens, currentDatabaseElement, configurationName);
       const body = JSON.stringify(secureTokens);
       return new Response(body, {
         status: response.status,

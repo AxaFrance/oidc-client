@@ -32,7 +32,7 @@ export const getDomains = (
   if (Array.isArray(trustedDomain)) {
     return trustedDomain;
   }
-  
+
   return trustedDomain[`${type}Domains`] ?? trustedDomain.domains ?? [];
 };
 
@@ -63,7 +63,7 @@ export const getCurrentDatabaseDomain = (
     ) {
       continue;
     }
-    const trustedDomain = trustedDomains == null ? [] : trustedDomains[key.split("#")[0]];
+    const trustedDomain = trustedDomains == null ? [] : trustedDomains[key.split('#')[0]];
 
     const domains = getDomains(trustedDomain, 'accessToken');
     const domainsToSendTokens = oidcServerConfiguration.userInfoEndpoint

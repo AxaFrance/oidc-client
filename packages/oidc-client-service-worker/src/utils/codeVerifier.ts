@@ -10,6 +10,6 @@ export const extractConfigurationNameFromCodeVerifier = (chaine: string): string
   if (match && match.length > 0) {
     return decodeURIComponent(match[1]);
   } else {
-    return "";
+    return '';
   }
 };
