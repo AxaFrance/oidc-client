@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.5
+## 7.25.6
+
+- [2cb8cde](https://github.com/AxaFrance/oidc-client/commit/2cb8cdeafdb39fadc19beb878808a5d2291cd6fa) - fix(oidc): multi-tab dpop not working with (#1531) (release), 2025-03-28 by *Guillaume Chervet*
+
+
+## v7.25.5
 
 - [d7567ba](https://github.com/AxaFrance/oidc-client/commit/d7567ba28c0dfe9b248be52ecfac4df6f98b397b) - feature(oidc-service-worker): multi tab auth (#1528) (release), 2025-03-27 by *Guillaume Chervet*
 
@@ -324,10 +329,5 @@
 ## v7.18.1
 
 - [0d13cc2](https://github.com/AxaFrance/oidc-client/commit/0d13cc28a8cc40c610d3943d33fe8a7d4e28c32f) - fix(oidc): unload user on logout (#1296) (release), 2024-02-13 by *Guillaume Chervet*
-
-
-## v7.18.0
-
-- [5e35346](https://github.com/AxaFrance/oidc-client/commit/5e35346bfa477b560f5bde1afb2125a2c5f6e9c4) - feat(oidc): add extras to revoke access_token and refresh_tokens (#1295) (release), 2024-02-13 by *Guillaume Chervet*
 
 
