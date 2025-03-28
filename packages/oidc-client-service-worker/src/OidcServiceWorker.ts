@@ -112,10 +112,23 @@ const handleFetch = async (event: FetchEvent) => {
     return;
   }
 
-  const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(
+  const currentDatabasesForRequestAccessToken = getCurrentDatabaseDomain(
     database,
     url,
     trustedDomains,
+  );
+  const authorization = originalRequest.headers.get('authorization');
+  let authenticationMode = 'Bearer';
+  let key = 'default';
+  if (authorization) {
+    const split = authorization.split(' ');
+    authenticationMode = split[0];
+    if (split[1].includes('#')) {
+      key = split[1].split('#')[1];
+    }
+  }
+  const currentDatabaseForRequestAccessToken = currentDatabasesForRequestAccessToken?.find(c =>
+    c.configurationName.endsWith(key),
   );
   if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
     while (
@@ -142,15 +155,10 @@ const handleFetch = async (event: FetchEvent) => {
         ...serializeHeaders(originalRequest.headers),
       };
     } else {
-      const authorization = originalRequest.headers.get('authorization');
-      let authenticationMode = 'Bearer';
-      if (authorization) {
-        authenticationMode = authorization.split(' ')[0];
-      }
-
       if (
         authenticationMode.toLowerCase() == 'dpop' ||
-          (!currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent && currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionConfiguration)
+        (!currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent &&
+          currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionConfiguration)
       ) {
         const claimsExtras = {
           ath: await base64urlOfHashOfASCIIEncodingAsync(
@@ -170,8 +178,7 @@ const handleFetch = async (event: FetchEvent) => {
       } else {
         headers = {
           ...serializeHeaders(originalRequest.headers),
-          authorization:
-            `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
+          authorization: `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
         };
       }
     }
