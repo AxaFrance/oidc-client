@@ -123,8 +123,8 @@ const handleFetch = async (event: FetchEvent) => {
   if (authorization) {
     const split = authorization.split(' ');
     authenticationMode = split[0];
-    if (split[1].includes('#')) {
-      key = split[1].split('#')[1];
+    if (split[1].includes('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')) {
+      key = split[1].split('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')[1];
     }
   }
   const currentDatabaseForRequestAccessToken = currentDatabasesForRequestAccessToken?.find(c =>
