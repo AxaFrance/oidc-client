@@ -95,6 +95,7 @@ async function generateDpopAsync(
       url,
       extrasClaims,
     );
+    
     headersExtras['dpop'] = dpop;
     if (currentDatabase.demonstratingProofOfPossessionNonce != null) {
       headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
@@ -147,7 +148,7 @@ const handleFetch = async (event: FetchEvent) => {
         authenticationMode = authorization.split(' ')[0];
       }
 
-      if (authenticationMode.toLowerCase() == 'dpop') {
+      if (authenticationMode.toLowerCase() == 'dpop' || !currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent) {
         const claimsExtras = {
           ath: await base64urlOfHashOfASCIIEncodingAsync(
             currentDatabaseForRequestAccessToken.tokens.access_token,
@@ -161,8 +162,7 @@ const handleFetch = async (event: FetchEvent) => {
         );
         headers = {
           ...dpopHeaders,
-          authorization:
-            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+          authorization: 'DPoP ' + currentDatabaseForRequestAccessToken.tokens.access_token,
         };
       } else {
         headers = {

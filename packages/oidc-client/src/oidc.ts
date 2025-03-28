@@ -3,7 +3,7 @@ import { CheckSessionIFrame } from './checkSessionIFrame.js';
 import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { eventNames } from './events.js';
 import { initSession } from './initSession.js';
-import { defaultServiceWorkerUpdateRequireCallback, initWorkerAsync } from './initWorker.js';
+import {defaultServiceWorkerUpdateRequireCallback, getTabId, initWorkerAsync} from './initWorker.js';
 import { activateServiceWorker } from './initWorkerOption';
 import {
   defaultDemonstratingProofOfPossessionConfiguration,
@@ -387,7 +387,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     const serviceWorker = await initWorkerAsync(configuration, this.configurationName);
 
     if (serviceWorker) {
-      return `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${this.configurationName}`;
+      return `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${this.configurationName}#tabId=${getTabId(this.configurationName)}`;
     }
 
     const session = initSession(this.configurationName, configuration.storage);
