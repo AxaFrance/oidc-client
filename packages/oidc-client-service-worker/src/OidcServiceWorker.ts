@@ -150,7 +150,7 @@ const handleFetch = async (event: FetchEvent) => {
 
       if (
         authenticationMode.toLowerCase() == 'dpop' ||
-        !currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent
+          (!currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent && currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionConfiguration)
       ) {
         const claimsExtras = {
           ath: await base64urlOfHashOfASCIIEncodingAsync(
@@ -165,13 +165,13 @@ const handleFetch = async (event: FetchEvent) => {
         );
         headers = {
           ...dpopHeaders,
-          authorization: 'DPoP ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+          authorization: `DPoP ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
         };
       } else {
         headers = {
           ...serializeHeaders(originalRequest.headers),
           authorization:
-            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+            `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
         };
       }
     }
