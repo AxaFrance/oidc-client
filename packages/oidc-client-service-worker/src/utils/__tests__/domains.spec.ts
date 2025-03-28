@@ -74,7 +74,7 @@ describe('domains', () => {
         default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
       };
       const url = 'https://demo.duendesoftware.com/connect/token';
-      expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toBeNull();
+      expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toStrictEqual([]);
     });
 
     it('will return null when url is the token endpoint oidc config token endpoint has a default port', () => {
@@ -85,7 +85,7 @@ describe('domains', () => {
         'https://demo.duendesoftware.com:443/connect/token';
 
       const url = 'https://demo.duendesoftware.com/connect/token';
-      expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toBeNull();
+      expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toStrictEqual([]);
     });
 
     it('will return null when url is the revocation endpoint', () => {
@@ -93,7 +93,7 @@ describe('domains', () => {
         default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
       };
       const url = 'https://demo.duendesoftware.com/connect/revocation';
-      expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toBeNull();
+      expect(getCurrentDatabaseDomain(db, url, trustedDomains)).toStrictEqual([]);
     });
 
     it('will not return null when url is the userinfo endpoint', () => {
@@ -120,7 +120,9 @@ describe('domains', () => {
         },
       };
 
-      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toBe(db.default);
+      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toStrictEqual([
+        db.default,
+      ]);
     });
 
     it('will test urls against accessTokenDomains list if it is present and ignore domains list', () => {
@@ -132,8 +134,10 @@ describe('domains', () => {
         },
       };
 
-      expect(getCurrentDatabaseDomain(db, 'https://myapi/test', trustedDomains)).toBe(db.default);
-      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toBeNull();
+      expect(getCurrentDatabaseDomain(db, 'https://myapi/test', trustedDomains)).toStrictEqual([
+        db.default,
+      ]);
+      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toStrictEqual([]);
     });
   });
 });

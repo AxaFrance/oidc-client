@@ -44,6 +44,7 @@ export const getCurrentDatabaseDomain = (
   if (url.endsWith(openidWellknownUrlEndWith)) {
     return null;
   }
+  const datatases = [];
   for (const [key, currentDatabase] of Object.entries<OidcConfig>(database)) {
     const oidcServerConfiguration = currentDatabase.oidcServerConfiguration;
 
@@ -89,11 +90,10 @@ export const getCurrentDatabaseDomain = (
     }
 
     if (hasToSendToken) {
-      if (!currentDatabase.tokens) {
-        return null;
+      if (currentDatabase.tokens) {
+        datatases.push(currentDatabase);
       }
-      return currentDatabase;
     }
   }
-  return null;
+  return datatases;
 };

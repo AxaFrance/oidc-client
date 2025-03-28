@@ -34,7 +34,7 @@ trustedDomains.config_with_dpop = {
   domains: ['https://demo.duendesoftware.com'],
   demonstratingProofOfPossession: true,
   demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
-  allowMultiTabLogin: false,
+  allowMultiTabLogin: true,
 };
 
 trustedDomains.config_multi_tab_login = {

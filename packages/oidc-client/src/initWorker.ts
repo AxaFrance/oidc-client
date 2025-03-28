@@ -57,7 +57,7 @@ export const defaultServiceWorkerUpdateRequireCallback =
     location.reload();
   };
 
-const getTabId = (configurationName: string) => {
+export const getTabId = (configurationName: string) => {
   const tabId = sessionStorage.getItem(`oidc.tabId.${configurationName}`);
 
   if (tabId) {

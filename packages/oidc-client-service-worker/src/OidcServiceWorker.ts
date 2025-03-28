@@ -95,6 +95,7 @@ async function generateDpopAsync(
       url,
       extrasClaims,
     );
+
     headersExtras['dpop'] = dpop;
     if (currentDatabase.demonstratingProofOfPossessionNonce != null) {
       headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
@@ -111,10 +112,23 @@ const handleFetch = async (event: FetchEvent) => {
     return;
   }
 
-  const currentDatabaseForRequestAccessToken = getCurrentDatabaseDomain(
+  const currentDatabasesForRequestAccessToken = getCurrentDatabaseDomain(
     database,
     url,
     trustedDomains,
+  );
+  const authorization = originalRequest.headers.get('authorization');
+  let authenticationMode = 'Bearer';
+  let key = 'default';
+  if (authorization) {
+    const split = authorization.split(' ');
+    authenticationMode = split[0];
+    if (split[1].includes('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')) {
+      key = split[1].split('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')[1];
+    }
+  }
+  const currentDatabaseForRequestAccessToken = currentDatabasesForRequestAccessToken?.find(c =>
+    c.configurationName.endsWith(key),
   );
   if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
     while (
@@ -141,13 +155,11 @@ const handleFetch = async (event: FetchEvent) => {
         ...serializeHeaders(originalRequest.headers),
       };
     } else {
-      const authorization = originalRequest.headers.get('authorization');
-      let authenticationMode = 'Bearer';
-      if (authorization) {
-        authenticationMode = authorization.split(' ')[0];
-      }
-
-      if (authenticationMode.toLowerCase() == 'dpop') {
+      if (
+        authenticationMode.toLowerCase() == 'dpop' ||
+        (!currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent &&
+          currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionConfiguration)
+      ) {
         const claimsExtras = {
           ath: await base64urlOfHashOfASCIIEncodingAsync(
             currentDatabaseForRequestAccessToken.tokens.access_token,
@@ -161,14 +173,12 @@ const handleFetch = async (event: FetchEvent) => {
         );
         headers = {
           ...dpopHeaders,
-          authorization:
-            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+          authorization: `DPoP ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
         };
       } else {
         headers = {
           ...serializeHeaders(originalRequest.headers),
-          authorization:
-            authenticationMode + ' ' + currentDatabaseForRequestAccessToken.tokens.access_token,
+          authorization: `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
         };
       }
     }
