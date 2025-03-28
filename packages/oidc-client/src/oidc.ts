@@ -3,7 +3,11 @@ import { CheckSessionIFrame } from './checkSessionIFrame.js';
 import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { eventNames } from './events.js';
 import { initSession } from './initSession.js';
-import {defaultServiceWorkerUpdateRequireCallback, getTabId, initWorkerAsync} from './initWorker.js';
+import {
+  defaultServiceWorkerUpdateRequireCallback,
+  getTabId,
+  initWorkerAsync,
+} from './initWorker.js';
 import { activateServiceWorker } from './initWorkerOption';
 import {
   defaultDemonstratingProofOfPossessionConfiguration,
