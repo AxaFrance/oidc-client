@@ -120,7 +120,9 @@ describe('domains', () => {
         },
       };
 
-      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toStrictEqual([db.default]);
+      expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toStrictEqual([
+        db.default,
+      ]);
     });
 
     it('will test urls against accessTokenDomains list if it is present and ignore domains list', () => {
@@ -132,7 +134,9 @@ describe('domains', () => {
         },
       };
 
-      expect(getCurrentDatabaseDomain(db, 'https://myapi/test', trustedDomains)).toStrictEqual([db.default]);
+      expect(getCurrentDatabaseDomain(db, 'https://myapi/test', trustedDomains)).toStrictEqual([
+        db.default,
+      ]);
       expect(getCurrentDatabaseDomain(db, 'https://domain/test', trustedDomains)).toStrictEqual([]);
     });
   });
