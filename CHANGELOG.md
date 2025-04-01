@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.6
+## 7.25.7
+
+- [930ad03](https://github.com/AxaFrance/oidc-client/commit/930ad0367cfcaa5bd15726c17501d70b0768ce5e) - fix(oidc-service-worker): fetch already consume (release) (#1534), 2025-04-01 by *Guillaume Chervet*
+
+
+## v7.25.6
 
 - [2cb8cde](https://github.com/AxaFrance/oidc-client/commit/2cb8cdeafdb39fadc19beb878808a5d2291cd6fa) - fix(oidc): multi-tab dpop not working with (#1531) (release), 2025-03-28 by *Guillaume Chervet*
 
@@ -324,10 +329,5 @@
 ## v7.18.2
 
 - [77329ce](https://github.com/AxaFrance/oidc-client/commit/77329ce52a5fc7278ff35ccd13ca572ff7ebbf4d) - fix(oidc-service-worker): bad request on many token request at the same time (#1300) (release), 2024-02-15 by *Guillaume Chervet*
-
-
-## v7.18.1
-
-- [0d13cc2](https://github.com/AxaFrance/oidc-client/commit/0d13cc28a8cc40c610d3943d33fe8a7d4e28c32f) - fix(oidc): unload user on logout (#1296) (release), 2024-02-13 by *Guillaume Chervet*
 
 
