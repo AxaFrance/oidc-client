@@ -21,11 +21,11 @@ import {
 import version from './version';
 
 // @ts-ignore
-if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == 'function') {
+if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy === 'function') {
   // @ts-ignore
   trustedTypes.createPolicy('default', {
     createScriptURL: function (url: string) {
-      if (url == scriptFilename) {
+      if (url === scriptFilename) {
         return url;
       } else {
         throw new Error('Untrusted script URL blocked: ' + url);
@@ -36,6 +36,7 @@ if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy == '
 
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
+// Déclare `trustedDomains` qui vient de l'extérieur :
 declare let trustedDomains: TrustedDomains;
 
 _self.importScripts(scriptFilename);
@@ -43,6 +44,8 @@ _self.importScripts(scriptFilename);
 const id = Math.round(new Date().getTime() / 1000).toString();
 
 const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
+const database: Database = {};
+
 const handleInstall = (event: ExtendableEvent) => {
   console.log('[OidcServiceWorker] service worker installed ' + id);
   event.waitUntil(_self.skipWaiting());
@@ -53,13 +56,15 @@ const handleActivate = (event: ExtendableEvent) => {
   event.waitUntil(_self.clients.claim());
 };
 
-const database: Database = {};
-
+/**
+ * Routine keepAlive : renvoie une réponse après un "sleep" éventuel.
+ */
 const keepAliveAsync = async (event: FetchEvent) => {
   const originalRequest = event.request;
   const isFromVanilla = originalRequest.headers.has('oidc-vanilla');
   const init = { status: 200, statusText: 'oidc-service-worker' };
   const response = new Response('{}', init);
+
   if (!isFromVanilla) {
     const originalRequestUrl = new URL(originalRequest.url);
     const minSleepSeconds = Number(originalRequestUrl.searchParams.get('minSleepSeconds')) || 240;
@@ -72,6 +77,9 @@ const keepAliveAsync = async (event: FetchEvent) => {
   return response;
 };
 
+/**
+ * Génération d'en-têtes DPoP s'il y a configuration dpop.
+ */
 async function generateDpopAsync(
   originalRequest: Request,
   currentDatabase: OidcConfig | null,
@@ -84,7 +92,7 @@ async function generateDpopAsync(
     currentDatabase.demonstratingProofOfPossessionJwkJson &&
     (!currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent ||
       (currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent &&
-        headersExtras['dpop']))
+        headersExtras.dpop))
   ) {
     const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
     const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
@@ -96,263 +104,318 @@ async function generateDpopAsync(
       extrasClaims,
     );
 
-    headersExtras['dpop'] = dpop;
+    headersExtras.dpop = dpop;
     if (currentDatabase.demonstratingProofOfPossessionNonce != null) {
-      headersExtras['nonce'] = currentDatabase.demonstratingProofOfPossessionNonce;
+      headersExtras.nonce = currentDatabase.demonstratingProofOfPossessionNonce;
     }
   }
   return headersExtras;
 }
 
-const handleFetch = async (event: FetchEvent) => {
-  const originalRequest = event.request;
-  const url = normalizeUrl(originalRequest.url);
-  if (url.includes(keepAliveJsonFilename)) {
-    event.respondWith(keepAliveAsync(event));
-    return;
-  }
+/**
+ * Nouveau handleFetch : on n’est plus async "directement".
+ * On encapsule toute la logique dans un `respondWith((async () => { ... })())`.
+ */
+const handleFetch = (event: FetchEvent): void => {
+  event.respondWith(
+    (async (): Promise<Response> => {
+      try {
+        const originalRequest = event.request;
+        const url = normalizeUrl(originalRequest.url);
 
-  const currentDatabasesForRequestAccessToken = getCurrentDatabaseDomain(
-    database,
-    url,
-    trustedDomains,
-  );
-  const authorization = originalRequest.headers.get('authorization');
-  let authenticationMode = 'Bearer';
-  let key = 'default';
-  if (authorization) {
-    const split = authorization.split(' ');
-    authenticationMode = split[0];
-    if (split[1].includes('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')) {
-      key = split[1].split('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')[1];
-    }
-  }
-  const currentDatabaseForRequestAccessToken = currentDatabasesForRequestAccessToken?.find(c =>
-    c.configurationName.endsWith(key),
-  );
-  if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
-    while (
-      currentDatabaseForRequestAccessToken.tokens &&
-      !isTokensValid(currentDatabaseForRequestAccessToken.tokens)
-    ) {
-      await sleep(200);
-    }
+        // 1) Si on est sur la ressource KeepAlive
+        if (url.includes(keepAliveJsonFilename)) {
+          return keepAliveAsync(event);
+        }
 
-    let requestMode = originalRequest.mode;
-
-    if (
-      originalRequest.mode !== 'navigate' &&
-      currentDatabaseForRequestAccessToken.convertAllRequestsToCorsExceptNavigate
-    ) {
-      requestMode = 'cors';
-    }
-    let headers: { [p: string]: string };
-    if (
-      originalRequest.mode == 'navigate' &&
-      !currentDatabaseForRequestAccessToken.setAccessTokenToNavigateRequests
-    ) {
-      headers = {
-        ...serializeHeaders(originalRequest.headers),
-      };
-    } else {
-      if (
-        authenticationMode.toLowerCase() == 'dpop' ||
-        (!currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent &&
-          currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionConfiguration)
-      ) {
-        const claimsExtras = {
-          ath: await base64urlOfHashOfASCIIEncodingAsync(
-            currentDatabaseForRequestAccessToken.tokens.access_token,
-          ),
-        };
-        const dpopHeaders = await generateDpopAsync(
-          originalRequest,
-          currentDatabaseForRequestAccessToken,
+        // 2) Cas normal : on regarde si on a un token
+        const currentDatabasesForRequestAccessToken = getCurrentDatabaseDomain(
+          database,
           url,
-          claimsExtras,
+          trustedDomains,
         );
-        headers = {
-          ...dpopHeaders,
-          authorization: `DPoP ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
-        };
-      } else {
-        headers = {
-          ...serializeHeaders(originalRequest.headers),
-          authorization: `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
-        };
-      }
-    }
-    let init: RequestInit;
-    if (originalRequest.mode === 'navigate') {
-      init = {
-        headers: headers,
-      };
-    } else {
-      init = {
-        headers: headers,
-        mode: requestMode,
-      };
-    }
 
-    const newRequest = new Request(originalRequest, init);
+        const authorization = originalRequest.headers.get('authorization');
+        let authenticationMode = 'Bearer';
+        let key = 'default';
 
-    event.respondWith(fetch(newRequest));
+        if (authorization) {
+          const split = authorization.split(' ');
+          authenticationMode = split[0];
+          if (split[1]?.includes('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')) {
+            key = split[1].split('ACCESS_TOKEN_SECURED_BY_OIDC_SERVICE_WORKER_')[1];
+          }
+        }
 
-    return;
-  }
+        const currentDatabaseForRequestAccessToken = currentDatabasesForRequestAccessToken?.find(
+          c => c.configurationName.endsWith(key),
+        );
 
-  if (event.request.method !== 'POST') {
-    return;
-  }
+        // 2a) Si on a déjà des tokens valides
+        if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
+          // On attend que le token soit valide (refresh possible en parallèle)
+          while (
+            currentDatabaseForRequestAccessToken.tokens &&
+            !isTokensValid(currentDatabaseForRequestAccessToken.tokens)
+          ) {
+            await sleep(200);
+          }
 
-  let currentDatabase: OidcConfig | null = null;
-  const currentDatabases = getCurrentDatabasesTokenEndpoint(database, url);
-  const numberDatabase = currentDatabases.length;
-  if (numberDatabase > 0) {
-    const responsePromise = new Promise<Response>((resolve, reject) => {
-      const clonedRequest = originalRequest.clone();
-      const response = clonedRequest.text().then(async actualBody => {
-        if (actualBody.includes(TOKEN.REFRESH_TOKEN) || actualBody.includes(TOKEN.ACCESS_TOKEN)) {
-          let headers = serializeHeaders(originalRequest.headers);
-          let newBody = actualBody;
-          for (let i = 0; i < numberDatabase; i++) {
-            const currentDb = currentDatabases[i];
+          // Ajustement du mode
+          let requestMode = originalRequest.mode;
+          if (
+            originalRequest.mode !== 'navigate' &&
+            currentDatabaseForRequestAccessToken.convertAllRequestsToCorsExceptNavigate
+          ) {
+            requestMode = 'cors';
+          }
 
-            if (currentDb?.tokens != null) {
+          // Construction des en-têtes
+          let headers: { [p: string]: string };
+
+          // Pas de token sur la requête "navigate" si setAccessTokenToNavigateRequests = false
+          if (
+            originalRequest.mode === 'navigate' &&
+            !currentDatabaseForRequestAccessToken.setAccessTokenToNavigateRequests
+          ) {
+            headers = {
+              ...serializeHeaders(originalRequest.headers),
+            };
+          } else {
+            // On injecte le token
+            if (
+              authenticationMode.toLowerCase() === 'dpop' ||
+              (!currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent &&
+                currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionConfiguration)
+            ) {
+              // Mode DPoP
               const claimsExtras = {
-                ath: await base64urlOfHashOfASCIIEncodingAsync(currentDb.tokens.access_token),
+                ath: await base64urlOfHashOfASCIIEncodingAsync(
+                  currentDatabaseForRequestAccessToken.tokens.access_token,
+                ),
               };
-              headers = await generateDpopAsync(originalRequest, currentDb, url, claimsExtras);
-
-              const keyRefreshToken = encodeURIComponent(
-                `${TOKEN.REFRESH_TOKEN}_${currentDb.configurationName}`,
+              const dpopHeaders = await generateDpopAsync(
+                originalRequest,
+                currentDatabaseForRequestAccessToken,
+                url,
+                claimsExtras,
               );
-              if (actualBody.includes(keyRefreshToken)) {
-                newBody = newBody.replace(
-                  keyRefreshToken,
-                  encodeURIComponent(currentDb.tokens.refresh_token as string),
-                );
-                currentDatabase = currentDb;
-                break;
-              }
-
-              const keyAccessToken = encodeURIComponent(
-                `${TOKEN.ACCESS_TOKEN}_${currentDb.configurationName}`,
-              );
-              if (actualBody.includes(keyAccessToken)) {
-                newBody = newBody.replace(
-                  keyAccessToken,
-                  encodeURIComponent(currentDb.tokens.access_token),
-                );
-                currentDatabase = currentDb;
-                break;
-              }
+              headers = {
+                ...dpopHeaders,
+                authorization: `DPoP ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
+              };
+            } else {
+              // Mode Bearer
+              headers = {
+                ...serializeHeaders(originalRequest.headers),
+                authorization: `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
+              };
             }
           }
 
-          const fetchPromise = fetch(originalRequest, {
-            body: newBody,
-            method: clonedRequest.method,
-            headers: {
-              ...headers,
-            },
-            mode: clonedRequest.mode,
-            cache: clonedRequest.cache,
-            redirect: clonedRequest.redirect,
-            referrer: clonedRequest.referrer,
-            credentials: clonedRequest.credentials,
-            integrity: clonedRequest.integrity,
-          });
+          const init: RequestInit =
+            originalRequest.mode === 'navigate' ? { headers } : { headers, mode: requestMode };
 
-          if (
-            currentDatabase?.oidcServerConfiguration?.revocationEndpoint &&
-            url.startsWith(normalizeUrl(currentDatabase.oidcServerConfiguration.revocationEndpoint))
-          ) {
-            return fetchPromise.then(async response => {
-              const text = await response.text();
-              return new Response(text, response);
-            });
-          }
-
-          return fetchPromise.then(hideTokens(currentDatabase as OidcConfig));
-        } else if (
-          actualBody.includes('code_verifier=') &&
-          extractConfigurationNameFromCodeVerifier(actualBody) != null
-        ) {
-          const currentLoginCallbackConfigurationName =
-            extractConfigurationNameFromCodeVerifier(actualBody);
-          currentDatabase = database[currentLoginCallbackConfigurationName];
-          let newBody = actualBody;
-          const codeVerifier = currentDatabase.codeVerifier;
-          if (codeVerifier != null) {
-            newBody = replaceCodeVerifier(newBody, codeVerifier);
-          }
-
-          const headersExtras = await generateDpopAsync(originalRequest, currentDatabase, url);
-
-          return fetch(originalRequest, {
-            body: newBody,
-            method: clonedRequest.method,
-            headers: {
-              ...headersExtras,
-            },
-            mode: clonedRequest.mode,
-            cache: clonedRequest.cache,
-            redirect: clonedRequest.redirect,
-            referrer: clonedRequest.referrer,
-            credentials: clonedRequest.credentials,
-            integrity: clonedRequest.integrity,
-          }).then(hideTokens(currentDatabase));
+          const newRequest = new Request(originalRequest, init);
+          // On retourne la promesse du fetch
+          return fetch(newRequest);
         }
 
-        // if showAccessToken=true, the token is already in the body
-        // of the request, and it does not need to be injected
-        // and we can simply clone the request
-        return fetch(originalRequest, {
-          body: actualBody,
-          method: clonedRequest.method,
-          headers: {
-            ...serializeHeaders(originalRequest.headers),
-          },
-          mode: clonedRequest.mode,
-          cache: clonedRequest.cache,
-          redirect: clonedRequest.redirect,
-          referrer: clonedRequest.referrer,
-          credentials: clonedRequest.credentials,
-          integrity: clonedRequest.integrity,
-        });
-      });
-      response
-        .then(r => {
-          resolve(r);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+        // 3) S’il ne s’agit pas d’un POST => on laisse passer
+        if (event.request.method !== 'POST') {
+          return fetch(originalRequest);
+        }
 
-    event.respondWith(responsePromise);
-  }
+        // 4) Cas POST vers un endpoint connu (token, revocation)
+        const currentDatabases = getCurrentDatabasesTokenEndpoint(database, url);
+        const numberDatabase = currentDatabases.length;
+
+        if (numberDatabase > 0) {
+          // On gère tout dans une promesse
+          const responsePromise = new Promise<Response>((resolve, reject) => {
+            const clonedRequest = originalRequest.clone();
+            clonedRequest
+              .text()
+              .then(async actualBody => {
+                let currentDatabase: OidcConfig | null = null;
+                try {
+                  // 4a) S’il y a un refresh_token masqué
+                  if (
+                    actualBody.includes(TOKEN.REFRESH_TOKEN) ||
+                    actualBody.includes(TOKEN.ACCESS_TOKEN)
+                  ) {
+                    let headers = serializeHeaders(originalRequest.headers);
+                    let newBody = actualBody;
+
+                    for (let i = 0; i < numberDatabase; i++) {
+                      const currentDb = currentDatabases[i];
+                      if (currentDb?.tokens) {
+                        const claimsExtras = {
+                          ath: await base64urlOfHashOfASCIIEncodingAsync(
+                            currentDb.tokens.access_token,
+                          ),
+                        };
+                        headers = await generateDpopAsync(
+                          originalRequest,
+                          currentDb,
+                          url,
+                          claimsExtras,
+                        );
+
+                        const keyRefreshToken = encodeURIComponent(
+                          `${TOKEN.REFRESH_TOKEN}_${currentDb.configurationName}`,
+                        );
+                        if (actualBody.includes(keyRefreshToken)) {
+                          newBody = newBody.replace(
+                            keyRefreshToken,
+                            encodeURIComponent(currentDb.tokens.refresh_token as string),
+                          );
+                          currentDatabase = currentDb;
+                          break;
+                        }
+
+                        const keyAccessToken = encodeURIComponent(
+                          `${TOKEN.ACCESS_TOKEN}_${currentDb.configurationName}`,
+                        );
+                        if (actualBody.includes(keyAccessToken)) {
+                          newBody = newBody.replace(
+                            keyAccessToken,
+                            encodeURIComponent(currentDb.tokens.access_token),
+                          );
+                          currentDatabase = currentDb;
+                          break;
+                        }
+                      }
+                    }
+
+                    const fetchPromise = fetch(originalRequest, {
+                      body: newBody,
+                      method: clonedRequest.method,
+                      headers,
+                      mode: clonedRequest.mode,
+                      cache: clonedRequest.cache,
+                      redirect: clonedRequest.redirect,
+                      referrer: clonedRequest.referrer,
+                      credentials: clonedRequest.credentials,
+                      integrity: clonedRequest.integrity,
+                    });
+
+                    // Cas “revocationEndpoint” ?
+                    if (
+                      currentDatabase?.oidcServerConfiguration?.revocationEndpoint &&
+                      url.startsWith(
+                        normalizeUrl(currentDatabase.oidcServerConfiguration.revocationEndpoint),
+                      )
+                    ) {
+                      // On ne modifie pas le corps
+                      const resp = await fetchPromise;
+                      const txt = await resp.text();
+                      resolve(new Response(txt, resp));
+                      return;
+                    }
+
+                    // Sinon on “cache” les tokens dans la réponse
+                    const hidden = await fetchPromise.then(
+                      hideTokens(currentDatabase as OidcConfig),
+                    );
+                    resolve(hidden);
+                    return;
+                  }
+
+                  // 4b) Sinon si c’est le code_verifier
+                  if (
+                    actualBody.includes('code_verifier=') &&
+                    extractConfigurationNameFromCodeVerifier(actualBody) != null
+                  ) {
+                    const currentLoginCallbackConfigurationName =
+                      extractConfigurationNameFromCodeVerifier(actualBody);
+                    currentDatabase = database[currentLoginCallbackConfigurationName];
+                    let newBody = actualBody;
+                    const codeVerifier = currentDatabase.codeVerifier;
+                    if (codeVerifier != null) {
+                      newBody = replaceCodeVerifier(newBody, codeVerifier);
+                    }
+
+                    const headersExtras = await generateDpopAsync(
+                      originalRequest,
+                      currentDatabase,
+                      url,
+                    );
+                    const resp = await fetch(originalRequest, {
+                      body: newBody,
+                      method: clonedRequest.method,
+                      headers: headersExtras,
+                      mode: clonedRequest.mode,
+                      cache: clonedRequest.cache,
+                      redirect: clonedRequest.redirect,
+                      referrer: clonedRequest.referrer,
+                      credentials: clonedRequest.credentials,
+                      integrity: clonedRequest.integrity,
+                    });
+                    const hidden = await hideTokens(currentDatabase)(resp);
+                    resolve(hidden);
+                    return;
+                  }
+
+                  // 4c) Sinon on laisse passer tel quel
+                  const normalResp = await fetch(originalRequest, {
+                    body: actualBody,
+                    method: clonedRequest.method,
+                    headers: serializeHeaders(originalRequest.headers),
+                    mode: clonedRequest.mode,
+                    cache: clonedRequest.cache,
+                    redirect: clonedRequest.redirect,
+                    referrer: clonedRequest.referrer,
+                    credentials: clonedRequest.credentials,
+                    integrity: clonedRequest.integrity,
+                  });
+                  resolve(normalResp);
+                } catch (err) {
+                  reject(err);
+                }
+              })
+              .catch(reject);
+          });
+
+          // On renvoie simplement la promesse
+          return responsePromise;
+        }
+
+        // 5) Par défaut, on laisse passer la requête
+        return fetch(originalRequest);
+      } catch (err) {
+        // En cas d’erreur imprévue, on log et on retourne une 500
+        console.error('[OidcServiceWorker] handleFetch error:', err);
+        return new Response('Service Worker Error', { status: 500 });
+      }
+    })(),
+  );
 };
 
+// ---- Gestion des messages depuis la page
 const handleMessage = async (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
+
   if (event.data.type === 'claim') {
     _self.clients.claim().then(() => port.postMessage({}));
     return;
   }
+
   const configurationName = data.configurationName.split('#')[0];
 
   if (trustedDomains == null) {
     trustedDomains = {};
   }
+
   const trustedDomain = trustedDomains[configurationName];
   const allowMultiTabLogin = Array.isArray(trustedDomain)
     ? false
     : trustedDomain.allowMultiTabLogin;
+
   const tabId = allowMultiTabLogin ? data.tabId : 'default';
   const configurationNameWithTabId = `${configurationName}#tabId=${tabId}`;
+
   let currentDatabase = database[configurationNameWithTabId];
   if (!currentDatabase) {
     const showAccessToken = Array.isArray(trustedDomain) ? false : trustedDomain.showAccessToken;
@@ -394,7 +457,6 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       currentDatabase.state = null;
       currentDatabase.codeVerifier = null;
       currentDatabase.nonce = null;
-
       currentDatabase.demonstratingProofOfPossessionNonce = null;
       currentDatabase.demonstratingProofOfPossessionJwkJson = null;
       currentDatabase.demonstratingProofOfPossessionConfiguration = null;
@@ -402,27 +464,28 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       currentDatabase.status = data.data.status;
       port.postMessage({ configurationName });
       return;
+
     case 'init': {
       const oidcServerConfiguration = data.data.oidcServerConfiguration;
-      const trustedDomain = trustedDomains[configurationName];
       const domains = getDomains(trustedDomain, 'oidc');
+
       if (!domains.some(domain => domain === acceptAnyDomainToken)) {
         [
           oidcServerConfiguration.tokenEndpoint,
           oidcServerConfiguration.revocationEndpoint,
           oidcServerConfiguration.userInfoEndpoint,
           oidcServerConfiguration.issuer,
-        ].forEach(url => {
-          checkDomain(domains, url);
+        ].forEach(u => {
+          checkDomain(domains, u);
         });
       }
+
       currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
       currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
 
+      // Cas DPoP
       if (currentDatabase.demonstratingProofOfPossessionConfiguration == null) {
-        const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(
-          trustedDomains[configurationName],
-        );
+        const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomain);
         if (demonstratingProofOfPossessionConfiguration != null) {
           if (currentDatabase.oidcConfiguration.demonstrating_proof_of_possession) {
             console.warn(
@@ -435,7 +498,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
             demonstratingProofOfPossessionConfiguration.generateKeyAlgorithm,
           );
           currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent =
-            getDpopOnlyWhenDpopHeaderPresent(trustedDomains[configurationName]) ?? false;
+            getDpopOnlyWhenDpopHeaderPresent(trustedDomain) ?? false;
         }
       }
 
@@ -447,9 +510,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
           version,
         });
       } else {
-        const tokens = {
-          ...currentDatabase.tokens,
-        };
+        const tokens = { ...currentDatabase.tokens };
         if (currentDatabase.hideAccessToken) {
           tokens.access_token = `${TOKEN.ACCESS_TOKEN}_${configurationName}#tabId=${tabId}`;
         }
@@ -468,12 +529,14 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       }
       return;
     }
+
     case 'setDemonstratingProofOfPossessionNonce': {
       currentDatabase.demonstratingProofOfPossessionNonce =
         data.data.demonstratingProofOfPossessionNonce;
       port.postMessage({ configurationName });
       return;
     }
+
     case 'getDemonstratingProofOfPossessionNonce': {
       const demonstratingProofOfPossessionNonce =
         currentDatabase.demonstratingProofOfPossessionNonce;
@@ -483,41 +546,49 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       });
       return;
     }
+
     case 'setState': {
       currentDatabase.state = data.data.state;
       port.postMessage({ configurationName });
       return;
     }
+
     case 'getState': {
       const state = currentDatabase.state;
       port.postMessage({ configurationName, state });
       return;
     }
+
     case 'setCodeVerifier': {
       currentDatabase.codeVerifier = data.data.codeVerifier;
       port.postMessage({ configurationName });
       return;
     }
+
     case 'getCodeVerifier': {
+      const codeVerifier =
+        currentDatabase.codeVerifier != null
+          ? `${TOKEN.CODE_VERIFIER}_${configurationName}#tabId=${tabId}`
+          : null;
       port.postMessage({
         configurationName,
-        codeVerifier:
-          currentDatabase.codeVerifier != null
-            ? `${TOKEN.CODE_VERIFIER}_${configurationName}#tabId=${tabId}`
-            : null,
+        codeVerifier,
       });
       return;
     }
+
     case 'setSessionState': {
       currentDatabase.sessionState = data.data.sessionState;
       port.postMessage({ configurationName });
       return;
     }
+
     case 'getSessionState': {
       const sessionState = currentDatabase.sessionState;
       port.postMessage({ configurationName, sessionState });
       return;
     }
+
     case 'setNonce': {
       const nonce = data.data.nonce;
       if (nonce) {
@@ -526,18 +597,20 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       port.postMessage({ configurationName });
       return;
     }
+
     case 'getNonce': {
       const keyNonce = `${TOKEN.NONCE_TOKEN}_${configurationName}#tabId=${tabId}`;
       const nonce = currentDatabase.nonce ? keyNonce : null;
       port.postMessage({ configurationName, nonce });
       return;
     }
-    default: {
+
+    default:
       return;
-    }
   }
 };
 
+// Écouteurs
 _self.addEventListener('install', handleInstall);
 _self.addEventListener('activate', handleActivate);
 _self.addEventListener('fetch', handleFetch);
