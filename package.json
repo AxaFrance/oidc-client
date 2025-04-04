@@ -35,7 +35,7 @@
     "eslint-define-config": "^2.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-n": "^17.16.2",
+    "eslint-plugin-n": "^17.17.0",
     "eslint-plugin-no-only-tests": "^3.3.0",
     "eslint-plugin-prettier": "^5.2.4",
     "eslint-plugin-react": "^7.37.4",
