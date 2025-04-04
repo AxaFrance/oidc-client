@@ -325,7 +325,7 @@ const handleFetch = (event: FetchEvent): void => {
                   // 4b) Sinon si c’est le code_verifier
                   if (
                     actualBody.includes('code_verifier=') &&
-                    extractConfigurationNameFromCodeVerifier(actualBody) != null
+                    extractConfigurationNameFromCodeVerifier(actualBody) != ''
                   ) {
                     const currentLoginCallbackConfigurationName =
                       extractConfigurationNameFromCodeVerifier(actualBody);
