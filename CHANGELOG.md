@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.7
+## 7.25.8
+
+- [4c85da7](https://github.com/AxaFrance/oidc-client/commit/4c85da7d0e0e802c95efe31c5de948ac5abd5494) - fix(oidc-service-worker): Error with latest Safari (#1547) (release), 2025-04-04 by *Guillaume Chervet*
+
+
+## v7.25.7
 
 - [930ad03](https://github.com/AxaFrance/oidc-client/commit/930ad0367cfcaa5bd15726c17501d70b0768ce5e) - fix(oidc-service-worker): fetch already consume (release) (#1534), 2025-04-01 by *Guillaume Chervet*
 
@@ -324,10 +329,5 @@
 ## v7.18.3
 
 - [8eb75d3](https://github.com/AxaFrance/oidc-client/commit/8eb75d3f2036708d9c3067a2973a4d685d8b4923) - fix(oidc): logout continue to run before redirecting (#1301) (release), 2024-02-15 by *Guillaume Chervet*
-
-
-## v7.18.2
-
-- [77329ce](https://github.com/AxaFrance/oidc-client/commit/77329ce52a5fc7278ff35ccd13ca572ff7ebbf4d) - fix(oidc-service-worker): bad request on many token request at the same time (#1300) (release), 2024-02-15 by *Guillaume Chervet*
 
 
