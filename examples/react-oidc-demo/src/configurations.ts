@@ -9,7 +9,7 @@ export const configurationIdentityServer = {
   refresh_time_before_tokens_expiration_in_second: 40,
   token_renew_mode: TokenRenewMode.access_token_invalid,
   token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
-  service_worker_relative_url: '/OidcServiceWorker.js',
+  // service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
 };
 
