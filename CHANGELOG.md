@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.8
+## 7.25.9
+
+- [c1ece66](https://github.com/AxaFrance/oidc-client/commit/c1ece663131db50a8c1152b18be0d3d5f6a0025e) - fix(oidc): make bearer fetch works on safari back (release) (#1550), 2025-04-11 by *Guillaume Chervet*
+
+
+## v7.25.8
 
 - [4c85da7](https://github.com/AxaFrance/oidc-client/commit/4c85da7d0e0e802c95efe31c5de948ac5abd5494) - fix(oidc-service-worker): Error with latest Safari (#1547) (release), 2025-04-04 by *Guillaume Chervet*
 
@@ -324,10 +329,5 @@
 ## v7.18.4
 
 - [b4e5ec8](https://github.com/AxaFrance/oidc-client/commit/b4e5ec834bdfedf8975b79086c2c0144f4e6e9b1) - fix(oidc-service-worker): set Bearer as default (release), 2024-02-17 by *Guillaume Chervet*
-
-
-## v7.18.3
-
-- [8eb75d3](https://github.com/AxaFrance/oidc-client/commit/8eb75d3f2036708d9c3067a2973a4d685d8b4923) - fix(oidc): logout continue to run before redirecting (#1301) (release), 2024-02-15 by *Guillaume Chervet*
 
 
