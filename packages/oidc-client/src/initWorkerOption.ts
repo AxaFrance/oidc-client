@@ -1,19 +1,14 @@
-﻿import { ServiceWorkerActivate } from './types';
+import { ServiceWorkerActivate } from './types';
 
-export const excludeOs = operatingSystem => {
-  if (operatingSystem.os === 'iOS' && operatingSystem.osVersion.startsWith('12')) {
-    return true;
-  }
-  if (operatingSystem.os === 'Mac OS X' && operatingSystem.osVersion.startsWith('10_15_6')) {
-    return true;
-  }
-  return false;
+export const excludeOs = (operatingSystem): boolean => {
+  // Exclure tous les OS Apple
+  return ['iOS', 'Mac OS', 'Mac OS X'].includes(operatingSystem.os);
 };
-export const getOperatingSystem = navigator => {
+
+export const getOperatingSystem = (navigator): { os: string; osVersion: string } => {
   const nVer = navigator.appVersion;
   const nAgt = navigator.userAgent;
   const unknown = '-';
-  // system
   let os = unknown;
   const clientStrings = [
     { s: 'Windows 10', r: /(Windows 10.0|Windows NT 10.0)/ },
@@ -42,13 +37,10 @@ export const getOperatingSystem = navigator => {
     { s: 'UNIX', r: /UNIX/ },
     { s: 'BeOS', r: /BeOS/ },
     { s: 'OS/2', r: /OS\/2/ },
-    {
-      s: 'Search Bot',
-      r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/,
-    },
+    { s: 'Search Bot', r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/ },
   ];
-  for (const id in clientStrings) {
-    const cs = clientStrings[id];
+
+  for (const cs of clientStrings) {
     if (cs.r.test(nAgt)) {
       os = cs.s;
       break;
@@ -58,7 +50,7 @@ export const getOperatingSystem = navigator => {
   let osVersion = unknown;
 
   if (/Windows/.test(os)) {
-    osVersion = /Windows (.*)/.exec(os)[1];
+    osVersion = /Windows (.*)/.exec(os)?.[1] ?? unknown;
     os = 'Windows';
   }
 
@@ -67,25 +59,21 @@ export const getOperatingSystem = navigator => {
     case 'Mac OS X':
     case 'Android':
       osVersion =
-        /(?:Android|Mac OS|Mac OS X|MacPPC|MacIntel|Mac_PowerPC|Macintosh) ([._\d]+)/.exec(nAgt)[1];
+        /(?:Android|Mac OS|Mac OS X|MacPPC|MacIntel|Mac_PowerPC|Macintosh) ([._\d]+)/.exec(nAgt)?.[1] ?? unknown;
       break;
-
     case 'iOS': {
       const osVersionArray = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
       if (osVersionArray != null && osVersionArray.length > 2) {
-        osVersion =
-          osVersionArray[1] + '.' + osVersionArray[2] + '.' + (parseInt(osVersionArray[3]) | 0);
+        osVersion = `${osVersionArray[1]}.${osVersionArray[2]}.${parseInt(osVersionArray[3]) || 0}`;
       }
       break;
     }
   }
-  return {
-    os,
-    osVersion,
-  };
+
+  return { os, osVersion };
 };
 
-function getBrowser() {
+function getBrowser(): { name: string; version: string } {
   const ua = navigator.userAgent;
   let tem;
   let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
@@ -94,18 +82,9 @@ function getBrowser() {
     return { name: 'ie', version: tem[1] || '' };
   }
   if (M[1] === 'Chrome') {
-    tem = ua.match(/\bOPR|Edge\/(\d+)/);
-
+    tem = ua.match(/\b(OPR|Edg)\/(\d+)/);
     if (tem != null) {
-      let version = tem[1];
-      if (!version) {
-        const splits = ua.split(tem[0] + '/');
-        if (splits.length > 1) {
-          version = splits[1];
-        }
-      }
-
-      return { name: 'opera', version };
+      return { name: tem[1] === 'OPR' ? 'opera' : 'edge', version: tem[2] };
     }
   }
   M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
@@ -119,22 +98,20 @@ function getBrowser() {
 }
 
 export const activateServiceWorker: ServiceWorkerActivate = (): boolean => {
-  const { name, version } = getBrowser();
-  if (name === 'chrome' && parseInt(version) <= 70) {
+  const { name: browserName, version: browserVersion } = getBrowser();
+
+  // Éventuel fallback si des versions spécifiques posent problème
+  if (browserName === 'chrome' && parseInt(browserVersion) <= 70) {
     return false;
   }
-  if (name === 'opera') {
-    if (!version) {
-      return false;
-    }
-    if (parseInt(version.split('.')[0]) < 80) {
-      return false;
-    }
+  if (browserName === 'opera' && (!browserVersion || parseInt(browserVersion.split('.')[0]) < 80)) {
+    return false;
   }
-  if (name === 'ie') {
+  if (browserName === 'ie') {
     return false;
   }
 
+  // Bloquer toutes les machines Apple
   const operatingSystem = getOperatingSystem(navigator);
   return !excludeOs(operatingSystem);
 };
