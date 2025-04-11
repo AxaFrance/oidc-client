@@ -213,8 +213,8 @@ const handleFetch = (event: FetchEvent): void => {
             }
           }
 
-          const init: RequestInit =
-            originalRequest.mode === 'navigate' ? { headers } : { headers, mode: requestMode };
+          // const init: RequestInit =
+          // originalRequest.mode === 'navigate' ? { headers } : { headers, mode: requestMode };
 
           // const newRequest = new Request(originalRequest, init);
           // On retourne la promesse du fetch
