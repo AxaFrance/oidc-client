@@ -212,13 +212,6 @@ const handleFetch = (event: FetchEvent): void => {
               };
             }
           }
-
-          // const init: RequestInit =
-          // originalRequest.mode === 'navigate' ? { headers } : { headers, mode: requestMode };
-
-          // const newRequest = new Request(originalRequest, init);
-          // On retourne la promesse du fetch
-          
           const newRequest = new Request(originalRequest.url, {
             method: originalRequest.method,
             headers: new Headers(headers),
@@ -228,7 +221,7 @@ const handleFetch = (event: FetchEvent): void => {
             referrer: originalRequest.referrer,
             cache: originalRequest.cache,
             integrity: originalRequest.integrity,
-            keepalive: originalRequest.keepalive
+            keepalive: originalRequest.keepalive,
           });
           return fetch(newRequest);
         }
