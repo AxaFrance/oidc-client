@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@axa-fr/react-oidc": "workspace:*",
-    "react": "^19.0.0",
+    "react": "^19.1.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.22.3"
   },
@@ -28,7 +28,7 @@
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "15.0.7",
     "@testing-library/user-event": "14.5.2",
-    "@types/react": "19.0.5",
+    "@types/react": "19.1.1",
     "@vitejs/plugin-react": "4.3.4",
     "bootstrap": "^4.6.2",
     "copyfiles": "2.4.1",
