@@ -4,41 +4,41 @@
 // Domains used by OIDC server must be also declared here
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const trustedDomains = {
-  default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
-  config_classic: ['https://demo.duendesoftware.com'],
-  config_with_monitor_session: ['https://demo.duendesoftware.com'],
-  config_without_silent_login: ['https://demo.duendesoftware.com'],
-  config_without_refresh_token: ['https://demo.duendesoftware.com'],
-  config_without_refresh_token_silent_login: ['https://demo.duendesoftware.com'],
+  default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com', 'http://localhost:8080/realms/master'],
+  config_classic: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
+  config_with_monitor_session: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
+  config_without_silent_login: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
+  config_without_refresh_token: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
+  config_without_refresh_token_silent_login: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
   config_google: [
     'https://oauth2.googleapis.com',
     'https://openidconnect.googleapis.com',
     'https://accounts.google.com',
   ],
-  config_with_hash: ['https://demo.duendesoftware.com'],
+  config_with_hash: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
 };
 // Service worker will continue to give access token to the JavaScript client
 // Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
 // scenarios which require it. For example, to send it via websocket connection.
 trustedDomains.config_show_access_token = {
-  domains: ['https://demo.duendesoftware.com'],
+  domains: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
   showAccessToken: true,
 };
 // This example defines domains used by OIDC server separately from domains to which access tokens will be injected.
 trustedDomains.config_separate_oidc_access_token_domains = {
-  oidcDomains: ['https://demo.duendesoftware.com'],
+  oidcDomains: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
   accessTokenDomains: ['https://myapi'],
 };
 
 trustedDomains.config_with_dpop = {
-  domains: ['https://demo.duendesoftware.com'],
+  domains: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
   demonstratingProofOfPossession: true,
   demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
   allowMultiTabLogin: true,
 };
 
 trustedDomains.config_multi_tab_login = {
-  domains: ['https://demo.duendesoftware.com'],
+  domains: ['https://demo.duendesoftware.com', 'http://localhost:8080/realms/master'],
   allowMultiTabLogin: true,
 };
 //# sourceMappingURL=OidcTrustedDomains.js.map

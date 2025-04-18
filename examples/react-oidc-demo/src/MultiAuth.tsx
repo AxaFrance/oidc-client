@@ -139,7 +139,6 @@ export const MultiAuthContainer = () => {
       redirect_uri: callBack,
       silent_redirect_uri,
       scope: 'openid profile email api offline_access',
-      client_id: 'interactive.public.short',
     },
     config_without_refresh_token: {
       ...configurationIdentityServer,
