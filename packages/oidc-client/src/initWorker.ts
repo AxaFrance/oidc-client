@@ -158,6 +158,8 @@ export const initWorkerAsync = async (
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
       await oidcConfiguration.service_worker_update_require_callback?.(registration, stopKeepAlive);
+    } else{
+        console.log(`Service worker ${serviceWorkerVersion} version match with js client version`);
     }
 
     // @ts-ignore
@@ -200,7 +202,7 @@ export const initWorkerAsync = async (
       configurationName,
     });
   };
-  const getNonceAsync = async () => {
+  const getNonceAsync = async (fallback:boolean=true) => {
     // @ts-ignore
     const result = await sendMessageAsync(registration)({
       type: 'getNonce',
@@ -212,6 +214,12 @@ export const initWorkerAsync = async (
     if (!nonce) {
       nonce = sessionStorage[`oidc.nonce.${configurationName}`];
       console.warn('nonce not found in service worker, using sessionStorage');
+      if (fallback) {
+        await setNonceAsync(nonce);
+        const data = await getNonceAsync(false);
+        // @ts-ignore
+        nonce = data.nonce;
+      }
     }
     return { nonce };
   };
@@ -272,7 +280,7 @@ export const initWorkerAsync = async (
     return JSON.parse(result.demonstratingProofOfPossessionJwkJson);
   };
 
-  const getStateAsync = async () => {
+  const getStateAsync = async (fallback:boolean=true) => {
     const result = await sendMessageAsync(registration)({
       type: 'getState',
       data: null,
@@ -283,6 +291,10 @@ export const initWorkerAsync = async (
     if (!state) {
       state = sessionStorage[`oidc.state.${configurationName}`];
       console.warn('state not found in service worker, using sessionStorage');
+      if(fallback) {
+        await setStateAsync(state);
+        state = await getStateAsync(false);
+      }
     }
     return state;
   };
