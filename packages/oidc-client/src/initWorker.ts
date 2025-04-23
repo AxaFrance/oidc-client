@@ -320,8 +320,10 @@ export const initWorkerAsync = async (
       codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
       console.warn('codeVerifier not found in service worker, using sessionStorage');
       if(fallback) {
+        console.log("setCodeVerifierAsync", codeVerifier);
         await setCodeVerifierAsync(codeVerifier);
         const data = await getCodeVerifierAsync(false);
+        console.log("getCodeVerifierAsync", data);
         // @ts-ignore
         codeVerifier = data.codeVerifier;
       }

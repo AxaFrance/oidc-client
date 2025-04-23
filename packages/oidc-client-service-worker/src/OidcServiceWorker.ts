@@ -53,10 +53,6 @@ const handleInstall = (event: ExtendableEvent) => {
 
 const handleActivate = (event: ExtendableEvent) => {
   console.log('[OidcServiceWorker] service worker activated ' + id);
-  _self.registration.unregister()
-      .then(function() {
-        return _self.clients.matchAll();
-      });
   event.waitUntil(_self.clients.claim());
 };
 
