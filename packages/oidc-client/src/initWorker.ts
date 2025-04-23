@@ -127,18 +127,23 @@ export const initWorkerAsync = async (
   // 2) Quand le SW actif change, on reload
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     // @ts-ignore
-    if (!window.__swReloading) {
-      // @ts-ignore
-      window.__swReloading = true;
-      console.log('SW controller changed – reloading page');
-      window.location.reload();
-    }
+    //if (!window.__swReloading) {
+    // @ts-ignore
+    //window.__swReloading = true;
+    console.log('SW controller changed – reloading page');
+    window.location.reload();
+    //}
   });
 
   // 3) Claim + init classique
-  await navigator.serviceWorker.ready;
-  if (!navigator.serviceWorker.controller) {
-    await sendMessageAsync(registration)({ type: 'claim' });
+  try {
+    await navigator.serviceWorker.ready;
+    if (!navigator.serviceWorker.controller) {
+      await sendMessageAsync(registration)({ type: 'claim' });
+    }
+  } catch (err) {
+    console.warn(`Failed init ServiceWorker ${err.toString()}`);
+    return null;
   }
 
   const clearAsync = async status => {
@@ -170,8 +175,8 @@ export const initWorkerAsync = async (
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
       await oidcConfiguration.service_worker_update_require_callback?.(registration, stopKeepAlive);
-    } else{
-        console.log(`Service worker ${serviceWorkerVersion} version match with js client version`);
+    } else {
+      console.log(`Service worker ${serviceWorkerVersion} version match with js client version`);
     }
 
     // @ts-ignore
@@ -214,7 +219,7 @@ export const initWorkerAsync = async (
       configurationName,
     });
   };
-  const getNonceAsync = async (fallback:boolean=true) => {
+  const getNonceAsync = async (fallback: boolean = true) => {
     // @ts-ignore
     const result = await sendMessageAsync(registration)({
       type: 'getNonce',
@@ -292,7 +297,7 @@ export const initWorkerAsync = async (
     return JSON.parse(result.demonstratingProofOfPossessionJwkJson);
   };
 
-  const getStateAsync = async (fallback:boolean=true) => {
+  const getStateAsync = async (fallback: boolean = true) => {
     const result = await sendMessageAsync(registration)({
       type: 'getState',
       data: null,
@@ -303,7 +308,7 @@ export const initWorkerAsync = async (
     if (!state) {
       state = sessionStorage[`oidc.state.${configurationName}`];
       console.warn('state not found in service worker, using sessionStorage');
-      if(fallback) {
+      if (fallback) {
         await setStateAsync(state);
         state = await getStateAsync(false);
       }
@@ -320,7 +325,7 @@ export const initWorkerAsync = async (
     });
   };
 
-  const getCodeVerifierAsync = async (fallback:boolean=true) => {
+  const getCodeVerifierAsync = async (fallback: boolean = true) => {
     const result = await sendMessageAsync(registration)({
       type: 'getCodeVerifier',
       data: null,
@@ -331,11 +336,11 @@ export const initWorkerAsync = async (
     if (!codeVerifier) {
       codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
       console.warn('codeVerifier not found in service worker, using sessionStorage');
-      if(fallback) {
-        console.log("setCodeVerifierAsync", codeVerifier);
+      if (fallback) {
+        console.log('setCodeVerifierAsync', codeVerifier);
         await setCodeVerifierAsync(codeVerifier);
         const data = await getCodeVerifierAsync(false);
-        console.log("getCodeVerifierAsync", data);
+        console.log('getCodeVerifierAsync', data);
         // @ts-ignore
         codeVerifier = data.codeVerifier;
       }

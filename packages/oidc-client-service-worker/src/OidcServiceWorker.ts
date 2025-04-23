@@ -42,7 +42,7 @@ declare let trustedDomains: TrustedDomains;
 _self.importScripts(scriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();
-console.log("service worker id", id);
+console.log('service worker id', id);
 const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
 const database: Database = {};
 /*
@@ -328,11 +328,14 @@ const handleFetch = (event: FetchEvent): void => {
                   }
 
                   // 4b) Sinon si c’est le code_verifier
-                  const isCodeVerifier = actualBody.includes('code_verifier=')
+                  const isCodeVerifier = actualBody.includes('code_verifier=');
                   if (isCodeVerifier) {
                     const currentLoginCallbackConfigurationName =
                       extractConfigurationNameFromCodeVerifier(actualBody);
-                    if (!currentLoginCallbackConfigurationName || currentLoginCallbackConfigurationName === '') {
+                    if (
+                      !currentLoginCallbackConfigurationName ||
+                      currentLoginCallbackConfigurationName === ''
+                    ) {
                       throw new Error('No configuration name found in code_verifier');
                     }
                     currentDatabase = database[currentLoginCallbackConfigurationName];
@@ -406,8 +409,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
   if (event.data?.type === 'SKIP_WAITING') {
     await _self.skipWaiting();
     return;
-  }
-  else if (event.data.type === 'claim') {
+  } else if (event.data.type === 'claim') {
     _self.clients.claim().then(() => port.postMessage({}));
     return;
   }
