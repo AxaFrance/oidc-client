@@ -308,7 +308,7 @@ export const initWorkerAsync = async (
     });
   };
 
-  const getCodeVerifierAsync = async () => {
+  const getCodeVerifierAsync = async (fallback:boolean=true) => {
     const result = await sendMessageAsync(registration)({
       type: 'getCodeVerifier',
       data: null,
@@ -319,6 +319,12 @@ export const initWorkerAsync = async (
     if (!codeVerifier) {
       codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
       console.warn('codeVerifier not found in service worker, using sessionStorage');
+      if(fallback) {
+        await setCodeVerifierAsync(codeVerifier);
+        const data = await getCodeVerifierAsync(false);
+        // @ts-ignore
+        codeVerifier = data.codeVerifier;
+      }
     }
     return codeVerifier;
   };

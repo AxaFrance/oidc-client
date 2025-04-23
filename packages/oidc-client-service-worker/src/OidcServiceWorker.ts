@@ -328,12 +328,13 @@ const handleFetch = (event: FetchEvent): void => {
                   }
 
                   // 4b) Sinon si c’est le code_verifier
-                  if (
-                    actualBody.includes('code_verifier=') &&
-                    extractConfigurationNameFromCodeVerifier(actualBody) != ''
-                  ) {
+                  const isCodeVerifier = actualBody.includes('code_verifier=')
+                  if (isCodeVerifier) {
                     const currentLoginCallbackConfigurationName =
                       extractConfigurationNameFromCodeVerifier(actualBody);
+                    if (!currentLoginCallbackConfigurationName || currentLoginCallbackConfigurationName === '') {
+                      throw new Error('No configuration name found in code_verifier');
+                    }
                     currentDatabase = database[currentLoginCallbackConfigurationName];
                     let newBody = actualBody;
                     const codeVerifier = currentDatabase.codeVerifier;
