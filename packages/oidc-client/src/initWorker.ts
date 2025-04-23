@@ -339,10 +339,8 @@ export const initWorkerAsync = async (
       if (fallback) {
         console.log('setCodeVerifierAsync', codeVerifier);
         await setCodeVerifierAsync(codeVerifier);
-        const data = await getCodeVerifierAsync(false);
-        console.log('getCodeVerifierAsync', data);
-        // @ts-ignore
-        codeVerifier = data.codeVerifier;
+        codeVerifier = await getCodeVerifierAsync(false);
+        console.log('getCodeVerifierAsync', codeVerifier);
       }
     }
     return codeVerifier;
