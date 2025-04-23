@@ -460,8 +460,6 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       trustedDomains[configurationName] = [];
     }
   }
-  console.log("event", event.data);
-  console.log("currentDatabase", currentDatabase);
 
   switch (data.type) {
     case 'clear':
@@ -573,9 +571,6 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 
     case 'setCodeVerifier': {
       currentDatabase.codeVerifier = data.data.codeVerifier;
-      console.log("ici1", currentDatabase.codeVerifier);
-      console.log("ici2", data.data.codeVerifier);
-      console.log("ici3", configurationName);
       port.postMessage({ configurationName });
       return;
     }
