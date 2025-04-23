@@ -53,6 +53,14 @@ const handleInstall = (event: ExtendableEvent) => {
 
 const handleActivate = (event: ExtendableEvent) => {
   console.log('[OidcServiceWorker] service worker activated ' + id);
+  _self.registration.unregister()
+      .then(function() {
+        return _self.clients.matchAll();
+      })
+      .then(function(clients) {
+        
+        //clients.forEach(client => client.navigate(client.url))
+      });
   event.waitUntil(_self.clients.claim());
 };
 
@@ -569,6 +577,9 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 
     case 'setCodeVerifier': {
       currentDatabase.codeVerifier = data.data.codeVerifier;
+      console.log("ici1", currentDatabase.codeVerifier);
+      console.log("ici2", data.data.codeVerifier);
+      console.log("ici3", configurationName);
       port.postMessage({ configurationName });
       return;
     }
