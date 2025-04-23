@@ -455,6 +455,8 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       trustedDomains[configurationName] = [];
     }
   }
+  console.log("event", event);
+  console.log("currentDatabase", currentDatabase);
 
   switch (data.type) {
     case 'clear':
