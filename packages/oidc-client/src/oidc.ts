@@ -4,7 +4,6 @@ import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { eventNames } from './events.js';
 import { initSession } from './initSession.js';
 import {
-  defaultServiceWorkerUpdateRequireCallback,
   getTabId,
   initWorkerAsync,
 } from './initWorker.js';

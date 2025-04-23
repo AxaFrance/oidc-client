@@ -109,9 +109,14 @@ export const initWorkerAsync = async (
   }
 
   const swUrl = `${serviceWorkerRelativeUrl}?v=${codeVersion}`;
-  const registration = await navigator.serviceWorker.register(swUrl, {
-    updateViaCache: 'none',
-  });
+  let registration :  ServiceWorkerRegistration = null;
+  if (configuration.service_worker_register) {
+    registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
+  } else {
+    registration = await navigator.serviceWorker.register(swUrl, {
+      updateViaCache: 'none',
+    });
+  }
 
   // 1) Détection updatefound
   registration.addEventListener('updatefound', () => {
@@ -172,9 +177,7 @@ export const initWorkerAsync = async (
       console.warn(
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
-    } else {
-      console.log(`Service worker ${serviceWorkerVersion} version match with js client version`);
-    }
+    } 
 
     // @ts-ignore
     return {
@@ -334,10 +337,8 @@ export const initWorkerAsync = async (
       codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
       console.warn('codeVerifier not found in service worker, using sessionStorage');
       if (fallback) {
-        console.log('setCodeVerifierAsync', codeVerifier);
         await setCodeVerifierAsync(codeVerifier);
         codeVerifier = await getCodeVerifierAsync(false);
-        console.log('getCodeVerifierAsync', codeVerifier);
       }
     }
     return codeVerifier;

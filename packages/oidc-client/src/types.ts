@@ -31,6 +31,7 @@ export type OidcConfiguration = {
   token_automatic_renew_mode?: TokenAutomaticRenewMode;
   token_request_timeout?: number;
   service_worker_relative_url?: string;
+  service_worker_register?: ServiceWorkerRegister;
   service_worker_keep_alive_path?: string;
   service_worker_activate?: ServiceWorkerActivate;
   service_worker_only?: boolean;
