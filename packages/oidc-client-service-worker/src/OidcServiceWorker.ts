@@ -56,10 +56,6 @@ const handleActivate = (event: ExtendableEvent) => {
   _self.registration.unregister()
       .then(function() {
         return _self.clients.matchAll();
-      })
-      .then(function(clients) {
-        
-        //clients.forEach(client => client.navigate(client.url))
       });
   event.waitUntil(_self.clients.claim());
 };
