@@ -94,7 +94,7 @@ export const initWorkerAsync = async (
   configuration: OidcConfiguration,
   configurationName: string,
 ) => {
-  const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
+  const serviceWorkerRelativeUrl = `${configuration.service_worker_relative_url}?v=${codeVersion}`;
   if (
     typeof window === 'undefined' ||
     typeof navigator === 'undefined' ||
@@ -108,25 +108,37 @@ export const initWorkerAsync = async (
     return null;
   }
 
-  let registration = null;
-  if (configuration.service_worker_register) {
-    registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
-  } else {
-    registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
+  const swUrl = `${serviceWorkerRelativeUrl}?v=${codeVersion}`;
+  const registration = await navigator.serviceWorker.register(swUrl, {
+    updateViaCache: 'none',
+  });
 
-    if (registration.active && registration.waiting) {
-      console.log('Detected new service worker waiting, unregistering and reloading');
-      await configuration.service_worker_update_require_callback?.(registration, stopKeepAlive);
+  // 1) Détection updatefound
+  registration.addEventListener('updatefound', () => {
+    const newSW = registration.installing;
+    newSW?.addEventListener('statechange', () => {
+      if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+        console.log('New SW waiting – skipWaiting()');
+        newSW.postMessage({ type: 'SKIP_WAITING' });
+      }
+    });
+  });
+
+  // 2) Quand le SW actif change, on reload
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    // @ts-ignore
+    if (!window.__swReloading) {
+      // @ts-ignore
+      window.__swReloading = true;
+      console.log('SW controller changed – reloading page');
+      window.location.reload();
     }
-  }
+  });
 
-  try {
-    await navigator.serviceWorker.ready;
-    if (!navigator.serviceWorker.controller)
-      await sendMessageAsync(registration)({ type: 'claim' });
-  } catch (err) {
-    console.warn(`Failed init ServiceWorker ${err.toString()}`);
-    return null;
+  // 3) Claim + init classique
+  await navigator.serviceWorker.ready;
+  if (!navigator.serviceWorker.controller) {
+    await sendMessageAsync(registration)({ type: 'claim' });
   }
 
   const clearAsync = async status => {

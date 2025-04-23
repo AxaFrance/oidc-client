@@ -42,10 +42,10 @@ declare let trustedDomains: TrustedDomains;
 _self.importScripts(scriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();
-
+console.log("service worker id", id);
 const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
 const database: Database = {};
-
+/*
 const handleInstall = (event: ExtendableEvent) => {
   console.log('[OidcServiceWorker] service worker installed ' + id);
   event.waitUntil(_self.skipWaiting());
@@ -54,7 +54,7 @@ const handleInstall = (event: ExtendableEvent) => {
 const handleActivate = (event: ExtendableEvent) => {
   console.log('[OidcServiceWorker] service worker activated ' + id);
   event.waitUntil(_self.clients.claim());
-};
+};*/
 
 /**
  * Routine keepAlive : renvoie une réponse après un "sleep" éventuel.
@@ -403,9 +403,8 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
 
-  if (event.data.type === 'claim') {
-    _self.clients.claim().then(() => port.postMessage({}));
-    return;
+  if (event.data?.type === 'SKIP_WAITING') {
+    await _self.skipWaiting();
   }
 
   const configurationName = data.configurationName.split('#')[0];
@@ -622,7 +621,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 };
 
 // Écouteurs
-_self.addEventListener('install', handleInstall);
-_self.addEventListener('activate', handleActivate);
+//_self.addEventListener('install', handleInstall);
+//_self.addEventListener('activate', handleActivate);
 _self.addEventListener('fetch', handleFetch);
 _self.addEventListener('message', handleMessage);
