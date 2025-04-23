@@ -31,12 +31,10 @@ export type OidcConfiguration = {
   token_automatic_renew_mode?: TokenAutomaticRenewMode;
   token_request_timeout?: number;
   service_worker_relative_url?: string;
-  service_worker_register?: ServiceWorkerRegister;
   service_worker_keep_alive_path?: string;
   service_worker_activate?: ServiceWorkerActivate;
   service_worker_only?: boolean;
   service_worker_convert_all_requests_to_cors?: boolean;
-  service_worker_update_require_callback?: ServiceWorkerUpdateRequireCallback;
   extras?: StringMap;
   token_request_extras?: StringMap;
   storage?: Storage;

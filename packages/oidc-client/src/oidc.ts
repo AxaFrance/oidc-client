@@ -120,9 +120,6 @@ export class Oidc {
         refresh_time_before_tokens_expiration_in_second - Math.floor(Math.random() * 40);
     }
     this.location = location ?? new OidcLocation();
-    const service_worker_update_require_callback =
-      configuration.service_worker_update_require_callback ??
-      defaultServiceWorkerUpdateRequireCallback(this.location);
 
     this.configuration = {
       ...configuration,
@@ -142,7 +139,6 @@ export class Oidc {
         'access_token',
         'refresh_token',
       ],
-      service_worker_update_require_callback,
       service_worker_activate: configuration.service_worker_activate ?? activateServiceWorker,
       demonstrating_proof_of_possession_configuration:
         configuration.demonstrating_proof_of_possession_configuration ??

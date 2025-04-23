@@ -116,8 +116,10 @@ export const initWorkerAsync = async (
   // 1) Détection updatefound
   registration.addEventListener('updatefound', () => {
     const newSW = registration.installing;
+    stopKeepAlive();
     newSW?.addEventListener('statechange', () => {
       if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+        stopKeepAlive();
         console.log('New SW waiting – skipWaiting()');
         newSW.postMessage({ type: 'SKIP_WAITING' });
       }
@@ -126,13 +128,9 @@ export const initWorkerAsync = async (
 
   // 2) Quand le SW actif change, on reload
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    // @ts-ignore
-    //if (!window.__swReloading) {
-    // @ts-ignore
-    //window.__swReloading = true;
     console.log('SW controller changed – reloading page');
+    stopKeepAlive();
     window.location.reload();
-    //}
   });
 
   // 3) Claim + init classique
@@ -174,7 +172,6 @@ export const initWorkerAsync = async (
       console.warn(
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
-      await oidcConfiguration.service_worker_update_require_callback?.(registration, stopKeepAlive);
     } else {
       console.log(`Service worker ${serviceWorkerVersion} version match with js client version`);
     }
@@ -360,8 +357,6 @@ export const initWorkerAsync = async (
     initAsync,
     startKeepAliveServiceWorker: () =>
       startKeepAliveServiceWorker(configuration.service_worker_keep_alive_path),
-    isServiceWorkerProxyActiveAsync: () =>
-      isServiceWorkerProxyActiveAsync(configuration.service_worker_keep_alive_path),
     setSessionStateAsync,
     getSessionStateAsync,
     setNonceAsync,
