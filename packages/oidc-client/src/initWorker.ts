@@ -94,7 +94,7 @@ export const initWorkerAsync = async (
   configuration: OidcConfiguration,
   configurationName: string,
 ) => {
-  const serviceWorkerRelativeUrl = `${configuration.service_worker_relative_url}?v=${codeVersion}`;
+  const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
   if (
     typeof window === 'undefined' ||
     typeof navigator === 'undefined' ||
