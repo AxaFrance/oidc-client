@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.25.9
+## 7.25.10
+
+- [dbb52da](https://github.com/AxaFrance/oidc-client/commit/dbb52dad456d2429d21fd5a645ff27d6b21e056a) - fix(serviceworker): ios (#1554) (release), 2025-04-24 by *Guillaume Chervet*
+- [f2f447e](https://github.com/AxaFrance/oidc-client/commit/f2f447e34805822387281126b93ec39153fb5672) - refactor(all): updates libraries, 2025-04-14 by *Guillaume Chervet*
+
+
+## v7.25.9
 
 - [c1ece66](https://github.com/AxaFrance/oidc-client/commit/c1ece663131db50a8c1152b18be0d3d5f6a0025e) - fix(oidc): make bearer fetch works on safari back (release) (#1550), 2025-04-11 by *Guillaume Chervet*
 
@@ -324,10 +330,5 @@
 ## v7.18.5
 
 - [7a38d96](https://github.com/AxaFrance/oidc-client/commit/7a38d962b0e08837989a1d2affeb5e557dc09444) - fix(oidc): parse token with many _ or - (#1302) (release), 2024-02-18 by *Guillaume Chervet*
-
-
-## v7.18.4
-
-- [b4e5ec8](https://github.com/AxaFrance/oidc-client/commit/b4e5ec834bdfedf8975b79086c2c0144f4e6e9b1) - fix(oidc-service-worker): set Bearer as default (release), 2024-02-17 by *Guillaume Chervet*
 
 
