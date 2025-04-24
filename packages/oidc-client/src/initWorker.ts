@@ -33,20 +33,6 @@ const stopKeepAlive = () => {
   }
 };
 
-const isServiceWorkerProxyActiveAsync = (service_worker_keep_alive_path = '/') => {
-  return fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json`, {
-    headers: {
-      'oidc-vanilla': 'true',
-    },
-  })
-    .then(response => {
-      return response.statusText === 'oidc-service-worker';
-    })
-    .catch(error => {
-      console.log(error);
-    });
-};
-
 export const defaultServiceWorkerUpdateRequireCallback =
   (location: ILOidcLocation) => async (registration: any, stopKeepAlive: () => void) => {
     stopKeepAlive();
@@ -109,7 +95,7 @@ export const initWorkerAsync = async (
   }
 
   const swUrl = `${serviceWorkerRelativeUrl}?v=${codeVersion}`;
-  let registration :  ServiceWorkerRegistration = null;
+  let registration: ServiceWorkerRegistration = null;
   if (configuration.service_worker_register) {
     registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
   } else {
@@ -177,7 +163,7 @@ export const initWorkerAsync = async (
       console.warn(
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
-    } 
+    }
 
     // @ts-ignore
     return {
