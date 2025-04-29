@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.10
+## 7.25.11
+
+- [e5e958a](https://github.com/AxaFrance/oidc-client/commit/e5e958a34f39ab349b34e094bc17f5df3b49b8f9) - fix(oidc-service-worker): missing body (#1556) (release), 2025-04-29 by *Guillaume Chervet*
+
+
+## v7.25.10
 
 - [dbb52da](https://github.com/AxaFrance/oidc-client/commit/dbb52dad456d2429d21fd5a645ff27d6b21e056a) - fix(serviceworker): ios (#1554) (release), 2025-04-24 by *Guillaume Chervet*
 - [f2f447e](https://github.com/AxaFrance/oidc-client/commit/f2f447e34805822387281126b93ec39153fb5672) - refactor(all): updates libraries, 2025-04-14 by *Guillaume Chervet*
@@ -325,10 +330,5 @@
 
 - [8f3940c](https://github.com/AxaFrance/oidc-client/commit/8f3940c42ad62264abfd61690777b602e0bdc31a) - feat(oidc): dpop inside serviceworker (#1306) (release), 2024-02-22 by *Guillaume Chervet*
 - [4a5887f](https://github.com/AxaFrance/oidc-client/commit/4a5887f5e7b3d739d709c7bb4fb7a007ccb051a1) - fix(oidc-service-worker): remove sw unecessary log, 2024-02-19 by *Guillaume Chervet*
-
-
-## v7.18.5
-
-- [7a38d96](https://github.com/AxaFrance/oidc-client/commit/7a38d962b0e08837989a1d2affeb5e557dc09444) - fix(oidc): parse token with many _ or - (#1302) (release), 2024-02-18 by *Guillaume Chervet*
 
 
