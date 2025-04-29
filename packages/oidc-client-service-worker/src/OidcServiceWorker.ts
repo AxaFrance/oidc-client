@@ -203,6 +203,7 @@ const handleFetch = (event: FetchEvent): void => {
             }
           }
           const newRequest = new Request(originalRequest.url, {
+            body: originalRequest.body,
             method: originalRequest.method,
             headers: new Headers(headers),
             mode: requestMode,
