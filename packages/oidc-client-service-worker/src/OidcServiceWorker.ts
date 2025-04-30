@@ -202,18 +202,20 @@ const handleFetch = (event: FetchEvent): void => {
               };
             }
           }
-          const newRequest = new Request(originalRequest.url, {
-            body: originalRequest.body,
-            method: originalRequest.method,
-            headers: new Headers(headers),
-            mode: requestMode,
-            credentials: originalRequest.credentials,
-            redirect: originalRequest.redirect,
-            referrer: originalRequest.referrer,
-            cache: originalRequest.cache,
-            integrity: originalRequest.integrity,
-            keepalive: originalRequest.keepalive,
-          });
+
+          let init: RequestInit;
+          if (originalRequest.mode === 'navigate') {
+            init = {
+              headers: headers,
+            };
+          } else {
+            init = {
+              headers: headers,
+              mode: requestMode,
+            };
+          }
+
+          const newRequest = new Request(originalRequest, init);
           return fetch(newRequest);
         }
 
