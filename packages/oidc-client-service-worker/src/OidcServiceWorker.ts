@@ -212,7 +212,6 @@ const handleFetch = (event: FetchEvent): void => {
             init = {
               headers: headers,
               mode: requestMode,
-              duplex: original.method !== 'GET' && original.method !== 'HEAD' ? 'half' : undefined,
             };
           }
 
