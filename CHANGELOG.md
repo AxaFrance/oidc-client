@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.11
+## 7.25.12
+
+- [f19cca8](https://github.com/AxaFrance/oidc-client/commit/f19cca8c4a0aa24f5646e13c80610148037e3bad) - fix(oidc-service-worker): stream already consumed (#1558) (release), 2025-04-30 by *Guillaume Chervet*
+
+
+## v7.25.11
 
 - [e5e958a](https://github.com/AxaFrance/oidc-client/commit/e5e958a34f39ab349b34e094bc17f5df3b49b8f9) - fix(oidc-service-worker): missing body (#1556) (release), 2025-04-29 by *Guillaume Chervet*
 
@@ -324,11 +329,5 @@
 - [322c1f1](https://github.com/AxaFrance/oidc-client/commit/322c1f1fbd3563b27b01a6ca98c8d95eeef12038) - doc(oidc-client-demo): update content and CSP, 2024-02-23 by *Guillaume Chervet*
 - [cf92792](https://github.com/AxaFrance/oidc-client/commit/cf92792db7ede5f35c3e2883f4353376e73ff7e3) - doc(oidc-client-demo): repair demo, 2024-02-23 by *Guillaume Chervet*
 - [fa33e72](https://github.com/AxaFrance/oidc-client/commit/fa33e7250cd5d46c98940c999b8f701116f78446) - doc(oidc-client): update vanilla to add Hack game, 2024-02-23 by *Guillaume Chervet*
-
-
-## v7.19.0
-
-- [8f3940c](https://github.com/AxaFrance/oidc-client/commit/8f3940c42ad62264abfd61690777b602e0bdc31a) - feat(oidc): dpop inside serviceworker (#1306) (release), 2024-02-22 by *Guillaume Chervet*
-- [4a5887f](https://github.com/AxaFrance/oidc-client/commit/4a5887f5e7b3d739d709c7bb4fb7a007ccb051a1) - fix(oidc-service-worker): remove sw unecessary log, 2024-02-19 by *Guillaume Chervet*
 
 
