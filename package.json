@@ -29,7 +29,7 @@
   "devDependencies": {
     "@eslint/compat": "^1.2.8",
     "@typescript-eslint/eslint-plugin": "^8.29.1",
-    "@typescript-eslint/parser": "^8.29.1",
+    "@typescript-eslint/parser": "^8.31.1",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^10.1.2",
     "eslint-define-config": "^2.1.0",
