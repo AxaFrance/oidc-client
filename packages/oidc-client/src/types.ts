@@ -36,7 +36,6 @@ export type OidcConfiguration = {
   service_worker_activate?: ServiceWorkerActivate;
   service_worker_only?: boolean;
   service_worker_convert_all_requests_to_cors?: boolean;
-  service_worker_update_require_callback?: ServiceWorkerUpdateRequireCallback;
   extras?: StringMap;
   token_request_extras?: StringMap;
   storage?: Storage;

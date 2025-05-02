@@ -42,19 +42,9 @@ declare let trustedDomains: TrustedDomains;
 _self.importScripts(scriptFilename);
 
 const id = Math.round(new Date().getTime() / 1000).toString();
-
+console.log('init service worker with id', id);
 const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
 const database: Database = {};
-
-const handleInstall = (event: ExtendableEvent) => {
-  console.log('[OidcServiceWorker] service worker installed ' + id);
-  event.waitUntil(_self.skipWaiting());
-};
-
-const handleActivate = (event: ExtendableEvent) => {
-  console.log('[OidcServiceWorker] service worker activated ' + id);
-  event.waitUntil(_self.clients.claim());
-};
 
 /**
  * Routine keepAlive : renvoie une réponse après un "sleep" éventuel.
@@ -212,17 +202,20 @@ const handleFetch = (event: FetchEvent): void => {
               };
             }
           }
-          const newRequest = new Request(originalRequest.url, {
-            method: originalRequest.method,
-            headers: new Headers(headers),
-            mode: requestMode,
-            credentials: originalRequest.credentials,
-            redirect: originalRequest.redirect,
-            referrer: originalRequest.referrer,
-            cache: originalRequest.cache,
-            integrity: originalRequest.integrity,
-            keepalive: originalRequest.keepalive,
-          });
+
+          let init: RequestInit;
+          if (originalRequest.mode === 'navigate') {
+            init = {
+              headers: headers,
+            };
+          } else {
+            init = {
+              headers: headers,
+              mode: requestMode,
+            };
+          }
+
+          const newRequest = new Request(originalRequest, init);
           return fetch(newRequest);
         }
 
@@ -328,12 +321,16 @@ const handleFetch = (event: FetchEvent): void => {
                   }
 
                   // 4b) Sinon si c’est le code_verifier
-                  if (
-                    actualBody.includes('code_verifier=') &&
-                    extractConfigurationNameFromCodeVerifier(actualBody) != ''
-                  ) {
+                  const isCodeVerifier = actualBody.includes('code_verifier=');
+                  if (isCodeVerifier) {
                     const currentLoginCallbackConfigurationName =
                       extractConfigurationNameFromCodeVerifier(actualBody);
+                    if (
+                      !currentLoginCallbackConfigurationName ||
+                      currentLoginCallbackConfigurationName === ''
+                    ) {
+                      throw new Error('No configuration name found in code_verifier');
+                    }
                     currentDatabase = database[currentLoginCallbackConfigurationName];
                     let newBody = actualBody;
                     const codeVerifier = currentDatabase.codeVerifier;
@@ -402,7 +399,10 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
 
-  if (event.data.type === 'claim') {
+  if (event.data?.type === 'SKIP_WAITING') {
+    await _self.skipWaiting();
+    return;
+  } else if (event.data.type === 'claim') {
     _self.clients.claim().then(() => port.postMessage({}));
     return;
   }
@@ -616,7 +616,5 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 };
 
 // Écouteurs
-_self.addEventListener('install', handleInstall);
-_self.addEventListener('activate', handleActivate);
 _self.addEventListener('fetch', handleFetch);
 _self.addEventListener('message', handleMessage);

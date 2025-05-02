@@ -1,6 +1,22 @@
 # Changelog
 
-## 7.25.9
+## 7.25.12
+
+- [f19cca8](https://github.com/AxaFrance/oidc-client/commit/f19cca8c4a0aa24f5646e13c80610148037e3bad) - fix(oidc-service-worker): stream already consumed (#1558) (release), 2025-04-30 by *Guillaume Chervet*
+
+
+## v7.25.11
+
+- [e5e958a](https://github.com/AxaFrance/oidc-client/commit/e5e958a34f39ab349b34e094bc17f5df3b49b8f9) - fix(oidc-service-worker): missing body (#1556) (release), 2025-04-29 by *Guillaume Chervet*
+
+
+## v7.25.10
+
+- [dbb52da](https://github.com/AxaFrance/oidc-client/commit/dbb52dad456d2429d21fd5a645ff27d6b21e056a) - fix(serviceworker): ios (#1554) (release), 2025-04-24 by *Guillaume Chervet*
+- [f2f447e](https://github.com/AxaFrance/oidc-client/commit/f2f447e34805822387281126b93ec39153fb5672) - refactor(all): updates libraries, 2025-04-14 by *Guillaume Chervet*
+
+
+## v7.25.9
 
 - [c1ece66](https://github.com/AxaFrance/oidc-client/commit/c1ece663131db50a8c1152b18be0d3d5f6a0025e) - fix(oidc): make bearer fetch works on safari back (release) (#1550), 2025-04-11 by *Guillaume Chervet*
 
@@ -313,21 +329,5 @@
 - [322c1f1](https://github.com/AxaFrance/oidc-client/commit/322c1f1fbd3563b27b01a6ca98c8d95eeef12038) - doc(oidc-client-demo): update content and CSP, 2024-02-23 by *Guillaume Chervet*
 - [cf92792](https://github.com/AxaFrance/oidc-client/commit/cf92792db7ede5f35c3e2883f4353376e73ff7e3) - doc(oidc-client-demo): repair demo, 2024-02-23 by *Guillaume Chervet*
 - [fa33e72](https://github.com/AxaFrance/oidc-client/commit/fa33e7250cd5d46c98940c999b8f701116f78446) - doc(oidc-client): update vanilla to add Hack game, 2024-02-23 by *Guillaume Chervet*
-
-
-## v7.19.0
-
-- [8f3940c](https://github.com/AxaFrance/oidc-client/commit/8f3940c42ad62264abfd61690777b602e0bdc31a) - feat(oidc): dpop inside serviceworker (#1306) (release), 2024-02-22 by *Guillaume Chervet*
-- [4a5887f](https://github.com/AxaFrance/oidc-client/commit/4a5887f5e7b3d739d709c7bb4fb7a007ccb051a1) - fix(oidc-service-worker): remove sw unecessary log, 2024-02-19 by *Guillaume Chervet*
-
-
-## v7.18.5
-
-- [7a38d96](https://github.com/AxaFrance/oidc-client/commit/7a38d962b0e08837989a1d2affeb5e557dc09444) - fix(oidc): parse token with many _ or - (#1302) (release), 2024-02-18 by *Guillaume Chervet*
-
-
-## v7.18.4
-
-- [b4e5ec8](https://github.com/AxaFrance/oidc-client/commit/b4e5ec834bdfedf8975b79086c2c0144f4e6e9b1) - fix(oidc-service-worker): set Bearer as default (release), 2024-02-17 by *Guillaume Chervet*
 
 

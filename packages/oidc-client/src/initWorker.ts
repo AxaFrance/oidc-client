@@ -33,20 +33,6 @@ const stopKeepAlive = () => {
   }
 };
 
-const isServiceWorkerProxyActiveAsync = (service_worker_keep_alive_path = '/') => {
-  return fetch(`${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json`, {
-    headers: {
-      'oidc-vanilla': 'true',
-    },
-  })
-    .then(response => {
-      return response.statusText === 'oidc-service-worker';
-    })
-    .catch(error => {
-      console.log(error);
-    });
-};
-
 export const defaultServiceWorkerUpdateRequireCallback =
   (location: ILOidcLocation) => async (registration: any, stopKeepAlive: () => void) => {
     stopKeepAlive();
@@ -108,22 +94,42 @@ export const initWorkerAsync = async (
     return null;
   }
 
-  let registration = null;
+  const swUrl = `${serviceWorkerRelativeUrl}?v=${codeVersion}`;
+  let registration: ServiceWorkerRegistration = null;
   if (configuration.service_worker_register) {
     registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
   } else {
-    registration = await navigator.serviceWorker.register(serviceWorkerRelativeUrl);
-
-    if (registration.active && registration.waiting) {
-      console.log('Detected new service worker waiting, unregistering and reloading');
-      await configuration.service_worker_update_require_callback?.(registration, stopKeepAlive);
-    }
+    registration = await navigator.serviceWorker.register(swUrl, {
+      updateViaCache: 'none',
+    });
   }
 
+  // 1) Détection updatefound
+  registration.addEventListener('updatefound', () => {
+    const newSW = registration.installing;
+    stopKeepAlive();
+    newSW?.addEventListener('statechange', () => {
+      if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+        stopKeepAlive();
+        console.log('New SW waiting – skipWaiting()');
+        newSW.postMessage({ type: 'SKIP_WAITING' });
+      }
+    });
+  });
+
+  // 2) Quand le SW actif change, on reload
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.log('SW controller changed – reloading page');
+    stopKeepAlive();
+    window.location.reload();
+  });
+
+  // 3) Claim + init classique
   try {
     await navigator.serviceWorker.ready;
-    if (!navigator.serviceWorker.controller)
+    if (!navigator.serviceWorker.controller) {
       await sendMessageAsync(registration)({ type: 'claim' });
+    }
   } catch (err) {
     console.warn(`Failed init ServiceWorker ${err.toString()}`);
     return null;
@@ -157,7 +163,6 @@ export const initWorkerAsync = async (
       console.warn(
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
-      await oidcConfiguration.service_worker_update_require_callback?.(registration, stopKeepAlive);
     }
 
     // @ts-ignore
@@ -200,7 +205,7 @@ export const initWorkerAsync = async (
       configurationName,
     });
   };
-  const getNonceAsync = async () => {
+  const getNonceAsync = async (fallback: boolean = true) => {
     // @ts-ignore
     const result = await sendMessageAsync(registration)({
       type: 'getNonce',
@@ -212,6 +217,12 @@ export const initWorkerAsync = async (
     if (!nonce) {
       nonce = sessionStorage[`oidc.nonce.${configurationName}`];
       console.warn('nonce not found in service worker, using sessionStorage');
+      if (fallback) {
+        await setNonceAsync(nonce);
+        const data = await getNonceAsync(false);
+        // @ts-ignore
+        nonce = data.nonce;
+      }
     }
     return { nonce };
   };
@@ -272,7 +283,7 @@ export const initWorkerAsync = async (
     return JSON.parse(result.demonstratingProofOfPossessionJwkJson);
   };
 
-  const getStateAsync = async () => {
+  const getStateAsync = async (fallback: boolean = true) => {
     const result = await sendMessageAsync(registration)({
       type: 'getState',
       data: null,
@@ -283,6 +294,10 @@ export const initWorkerAsync = async (
     if (!state) {
       state = sessionStorage[`oidc.state.${configurationName}`];
       console.warn('state not found in service worker, using sessionStorage');
+      if (fallback) {
+        await setStateAsync(state);
+        state = await getStateAsync(false);
+      }
     }
     return state;
   };
@@ -296,7 +311,7 @@ export const initWorkerAsync = async (
     });
   };
 
-  const getCodeVerifierAsync = async () => {
+  const getCodeVerifierAsync = async (fallback: boolean = true) => {
     const result = await sendMessageAsync(registration)({
       type: 'getCodeVerifier',
       data: null,
@@ -307,6 +322,10 @@ export const initWorkerAsync = async (
     if (!codeVerifier) {
       codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
       console.warn('codeVerifier not found in service worker, using sessionStorage');
+      if (fallback) {
+        await setCodeVerifierAsync(codeVerifier);
+        codeVerifier = await getCodeVerifierAsync(false);
+      }
     }
     return codeVerifier;
   };
@@ -325,8 +344,6 @@ export const initWorkerAsync = async (
     initAsync,
     startKeepAliveServiceWorker: () =>
       startKeepAliveServiceWorker(configuration.service_worker_keep_alive_path),
-    isServiceWorkerProxyActiveAsync: () =>
-      isServiceWorkerProxyActiveAsync(configuration.service_worker_keep_alive_path),
     setSessionStateAsync,
     getSessionStateAsync,
     setNonceAsync,
