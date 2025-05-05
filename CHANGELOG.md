@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.12
+## 7.25.13
+
+- [31661bc](https://github.com/AxaFrance/oidc-client/commit/31661bc16d67866b6e8d5b978b117600b769fe28) - refcator(all): update dependencies (#1567) (release), 2025-05-05 by *Guillaume Chervet*
+
+
+## v7.25.12
 
 - [f19cca8](https://github.com/AxaFrance/oidc-client/commit/f19cca8c4a0aa24f5646e13c80610148037e3bad) - fix(oidc-service-worker): stream already consumed (#1558) (release), 2025-04-30 by *Guillaume Chervet*
 
@@ -319,15 +324,5 @@
 ## v7.19.2
 
 - [95be8f7](https://github.com/AxaFrance/oidc-client/commit/95be8f79a3fc399b05322d0197ab674cf272326a) - build(npm): bump vitest from 1.2.2 to 1.3.1 (#1315), 2024-03-07 by *dependabot[bot]*
-
-
-## v7.19.1
-
-- [7b2b21a](https://github.com/AxaFrance/oidc-client/commit/7b2b21a9837210d0caaea9e16cfea9e9daeb8364) - build(npm): bump rimraf from 5.0.1 to 5.0.5 (#1313) (release), 2024-03-04 by *dependabot[bot]*
-- [d4c9ec6](https://github.com/AxaFrance/oidc-client/commit/d4c9ec6b8a4760c81f4d88bc72563cc810b52b00) - fix(oidc): when having multiple iframes, only the last one gets resolved (#1311) (alpha), 2024-02-28 by *Jean-Marc Rakotoarisoa*
-- [db13d8b](https://github.com/AxaFrance/oidc-client/commit/db13d8bdfbd49e564452461aeefc6e3024ce4435) - doc(oidc-client-demo): fix workflow, 2024-02-23 by *Guillaume Chervet*
-- [322c1f1](https://github.com/AxaFrance/oidc-client/commit/322c1f1fbd3563b27b01a6ca98c8d95eeef12038) - doc(oidc-client-demo): update content and CSP, 2024-02-23 by *Guillaume Chervet*
-- [cf92792](https://github.com/AxaFrance/oidc-client/commit/cf92792db7ede5f35c3e2883f4353376e73ff7e3) - doc(oidc-client-demo): repair demo, 2024-02-23 by *Guillaume Chervet*
-- [fa33e72](https://github.com/AxaFrance/oidc-client/commit/fa33e7250cd5d46c98940c999b8f701116f78446) - doc(oidc-client): update vanilla to add Hack game, 2024-02-23 by *Guillaume Chervet*
 
 
