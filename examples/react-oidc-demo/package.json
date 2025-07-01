@@ -22,7 +22,7 @@
     "@axa-fr/react-oidc": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^6.22.3"
+    "react-router-dom": "^7.6.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.6.3",
