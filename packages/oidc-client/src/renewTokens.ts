@@ -204,6 +204,7 @@ const synchroniseTokensAsync =
     forceRefresh = false,
     extras: StringMap = null,
     scope: string = null,
+    hiddenRetryCount = 0,
   ) => {
     if (!navigator.onLine && document.hidden) {
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
@@ -217,9 +218,20 @@ const synchroniseTokensAsync =
       });
     }
     const isDocumentHidden = document.hidden;
-    const nextIndex = isDocumentHidden ? index : index + 1;
-    if (index > 4) {
+    const nextIndex = index + 1;
+    const nextHiddenRetryCount = isDocumentHidden ? hiddenRetryCount + 1 : hiddenRetryCount;
+
+    const shouldGiveUp = index > 4 || (isDocumentHidden && hiddenRetryCount > 10);
+
+    if (shouldGiveUp) {
       if (isDocumentHidden) {
+        if (hiddenRetryCount > 10) {
+          updateTokens(null);
+          oidc.publishEvent(eventNames.refreshTokensAsync_error, {
+            message: 'refresh token failed after max hidden retries',
+          });
+          return { tokens: null, status: 'SESSION_LOST' };
+        }
         return { tokens: oidc.tokens, status: 'GIVE_UP' };
       } else {
         updateTokens(null);
@@ -227,6 +239,7 @@ const synchroniseTokensAsync =
         return { tokens: null, status: 'SESSION_LOST' };
       }
     }
+
     if (!extras) {
       extras = {};
     }
@@ -275,6 +288,7 @@ const synchroniseTokensAsync =
         return { tokens: silent_token_response.tokens, status: 'LOGGED' };
       } catch (exceptionSilent: any) {
         console.error(exceptionSilent);
+
         oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
           message: 'exceptionSilent',
           exception: exceptionSilent.message,
@@ -285,6 +299,7 @@ const synchroniseTokensAsync =
           forceRefresh,
           extras,
           scope,
+          nextHiddenRetryCount,
         );
       }
     };
@@ -448,6 +463,7 @@ const synchroniseTokensAsync =
                 forceRefresh,
                 extras,
                 scope,
+                nextHiddenRetryCount,
               );
             }
           };
@@ -456,6 +472,7 @@ const synchroniseTokensAsync =
       }
     } catch (exception: any) {
       console.error(exception);
+
       oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
         message: 'exception',
         exception: exception.message,
@@ -465,7 +482,14 @@ const synchroniseTokensAsync =
       // so we need to brake calls chain and delay next call
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras, scope)
+          synchroniseTokensAsync(oidc)(
+            updateTokens,
+            nextIndex,
+            forceRefresh,
+            extras,
+            scope,
+            nextHiddenRetryCount,
+          )
             .then(resolve)
             .catch(reject);
         }, 1000);
