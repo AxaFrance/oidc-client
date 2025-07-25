@@ -20,6 +20,7 @@ async function syncTokens(
   const { tokens, status } = await synchroniseTokensAsync(oidc)(
     updateTokens,
     0,
+    0,
     forceRefresh,
     extras,
     scope,
@@ -200,16 +201,19 @@ const synchroniseTokensAsync =
   (oidc: Oidc) =>
   async (
     updateTokens,
-    index = 0,
+    tryNumber = 0,
+    backgroundTry = 0,
     forceRefresh = false,
     extras: StringMap = null,
     scope: string = null,
-    hiddenRetryCount = 0,
   ) => {
     if (!navigator.onLine && document.hidden) {
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
     }
     let numberTryOnline = 6;
+    const maxTries = 5;
+    const maxBackgroundTries = 5;
+
     while (!navigator.onLine && numberTryOnline > 0) {
       await sleepAsync({ milliseconds: 1000 });
       numberTryOnline--;
@@ -218,26 +222,13 @@ const synchroniseTokensAsync =
       });
     }
     const isDocumentHidden = document.hidden;
-    const nextIndex = index + 1;
-    const nextHiddenRetryCount = isDocumentHidden ? hiddenRetryCount + 1 : hiddenRetryCount;
+    const nextTry = isDocumentHidden ? tryNumber : tryNumber + 1;
+    const nextBackgroundTry = isDocumentHidden ? backgroundTry + 1 : backgroundTry;
 
-    const shouldGiveUp = index > 4 || (isDocumentHidden && hiddenRetryCount > 10);
-
-    if (shouldGiveUp) {
-      if (isDocumentHidden) {
-        if (hiddenRetryCount > 10) {
-          updateTokens(null);
-          oidc.publishEvent(eventNames.refreshTokensAsync_error, {
-            message: 'refresh token failed after max hidden retries',
-          });
-          return { tokens: null, status: 'SESSION_LOST' };
-        }
-        return { tokens: oidc.tokens, status: 'GIVE_UP' };
-      } else {
-        updateTokens(null);
-        oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
-        return { tokens: null, status: 'SESSION_LOST' };
-      }
+    if (tryNumber >= maxTries || backgroundTry >= maxBackgroundTries) {
+      updateTokens(null);
+      oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
+      return { tokens: null, status: 'SESSION_LOST' };
     }
 
     if (!extras) {
@@ -288,18 +279,17 @@ const synchroniseTokensAsync =
         return { tokens: silent_token_response.tokens, status: 'LOGGED' };
       } catch (exceptionSilent: any) {
         console.error(exceptionSilent);
-
         oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
           message: 'exceptionSilent',
           exception: exceptionSilent.message,
         });
         return await synchroniseTokensAsync(oidc)(
           updateTokens,
-          nextIndex,
+          nextTry,
+          nextBackgroundTry,
           forceRefresh,
           extras,
           scope,
-          nextHiddenRetryCount,
         );
       }
     };
@@ -346,7 +336,7 @@ const synchroniseTokensAsync =
             return { tokens: oidc.tokens, status: 'GIVE_UP' };
           }
 
-          oidc.publishEvent(eventNames.refreshTokensAsync_begin, { tryNumber: index });
+          oidc.publishEvent(eventNames.refreshTokensAsync_begin, { tryNumber: tryNumber });
           return await localSilentLoginAsync();
         default: {
           if (
@@ -361,8 +351,10 @@ const synchroniseTokensAsync =
           oidc.publishEvent(eventNames.refreshTokensAsync_begin, {
             refreshToken: tokens.refreshToken,
             status,
-            tryNumber: index,
+            tryNumber: tryNumber,
+            backgroundTry: backgroundTry,
           });
+
           if (!tokens.refreshToken) {
             return await localSilentLoginAsync();
           }
@@ -459,11 +451,11 @@ const synchroniseTokensAsync =
 
               return await synchroniseTokensAsync(oidc)(
                 updateTokens,
-                nextIndex,
+                nextTry,
+                nextBackgroundTry,
                 forceRefresh,
                 extras,
                 scope,
-                nextHiddenRetryCount,
               );
             }
           };
@@ -484,11 +476,11 @@ const synchroniseTokensAsync =
         setTimeout(() => {
           synchroniseTokensAsync(oidc)(
             updateTokens,
-            nextIndex,
+            nextTry,
+            nextBackgroundTry,
             forceRefresh,
             extras,
             scope,
-            nextHiddenRetryCount,
           )
             .then(resolve)
             .catch(reject);
