@@ -20,6 +20,7 @@ async function syncTokens(
   const { tokens, status } = await synchroniseTokensAsync(oidc)(
     updateTokens,
     0,
+    0,
     forceRefresh,
     extras,
     scope,
@@ -200,7 +201,8 @@ const synchroniseTokensAsync =
   (oidc: Oidc) =>
   async (
     updateTokens,
-    index = 0,
+    tryNumber = 0,
+    backgroundTry = 0,
     forceRefresh = false,
     extras: StringMap = null,
     scope: string = null,
@@ -209,6 +211,9 @@ const synchroniseTokensAsync =
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
     }
     let numberTryOnline = 6;
+    const maxTries = 5;
+    const maxBackgroundTries = 5;
+
     while (!navigator.onLine && numberTryOnline > 0) {
       await sleepAsync({ milliseconds: 1000 });
       numberTryOnline--;
@@ -217,16 +222,15 @@ const synchroniseTokensAsync =
       });
     }
     const isDocumentHidden = document.hidden;
-    const nextIndex = isDocumentHidden ? index : index + 1;
-    if (index > 4) {
-      if (isDocumentHidden) {
-        return { tokens: oidc.tokens, status: 'GIVE_UP' };
-      } else {
-        updateTokens(null);
-        oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
-        return { tokens: null, status: 'SESSION_LOST' };
-      }
+    const nextTry = isDocumentHidden ? tryNumber : tryNumber + 1;
+    const nextBackgroundTry = isDocumentHidden ? backgroundTry + 1 : backgroundTry;
+
+    if (tryNumber >= maxTries || backgroundTry >= maxBackgroundTries) {
+      updateTokens(null);
+      oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
+      return { tokens: null, status: 'SESSION_LOST' };
     }
+
     if (!extras) {
       extras = {};
     }
@@ -281,7 +285,8 @@ const synchroniseTokensAsync =
         });
         return await synchroniseTokensAsync(oidc)(
           updateTokens,
-          nextIndex,
+          nextTry,
+          nextBackgroundTry,
           forceRefresh,
           extras,
           scope,
@@ -331,7 +336,7 @@ const synchroniseTokensAsync =
             return { tokens: oidc.tokens, status: 'GIVE_UP' };
           }
 
-          oidc.publishEvent(eventNames.refreshTokensAsync_begin, { tryNumber: index });
+          oidc.publishEvent(eventNames.refreshTokensAsync_begin, { tryNumber: tryNumber });
           return await localSilentLoginAsync();
         default: {
           if (
@@ -346,8 +351,10 @@ const synchroniseTokensAsync =
           oidc.publishEvent(eventNames.refreshTokensAsync_begin, {
             refreshToken: tokens.refreshToken,
             status,
-            tryNumber: index,
+            tryNumber: tryNumber,
+            backgroundTry: backgroundTry,
           });
+
           if (!tokens.refreshToken) {
             return await localSilentLoginAsync();
           }
@@ -444,7 +451,8 @@ const synchroniseTokensAsync =
 
               return await synchroniseTokensAsync(oidc)(
                 updateTokens,
-                nextIndex,
+                nextTry,
+                nextBackgroundTry,
                 forceRefresh,
                 extras,
                 scope,
@@ -456,6 +464,7 @@ const synchroniseTokensAsync =
       }
     } catch (exception: any) {
       console.error(exception);
+
       oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
         message: 'exception',
         exception: exception.message,
@@ -465,7 +474,14 @@ const synchroniseTokensAsync =
       // so we need to brake calls chain and delay next call
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          synchroniseTokensAsync(oidc)(updateTokens, nextIndex, forceRefresh, extras, scope)
+          synchroniseTokensAsync(oidc)(
+            updateTokens,
+            nextTry,
+            nextBackgroundTry,
+            forceRefresh,
+            extras,
+            scope,
+          )
             .then(resolve)
             .catch(reject);
         }, 1000);
