@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.13
+## 7.25.14
+
+- [f5b86ff](https://github.com/AxaFrance/oidc-client/commit/f5b86ffe656845c26b6f7bcf88da43cf8ece173e) - fix(renewTokens): prevent infinite loop on renew token flow (#1581) (release), 2025-08-02 by *Matheus Frigo*
+
+
+## v7.25.13
 
 - [31661bc](https://github.com/AxaFrance/oidc-client/commit/31661bc16d67866b6e8d5b978b117600b769fe28) - refcator(all): update dependencies (#1567) (release), 2025-05-05 by *Guillaume Chervet*
 
@@ -319,10 +324,5 @@
 ## v7.19.3
 
 - [397629d](https://github.com/AxaFrance/oidc-client/commit/397629d2c9e1d58efab96c000247382cfc94ce24) - build(npm): bump vite from 5.0.12 to 5.1.5 (#1319), 2024-03-07 by *dependabot[bot]*
-
-
-## v7.19.2
-
-- [95be8f7](https://github.com/AxaFrance/oidc-client/commit/95be8f79a3fc399b05322d0197ab674cf272326a) - build(npm): bump vitest from 1.2.2 to 1.3.1 (#1315), 2024-03-07 by *dependabot[bot]*
 
 
