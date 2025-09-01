@@ -8,8 +8,12 @@ export const userInfoAsync =
       return oidc.userInfo;
     }
     // Check storage cache
-    const stored = !noCache && oidc.configuration.storage?.getItem(`oidc.${oidc.configurationName}.userInfo`);
-    if (stored) return oidc.userInfo = JSON.parse(stored);
+    const stored =
+      !noCache && oidc.configuration.storage?.getItem(`oidc.${oidc.configurationName}.userInfo`);
+    if (stored) {
+      oidc.userInfo = JSON.parse(stored);
+      return oidc.userInfo;
+    }
     const configuration = oidc.configuration;
     const oidcServerConfiguration = await oidc.initAsync(
       configuration.authority,
@@ -27,6 +31,11 @@ export const userInfoAsync =
     const userInfo = await fetchUserInfo();
     oidc.userInfo = userInfo;
     // Store in cache
-    if (userInfo) oidc.configuration.storage?.setItem(`oidc.${oidc.configurationName}.userInfo`, JSON.stringify(userInfo));
+    if (userInfo) {
+      oidc.configuration.storage?.setItem(
+        `oidc.${oidc.configurationName}.userInfo`,
+        JSON.stringify(userInfo),
+      );
+    }
     return userInfo;
   };
