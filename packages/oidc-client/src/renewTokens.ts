@@ -253,13 +253,30 @@ const synchroniseTokensAsync =
           const session = initSession(oidc.configurationName, configuration.storage);
           loginParams = session.getLoginParams();
         }
-        const silent_token_response = await silentLoginAsync({
-          ...loginParams.extras,
-          ...extras,
-          prompt: 'none',
-          scope,
-        });
+        console.log("loginParams:", loginParams);
+        console.log("extras:", extras);
+        const silentLoginInput = {};
+
+        if(loginParams && loginParams.extras) {
+            for (const [key, value] of Object.entries(loginParams.extras)) {
+                silentLoginInput[key] = value;
+            }
+        }
+        if(extras) {
+            for (const [key, value] of Object.entries(extras)) {
+                silentLoginInput[key] = value;
+            }
+        }
+        silentLoginInput['prompt'] = 'none';
+        if (scope) {
+           silentLoginInput['scope'] = scope;
+        }
+        
+        console.log('silentLoginInput:', silentLoginInput);
+        const silent_token_response = await silentLoginAsync(silentLoginInput);
         if (!silent_token_response) {
+            
+            
           updateTokens(null);
           oidc.publishEvent(eventNames.refreshTokensAsync_error, {
             message: 'refresh token silent not active',
@@ -301,6 +318,11 @@ const synchroniseTokensAsync =
         oidc.tokens,
         forceRefresh,
       );
+      
+      console.log("status:", status);
+      console.log("tokens:", tokens);
+      console.log("nonce:", nonce);
+      
       switch (status) {
         case synchroniseTokensStatus.SESSION_LOST:
           updateTokens(null);
