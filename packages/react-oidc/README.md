@@ -199,7 +199,7 @@ const configuration = {
     silent_login_timeout: Number, // Optional, default is 12000 milliseconds
     scope: String.isRequired, // oidc scope (you need to set "offline_access")
     authority: String.isRequired,
-    storage: Storage, // Default sessionStorage, you can set localStorage, but it is less secure against XSS attacks
+    storage: Storage, // Default sessionStorage, you can set localStorage, but it is not secure
     authority_configuration: {
       // Optional for providers that do not implement OIDC server auto-discovery via a .wellknown URL
       authorization_endpoint: String,

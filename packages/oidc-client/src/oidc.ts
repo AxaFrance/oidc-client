@@ -434,7 +434,6 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
     timer.clearTimeout(this.timeoutId);
     // @ts-ignore
-
     this.renewTokensPromise = renewTokensAndStartTimerAsync(this, true, extras, scope);
     return this.renewTokensPromise.finally(() => {
       this.renewTokensPromise = null;
