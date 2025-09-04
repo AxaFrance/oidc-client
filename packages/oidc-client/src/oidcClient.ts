@@ -2,6 +2,7 @@ import { fetchWithTokens } from './fetch';
 import { ILOidcLocation, OidcLocation } from './location';
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, OidcToken, Tokens, ValidToken } from './parseTokens.js';
+import { syncTokensInfoAsync } from './renewTokens';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
 
 export interface EventSubscriber {
@@ -100,6 +101,15 @@ export class OidcClient {
         token_automatic_renew_mode: oidc.configuration.token_automatic_renew_mode,
         refresh_time_before_tokens_expiration_in_second:
           oidc.configuration.refresh_time_before_tokens_expiration_in_second,
+      },
+      syncTokensInfoAsync: async () => {
+        const { status } = await syncTokensInfoAsync(oidc)(
+          oidc.configuration,
+          oidc.configurationName,
+          oidc.tokens,
+          false,
+        );
+        return status;
       },
       renewTokensAsync: oidc.renewTokensAsync.bind(oidc),
     };

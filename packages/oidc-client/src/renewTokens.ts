@@ -29,7 +29,7 @@ async function syncTokens(
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if (!serviceWorker) {
     const session = initSession(oidc.configurationName, oidc.configuration.storage);
-    await session.setTokens(oidc.tokens);
+    session.setTokens(oidc.tokens);
   }
 
   if (!oidc.tokens) {
@@ -50,7 +50,6 @@ export async function renewTokensAndStartTimerAsync(
 
   let tokens: null;
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
-
   if ((configuration?.storage === window?.sessionStorage && !serviceWorker) || !navigator.locks) {
     tokens = await syncTokens(oidc, forceRefresh, extras, scope);
   } else {
@@ -110,8 +109,10 @@ export const synchroniseTokensStatus = {
   NOT_CONNECTED: 'NOT_CONNECTED',
   TOKENS_VALID: 'TOKENS_VALID',
   TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID: 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID',
+  TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID: 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID',
   LOGOUT_FROM_ANOTHER_TAB: 'LOGOUT_FROM_ANOTHER_TAB',
   REQUIRE_SYNC_TOKENS: 'REQUIRE_SYNC_TOKENS',
+  TOKENS_INVALID: 'TOKENS_INVALID',
 };
 
 export const syncTokensInfoAsync =
@@ -126,7 +127,7 @@ export const syncTokensInfoAsync =
     // const configuration = this.configuration;
     const nullNonce = { nonce: null };
     if (!currentTokens) {
-      return { tokens: null, status: 'NOT_CONNECTED', nonce: nullNonce };
+      return { tokens: null, status: synchroniseTokensStatus.NOT_CONNECTED, nonce: nullNonce };
     }
     let nonce = nullNonce;
     const oidcServerConfiguration = await oidc.initAsync(
@@ -141,11 +142,19 @@ export const syncTokensInfoAsync =
         configuration,
       );
       if (status === 'LOGGED_OUT') {
-        return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
+        return {
+          tokens: null,
+          status: synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB,
+          nonce: nullNonce,
+        };
       } else if (status === 'SESSIONS_LOST') {
-        return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
+        return { tokens: null, status: synchroniseTokensStatus.SESSION_LOST, nonce: nullNonce };
       } else if (!status || !tokens) {
-        return { tokens: null, status: 'REQUIRE_SYNC_TOKENS', nonce: nullNonce };
+        return {
+          tokens: null,
+          status: synchroniseTokensStatus.REQUIRE_SYNC_TOKENS,
+          nonce: nullNonce,
+        };
       } else if (tokens.issuedAt !== currentTokens.issuedAt) {
         const timeLeft = computeTimeLeft(
           configuration.refresh_time_before_tokens_expiration_in_second,
@@ -153,8 +162,8 @@ export const syncTokensInfoAsync =
         );
         const status =
           timeLeft > 0
-            ? 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID'
-            : 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID';
+            ? synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID
+            : synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID;
         const nonce = await serviceWorker.getNonceAsync();
         return { tokens, status, nonce };
       }
@@ -168,9 +177,13 @@ export const syncTokensInfoAsync =
         tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
       }
       if (!tokens) {
-        return { tokens: null, status: 'LOGOUT_FROM_ANOTHER_TAB', nonce: nullNonce };
+        return {
+          tokens: null,
+          status: synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB,
+          nonce: nullNonce,
+        };
       } else if (status === 'SESSIONS_LOST') {
-        return { tokens: null, status: 'SESSIONS_LOST', nonce: nullNonce };
+        return { tokens: null, status: synchroniseTokensStatus.SESSION_LOST, nonce: nullNonce };
       } else if (tokens.issuedAt !== currentTokens.issuedAt) {
         const timeLeft = computeTimeLeft(
           configuration.refresh_time_before_tokens_expiration_in_second,
@@ -178,8 +191,8 @@ export const syncTokensInfoAsync =
         );
         const status =
           timeLeft > 0
-            ? 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID'
-            : 'TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID';
+            ? synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_VALID
+            : synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID;
         const nonce = await session.getNonceAsync();
         return { tokens, status, nonce };
       }
@@ -211,7 +224,7 @@ const synchroniseTokensAsync =
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
     }
     let numberTryOnline = 6;
-    const maxTries = 5;
+    const maxTries = forceRefresh ? 2 : 5;
     const maxBackgroundTries = 5;
 
     while (!navigator.onLine && numberTryOnline > 0) {
@@ -253,12 +266,24 @@ const synchroniseTokensAsync =
           const session = initSession(oidc.configurationName, configuration.storage);
           loginParams = session.getLoginParams();
         }
-        const silent_token_response = await silentLoginAsync({
-          ...loginParams.extras,
-          ...extras,
-          prompt: 'none',
-          scope,
-        });
+        const silentLoginInput = {};
+
+        if (loginParams && loginParams.extras) {
+          for (const [key, value] of Object.entries(loginParams.extras)) {
+            silentLoginInput[key] = value;
+          }
+        }
+        if (extras) {
+          for (const [key, value] of Object.entries(extras)) {
+            silentLoginInput[key] = value;
+          }
+        }
+        silentLoginInput['prompt'] = 'none';
+        if (scope) {
+          silentLoginInput['scope'] = scope;
+        }
+
+        const silent_token_response = await silentLoginAsync(silentLoginInput);
         if (!silent_token_response) {
           updateTokens(null);
           oidc.publishEvent(eventNames.refreshTokensAsync_error, {
@@ -301,6 +326,7 @@ const synchroniseTokensAsync =
         oidc.tokens,
         forceRefresh,
       );
+
       switch (status) {
         case synchroniseTokensStatus.SESSION_LOST:
           updateTokens(null);
@@ -330,7 +356,7 @@ const synchroniseTokensAsync =
           if (
             configuration.token_automatic_renew_mode ==
               TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted &&
-            synchroniseTokensStatus.FORCE_REFRESH !== status
+            !forceRefresh
           ) {
             oidc.publishEvent(eventNames.tokensInvalidAndWaitingActionsToRefresh, {});
             return { tokens: oidc.tokens, status: 'GIVE_UP' };

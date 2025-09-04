@@ -9,6 +9,7 @@ import {
   setTokens,
   TokenRenewMode,
 } from './parseTokens';
+import { synchroniseTokensStatus } from './renewTokens';
 import { StringMap, TokenAutomaticRenewMode } from './types';
 
 describe('ParseTokens test Suite', () => {
@@ -34,6 +35,7 @@ describe('ParseTokens test Suite', () => {
           token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
           refresh_time_before_tokens_expiration_in_second: 0,
         },
+        syncTokensInfoAsync: async () => synchroniseTokensStatus.TOKENS_VALID,
         renewTokensAsync: async (_extras: StringMap) => {
           await sleepAsync({ milliseconds: 10 });
         },

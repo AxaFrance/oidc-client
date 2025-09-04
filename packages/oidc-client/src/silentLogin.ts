@@ -61,6 +61,7 @@ export const _silentLoginAsync =
 
       iframe.id = `${configurationName}_oidc_iframe`;
       iframe.setAttribute('src', link);
+      iframe.style.display = 'none';
       document.body.appendChild(iframe);
       return new Promise((resolve, reject) => {
         let isResolved = false;
