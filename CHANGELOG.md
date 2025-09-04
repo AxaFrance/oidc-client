@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.25.15
+## 7.25.16
+
+- [c79907b](https://github.com/AxaFrance/oidc-client/commit/c79907b63af69352ed660e97d9e61265bc155131) - fix(oidc-client): renew token silent login (release) (#1598), 2025-09-04 by *Guillaume Chervet*
+
+
+## v7.25.15
 
 - [f4ce35e](https://github.com/AxaFrance/oidc-client/commit/f4ce35e4e272de9e4f4387494877bab5939fa1a9) - fix(oidc-client): implement consistent storage caching for userInfo and well-known configuration (release) (#1592), 2025-09-02 by *Michael Sverdlov*
 
@@ -319,10 +324,5 @@
 ## v7.19.5
 
 - [be24bba](https://github.com/AxaFrance/oidc-client/commit/be24bbab3d699ff003cb14302dedc3463b1f3a1b) - refactor(all): update build libraries (release), 2024-03-12 by *Guillaume Chervet*
-
-
-## v7.19.4
-
-- [7df257c](https://github.com/AxaFrance/oidc-client/commit/7df257ca7ba32a2605cd5d76881ea3aa50aba208) - refactor(all): update build libraries (release), 2024-03-12 by *Guillaume Chervet*
 
 
