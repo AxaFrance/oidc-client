@@ -61,10 +61,10 @@ export const _silentLoginAsync =
 
       iframe.id = `${configurationName}_oidc_iframe`;
       iframe.setAttribute('src', link);
-      console.log("silent login link: " + link);
+      console.log('silent login link: ' + link);
       console.log(`Silent login iframe: ${iframe.id}`);
       // j'aimerais logger l'id du parent aussi
-        console.log(window.location.origin);
+      console.log(window.location.origin);
       iframe.style.display = 'none';
       document.body.appendChild(iframe);
       return new Promise((resolve, reject) => {
