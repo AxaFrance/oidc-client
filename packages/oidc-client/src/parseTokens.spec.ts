@@ -9,8 +9,8 @@ import {
   setTokens,
   TokenRenewMode,
 } from './parseTokens';
+import { synchroniseTokensStatus } from './renewTokens';
 import { StringMap, TokenAutomaticRenewMode } from './types';
-import {synchroniseTokensStatus} from "./renewTokens";
 
 describe('ParseTokens test Suite', () => {
   const currentTimeUnixSecond = new Date().getTime() / 1000;

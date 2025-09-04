@@ -142,11 +142,19 @@ export const syncTokensInfoAsync =
         configuration,
       );
       if (status === 'LOGGED_OUT') {
-        return { tokens: null, status: synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB, nonce: nullNonce };
+        return {
+          tokens: null,
+          status: synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB,
+          nonce: nullNonce,
+        };
       } else if (status === 'SESSIONS_LOST') {
         return { tokens: null, status: synchroniseTokensStatus.SESSION_LOST, nonce: nullNonce };
       } else if (!status || !tokens) {
-        return { tokens: null, status: synchroniseTokensStatus.REQUIRE_SYNC_TOKENS, nonce: nullNonce };
+        return {
+          tokens: null,
+          status: synchroniseTokensStatus.REQUIRE_SYNC_TOKENS,
+          nonce: nullNonce,
+        };
       } else if (tokens.issuedAt !== currentTokens.issuedAt) {
         const timeLeft = computeTimeLeft(
           configuration.refresh_time_before_tokens_expiration_in_second,
@@ -169,7 +177,11 @@ export const syncTokensInfoAsync =
         tokens = setTokens(tokens, oidc.tokens, configuration.token_renew_mode);
       }
       if (!tokens) {
-        return { tokens: null, status: synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB, nonce: nullNonce };
+        return {
+          tokens: null,
+          status: synchroniseTokensStatus.LOGOUT_FROM_ANOTHER_TAB,
+          nonce: nullNonce,
+        };
       } else if (status === 'SESSIONS_LOST') {
         return { tokens: null, status: synchroniseTokensStatus.SESSION_LOST, nonce: nullNonce };
       } else if (tokens.issuedAt !== currentTokens.issuedAt) {

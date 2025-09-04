@@ -1,6 +1,6 @@
 import { sleepAsync } from './initWorker.js';
+import { synchroniseTokensStatus } from './renewTokens';
 import { StringMap, TokenAutomaticRenewMode } from './types';
-import { synchroniseTokensStatus } from "./renewTokens";
 
 const b64DecodeUnicode = str =>
   decodeURIComponent(
@@ -195,7 +195,7 @@ export type ValidToken = {
 
 export interface OidcToken {
   getTokens: () => Tokens | null;
-  syncTokensInfoAsync : () => Promise<string>;
+  syncTokensInfoAsync: () => Promise<string>;
   configuration: {
     token_automatic_renew_mode?: TokenAutomaticRenewMode;
     refresh_time_before_tokens_expiration_in_second?: number;
@@ -210,16 +210,15 @@ export const getValidTokenAsync = async (
 ): Promise<ValidToken> => {
   let numberWaitTemp = numberWait;
 
-  let status = await oidc.syncTokensInfoAsync()
-    const tryToSync = [synchroniseTokensStatus.REQUIRE_SYNC_TOKENS,
-        synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID,
-        synchroniseTokensStatus.TOKENS_INVALID
-    ].includes(status)
-  while ([synchroniseTokensStatus.REQUIRE_SYNC_TOKENS, 
+  let status = await oidc.syncTokensInfoAsync();
+  while (
+    [
+      synchroniseTokensStatus.REQUIRE_SYNC_TOKENS,
       synchroniseTokensStatus.TOKEN_UPDATED_BY_ANOTHER_TAB_TOKENS_INVALID,
-      synchroniseTokensStatus.TOKENS_INVALID
-  ].includes(status) && numberWaitTemp > 0)
-  {
+      synchroniseTokensStatus.TOKENS_INVALID,
+    ].includes(status) &&
+    numberWaitTemp > 0
+  ) {
     if (
       oidc.configuration.token_automatic_renew_mode ==
       TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted
@@ -230,7 +229,7 @@ export const getValidTokenAsync = async (
       await sleepAsync({ milliseconds: waitMs });
     }
     numberWaitTemp = numberWaitTemp - 1;
-    
+
     status = await oidc.syncTokensInfoAsync();
   }
   const isValid = isTokensValid(oidc.getTokens());

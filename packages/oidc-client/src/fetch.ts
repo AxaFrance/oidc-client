@@ -1,7 +1,7 @@
 ﻿import Oidc from './oidc';
 import { getValidTokenAsync, OidcToken } from './parseTokens';
+import { syncTokensInfoAsync } from './renewTokens';
 import { Fetch } from './types';
-import {syncTokensInfoAsync} from "./renewTokens";
 
 // @ts-ignore
 export const fetchWithTokens =
@@ -16,22 +16,22 @@ export const fetchWithTokens =
         : optionTmp.headers;
     }
     const oidcToken: OidcToken = {
-        getTokens: () => oidc.tokens,
-        configuration: {
-            token_automatic_renew_mode: oidc.configuration.token_automatic_renew_mode,
-            refresh_time_before_tokens_expiration_in_second:
-            oidc.configuration.refresh_time_before_tokens_expiration_in_second,
-        },
-        
-        syncTokensInfoAsync: async () =>   {
-            const {status } = await syncTokensInfoAsync(oidc)(
-                oidc.configuration,
-                oidc.configurationName,
-                oidc.tokens,
-                false,
-            );
-            return status;
-        },
+      getTokens: () => oidc.tokens,
+      configuration: {
+        token_automatic_renew_mode: oidc.configuration.token_automatic_renew_mode,
+        refresh_time_before_tokens_expiration_in_second:
+          oidc.configuration.refresh_time_before_tokens_expiration_in_second,
+      },
+
+      syncTokensInfoAsync: async () => {
+        const { status } = await syncTokensInfoAsync(oidc)(
+          oidc.configuration,
+          oidc.configurationName,
+          oidc.tokens,
+          false,
+        );
+        return status;
+      },
       renewTokensAsync: oidc.renewTokensAsync.bind(oidc),
     };
 

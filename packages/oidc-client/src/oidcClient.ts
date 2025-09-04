@@ -2,8 +2,8 @@ import { fetchWithTokens } from './fetch';
 import { ILOidcLocation, OidcLocation } from './location';
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, OidcToken, Tokens, ValidToken } from './parseTokens.js';
+import { syncTokensInfoAsync } from './renewTokens';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
-import {syncTokensInfoAsync} from "./renewTokens";
 
 export interface EventSubscriber {
   (name: string, data: any);
@@ -102,15 +102,15 @@ export class OidcClient {
         refresh_time_before_tokens_expiration_in_second:
           oidc.configuration.refresh_time_before_tokens_expiration_in_second,
       },
-        syncTokensInfoAsync: async () =>   {
-            const {status } = await syncTokensInfoAsync(oidc)(
-                oidc.configuration,
-                oidc.configurationName,
-                oidc.tokens,
-                false,
-            );
-            return status;
-        },
+      syncTokensInfoAsync: async () => {
+        const { status } = await syncTokensInfoAsync(oidc)(
+          oidc.configuration,
+          oidc.configurationName,
+          oidc.tokens,
+          false,
+        );
+        return status;
+      },
       renewTokensAsync: oidc.renewTokensAsync.bind(oidc),
     };
     return getValidTokenAsync(oidcToken, waitMs, numberWait);
