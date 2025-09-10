@@ -1,6 +1,7 @@
 export const initSession = (configurationName, storage = sessionStorage) => {
   const clearAsync = status => {
     storage[`oidc.${configurationName}`] = JSON.stringify({ tokens: null, status });
+    delete storage[`oidc.${configurationName}.userInfo`];
     return Promise.resolve();
   };
 
