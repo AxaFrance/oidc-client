@@ -102,6 +102,12 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   getFetch = null,
   location = null,
 }) => {
+  if (configuration && configuration.redirect_uri && configuration.silent_redirect_uri) {
+    if (configuration.redirect_uri === configuration.silent_redirect_uri) {
+      throw new Error('redirect_uri and silent_redirect_uri must be different');
+    }
+  }
+
   const getOidc = (configurationName = 'default') => {
     return OidcClient.getOrCreate(getFetch ?? getFetchDefault, location ?? new OidcLocation())(
       configuration,
