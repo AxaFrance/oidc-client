@@ -1,6 +1,12 @@
 # Changelog
 
-## 7.25.16
+## 7.26.0
+
+- [b9656c2](https://github.com/AxaFrance/oidc-client/commit/b9656c2559993efe94a121c442000969b1eaba2b) - feat(react-oidc): enforce uniqueness of redirect_uri and silent_redirect_uri (#1606) (release), 2025-09-17 by *Jean-Marc Rakotoarisoa*
+- [960a694](https://github.com/AxaFrance/oidc-client/commit/960a69472b75e12490025ee3b46d15643c0e35a6) - fix(oidc-client): Clear userInfo in storage in clearAsync function (#1603), 2025-09-17 by *Mérill Téterel*
+
+
+## v7.25.16
 
 - [c79907b](https://github.com/AxaFrance/oidc-client/commit/c79907b63af69352ed660e97d9e61265bc155131) - fix(oidc-client): renew token silent login (release) (#1598), 2025-09-04 by *Guillaume Chervet*
 
@@ -319,10 +325,5 @@
 ## v7.19.6
 
 - [b7568f8](https://github.com/AxaFrance/oidc-client/commit/b7568f8d73d21ba1b7cd4890bff2ad30941696e2) - fix(oidc-service-worker): normalize userinfo endpoint in service worker (#1320) (release), 2024-03-13 by *meesvandongen*
-
-
-## v7.19.5
-
-- [be24bba](https://github.com/AxaFrance/oidc-client/commit/be24bbab3d699ff003cb14302dedc3463b1f3a1b) - refactor(all): update build libraries (release), 2024-03-12 by *Guillaume Chervet*
 
 
