@@ -182,6 +182,9 @@ const App = () => (
 render(<App />, document.getElementById('root'));
 ```
 
+> [!WARNING]
+> If you have both `redirect_uri` and `silent_redirect_uri` configured, their value must be different.
+
 ```javascript
 const configuration = {
   loadingComponent: ReactComponent, // you can inject your own loading component
