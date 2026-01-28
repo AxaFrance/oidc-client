@@ -117,7 +117,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
 
   const [loading, setLoading] = useState(true);
   const [event, setEvent] = useState(defaultEventState);
-  const [currentConfigurationName, setConfigurationName] = useState('default');
+  const [currentConfigurationName, setConfigurationName] = useState(configurationName);
 
   useEffect(() => {
     const oidc = getOidc(configurationName);
@@ -170,8 +170,11 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
       }
     });
 
-    setConfigurationName(configurationName);
-    setLoading(false);
+    queueMicrotask(() => {
+      setConfigurationName(configurationName);
+      setLoading(false);
+    });
+
     return () => {
       const previousOidc = getOidc(configurationName);
       previousOidc.removeEventSubscription(newSubscriptionId);

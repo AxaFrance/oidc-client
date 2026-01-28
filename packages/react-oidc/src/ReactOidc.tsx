@@ -25,7 +25,6 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
   useEffect(() => {
     let isMounted = true;
     const oidc = getOidc(configurationName);
-    setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (
@@ -118,18 +117,11 @@ function getGenerateDemonstrationOfProofOfPossessionAsync(oidc: OidcClient, toke
 
 export const useOidcAccessToken = (configurationName = defaultConfigurationName) => {
   const getOidc = OidcClient.get;
-  const [state, setAccessToken] = useState<OidcAccessToken>(initTokens(configurationName));
+  const [state, setAccessToken] = useState<OidcAccessToken>(() => initTokens(configurationName));
 
   useEffect(() => {
     let isMounted = true;
     const oidc = getOidc(configurationName);
-    if (oidc.tokens) {
-      const tokens = oidc.tokens;
-      setAccessToken({
-        accessToken: tokens.accessToken,
-        accessTokenPayload: tokens.accessTokenPayload,
-      });
-    }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (
@@ -183,15 +175,11 @@ export type OidcIdToken = {
 
 export const useOidcIdToken = (configurationName = defaultConfigurationName) => {
   const getOidc = OidcClient.get;
-  const [state, setIDToken] = useState<OidcIdToken>(initIdToken(configurationName));
+  const [state, setIDToken] = useState<OidcIdToken>(() => initIdToken(configurationName));
 
   useEffect(() => {
     let isMounted = true;
     const oidc = getOidc(configurationName);
-    if (oidc.tokens) {
-      const tokens = oidc.tokens;
-      setIDToken({ idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload });
-    }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (

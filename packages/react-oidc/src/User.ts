@@ -34,7 +34,13 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
       if (isCache && oidc.userInfo<T>()) {
         return;
       }
-      setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
+      // Use queueMicrotask to defer setState to avoid synchronous call in effect
+      queueMicrotask(() => {
+        if (isMounted) {
+          setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
+          setPreviousOidcUserId(oidcUserId);
+        }
+      });
       oidc
         .userInfoAsync(!isCache, demonstrating_proof_of_possession)
         .then(info => {
@@ -44,9 +50,12 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
           }
         })
         .catch(() => setOidcUser({ ...oidcUser, status: OidcUserStatus.LoadingError }));
-      setPreviousOidcUserId(oidcUserId);
     } else {
-      setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
+      queueMicrotask(() => {
+        if (isMounted) {
+          setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
+        }
+      });
     }
     const newSubscriptionId = oidc.subscribeEvents((name: string) => {
       if (
