@@ -7,7 +7,7 @@ describe('WithRouter test Suite', () => {
   beforeEach(() => {});
   it('should CreateEvent return correct Event if not on IE', () => {
     const windowMock = {
-      CustomEvent: vi.fn().mockImplementation((event, params) => {
+      CustomEvent: vi.fn(function (event, params) {
         return { event, params };
       }),
     };
