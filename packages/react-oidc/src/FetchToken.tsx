@@ -53,7 +53,7 @@ export const useOidcFetch = (
       );
       return newFetch(input, init);
     },
-    [previousFetch, configurationName],
+    [previousFetch, configurationName, demonstratingProofOfPossession],
   );
   return { fetch: memoizedFetchCallback };
 };

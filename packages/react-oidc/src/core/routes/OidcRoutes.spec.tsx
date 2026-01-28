@@ -9,7 +9,7 @@ describe('Authenticating test suite', () => {
     // Mock window.location
     delete (window as any).location;
     window.location = { href: 'http://example.com:3000/' } as any;
-    
+
     // Mock window event listeners
     window.addEventListener = vi.fn();
     window.removeEventListener = vi.fn();
