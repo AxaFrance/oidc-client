@@ -16,15 +16,15 @@ const keepAlive = (service_worker_keep_alive_path = '/') => {
     const minSleepSeconds = 150;
     keepAliveController = new AbortController();
     const promise = fetch(
-        `${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`,
-        { signal: keepAliveController.signal },
+      `${service_worker_keep_alive_path}OidcKeepAliveServiceWorker.json?minSleepSeconds=${minSleepSeconds}`,
+      { signal: keepAliveController.signal },
     );
     promise.catch(error => {
       console.log(error);
     });
-    
+
     sleepAsync({ milliseconds: minSleepSeconds * 1000 }).then(() =>
-        keepAlive(service_worker_keep_alive_path),
+      keepAlive(service_worker_keep_alive_path),
     );
   } catch (error) {
     console.log(error);
@@ -38,14 +38,14 @@ const stopKeepAlive = () => {
 };
 
 export const defaultServiceWorkerUpdateRequireCallback =
-    (location: ILOidcLocation) => async (registration: any, stopKeepAlive: () => void) => {
-      stopKeepAlive();
-      await registration.update();
-      const isSuccess = await registration.unregister();
-      console.log(`Service worker unregistration ${isSuccess ? 'successful' : 'failed'}`);
-      await sleepAsync({ milliseconds: 2000 });
-      location.reload();
-    };
+  (location: ILOidcLocation) => async (registration: any, stopKeepAlive: () => void) => {
+    stopKeepAlive();
+    await registration.update();
+    const isSuccess = await registration.unregister();
+    console.log(`Service worker unregistration ${isSuccess ? 'successful' : 'failed'}`);
+    await sleepAsync({ milliseconds: 2000 });
+    location.reload();
+  };
 
 export const getTabId = (configurationName: string) => {
   const key = `oidc.tabId.${configurationName}`;
@@ -61,67 +61,72 @@ const DEFAULT_SW_MESSAGE_TIMEOUT_MS = 5000;
 
 const getServiceWorkerTarget = (registration: ServiceWorkerRegistration): ServiceWorker | null => {
   return (
-      navigator.serviceWorker.controller ??
-      registration.active ??
-      registration.waiting ??
-      registration.installing ??
-      null
+    navigator.serviceWorker.controller ??
+    registration.active ??
+    registration.waiting ??
+    registration.installing ??
+    null
   );
 };
 
 const sendMessageAsync =
-    (registration: ServiceWorkerRegistration, opts?: { timeoutMs?: number }) =>
-        (data: any): Promise<any> => {
-          const timeoutMs = opts?.timeoutMs ?? DEFAULT_SW_MESSAGE_TIMEOUT_MS;
+  (registration: ServiceWorkerRegistration, opts?: { timeoutMs?: number }) =>
+  (data: any): Promise<any> => {
+    const timeoutMs = opts?.timeoutMs ?? DEFAULT_SW_MESSAGE_TIMEOUT_MS;
 
-          return new Promise((resolve, reject) => {
-            const target = getServiceWorkerTarget(registration);
+    return new Promise((resolve, reject) => {
+      const target = getServiceWorkerTarget(registration);
 
-            if (!target) {
-              reject(new Error('Service worker target not available (controller/active/waiting/installing missing)'));
-              return;
-            }
+      if (!target) {
+        reject(
+          new Error(
+            'Service worker target not available (controller/active/waiting/installing missing)',
+          ),
+        );
+        return;
+      }
 
-            const messageChannel = new MessageChannel();
-            let timeoutId: any = null;
+      const messageChannel = new MessageChannel();
+      let timeoutId: any = null;
 
-            const cleanup = () => {
-              try {
-                if (timeoutId != null) {
-                  timer.clearTimeout(timeoutId);
-                  timeoutId = null;
-                }
-                messageChannel.port1.onmessage = null;
-                messageChannel.port1.close();
-                messageChannel.port2.close();
-              } catch (ex) {
-                console.error(ex);
-              }
-            };
+      const cleanup = () => {
+        try {
+          if (timeoutId != null) {
+            timer.clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+          messageChannel.port1.onmessage = null;
+          messageChannel.port1.close();
+          messageChannel.port2.close();
+        } catch (ex) {
+          console.error(ex);
+        }
+      };
 
-            timeoutId = timer.setTimeout(() => {
-              cleanup();
-              reject(new Error(`Service worker did not respond within ${timeoutMs}ms (type=${data?.type})`));
-            }, timeoutMs);
+      timeoutId = timer.setTimeout(() => {
+        cleanup();
+        reject(
+          new Error(`Service worker did not respond within ${timeoutMs}ms (type=${data?.type})`),
+        );
+      }, timeoutMs);
 
-            messageChannel.port1.onmessage = event => {
-              cleanup();
-              if (event?.data?.error) reject(event.data.error);
-              else resolve(event.data);
-            };
+      messageChannel.port1.onmessage = event => {
+        cleanup();
+        if (event?.data?.error) reject(event.data.error);
+        else resolve(event.data);
+      };
 
-            try {
-              const configurationName = data?.configurationName;
-              target.postMessage(
-                  { ...data, tabId: getTabId(configurationName ?? 'default') },
-                  [messageChannel.port2],
-              );
-            } catch (err) {
-              cleanup();
-              reject(err);
-            }
-          });
-        };
+      try {
+        const configurationName = data?.configurationName;
+        target.postMessage({ ...data, tabId: getTabId(configurationName ?? 'default') }, [
+          messageChannel.port2,
+        ]);
+      } catch (err) {
+        cleanup();
+        reject(err);
+      }
+    });
+  };
 
 const waitForControllerAsync = async (timeoutMs: number) => {
   if (navigator.serviceWorker.controller) return navigator.serviceWorker.controller;
@@ -147,16 +152,16 @@ const waitForControllerAsync = async (timeoutMs: number) => {
 };
 
 export const initWorkerAsync = async (
-    configuration: OidcConfiguration,
-    configurationName: string,
+  configuration: OidcConfiguration,
+  configurationName: string,
 ) => {
   const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
 
   if (
-      typeof window === 'undefined' ||
-      typeof navigator === 'undefined' ||
-      !navigator.serviceWorker ||
-      !serviceWorkerRelativeUrl
+    typeof window === 'undefined' ||
+    typeof navigator === 'undefined' ||
+    !navigator.serviceWorker ||
+    !serviceWorkerRelativeUrl
   ) {
     return null;
   }
@@ -246,9 +251,9 @@ export const initWorkerAsync = async (
   };
 
   const initAsync = async (
-      oidcServerConfiguration,
-      where,
-      oidcConfiguration: OidcConfiguration,
+    oidcServerConfiguration,
+    where,
+    oidcConfiguration: OidcConfiguration,
   ) => {
     const result = await sendMessageAsync(registration)({
       type: 'init',
@@ -258,7 +263,7 @@ export const initWorkerAsync = async (
         oidcConfiguration: {
           token_renew_mode: oidcConfiguration.token_renew_mode,
           service_worker_convert_all_requests_to_cors:
-          oidcConfiguration.service_worker_convert_all_requests_to_cors,
+            oidcConfiguration.service_worker_convert_all_requests_to_cors,
         },
       },
       configurationName,
@@ -268,7 +273,7 @@ export const initWorkerAsync = async (
     const serviceWorkerVersion = result.version;
     if (serviceWorkerVersion !== codeVersion) {
       console.warn(
-          `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
+        `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
     }
 
@@ -350,7 +355,7 @@ export const initWorkerAsync = async (
   };
 
   const setDemonstratingProofOfPossessionNonce = async (
-      demonstratingProofOfPossessionNonce: string,
+    demonstratingProofOfPossessionNonce: string,
   ) => {
     await sendMessageAsync(registration)({
       type: 'setDemonstratingProofOfPossessionNonce',
@@ -369,7 +374,7 @@ export const initWorkerAsync = async (
   };
 
   const setDemonstratingProofOfPossessionJwkAsync = async (
-      demonstratingProofOfPossessionJwk: JsonWebKey,
+    demonstratingProofOfPossessionJwk: JsonWebKey,
   ) => {
     const demonstratingProofOfPossessionJwkJson = JSON.stringify(demonstratingProofOfPossessionJwk);
     await sendMessageAsync(registration)({
@@ -453,7 +458,7 @@ export const initWorkerAsync = async (
     clearAsync,
     initAsync,
     startKeepAliveServiceWorker: () =>
-        startKeepAliveServiceWorker(configuration.service_worker_keep_alive_path),
+      startKeepAliveServiceWorker(configuration.service_worker_keep_alive_path),
     setSessionStateAsync,
     getSessionStateAsync,
     setNonceAsync,

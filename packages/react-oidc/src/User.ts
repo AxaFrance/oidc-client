@@ -29,25 +29,35 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
   useEffect(() => {
     const oidc = OidcClient.get(configurationName);
     let isMounted = true;
-    if (oidc && oidc.tokens) {
-      const isCache = oidcUserId === oidcPreviousUserId;
-      if (isCache && oidc.userInfo<T>()) {
-        return;
-      }
-      setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
-      oidc
-        .userInfoAsync(!isCache, demonstrating_proof_of_possession)
-        .then(info => {
+
+    const loadUser = async () => {
+      if (oidc && oidc.tokens) {
+        const isCache = oidcUserId === oidcPreviousUserId;
+        if (isCache && oidc.userInfo<T>()) {
+          return;
+        }
+
+        try {
+          const info = await oidc.userInfoAsync(!isCache, demonstrating_proof_of_possession);
           if (isMounted) {
             // @ts-ignore
             setOidcUser({ user: info, status: OidcUserStatus.Loaded });
           }
-        })
-        .catch(() => setOidcUser({ ...oidcUser, status: OidcUserStatus.LoadingError }));
-      setPreviousOidcUserId(oidcUserId);
-    } else {
-      setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
-    }
+        } catch {
+          if (isMounted) {
+            setOidcUser(prev => ({ ...prev, status: OidcUserStatus.LoadingError }));
+          }
+        }
+        setPreviousOidcUserId(oidcUserId);
+      } else {
+        if (isMounted) {
+          setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
+        }
+      }
+    };
+
+    loadUser();
+
     const newSubscriptionId = oidc.subscribeEvents((name: string) => {
       if (
         name === OidcClient.eventNames.logout_from_another_tab ||
@@ -62,7 +72,7 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
       isMounted = false;
       oidc.removeEventSubscription(newSubscriptionId);
     };
-  }, [oidcUserId]);
+  }, [oidcUserId, configurationName, demonstrating_proof_of_possession, oidcPreviousUserId]);
 
   const reloadOidcUser = () => {
     setOidcUserId(oidcUserId + 1);
