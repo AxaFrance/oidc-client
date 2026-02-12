@@ -408,6 +408,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 
   if (event.data?.type === 'SKIP_WAITING') {
     await _self.skipWaiting();
+    port?.postMessage?.({});
     return;
   } else if (event.data.type === 'claim') {
     _self.clients.claim().then(() => port.postMessage({}));
