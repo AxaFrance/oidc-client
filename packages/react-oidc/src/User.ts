@@ -29,35 +29,34 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
   useEffect(() => {
     const oidc = OidcClient.get(configurationName);
     let isMounted = true;
-
-    const loadUser = async () => {
-      if (oidc && oidc.tokens) {
-        const isCache = oidcUserId === oidcPreviousUserId;
-        if (isCache && oidc.userInfo<T>()) {
-          return;
+    if (oidc && oidc.tokens) {
+      const isCache = oidcUserId === oidcPreviousUserId;
+      if (isCache && oidc.userInfo<T>()) {
+        return;
+      }
+      // Use queueMicrotask to defer setState to avoid synchronous call in effect
+      queueMicrotask(() => {
+        if (isMounted) {
+          setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
+          setPreviousOidcUserId(oidcUserId);
         }
-
-        try {
-          const info = await oidc.userInfoAsync(!isCache, demonstrating_proof_of_possession);
+      });
+      oidc
+        .userInfoAsync(!isCache, demonstrating_proof_of_possession)
+        .then(info => {
           if (isMounted) {
             // @ts-ignore
             setOidcUser({ user: info, status: OidcUserStatus.Loaded });
           }
-        } catch {
-          if (isMounted) {
-            setOidcUser(prev => ({ ...prev, status: OidcUserStatus.LoadingError }));
-          }
-        }
-        setPreviousOidcUserId(oidcUserId);
-      } else {
+        })
+        .catch(() => setOidcUser({ ...oidcUser, status: OidcUserStatus.LoadingError }));
+    } else {
+      queueMicrotask(() => {
         if (isMounted) {
           setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
         }
-      }
-    };
-
-    loadUser();
-
+      });
+    }
     const newSubscriptionId = oidc.subscribeEvents((name: string) => {
       if (
         name === OidcClient.eventNames.logout_from_another_tab ||

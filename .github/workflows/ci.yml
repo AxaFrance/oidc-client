@@ -10,7 +10,7 @@ on:
 
 env:
   PNPM_VERSION: 8.6.11
-  NODE_VERSION: 18
+  NODE_VERSION: 20
 
 jobs:
   tests:

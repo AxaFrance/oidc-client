@@ -170,6 +170,11 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
       }
     });
 
+    queueMicrotask(() => {
+      setConfigurationName(configurationName);
+      setLoading(false);
+    });
+
     return () => {
       const previousOidc = getOidc(configurationName);
       previousOidc.removeEventSubscription(newSubscriptionId);
