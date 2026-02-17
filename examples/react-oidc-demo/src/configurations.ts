@@ -1,17 +1,21 @@
-import { TokenAutomaticRenewMode, TokenRenewMode } from '@axa-fr/react-oidc';
 
 export const configurationIdentityServer = {
   client_id: 'interactive.public.short',
   redirect_uri: window.location.origin + '/authentication/callback',
-  silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
+  // silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
   refresh_time_before_tokens_expiration_in_second: 40,
-  token_renew_mode: TokenRenewMode.access_token_invalid,
-  token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
-  service_worker_relative_url: '/OidcServiceWorker.js',
-  service_worker_only: false,
+  // service_worker_relative_url: '/OidcServiceWorker.js',
 };
+
+
+
+
+
+
+
+
 
 export const configurationIdentityServerWithHash = {
   client_id: 'interactive.public.short',
