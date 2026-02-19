@@ -247,6 +247,10 @@ export const initWorkerAsync = async (
   }
 
   const clearAsync = async status => {
+    // Ensure no stale userInfo data is kept in the browser storage when using SW.
+    // This completes the initial fix from https://github.com/AxaFrance/oidc-client/pull/1603
+    delete sessionStorage[`oidc.${configurationName}.userInfo`];
+    
     return sendMessageAsync(registration)({ type: 'clear', data: { status }, configurationName });
   };
 
