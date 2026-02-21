@@ -1,5 +1,4 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { OidcUserStatus, useOidcUser } from './User';
@@ -81,11 +80,11 @@ describe('useOidcUser', () => {
       result.current.reloadOidcUser();
     });
 
-    // Should transition to Loading then to Loaded (not stuck at Loading)
+    // Should complete the reload and show the reloaded user (not stuck at Loading)
     await waitFor(() => {
-      expect(result.current.oidcUserLoadingState).toBe(OidcUserStatus.Loaded);
+      expect(result.current.oidcUser).toEqual(reloadedUser);
     });
 
-    expect(result.current.oidcUser).toEqual(reloadedUser);
+    expect(result.current.oidcUserLoadingState).toBe(OidcUserStatus.Loaded);
   });
 });
