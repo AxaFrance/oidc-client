@@ -45,6 +45,9 @@ export const _silentLoginAsync =
 
       if (extras != null) {
         for (const [key, value] of Object.entries(extras)) {
+          if (value == null) {
+            continue;
+          }
           if (queries === '') {
             queries = `?${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
           } else {

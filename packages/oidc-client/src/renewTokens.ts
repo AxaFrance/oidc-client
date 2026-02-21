@@ -270,12 +270,16 @@ const synchroniseTokensAsync =
 
         if (loginParams && loginParams.extras) {
           for (const [key, value] of Object.entries(loginParams.extras)) {
-            silentLoginInput[key] = value;
+            if (value != null) {
+              silentLoginInput[key] = value;
+            }
           }
         }
         if (extras) {
           for (const [key, value] of Object.entries(extras)) {
-            silentLoginInput[key] = value;
+            if (value != null) {
+              silentLoginInput[key] = value;
+            }
           }
         }
         silentLoginInput['prompt'] = 'none';
