@@ -144,9 +144,13 @@ const handleFetch = (event: FetchEvent): void => {
           }
         }
 
-        const currentDatabaseForRequestAccessToken = currentDatabasesForRequestAccessToken?.find(
-          c => c.configurationName.endsWith(key),
-        );
+        // When a request carries no Authorization header (e.g. axios without any custom config),
+        // `key` stays as 'default'. With allowMultiTabLogin:true entries are stored as
+        // `configurationName#tabId=xxx`, so the endsWith('default') match fails.
+        // In that case fall back to the first matching entry so the token is still injected.
+        const currentDatabaseForRequestAccessToken =
+          currentDatabasesForRequestAccessToken?.find(c => c.configurationName.endsWith(key)) ??
+          (!authorization ? currentDatabasesForRequestAccessToken?.[0] : undefined);
 
         // 2a) Si on a déjà des tokens valides
         if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
