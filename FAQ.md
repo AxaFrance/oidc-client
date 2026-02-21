@@ -1,5 +1,60 @@
 # FAQ (Frequently Asked Questions)
 
+## Why is the Bearer token not injected when `allowMultiTabLogin: true`?
+
+When `allowMultiTabLogin: true` is set in `OidcTrustedDomains.js`, each browser tab stores its own access token in the service worker, keyed by a unique tab identifier (e.g. `default#tabId=8d903cd1-...`).
+
+The service worker identifies which tab's token to inject by reading a tab-specific placeholder value from the incoming request's `Authorization` header. This placeholder is automatically set by the **OIDC fetch** wrapper (`useOidcFetch` / `withOidcFetch` in React, or `oidcClient.fetchWithTokens(fetch)` in vanilla JS).
+
+If you use a plain `fetch` call or a library like **axios** without configuring it to use the OIDC fetch, requests will arrive at the service worker with no `Authorization` header. The service worker has no way to determine which tab's token to use, so no token is injected and your API calls return 401 errors.
+
+**Solution**: always use the OIDC fetch wrapper for API requests when `allowMultiTabLogin: true`.
+
+### React example
+
+```javascript
+import { useOidcFetch } from '@axa-fr/react-oidc';
+
+const MyComponent = () => {
+  const { fetch } = useOidcFetch();
+
+  const callApi = async () => {
+    const res = await fetch('https://my-api.example.com/data');
+    return res.json();
+  };
+  // ...
+};
+```
+
+### Vanilla JS example
+
+```javascript
+const oidcFetch = oidcClient.fetchWithTokens(fetch);
+const res = await oidcFetch('https://my-api.example.com/data');
+```
+
+### Using axios
+
+Axios can be configured to use a custom fetch adapter or you can wrap axios calls to use the OIDC fetch instead:
+
+```javascript
+import { useOidcFetch } from '@axa-fr/react-oidc';
+
+const MyComponent = () => {
+  const { fetch } = useOidcFetch();
+
+  const callApi = async () => {
+    // Use the OIDC fetch directly instead of axios when allowMultiTabLogin is true
+    const res = await fetch('https://my-api.example.com/data', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return res.json();
+  };
+  // ...
+};
+```
+
 ## Condition to make silent signing work
 
 Third-party cookies are blocked by default on Safari and will be blocked on all browsers soon.

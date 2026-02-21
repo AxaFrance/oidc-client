@@ -122,6 +122,13 @@ trustedDomains.config_with_dpop = {
 
 // Setting allowMultiTabLogin to true will enable storing login-specific parameters (state, nonce, code verifier)
 // separately for each tab. This will prevent errors when logins are initiated from multiple tabs.
+// IMPORTANT: When allowMultiTabLogin is true, you MUST use the OIDC fetch provided by
+// oidcClient.fetchWithTokens(fetch) for API requests. The service worker embeds a tab-specific
+// token placeholder in the Authorization header, which it then replaces with the real access token.
+// Using a plain fetch or axios without the OIDC fetch wrapper will result in requests being sent
+// without an Authorization header (401 errors), because the service worker cannot determine which
+// tab's token to inject without the placeholder.
+// Example with axios: configure it to use the OIDC fetch as its adapter or use the OIDC fetch directly.
 trustedDomains.config_multi_tab_login = {
   domains: ['https://demo.duendesoftware.com'],
   allowMultiTabLogin: true,
