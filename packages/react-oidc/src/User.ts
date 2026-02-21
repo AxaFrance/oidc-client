@@ -1,5 +1,5 @@
 import { OidcClient, type OidcUserInfo } from '@axa-fr/oidc-client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export enum OidcUserStatus {
   Unauthenticated = 'Unauthenticated',
@@ -24,21 +24,21 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
     status: user ? OidcUserStatus.Loaded : OidcUserStatus.Unauthenticated,
   });
   const [oidcUserId, setOidcUserId] = useState<number>(user ? 1 : 0);
-  const [oidcPreviousUserId, setPreviousOidcUserId] = useState<number>(user ? 1 : 0);
+  const oidcPreviousUserIdRef = useRef<number>(user ? 1 : 0);
 
   useEffect(() => {
     const oidc = OidcClient.get(configurationName);
     let isMounted = true;
     if (oidc && oidc.tokens) {
-      const isCache = oidcUserId === oidcPreviousUserId;
+      const isCache = oidcUserId === oidcPreviousUserIdRef.current;
       if (isCache && oidc.userInfo<T>()) {
         return;
       }
+      oidcPreviousUserIdRef.current = oidcUserId;
       // Use queueMicrotask to defer setState to avoid synchronous call in effect
       queueMicrotask(() => {
         if (isMounted) {
           setOidcUser({ ...oidcUser, status: OidcUserStatus.Loading });
-          setPreviousOidcUserId(oidcUserId);
         }
       });
       oidc
@@ -71,7 +71,7 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
       isMounted = false;
       oidc.removeEventSubscription(newSubscriptionId);
     };
-  }, [oidcUserId, configurationName, demonstrating_proof_of_possession, oidcPreviousUserId]);
+  }, [oidcUserId, configurationName, demonstrating_proof_of_possession]);
 
   const reloadOidcUser = () => {
     setOidcUserId(oidcUserId + 1);
