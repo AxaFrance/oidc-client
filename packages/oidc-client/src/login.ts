@@ -119,8 +119,10 @@ export const loginCallbackAsync =
       let nonceData;
       let getLoginParams;
       let state;
+      let existingTokens = null;
       if (serviceWorker) {
-        await serviceWorker.initAsync(oidcServerConfiguration, 'loginCallbackAsync', configuration);
+        const { tokens } = await serviceWorker.initAsync(oidcServerConfiguration, 'loginCallbackAsync', configuration);
+        existingTokens = tokens;
         await serviceWorker.setSessionStateAsync(sessionState);
         nonceData = await serviceWorker.getNonceAsync();
         getLoginParams = serviceWorker.getLoginParams();
@@ -132,6 +134,8 @@ export const loginCallbackAsync =
           oidc.configurationName,
           configuration.storage ?? sessionStorage,
         );
+        const { tokens } = await session.initAsync();
+        existingTokens = tokens;
         await session.setSessionStateAsync(sessionState);
         nonceData = await session.getNonceAsync();
         getLoginParams = session.getLoginParams();
@@ -152,6 +156,19 @@ export const loginCallbackAsync =
         );
       }
       if (queryParams.state && queryParams.state !== state) {
+        if (oidc.tokens || existingTokens) {
+          console.warn(
+            `State not valid (expected: ${state}, received: ${queryParams.state}), but user is already authenticated, redirecting to callback path`,
+          );
+          oidc.publishEvent(eventNames.loginCallbackAsync_end, {});
+          return {
+            tokens: oidc.tokens ?? existingTokens,
+            state: 'request.state',
+            callbackPath: getLoginParams?.callbackPath,
+            scope: queryParams.scope,
+            extras: getLoginParams?.extras,
+          };
+        }
         throw new Error(`State not valid (expected: ${state}, received: ${queryParams.state})`);
       }
 
