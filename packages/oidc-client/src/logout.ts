@@ -46,7 +46,11 @@ export const destroyAsync = oidc => async status => {
   }
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if (!serviceWorker) {
-    const session = initSession(oidc.configurationName, oidc.configuration.storage, oidc.configuration.login_state_storage ?? oidc.configuration.storage);
+    const session = initSession(
+      oidc.configurationName,
+      oidc.configuration.storage,
+      oidc.configuration.login_state_storage ?? oidc.configuration.storage,
+    );
     await session.clearAsync(status);
   } else {
     await serviceWorker.clearAsync(status);

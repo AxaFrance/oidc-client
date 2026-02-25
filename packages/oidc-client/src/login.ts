@@ -69,7 +69,11 @@ export const defaultLoginAsync =
           serviceWorker.startKeepAliveServiceWorker();
           storage = serviceWorker;
         } else {
-          const session = initSession(configurationName, configuration.storage ?? sessionStorage, configuration.login_state_storage ?? configuration.storage ?? sessionStorage);
+          const session = initSession(
+            configurationName,
+            configuration.storage ?? sessionStorage,
+            configuration.login_state_storage ?? configuration.storage ?? sessionStorage,
+          );
           session.setLoginParams({ callbackPath: url, extras: originExtras, scope: scope });
           await session.setNonceAsync(nonce);
           storage = session;
@@ -187,7 +191,11 @@ export const loginCallbackAsync =
           const jwk = await generateJwkAsync(window)(
             configuration.demonstrating_proof_of_possession_configuration.generateKeyAlgorithm,
           );
-          const session = initSession(oidc.configurationName, configuration.storage, configuration.login_state_storage ?? configuration.storage);
+          const session = initSession(
+            oidc.configurationName,
+            configuration.storage,
+            configuration.login_state_storage ?? configuration.storage,
+          );
           await session.setDemonstratingProofOfPossessionJwkAsync(jwk);
           headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(window)(
             configuration.demonstrating_proof_of_possession_configuration,
@@ -252,7 +260,11 @@ export const loginCallbackAsync =
           );
         }
       } else {
-        const session = initSession(oidc.configurationName, configuration.storage, configuration.login_state_storage ?? configuration.storage);
+        const session = initSession(
+          oidc.configurationName,
+          configuration.storage,
+          configuration.login_state_storage ?? configuration.storage,
+        );
         loginParams = session.getLoginParams();
         if (demonstratingProofOfPossessionNonce) {
           await session.setDemonstratingProofOfPossessionNonce(demonstratingProofOfPossessionNonce);

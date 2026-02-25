@@ -28,7 +28,11 @@ async function syncTokens(
 
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if (!serviceWorker) {
-    const session = initSession(oidc.configurationName, oidc.configuration.storage, oidc.configuration.login_state_storage ?? oidc.configuration.storage);
+    const session = initSession(
+      oidc.configurationName,
+      oidc.configuration.storage,
+      oidc.configuration.login_state_storage ?? oidc.configuration.storage,
+    );
     session.setTokens(oidc.tokens);
   }
 
@@ -169,7 +173,11 @@ export const syncTokensInfoAsync =
       }
       nonce = await serviceWorker.getNonceAsync();
     } else {
-      const session = initSession(configurationName, configuration.storage ?? sessionStorage, configuration.login_state_storage ?? configuration.storage ?? sessionStorage);
+      const session = initSession(
+        configurationName,
+        configuration.storage ?? sessionStorage,
+        configuration.login_state_storage ?? configuration.storage ?? sessionStorage,
+      );
       const initAsyncResponse = await session.initAsync();
       let { tokens } = initAsyncResponse;
       const { status } = initAsyncResponse;
@@ -263,7 +271,11 @@ const synchroniseTokensAsync =
         if (serviceWorker) {
           loginParams = serviceWorker.getLoginParams();
         } else {
-          const session = initSession(oidc.configurationName, configuration.storage, configuration.login_state_storage ?? configuration.storage);
+          const session = initSession(
+            oidc.configurationName,
+            configuration.storage,
+            configuration.login_state_storage ?? configuration.storage,
+          );
           loginParams = session.getLoginParams();
         }
         const silentLoginInput = {};
@@ -454,7 +466,11 @@ const synchroniseTokensAsync =
                     tokenResponse.demonstratingProofOfPossessionNonce,
                   );
                 } else {
-                  const session = initSession(oidc.configurationName, configuration.storage, configuration.login_state_storage ?? configuration.storage);
+                  const session = initSession(
+                    oidc.configurationName,
+                    configuration.storage,
+                    configuration.login_state_storage ?? configuration.storage,
+                  );
                   await session.setDemonstratingProofOfPossessionNonce(
                     tokenResponse.demonstratingProofOfPossessionNonce,
                   );

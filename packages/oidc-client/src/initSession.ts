@@ -1,4 +1,8 @@
-export const initSession = (configurationName, storage = sessionStorage, loginStateStorage?: Storage) => {
+export const initSession = (
+  configurationName,
+  storage = sessionStorage,
+  loginStateStorage?: Storage,
+) => {
   const loginStorage = loginStateStorage ?? storage;
 
   const clearAsync = status => {
