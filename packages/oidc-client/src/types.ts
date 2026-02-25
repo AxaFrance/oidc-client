@@ -39,6 +39,7 @@ export type OidcConfiguration = {
   extras?: StringMap;
   token_request_extras?: StringMap;
   storage?: Storage;
+  login_state_storage?: Storage;
   monitor_session?: boolean;
   token_renew_mode?: string;
   logout_tokens_to_invalidate?: Array<LogoutToken>;

@@ -1,7 +1,15 @@
-export const initSession = (configurationName, storage = sessionStorage) => {
+export const initSession = (configurationName, storage = sessionStorage, loginStateStorage?: Storage) => {
+  const loginStorage = loginStateStorage ?? storage;
+
   const clearAsync = status => {
     storage[`oidc.${configurationName}`] = JSON.stringify({ tokens: null, status });
     delete storage[`oidc.${configurationName}.userInfo`];
+    if (loginStateStorage && loginStateStorage !== storage) {
+      delete loginStorage[`oidc.login.${configurationName}`];
+      delete loginStorage[`oidc.state.${configurationName}`];
+      delete loginStorage[`oidc.code_verifier.${configurationName}`];
+      delete loginStorage[`oidc.nonce.${configurationName}`];
+    }
     return Promise.resolve();
   };
 
@@ -27,7 +35,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
   };
 
   const setNonceAsync = nonce => {
-    storage[`oidc.nonce.${configurationName}`] = nonce.nonce;
+    loginStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
   };
 
   const setDemonstratingProofOfPossessionJwkAsync = (jwk: JsonWebKey) => {
@@ -40,7 +48,7 @@ export const initSession = (configurationName, storage = sessionStorage) => {
 
   const getNonceAsync = async () => {
     // @ts-ignore
-    return { nonce: storage[`oidc.nonce.${configurationName}`] };
+    return { nonce: loginStorage[`oidc.nonce.${configurationName}`] };
   };
 
   const setDemonstratingProofOfPossessionNonce = async (dpopNonce: string) => {
@@ -61,10 +69,10 @@ export const initSession = (configurationName, storage = sessionStorage) => {
   const getLoginParamsCache = {};
   const setLoginParams = data => {
     getLoginParamsCache[configurationName] = data;
-    storage[`oidc.login.${configurationName}`] = JSON.stringify(data);
+    loginStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
   };
   const getLoginParams = () => {
-    const dataString = storage[`oidc.login.${configurationName}`];
+    const dataString = loginStorage[`oidc.login.${configurationName}`];
 
     if (!dataString) {
       console.warn(
@@ -80,19 +88,19 @@ export const initSession = (configurationName, storage = sessionStorage) => {
   };
 
   const getStateAsync = async () => {
-    return storage[`oidc.state.${configurationName}`];
+    return loginStorage[`oidc.state.${configurationName}`];
   };
 
   const setStateAsync = async (state: string) => {
-    storage[`oidc.state.${configurationName}`] = state;
+    loginStorage[`oidc.state.${configurationName}`] = state;
   };
 
   const getCodeVerifierAsync = async () => {
-    return storage[`oidc.code_verifier.${configurationName}`];
+    return loginStorage[`oidc.code_verifier.${configurationName}`];
   };
 
   const setCodeVerifierAsync = async codeVerifier => {
-    storage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
+    loginStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
   };
 
   return {

@@ -1,4 +1,4 @@
-﻿# @axa-fr/oidc-client
+# @axa-fr/oidc-client
 
 [![Continuous Integration](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_react-oidc) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=security_rating) [![Code Corevage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_react-oidc&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_react-oidc&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
@@ -210,6 +210,7 @@ const configuration = {
     scope: String.isRequired, // oidc scope (you need to set "offline_access")
     authority: String.isRequired,
     storage: Storage, // Default sessionStorage, you can set localStorage, but it is not secure
+    login_state_storage: Storage, // Optional. Storage used only for authorization flow state (state, code_verifier, nonce, login params). Defaults to the value of `storage`. Set to sessionStorage when using storage: localStorage to prevent race conditions when multiple tabs start the login flow simultaneously.
     authority_configuration: {
       // Optional for providers that do not implement OIDC server auto-discovery via a .wellknown URL
       authorization_endpoint: String,
