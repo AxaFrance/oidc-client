@@ -181,6 +181,48 @@ export const initWorkerAsync = async (
     });
   }
 
+  const versionMismatchKey = `oidc.sw.version_mismatch_reload.${configurationName}`;
+
+  const sendSkipWaiting = async () => {
+    stopKeepAlive();
+    console.log('New SW waiting – SKIP_WAITING');
+    try {
+      await sendMessageAsync(registration, { timeoutMs: 8000 })({
+        type: 'SKIP_WAITING',
+        configurationName,
+        data: null,
+      });
+    } catch (e) {
+      console.warn('SKIP_WAITING failed', e);
+    }
+  };
+
+  const trackInstallingWorker = (newSW: ServiceWorker) => {
+    stopKeepAlive();
+    newSW.addEventListener('statechange', async () => {
+      if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+        await sendSkipWaiting();
+      }
+    });
+  };
+
+  // 1) Détection updatefound – registered BEFORE update() to avoid missing the event
+  registration.addEventListener('updatefound', () => {
+    const newSW = registration.installing;
+    if (newSW) {
+      trackInstallingWorker(newSW);
+    }
+  });
+
+  // Handle a SW that is already installing or waiting (e.g. when the listener above was
+  // registered after the updatefound event already fired in a previous call)
+  if (registration.installing) {
+    trackInstallingWorker(registration.installing);
+  } else if (registration.waiting && navigator.serviceWorker.controller) {
+    // A new SW is already waiting – activate it straight away
+    sendSkipWaiting();
+  }
+
   // (Optional but useful on Safari) ask for update early
   try {
     await registration.update();
@@ -188,31 +230,7 @@ export const initWorkerAsync = async (
     console.error(ex);
   }
 
-  // 1) Détection updatefound
-  registration.addEventListener('updatefound', () => {
-    const newSW = registration.installing;
-    stopKeepAlive();
-
-    newSW?.addEventListener('statechange', async () => {
-      if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-        stopKeepAlive();
-        console.log('New SW waiting – SKIP_WAITING');
-
-        try {
-          // Use MessageChannel to avoid “fire and forget” hangs
-          await sendMessageAsync(registration, { timeoutMs: 8000 })({
-            type: 'SKIP_WAITING',
-            configurationName,
-            data: null,
-          });
-        } catch (e) {
-          console.warn('SKIP_WAITING failed', e);
-        }
-      }
-    });
-  });
-
-  // 2) Quand le SW actif change, on reload (once)
+  // 2) Quand le SW actif change, on reload (once per session)
   const reloadKey = `oidc.sw.controllerchange.reloaded.${configurationName}`;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
@@ -275,6 +293,35 @@ export const initWorkerAsync = async (
       console.warn(
         `Service worker ${serviceWorkerVersion} version mismatch with js client version ${codeVersion}, unregistering and reloading`,
       );
+
+      const reloadCount = parseInt(sessionStorage.getItem(versionMismatchKey) ?? '0', 10);
+      if (reloadCount < 3) {
+        sessionStorage.setItem(versionMismatchKey, String(reloadCount + 1));
+        // If a new SW is already waiting, skip it into activation so controllerchange triggers reload
+        if (registration.waiting) {
+          await sendSkipWaiting();
+        } else {
+          // No waiting SW – force a fresh update and reload
+          stopKeepAlive();
+          try {
+            await registration.update();
+          } catch (ex) {
+            console.error(ex);
+          }
+          const isSuccess = await registration.unregister();
+          console.log(`Service worker unregistering ${isSuccess}`);
+          await sleepAsync({ milliseconds: 2000 });
+          window.location.reload();
+        }
+      } else {
+        console.error(
+          `Service worker version mismatch persists after ${reloadCount} attempt(s). Continuing with mismatched version.`,
+        );
+        sessionStorage.removeItem(versionMismatchKey);
+      }
+    } else {
+      // Version matches – clear any leftover mismatch counter
+      sessionStorage.removeItem(versionMismatchKey);
     }
 
     // @ts-ignore
