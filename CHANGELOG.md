@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.26.7
+## 7.26.8
+
+- [7c5dd661](https://github.com/AxaFrance/oidc-client/commit/7c5dd6612ae7ef5c492845eeae65dfdd23a75842) - fix(oidc): infinite service worker reload loop on version change (#1647) (release), 2026-03-10 by *Copilot*
+
+
+## v7.26.7
 
 - [46bd6a89](https://github.com/AxaFrance/oidc-client/commit/46bd6a89b803ca9c2c9aedf0a0fa1d73d229b995) - docs: clarify that allowMultiTabLogin requires OIDC fetch wrapper for API calls (#1643) (release), 2026-02-21 by *Copilot*
 - [f35ae017](https://github.com/AxaFrance/oidc-client/commit/f35ae0174664ea8abcc6c79b608958d0b2164636) - Fix `useOidcUser` stuck in Loading state after reloadOidcUser() (#1642), 2026-02-21 by *Copilot*
@@ -319,10 +324,5 @@
 ## v7.22.4
 
 - [64c76e0b](https://github.com/AxaFrance/oidc-client/commit/64c76e0b1f4fccf1c0ed93269a0307212be9d661) - feature(oidc):preload user (release) (#1352), 2024-04-23 by *Guillaume Chervet*
-
-
-## v7.22.3
-
-- [5af80754](https://github.com/AxaFrance/oidc-client/commit/5af807548e35c64da74fc3547e35c8ec512399ba) - fix(all): types import in index.ts for all typescript (release), 2024-04-18 by *Guillaume Chervet*
 
 
