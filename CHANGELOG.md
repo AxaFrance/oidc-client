@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.26.8
+## 7.27.0
+
+- [48d3ad02](https://github.com/AxaFrance/oidc-client/commit/48d3ad028d7b8ccbd6504bb2682f72e0b079643c) - feat(oidc-client): Add a 'login_state_storage' option to allow storing the auth flow state separately to tokens (#1646) (release), 2026-03-11 by *Alex O'Callaghan*
+
+
+## v7.26.8
 
 - [7c5dd661](https://github.com/AxaFrance/oidc-client/commit/7c5dd6612ae7ef5c492845eeae65dfdd23a75842) - fix(oidc): infinite service worker reload loop on version change (#1647) (release), 2026-03-10 by *Copilot*
 
@@ -319,10 +324,5 @@
 
 - [8d9fd955](https://github.com/AxaFrance/oidc-client/commit/8d9fd9550a74a771936f0e686eb31fe271cd912b) - fix(oidc): user loaded 401 when preload true and not serviceworder mode (release), 2024-05-19 by *Guillaume Chervet*
 - [d764b2bd](https://github.com/AxaFrance/oidc-client/commit/d764b2bd7319711c49a393c1fd3496d054661065) - refatcor(all): update librairies, 2024-05-18 by *Guillaume Chervet*
-
-
-## v7.22.4
-
-- [64c76e0b](https://github.com/AxaFrance/oidc-client/commit/64c76e0b1f4fccf1c0ed93269a0307212be9d661) - feature(oidc):preload user (release) (#1352), 2024-04-23 by *Guillaume Chervet*
 
 
