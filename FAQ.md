@@ -103,6 +103,26 @@ export const configuration = {
 
 If your Service Worker file is already registered on your browser, your need to unregister it. For example from chrome dev tool.
 
+## Two tabs race condition during login with localStorage
+
+When `storage: localStorage` is used without a service worker and two tabs initiate the login flow at the same time, they write the authorization state (`state`, `code_verifier`, `nonce`, login params) to the same `localStorage` keys. Each tab can overwrite the other's values, causing the callback in one tab to fail with a state mismatch error.
+
+The recommended fix is to use the `login_state_storage` option to store authorization flow state in `sessionStorage` (which is isolated per tab) while keeping tokens in `localStorage` so they persist across tabs:
+
+```javascript
+export const configuration = {
+  client_id: 'interactive.public.short',
+  redirect_uri: window.location.origin + '/authentication/callback',
+  scope: 'openid profile email api offline_access',
+  authority: 'https://demo.duendesoftware.com',
+  service_worker_only: false,
+  storage: localStorage,         // tokens persist across tabs
+  login_state_storage: sessionStorage, // authorization state is isolated per tab
+};
+```
+
+This option has no effect when using a service worker, which already handles multi-tab isolation internally.
+
 ## Tokens are always refreshed in background every seconds
 
 The @axa-fr/oidc-client automatically refreshes tokens in the background.  

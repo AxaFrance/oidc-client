@@ -1,4 +1,4 @@
-﻿import { eventNames } from './events';
+import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync } from './initWorker';
 import Oidc from './oidc';
@@ -62,7 +62,11 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
           message: 'service worker is not supported by this browser',
         });
       }
-      const session = initSession(oidc.configurationName, configuration.storage ?? sessionStorage);
+      const session = initSession(
+        oidc.configurationName,
+        configuration.storage ?? sessionStorage,
+        configuration.login_state_storage ?? configuration.storage ?? sessionStorage,
+      );
       const { tokens } = await session.initAsync();
       if (tokens) {
         // @ts-ignore

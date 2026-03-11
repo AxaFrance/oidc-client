@@ -348,7 +348,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
       this.tokens = parsedTokens;
       const serviceWorker = await initWorkerAsync(this.configuration, this.configurationName);
       if (!serviceWorker) {
-        const session = initSession(this.configurationName, this.configuration.storage);
+        const session = initSession(
+          this.configurationName,
+          this.configuration.storage,
+          this.configuration.login_state_storage ?? this.configuration.storage,
+        );
         session.setTokens(parsedTokens);
       }
       this.publishEvent(Oidc.eventNames.token_acquired, parsedTokens);
@@ -388,7 +392,11 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
       return `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${this.configurationName}#tabId=${getTabId(this.configurationName)}`;
     }
 
-    const session = initSession(this.configurationName, configuration.storage);
+    const session = initSession(
+      this.configurationName,
+      configuration.storage,
+      configuration.login_state_storage ?? configuration.storage,
+    );
     const jwk = await session.getDemonstratingProofOfPossessionJwkAsync();
     const demonstratingProofOfPossessionNonce = session.getDemonstratingProofOfPossessionNonce();
 
