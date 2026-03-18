@@ -151,6 +151,46 @@ const waitForControllerAsync = async (timeoutMs: number) => {
   });
 };
 
+// Module-level guards to prevent:
+// - registering multiple controllerchange listeners (one per initWorkerAsync call)
+// - reloading more than once per page lifetime
+let controllerChangeListenerRegistered = false;
+let controllerChangeReloading = false;
+
+// Session-level guard to prevent infinite reload loops caused by SW update cycles.
+// The controllerchange listener triggers a page reload, but after reload the module-level
+// guards above are reset. If the SW still hasn't been updated correctly (e.g. stale cache,
+// Firefox issues), the cycle would repeat forever. This key tracks reloads across page loads
+// via sessionStorage so we can break the loop.
+const SW_RELOAD_SESSION_KEY = 'oidc.sw.controllerchange_reload_count';
+const SW_RELOAD_MAX = 3;
+
+const getControllerChangeReloadCount = (): number => {
+  try {
+    return parseInt(sessionStorage.getItem(SW_RELOAD_SESSION_KEY) ?? '0', 10);
+  } catch {
+    return 0;
+  }
+};
+
+const incrementControllerChangeReloadCount = (): number => {
+  const count = getControllerChangeReloadCount() + 1;
+  try {
+    sessionStorage.setItem(SW_RELOAD_SESSION_KEY, String(count));
+  } catch {
+    // ignore
+  }
+  return count;
+};
+
+const clearControllerChangeReloadCount = () => {
+  try {
+    sessionStorage.removeItem(SW_RELOAD_SESSION_KEY);
+  } catch {
+    // ignore
+  }
+};
+
 export const initWorkerAsync = async (
   configuration: OidcConfiguration,
   configurationName: string,
@@ -183,17 +223,65 @@ export const initWorkerAsync = async (
 
   const versionMismatchKey = `oidc.sw.version_mismatch_reload.${configurationName}`;
 
-  const sendSkipWaiting = async () => {
+  const sendSkipWaitingToWorker = async (targetSw: ServiceWorker) => {
     stopKeepAlive();
     console.log('New SW waiting – SKIP_WAITING');
     try {
-      await sendMessageAsync(registration, { timeoutMs: 8000 })({
-        type: 'SKIP_WAITING',
-        configurationName,
-        data: null,
+      await new Promise<void>((resolve, reject) => {
+        const messageChannel = new MessageChannel();
+        let timeoutId: any = null;
+
+        const cleanup = () => {
+          try {
+            if (timeoutId != null) {
+              timer.clearTimeout(timeoutId);
+              timeoutId = null;
+            }
+            messageChannel.port1.onmessage = null;
+            messageChannel.port1.close();
+            messageChannel.port2.close();
+          } catch (ex) {
+            console.error(ex);
+          }
+        };
+
+        timeoutId = timer.setTimeout(() => {
+          cleanup();
+          reject(new Error('SKIP_WAITING did not respond within 8000ms'));
+        }, 8000);
+
+        messageChannel.port1.onmessage = event => {
+          cleanup();
+          if (event?.data?.error) reject(event.data.error);
+          else resolve();
+        };
+
+        try {
+          targetSw.postMessage(
+            {
+              type: 'SKIP_WAITING',
+              configurationName,
+              data: null,
+              tabId: getTabId(configurationName ?? 'default'),
+            },
+            [messageChannel.port2],
+          );
+        } catch (err) {
+          cleanup();
+          reject(err);
+        }
       });
     } catch (e) {
       console.warn('SKIP_WAITING failed', e);
+    }
+  };
+
+  const sendSkipWaiting = async () => {
+    const waitingSw = registration.waiting;
+    if (waitingSw) {
+      await sendSkipWaitingToWorker(waitingSw);
+    } else {
+      console.warn('sendSkipWaiting called but no waiting service worker found');
     }
   };
 
@@ -201,7 +289,16 @@ export const initWorkerAsync = async (
     stopKeepAlive();
     newSW.addEventListener('statechange', async () => {
       if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-        await sendSkipWaiting();
+        // Guard against infinite SKIP_WAITING → controllerchange → reload loops.
+        // If we've already exhausted the reload budget, don't force activation – let the
+        // browser handle it naturally on the next navigation instead.
+        if (getControllerChangeReloadCount() >= SW_RELOAD_MAX) {
+          console.warn(
+            'SW trackInstallingWorker: skipping SKIP_WAITING because the reload budget is exhausted',
+          );
+          return;
+        }
+        await sendSkipWaitingToWorker(newSW);
       }
     });
   };
@@ -219,33 +316,25 @@ export const initWorkerAsync = async (
   if (registration.installing) {
     trackInstallingWorker(registration.installing);
   } else if (registration.waiting && navigator.serviceWorker.controller) {
-    // A new SW is already waiting – activate it straight away
-    sendSkipWaiting();
-  }
-
-  // (Optional but useful on Safari) ask for update early
-  try {
-    await registration.update();
-  } catch (ex) {
-    console.error(ex);
-  }
-
-  // 2) Quand le SW actif change, on reload (once per session)
-  const reloadKey = `oidc.sw.controllerchange.reloaded.${configurationName}`;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    try {
-      if (sessionStorage.getItem(reloadKey) === '1') return;
-      sessionStorage.setItem(reloadKey, '1');
-    } catch {
-      // ignore
+    // A new SW is already waiting – activate it straight away (unless reload budget exhausted)
+    if (getControllerChangeReloadCount() < SW_RELOAD_MAX) {
+      sendSkipWaiting();
+    } else {
+      console.warn(
+        'SW: a waiting worker exists but reload budget is exhausted – skipping activation',
+      );
     }
+  }
 
-    console.log('SW controller changed – reloading page');
-    stopKeepAlive();
-    window.location.reload();
+  // (Optional but useful on Safari) ask for update early – non-blocking to avoid slowing init
+  registration.update().catch(ex => {
+    console.error(ex);
   });
 
-  // 3) Claim + init classique (Safari-safe)
+  // 2) Claim + init classique (Safari-safe)
+  // IMPORTANT: claim() is done BEFORE registering the controllerchange listener,
+  // because claim() can trigger a controllerchange event on first visit and we don't
+  // want that initial claim to cause a reload loop.
   try {
     await navigator.serviceWorker.ready;
 
@@ -262,6 +351,37 @@ export const initWorkerAsync = async (
   } catch (err: any) {
     console.warn(`Failed init ServiceWorker ${err?.toString?.() ?? String(err)}`);
     return null;
+  }
+
+  // 3) Register the controllerchange listener AFTER claim, and only once per page lifetime.
+  // This prevents:
+  // - claim() from triggering a reload on first visit
+  // - multiple listeners being stacked (initWorkerAsync is called many times)
+  // - more than one reload per page lifetime (guard via controllerChangeReloading)
+  // - infinite loops across page reloads (guard via sessionStorage counter)
+  if (!controllerChangeListenerRegistered) {
+    controllerChangeListenerRegistered = true;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (controllerChangeReloading) {
+        return;
+      }
+
+      // Session-level guard: prevent infinite reload loops when the SW never converges
+      // to the expected version (e.g. stale cache, Firefox issues, Electron quirks).
+      const reloadCount = incrementControllerChangeReloadCount();
+      if (reloadCount > SW_RELOAD_MAX) {
+        console.warn(
+          `SW controllerchange: reload budget exhausted (${reloadCount - 1} reloads). ` +
+            'Skipping reload to avoid infinite loop.',
+        );
+        return;
+      }
+
+      controllerChangeReloading = true;
+      console.log('SW controller changed – reloading page');
+      stopKeepAlive();
+      window.location.reload();
+    });
   }
 
   const clearAsync = async status => {
@@ -297,9 +417,18 @@ export const initWorkerAsync = async (
       const reloadCount = parseInt(sessionStorage.getItem(versionMismatchKey) ?? '0', 10);
       if (reloadCount < 3) {
         sessionStorage.setItem(versionMismatchKey, String(reloadCount + 1));
-        // If a new SW is already waiting, skip it into activation so controllerchange triggers reload
+
         if (registration.waiting) {
+          // A new SW is already waiting – activate it; controllerchange will trigger reload
           await sendSkipWaiting();
+          // If controllerchange did not reload yet, wait a moment then force reload
+          await sleepAsync({ milliseconds: 500 });
+          if (!controllerChangeReloading) {
+            controllerChangeReloading = true;
+            window.location.reload();
+          }
+          // Return a never-resolving promise to avoid returning stale tokens
+          return new Promise<never>(() => {});
         } else {
           // No waiting SW – force a fresh update and reload
           stopKeepAlive();
@@ -310,18 +439,24 @@ export const initWorkerAsync = async (
           }
           const isSuccess = await registration.unregister();
           console.log(`Service worker unregistering ${isSuccess}`);
-          await sleepAsync({ milliseconds: 2000 });
-          window.location.reload();
+          await sleepAsync({ milliseconds: 500 });
+          if (!controllerChangeReloading) {
+            controllerChangeReloading = true;
+            window.location.reload();
+          }
+          return new Promise<never>(() => {});
         }
       } else {
+        // Max retries reached – do NOT clear the key so future initAsync calls
+        // won't restart the cycle of 3 reloads
         console.error(
           `Service worker version mismatch persists after ${reloadCount} attempt(s). Continuing with mismatched version.`,
         );
-        sessionStorage.removeItem(versionMismatchKey);
       }
     } else {
-      // Version matches – clear any leftover mismatch counter
+      // Version matches – clear any leftover mismatch counter and reload counter
       sessionStorage.removeItem(versionMismatchKey);
+      clearControllerChangeReloadCount();
     }
 
     // @ts-ignore
