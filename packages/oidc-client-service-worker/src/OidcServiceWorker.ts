@@ -151,11 +151,20 @@ const handleFetch = (event: FetchEvent): void => {
         // 2a) Si on a déjà des tokens valides
         if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
           // On attend que le token soit valide (refresh possible en parallèle)
+          const maxWaitMs = 5000;
+          let waited = 0;
           while (
             currentDatabaseForRequestAccessToken.tokens &&
             !isTokensValid(currentDatabaseForRequestAccessToken.tokens)
           ) {
+            if (waited >= maxWaitMs) {
+              return new Response(null, {
+                status: 401,
+                statusText: 'Token expired - service worker renewal timeout',
+              });
+            }
             await sleep(200);
+            waited += 200;
           }
 
           // Ajustement du mode
