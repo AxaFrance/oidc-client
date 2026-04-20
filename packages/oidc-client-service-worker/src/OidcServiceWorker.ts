@@ -167,6 +167,12 @@ const handleFetch = (event: FetchEvent): void => {
             waited += 200;
           }
 
+          if (!currentDatabaseForRequestAccessToken.tokens?.access_token) {
+            return new Response(null, {
+              status: 401,
+              statusText: 'Missing access token',
+            });
+          }
           // Ajustement du mode
           let requestMode = originalRequest.mode;
           if (
