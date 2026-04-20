@@ -35,7 +35,10 @@ describe('waitForValidTokens', () => {
     // Let the first poll complete
     await vi.advanceTimersByTimeAsync(200);
     // Simulate a successful token renewal
-    config.tokens = new TokenBuilder().withNonExpiredToken().withAccessToken('renewed-token').build();
+    config.tokens = new TokenBuilder()
+      .withNonExpiredToken()
+      .withAccessToken('renewed-token')
+      .build();
     await vi.advanceTimersByTimeAsync(200);
 
     const result = await resultPromise;

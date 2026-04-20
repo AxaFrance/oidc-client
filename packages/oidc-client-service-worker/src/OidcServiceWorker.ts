@@ -394,7 +394,6 @@ const handleFetch = (event: FetchEvent): void => {
   );
 };
 
-
 const handleMessage = async (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
