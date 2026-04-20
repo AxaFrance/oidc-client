@@ -9,10 +9,10 @@ import {
   getCurrentDatabaseDomain,
   getDomains,
   hideTokens,
-  isTokensValid,
   normalizeUrl,
   serializeHeaders,
   sleep,
+  waitForValidTokens,
 } from './utils';
 import {
   extractConfigurationNameFromCodeVerifier,
@@ -36,7 +36,7 @@ if (typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy === 
 
 const _self = self as ServiceWorkerGlobalScope & typeof globalThis;
 
-// Déclare `trustedDomains` qui vient de l'extérieur :
+// `trustedDomains` is declared in the externally loaded script (OidcTrustedDomains.js)
 declare let trustedDomains: TrustedDomains;
 
 _self.importScripts(scriptFilename);
@@ -47,7 +47,7 @@ const keepAliveJsonFilename = 'OidcKeepAliveServiceWorker.json';
 const database: Database = {};
 
 /**
- * Routine keepAlive : renvoie une réponse après un "sleep" éventuel.
+ * Keeps the service worker alive by responding with a cached response after a sleep.
  */
 const keepAliveAsync = async (event: FetchEvent) => {
   const originalRequest = event.request;
@@ -68,7 +68,7 @@ const keepAliveAsync = async (event: FetchEvent) => {
 };
 
 /**
- * Génération d'en-têtes DPoP s'il y a configuration dpop.
+ * Generates DPoP headers when a DPoP configuration is present.
  */
 async function generateDpopAsync(
   originalRequest: Request,
@@ -103,8 +103,7 @@ async function generateDpopAsync(
 }
 
 /**
- * Nouveau handleFetch : on n’est plus async "directement".
- * On encapsule toute la logique dans un `respondWith((async () => { ... })())`.
+ * Intercepts fetch requests to inject access tokens and handle token endpoints.
  */
 const handleFetch = (event: FetchEvent): void => {
   /**
@@ -120,12 +119,12 @@ const handleFetch = (event: FetchEvent): void => {
         const originalRequest = event.request;
         const url = normalizeUrl(originalRequest.url);
 
-        // 1) Si on est sur la ressource KeepAlive
+        // 1) Handle keep-alive requests
         if (url.includes(keepAliveJsonFilename)) {
           return keepAliveAsync(event);
         }
 
-        // 2) Cas normal : on regarde si on a un token
+        // Check if an access token is available for this request
         const currentDatabasesForRequestAccessToken = getCurrentDatabaseDomain(
           database,
           url,
@@ -148,33 +147,15 @@ const handleFetch = (event: FetchEvent): void => {
           c => c.configurationName.endsWith(key),
         );
 
-        // 2a) Si on a déjà des tokens valides
+        // Inject the access token into the request if one is available
         if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
-          // On attend que le token soit valide (refresh possible en parallèle)
-          const maxWaitMs = 5000;
-          const pollIntervalMs = 200;
-          let waited = 0;
-          while (
-            currentDatabaseForRequestAccessToken.tokens &&
-            !isTokensValid(currentDatabaseForRequestAccessToken.tokens)
-          ) {
-            if (waited >= maxWaitMs) {
-              return new Response(null, {
-                status: 401,
-                statusText: 'Token expired - service worker renewal timeout',
-              });
-            }
-            await sleep(pollIntervalMs);
-            waited += pollIntervalMs;
+          // Wait for token to become valid (a parallel refresh may be in progress)
+          const tokenError = await waitForValidTokens(currentDatabaseForRequestAccessToken);
+          if (tokenError) {
+            return tokenError;
           }
 
-          if (!currentDatabaseForRequestAccessToken.tokens?.access_token) {
-            return new Response(null, {
-              status: 401,
-              statusText: 'Missing access token',
-            });
-          }
-          // Ajustement du mode
+          // Adjust request mode for CORS if configured
           let requestMode = originalRequest.mode;
           if (
             originalRequest.mode !== 'navigate' &&
@@ -183,10 +164,10 @@ const handleFetch = (event: FetchEvent): void => {
             requestMode = 'cors';
           }
 
-          // Construction des en-têtes
+          // Build request headers
           let headers: { [p: string]: string };
 
-          // Pas de token sur la requête "navigate" si setAccessTokenToNavigateRequests = false
+          // Skip the access token for navigate requests when setAccessTokenToNavigateRequests is false
           if (
             originalRequest.mode === 'navigate' &&
             !currentDatabaseForRequestAccessToken.setAccessTokenToNavigateRequests
@@ -195,13 +176,12 @@ const handleFetch = (event: FetchEvent): void => {
               ...serializeHeaders(originalRequest.headers),
             };
           } else {
-            // On injecte le token
             if (
               authenticationMode.toLowerCase() === 'dpop' ||
               (!currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent &&
                 currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionConfiguration)
             ) {
-              // Mode DPoP
+              // DPoP mode
               const claimsExtras = {
                 ath: await base64urlOfHashOfASCIIEncodingAsync(
                   currentDatabaseForRequestAccessToken.tokens.access_token,
@@ -218,7 +198,7 @@ const handleFetch = (event: FetchEvent): void => {
                 authorization: `DPoP ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
               };
             } else {
-              // Mode Bearer
+              // Bearer mode
               headers = {
                 ...serializeHeaders(originalRequest.headers),
                 authorization: `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
@@ -242,17 +222,16 @@ const handleFetch = (event: FetchEvent): void => {
           return fetch(newRequest);
         }
 
-        // 3) S’il ne s’agit pas d’un POST => on laisse passer
+        // Pass through non-POST requests without modification
         if (event.request.method !== 'POST') {
           return fetch(originalRequest);
         }
 
-        // 4) Cas POST vers un endpoint connu (token, revocation)
+        // Handle POST requests to known token/revocation endpoints
         const currentDatabases = getCurrentDatabasesTokenEndpoint(database, url);
         const numberDatabase = currentDatabases.length;
 
         if (numberDatabase > 0) {
-          // On gère tout dans une promesse
           const responsePromise = new Promise<Response>((resolve, reject) => {
             const clonedRequest = originalRequest.clone();
             clonedRequest
@@ -260,7 +239,7 @@ const handleFetch = (event: FetchEvent): void => {
               .then(async actualBody => {
                 let currentDatabase: OidcConfig | null = null;
                 try {
-                  // 4a) S’il y a un refresh_token masqué
+                  // Replace hidden token placeholders with the real token values
                   if (
                     actualBody.includes(TOKEN.REFRESH_TOKEN) ||
                     actualBody.includes(TOKEN.ACCESS_TOKEN)
@@ -321,21 +300,20 @@ const handleFetch = (event: FetchEvent): void => {
                       integrity: clonedRequest.integrity,
                     });
 
-                    // Cas “revocationEndpoint” ?
+                    // Forward revocation requests without modifying the response body
                     if (
                       currentDatabase?.oidcServerConfiguration?.revocationEndpoint &&
                       url.startsWith(
                         normalizeUrl(currentDatabase.oidcServerConfiguration.revocationEndpoint),
                       )
                     ) {
-                      // On ne modifie pas le corps
                       const resp = await fetchPromise;
                       const txt = await resp.text();
                       resolve(new Response(txt, resp));
                       return;
                     }
 
-                    // Sinon on “cache” les tokens dans la réponse
+                    // Hide real token values in the response
                     const hidden = await fetchPromise.then(
                       hideTokens(currentDatabase as OidcConfig),
                     );
@@ -343,7 +321,7 @@ const handleFetch = (event: FetchEvent): void => {
                     return;
                   }
 
-                  // 4b) Sinon si c’est le code_verifier
+                  // Handle authorization code exchange: replace the PKCE code_verifier placeholder
                   const isCodeVerifier = actualBody.includes('code_verifier=');
                   if (isCodeVerifier) {
                     const currentLoginCallbackConfigurationName =
@@ -382,7 +360,7 @@ const handleFetch = (event: FetchEvent): void => {
                     return;
                   }
 
-                  // 4c) Sinon on laisse passer tel quel
+                  // Pass through all other POST requests unchanged
                   const normalResp = await fetch(originalRequest, {
                     body: actualBody,
                     method: clonedRequest.method,
@@ -402,14 +380,13 @@ const handleFetch = (event: FetchEvent): void => {
               .catch(reject);
           });
 
-          // On renvoie simplement la promesse
           return responsePromise;
         }
 
-        // 5) Par défaut, on laisse passer la requête
+        // Default: pass through the request unchanged
         return fetch(originalRequest);
       } catch (err) {
-        // En cas d’erreur imprévue, on log et on retourne une 500
+        // Surface unexpected errors as a 500 rather than silently hanging
         console.error('[OidcServiceWorker] handleFetch error:', err);
         return new Response('Service Worker Error', { status: 500 });
       }
@@ -417,7 +394,7 @@ const handleFetch = (event: FetchEvent): void => {
   );
 };
 
-// ---- Gestion des messages depuis la page
+
 const handleMessage = async (event: ExtendableMessageEvent) => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
@@ -512,7 +489,6 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
       currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
 
-      // Cas DPoP
       if (currentDatabase.demonstratingProofOfPossessionConfiguration == null) {
         const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomain);
         if (demonstratingProofOfPossessionConfiguration != null) {
@@ -639,6 +615,6 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
   }
 };
 
-// Écouteurs
+// Event listeners
 _self.addEventListener('fetch', handleFetch);
 _self.addEventListener('message', handleMessage);
