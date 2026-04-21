@@ -157,6 +157,11 @@ const waitForControllerAsync = async (timeoutMs: number) => {
 let controllerChangeListenerRegistered = false;
 let controllerChangeReloading = false;
 
+// Cache registration promises by URL so that navigator.serviceWorker.register (or a custom
+// service_worker_register) is called at most once per JavaScript session (page lifetime),
+// regardless of how many times initWorkerAsync is invoked.
+const registrationCache = new Map<string, Promise<ServiceWorkerRegistration>>();
+
 // Session-level guard to prevent infinite reload loops caused by SW update cycles.
 // The controllerchange listener triggers a page reload, but after reload the module-level
 // guards above are reset. If the SW still hasn't been updated correctly (e.g. stale cache,
@@ -214,11 +219,23 @@ export const initWorkerAsync = async (
 
   let registration: ServiceWorkerRegistration = null as any;
   if (configuration.service_worker_register) {
-    registration = await configuration.service_worker_register(serviceWorkerRelativeUrl);
+    if (!registrationCache.has(serviceWorkerRelativeUrl)) {
+      registrationCache.set(
+        serviceWorkerRelativeUrl,
+        configuration.service_worker_register(serviceWorkerRelativeUrl),
+      );
+    }
+    registration = await registrationCache.get(serviceWorkerRelativeUrl)!;
   } else {
-    registration = await navigator.serviceWorker.register(swUrl, {
-      updateViaCache: 'none',
-    });
+    if (!registrationCache.has(swUrl)) {
+      registrationCache.set(
+        swUrl,
+        navigator.serviceWorker.register(swUrl, {
+          updateViaCache: 'none',
+        }),
+      );
+    }
+    registration = await registrationCache.get(swUrl)!;
   }
 
   const versionMismatchKey = `oidc.sw.version_mismatch_reload.${configurationName}`;
