@@ -1,7 +1,6 @@
 # @axa-fr/oidc-client
 
 [![Continuous Integration](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/react-oidc/actions/workflows/npm-publish.yml)
-[![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/introduction.gif"
@@ -14,8 +13,8 @@
 - [Run The Demos](#run-the-demos)
 - [How It Works](#how-it-works)
 - Packages
-  - [`@axa-fr/oidc-client`](./packages/oidc-client#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Foidc-client.svg)](https://badge.fury.io/js/%40axa-fr%2Foidc-client)
-  - [`@axa-fr/react-oidc`](./packages/react-oidc#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc)
+  - [`@axa-fr/oidc-client`](./packages/oidc-client#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Foidc-client.svg)](https://badge.fury.io/js/%40axa-fr%2Foidc-client) [![npm downloads](https://img.shields.io/npm/dw/@axa-fr/oidc-client)](https://www.npmjs.com/package/@axa-fr/oidc-client)
+  - [`@axa-fr/react-oidc`](./packages/react-oidc#readme.md) [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Freact-oidc) [![npm downloads](https://img.shields.io/npm/dw/@axa-fr/react-oidc)](https://www.npmjs.com/package/@axa-fr/react-oidc)
   - `@axa-fr/svelte-oidc` : we are looking for contributor
   - `@axa-fr/vue-oidc` : we are looking for contributor
   - `@axa-fr/angular-oidc` : we are looking for contributor
