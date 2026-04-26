@@ -1,8 +1,6 @@
-import { FetchHeaders } from '../types';
-
 function serializeHeaders(headers: Headers) {
   const headersObj: Record<string, string> = {};
-  for (const key of (headers as FetchHeaders).keys()) {
+  for (const key of headers.keys()) {
     if (headers.has(key)) {
       headersObj[key] = headers.get(key) as string;
     }

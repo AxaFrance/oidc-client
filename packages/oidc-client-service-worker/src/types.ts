@@ -43,11 +43,6 @@ export type OidcConfiguration = {
   demonstrating_proof_of_possession: boolean;
 };
 
-// Uncertain why the Headers interface in lib.webworker.d.ts does not have a keys() function, so extending
-export interface FetchHeaders extends Headers {
-  keys(): string[];
-}
-
 export type Status =
   | 'LOGGED'
   | 'LOGGED_IN'

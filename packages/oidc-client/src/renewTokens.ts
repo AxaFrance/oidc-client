@@ -133,7 +133,7 @@ export const syncTokensInfoAsync =
     if (!currentTokens) {
       return { tokens: null, status: synchroniseTokensStatus.NOT_CONNECTED, nonce: nullNonce };
     }
-    let nonce = nullNonce;
+    let nonce;
     const oidcServerConfiguration = await oidc.initAsync(
       configuration.authority,
       configuration.authority_configuration,

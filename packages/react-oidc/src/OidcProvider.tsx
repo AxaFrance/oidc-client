@@ -181,10 +181,6 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     };
   }, [configuration, configurationName]);
 
-  useEffect(() => {
-    setConfigurationName(configurationName);
-  }, [configurationName]);
-
   const SessionLostComponent = sessionLostComponent;
   const AuthenticatingComponent = authenticatingComponent;
   const LoadingComponent = loadingComponent;

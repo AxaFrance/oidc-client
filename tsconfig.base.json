@@ -6,6 +6,7 @@
     "allowJs": true,
     "noEmit": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true
