@@ -114,8 +114,11 @@ const handleFetch = (event: FetchEvent): void => {
     return; // Don't call event.respondWith() - let browser handle naturally
   }
 
-  const url = normalizeUrl(event.request.url);
-  if (!url.includes(keepAliveJsonFilename) && shouldBypassNonOidcRequest(database, url)) {
+  const normalizedUrl = normalizeUrl(event.request.url);
+  if (
+    !normalizedUrl.includes(keepAliveJsonFilename) &&
+    shouldBypassNonOidcRequest(database, normalizedUrl)
+  ) {
     return; // Don't call event.respondWith() - let browser handle naturally
   }
 
@@ -123,6 +126,7 @@ const handleFetch = (event: FetchEvent): void => {
     (async (): Promise<Response> => {
       try {
         const originalRequest = event.request;
+        const url = normalizedUrl;
 
         // 1) Handle keep-alive requests
         if (url.includes(keepAliveJsonFilename)) {

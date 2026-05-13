@@ -13,9 +13,7 @@ const getOidcServerUrls = (oidcServerConfiguration: OidcServerConfiguration): st
     .map(normalizeUrl);
 };
 
-const isOidcServerRequest = (database: Database, url: string): boolean => {
-  const normalizedUrl = normalizeUrl(url);
-
+const isOidcServerRequest = (database: Database, normalizedUrl: string): boolean => {
   return Object.values(database).some(config => {
     const { oidcServerConfiguration } = config || {};
     if (!oidcServerConfiguration) {
@@ -28,19 +26,22 @@ const isOidcServerRequest = (database: Database, url: string): boolean => {
   });
 };
 
-const shouldBypassNonOidcRequest = (database: Database, url: string): boolean => {
+const shouldBypassNonOidcRequest = (database: Database, normalizedUrl: string): boolean => {
   const configurations = Object.values(database);
 
-  if (
-    configurations.length === 0 ||
-    !configurations.every(
-      config => config.bypassAllNonOidcRequests && config.oidcServerConfiguration,
-    )
-  ) {
+  if (configurations.length === 0) {
     return false;
   }
 
-  return !isOidcServerRequest(database, url);
+  if (!configurations.every(config => config.bypassAllNonOidcRequests)) {
+    return false;
+  }
+
+  if (!configurations.every(config => config.oidcServerConfiguration != null)) {
+    return false;
+  }
+
+  return !isOidcServerRequest(database, normalizedUrl);
 };
 
 const getMatchingOidcConfigurations = (database: Database, url: string): OidcConfig[] => {
