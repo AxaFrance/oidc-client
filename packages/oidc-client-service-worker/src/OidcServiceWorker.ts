@@ -117,7 +117,7 @@ const handleFetch = (event: FetchEvent): void => {
   const normalizedUrl = normalizeUrl(event.request.url);
   if (
     !normalizedUrl.includes(keepAliveJsonFilename) &&
-    shouldBypassNonOidcRequest(database, normalizedUrl)
+    shouldBypassNonOidcRequest(database, normalizedUrl, trustedDomains)
   ) {
     return; // Don't call event.respondWith() - let browser handle naturally
   }

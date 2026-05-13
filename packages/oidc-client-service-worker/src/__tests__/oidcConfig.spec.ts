@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getCurrentDatabasesTokenEndpoint,
+  isAccessTokenDomainRequest,
   isOidcServerRequest,
   shouldBypassNonOidcRequest,
 } from '../oidcConfig';
-import { Database } from '../types';
+import { Database, TrustedDomains } from '../types';
 
 const oidcConfigDefaults = {
   demonstratingProofOfPossessionConfiguration: null,
@@ -175,7 +176,7 @@ describe('shouldBypassNonOidcRequest', () => {
   };
 
   it('should bypass non-OIDC requests when enabled', () => {
-    expect(shouldBypassNonOidcRequest(database, 'https://api.example.com/users')).toBe(true);
+    expect(shouldBypassNonOidcRequest(database, 'https://api.example.com/users', null)).toBe(true);
   });
 
   it.each([
@@ -186,7 +187,7 @@ describe('shouldBypassNonOidcRequest', () => {
     'https://oidc.example.com/connect/userinfo',
   ])('should never bypass OIDC server request %s', url => {
     expect(isOidcServerRequest(database, url)).toBe(true);
-    expect(shouldBypassNonOidcRequest(database, url)).toBe(false);
+    expect(shouldBypassNonOidcRequest(database, url, null)).toBe(false);
   });
 
   it('should keep existing behavior when disabled', () => {
@@ -199,6 +200,7 @@ describe('shouldBypassNonOidcRequest', () => {
           },
         },
         'https://api.example.com/users',
+        null,
       ),
     ).toBe(false);
   });
@@ -214,7 +216,37 @@ describe('shouldBypassNonOidcRequest', () => {
           },
         },
         'https://api.example.com/users',
+        null,
       ),
+    ).toBe(false);
+  });
+
+  it('should keep accessTokenDomains requests intercepted when bypass is enabled', () => {
+    const trustedDomains: TrustedDomains = {
+      config1: {
+        accessTokenDomains: ['https://api.example.com'],
+        showAccessToken: false,
+      },
+    };
+
+    expect(
+      isAccessTokenDomainRequest(database, 'https://api.example.com/users', trustedDomains),
+    ).toBe(true);
+    expect(
+      shouldBypassNonOidcRequest(database, 'https://api.example.com/users', trustedDomains),
+    ).toBe(false);
+  });
+
+  it('should keep domains fallback requests intercepted when bypass is enabled', () => {
+    const trustedDomains: TrustedDomains = {
+      config1: {
+        domains: ['https://api.example.com'],
+        showAccessToken: false,
+      },
+    };
+
+    expect(
+      shouldBypassNonOidcRequest(database, 'https://api.example.com/users', trustedDomains),
     ).toBe(false);
   });
 
@@ -232,6 +264,7 @@ describe('shouldBypassNonOidcRequest', () => {
           },
         },
         'https://api.example.com/users',
+        null,
       ),
     ).toBe(false);
   });
