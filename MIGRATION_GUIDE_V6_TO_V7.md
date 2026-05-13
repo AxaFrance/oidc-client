@@ -13,5 +13,6 @@ trustedDomains.config_show_access_token = {
   showAccessToken: true,
   // convertAllRequestsToCorsExceptNavigate: false, // default value is false
   // setAccessTokenToNavigateRequests: true, // default value is true
+  // bypassAllNonOidcRequests: false, // default value is false; when true, non-OIDC requests are handled by the browser while OIDC server requests still go through the service worker
 };
 ```

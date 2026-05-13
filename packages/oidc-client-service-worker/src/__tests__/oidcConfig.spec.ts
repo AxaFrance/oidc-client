@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { getCurrentDatabasesTokenEndpoint } from '../oidcConfig';
+import {
+  getCurrentDatabasesTokenEndpoint,
+  isOidcServerRequest,
+  shouldBypassNonOidcRequest,
+} from '../oidcConfig';
 import { Database } from '../types';
 
 const oidcConfigDefaults = {
@@ -18,6 +22,7 @@ const oidcConfigDefaults = {
   demonstratingProofOfPossessionJwkJson: null,
   demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
   allowMultiTabLogin: true,
+  bypassAllNonOidcRequests: false,
 };
 
 const oidcServerConfigDefault = {
@@ -150,5 +155,84 @@ describe('getCurrentDatabasesTokenEndpoint', () => {
     const result = getCurrentDatabasesTokenEndpoint(database, url);
 
     expect(result).toHaveLength(0);
+  });
+});
+
+describe('shouldBypassNonOidcRequest', () => {
+  const database: Database = {
+    config1: {
+      ...oidcConfigDefaults,
+      bypassAllNonOidcRequests: true,
+      oidcServerConfiguration: {
+        ...oidcServerConfigDefault,
+        issuer: 'https://oidc.example.com',
+        authorizationEndpoint: 'https://oidc.example.com/connect/authorize',
+        tokenEndpoint: 'https://oidc.example.com/connect/token',
+        revocationEndpoint: 'https://oidc.example.com/connect/revoke',
+        userInfoEndpoint: 'https://oidc.example.com/connect/userinfo',
+      },
+    },
+  };
+
+  it('should bypass non-OIDC requests when enabled', () => {
+    expect(shouldBypassNonOidcRequest(database, 'https://api.example.com/users')).toBe(true);
+  });
+
+  it.each([
+    'https://oidc.example.com/.well-known/openid-configuration',
+    'https://oidc.example.com/connect/authorize',
+    'https://oidc.example.com/connect/token',
+    'https://oidc.example.com/connect/revoke',
+    'https://oidc.example.com/connect/userinfo',
+  ])('should never bypass OIDC server request %s', url => {
+    expect(isOidcServerRequest(database, url)).toBe(true);
+    expect(shouldBypassNonOidcRequest(database, url)).toBe(false);
+  });
+
+  it('should keep existing behavior when disabled', () => {
+    expect(
+      shouldBypassNonOidcRequest(
+        {
+          config1: {
+            ...database.config1,
+            bypassAllNonOidcRequests: false,
+          },
+        },
+        'https://api.example.com/users',
+      ),
+    ).toBe(false);
+  });
+
+  it('should keep existing behavior until OIDC server configuration is initialized', () => {
+    expect(
+      shouldBypassNonOidcRequest(
+        {
+          config1: {
+            ...oidcConfigDefaults,
+            bypassAllNonOidcRequests: true,
+            oidcServerConfiguration: null,
+          },
+        },
+        'https://api.example.com/users',
+      ),
+    ).toBe(false);
+  });
+
+  it('should keep existing behavior unless all initialized configurations enable bypass', () => {
+    expect(
+      shouldBypassNonOidcRequest(
+        {
+          ...database,
+          config2: {
+            ...oidcConfigDefaults,
+            oidcServerConfiguration: {
+              ...oidcServerConfigDefault,
+              issuer: 'https://other-oidc.example.com',
+            },
+          },
+        },
+        'https://api.example.com/users',
+      ),
+    ).toBe(false);
   });
 });

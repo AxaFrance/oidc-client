@@ -127,6 +127,7 @@ class OidcConfigBuilder {
     demonstratingProofOfPossessionConfiguration: null,
     demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
     allowMultiTabLogin: true,
+    bypassAllNonOidcRequests: false,
   };
 
   public withTestingDefault(): OidcConfigBuilder {

@@ -57,6 +57,7 @@ describe('domains', () => {
           demonstratingProofOfPossessionConfiguration: null,
           demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
           allowMultiTabLogin: true,
+          bypassAllNonOidcRequests: false,
         },
       };
     });
