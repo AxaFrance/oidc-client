@@ -2,7 +2,7 @@ import { acceptAnyDomainToken, scriptFilename, TOKEN } from './constants';
 import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent } from './dpop';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
-import { getCurrentDatabasesTokenEndpoint } from './oidcConfig';
+import { getCurrentDatabasesTokenEndpoint, shouldBypassNonOidcRequest } from './oidcConfig';
 import { Database, MessageEventData, OidcConfig, TrustedDomains } from './types';
 import {
   checkDomain,
@@ -113,11 +113,20 @@ const handleFetch = (event: FetchEvent): void => {
   if (bypassedDestinations.includes(event.request.destination)) {
     return; // Don't call event.respondWith() - let browser handle naturally
   }
+
+  const normalizedUrl = normalizeUrl(event.request.url);
+  if (
+    !normalizedUrl.includes(keepAliveJsonFilename) &&
+    shouldBypassNonOidcRequest(database, normalizedUrl, trustedDomains)
+  ) {
+    return; // Don't call event.respondWith() - let browser handle naturally
+  }
+
   event.respondWith(
     (async (): Promise<Response> => {
       try {
         const originalRequest = event.request;
-        const url = normalizeUrl(originalRequest.url);
+        const url = normalizedUrl;
 
         // 1) Handle keep-alive requests
         if (url.includes(keepAliveJsonFilename)) {
@@ -430,6 +439,9 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
     const convertAllRequestsToCorsExceptNavigate = Array.isArray(trustedDomain)
       ? false
       : trustedDomain.convertAllRequestsToCorsExceptNavigate;
+    const bypassAllNonOidcRequests = Array.isArray(trustedDomain)
+      ? false
+      : trustedDomain.bypassAllNonOidcRequests;
 
     database[configurationNameWithTabId] = {
       tokens: null,
@@ -448,6 +460,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       demonstratingProofOfPossessionConfiguration: null,
       demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: false,
       allowMultiTabLogin: allowMultiTabLogin ?? false,
+      bypassAllNonOidcRequests: bypassAllNonOidcRequests ?? false,
     };
     currentDatabase = database[configurationNameWithTabId];
 

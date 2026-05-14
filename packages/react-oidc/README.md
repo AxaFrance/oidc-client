@@ -94,6 +94,7 @@ trustedDomains.config_show_access_token = {
   showAccessToken: true,
   // convertAllRequestsToCorsExceptNavigate: false, // default value is false
   // setAccessTokenToNavigateRequests: true, // default value is true
+  // bypassAllNonOidcRequests: false, // default value is false; when true, requests outside OIDC and accessTokenDomains are handled by the browser
 };
 
 // DPoP (Demonstrating Proof of Possession) will be activated for the following domains
