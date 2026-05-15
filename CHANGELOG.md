@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.7
+## 7.27.8
+
+- [c67eabfb](https://github.com/AxaFrance/oidc-client/commit/c67eabfbe2bf437b490f37c63d58d79bdf82c4de) - Update all dependencies to latest versions (#1665) (release), 2026-05-15 by *Copilot*
+
+
+## v7.27.7
 
 
 
@@ -319,9 +324,5 @@
 ## v7.22.13
 
 - [95c814dd](https://github.com/AxaFrance/oidc-client/commit/95c814dd9dd325a3a00c3a0dc049d301d983514e) - fix(ci): setup pnpm (release) (#1399), 2024-07-05 by *Guillaume Chervet*
-
-
-## v7.22.12
-
 
 
