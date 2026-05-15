@@ -1,6 +1,19 @@
 # Changelog
 
-## 7.27.4
+## 7.27.7
+
+
+
+## v7.27.6
+
+
+
+## v7.27.5
+
+- [debafc81](https://github.com/AxaFrance/oidc-client/commit/debafc81b9f6d24f2c2bfc81e160b1cc595cacc0) - Bypass non-OIDC requests in the service worker (#1663) (release), 2026-05-14 by *Copilot*
+
+
+## v7.27.4
 
 - [9d94b3d6](https://github.com/AxaFrance/oidc-client/commit/9d94b3d64a0cec857106b15e87ddcd1777ef42d7) - chore(all): Update workspace libraries (#1659) (release), 2026-04-27 by *Copilot*
 - [78a0bfa6](https://github.com/AxaFrance/oidc-client/commit/78a0bfa6281c0891ce4b7abde786ffdcd119d964) - Remove sonar badges from all README.md files (#1658), 2026-04-24 by *Copilot*
@@ -310,19 +323,5 @@
 
 ## v7.22.12
 
-
-
-## v7.22.11
-
-
-
-## v7.22.10
-
-- [6c80c5cc](https://github.com/AxaFrance/oidc-client/commit/6c80c5cc77750aead50e62136a6594b05f21b42b) - fix(oidc): logout trigger login (release) (#1394), 2024-07-04 by *Guillaume Chervet*
-
-
-## v7.22.9
-
-- [77eb9e18](https://github.com/AxaFrance/oidc-client/commit/77eb9e1841814cfeb6c6672159740dad4c0a9d4d) - fix(oidc): MessageChannel is not closed after message is received (release) (#1396), 2024-07-02 by *radk0s*
 
 
