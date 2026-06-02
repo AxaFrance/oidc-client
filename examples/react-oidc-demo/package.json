@@ -21,7 +21,7 @@
   "dependencies": {
     "@axa-fr/react-oidc": "workspace:*",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react-dom": "^19.2.7",
     "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
