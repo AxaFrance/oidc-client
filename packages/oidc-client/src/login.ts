@@ -5,7 +5,7 @@ import { initWorkerAsync } from './initWorker.js';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
 import { ILOidcLocation } from './location';
 import Oidc from './oidc';
-import { isTokensOidcValid } from './parseTokens.js';
+import { isTokensOidcValid, isTokensValid, setTokens } from './parseTokens.js';
 import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests.js';
 import { getParseQueryStringFromLocation } from './route-utils.js';
 import { OidcConfiguration, StringMap } from './types.js';
@@ -99,6 +99,68 @@ export const defaultLoginAsync =
     return loginLocalAsync();
   };
 
+const getExistingValidTokens = async (
+  oidc: Oidc,
+  serviceWorker: any,
+  configuration: OidcConfiguration,
+  getLoginParams: any,
+) => {
+  // Check if the Oidc instance already has valid tokens (SPA in-memory)
+  if (oidc.tokens && isTokensValid(oidc.tokens)) {
+    return {
+      tokens: oidc.tokens,
+      state: 'request.state',
+      callbackPath: getLoginParams?.callbackPath ?? '/',
+      scope: undefined,
+      extras: getLoginParams?.extras,
+    };
+  }
+
+  if (serviceWorker) {
+    // For service worker mode, retrieve tokens via initAsync with tryKeepExistingSessionAsync
+    const oidcServerConfiguration = await oidc.initAsync(
+      configuration.authority,
+      configuration.authority_configuration,
+    );
+    const { tokens } = await serviceWorker.initAsync(
+      oidcServerConfiguration,
+      'tryKeepExistingSessionAsync',
+      configuration,
+    );
+    if (tokens && isTokensValid(tokens)) {
+      return {
+        tokens,
+        state: 'request.state',
+        callbackPath: getLoginParams?.callbackPath ?? '/',
+        scope: undefined,
+        extras: getLoginParams?.extras,
+      };
+    }
+  } else {
+    // Check storage for existing tokens (handles full page reload scenarios)
+    const session = initSession(
+      oidc.configurationName,
+      configuration.storage ?? sessionStorage,
+      configuration.login_state_storage ?? configuration.storage ?? sessionStorage,
+    );
+    const { tokens } = await session.initAsync();
+    if (tokens) {
+      const parsedTokens = setTokens(tokens, null, configuration.token_renew_mode);
+      if (isTokensValid(parsedTokens)) {
+        return {
+          tokens: parsedTokens,
+          state: 'request.state',
+          callbackPath: getLoginParams?.callbackPath ?? '/',
+          scope: undefined,
+          extras: getLoginParams?.extras,
+        };
+      }
+    }
+  }
+
+  return null;
+};
+
 export const loginCallbackAsync =
   (oidc: Oidc) =>
   async (isSilentSignin = false) => {
@@ -157,6 +219,21 @@ export const loginCallbackAsync =
         );
       }
       if (queryParams.state && queryParams.state !== state) {
+        // When stored state is null/undefined, it means the original login flow already
+        // consumed the state. This happens when the user presses the back button after login
+        // and the IdP (e.g. Keycloak) auto-redirects back to the callback URL with a new state.
+        if (!state) {
+          const existingTokens = await getExistingValidTokens(
+            oidc,
+            serviceWorker,
+            configuration,
+            getLoginParams,
+          );
+          if (existingTokens) {
+            oidc.publishEvent(eventNames.loginCallbackAsync_end, {});
+            return existingTokens;
+          }
+        }
         throw new Error(`State not valid (expected: ${state}, received: ${queryParams.state})`);
       }
 
