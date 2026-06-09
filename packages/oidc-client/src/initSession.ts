@@ -1,3 +1,39 @@
+// Guarded writes to storage. Assigning `undefined` or `null` through bracket
+// notation (or `setItem`) coerces the value to the literal strings
+// `"undefined"` / `"null"`, which then poison the next `JSON.parse` read.
+// See https://github.com/AxaFrance/oidc-client/issues/1257 (and #871, #1274).
+const writeJson = (storage: Storage, key: string, value: unknown) => {
+  if (value === undefined || value === null) {
+    delete storage[key];
+    return;
+  }
+  storage[key] = JSON.stringify(value);
+};
+
+const writeRaw = (storage: Storage, key: string, value: string | null | undefined) => {
+  if (value === undefined || value === null) {
+    delete storage[key];
+    return;
+  }
+  storage[key] = value;
+};
+
+const parseJsonOrNull = <T = unknown>(raw: unknown): T | null => {
+  if (typeof raw !== 'string') {
+    return null;
+  }
+  // Defence in depth against pre-existing poisoned values written by older
+  // versions of this library before the setter guards above were in place.
+  if (raw === 'undefined' || raw === 'null' || raw === '') {
+    return null;
+  }
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+};
+
 export const initSession = (
   configurationName,
   storage = sessionStorage,
@@ -6,7 +42,7 @@ export const initSession = (
   const loginStorage = loginStateStorage ?? storage;
 
   const clearAsync = status => {
-    storage[`oidc.${configurationName}`] = JSON.stringify({ tokens: null, status });
+    writeJson(storage, `oidc.${configurationName}`, { tokens: null, status });
     delete storage[`oidc.${configurationName}.userInfo`];
     if (loginStateStorage && loginStateStorage !== storage) {
       delete loginStorage[`oidc.login.${configurationName}`];
@@ -18,20 +54,23 @@ export const initSession = (
   };
 
   const initAsync = async () => {
-    if (!storage[`oidc.${configurationName}`]) {
-      storage[`oidc.${configurationName}`] = JSON.stringify({ tokens: null, status: null });
+    const existing = parseJsonOrNull(storage[`oidc.${configurationName}`]) as {
+      tokens: any;
+      status: any;
+    } | null;
+    if (!existing) {
+      writeJson(storage, `oidc.${configurationName}`, { tokens: null, status: null });
       return { tokens: null, status: null };
     }
-    const data = JSON.parse(storage[`oidc.${configurationName}`]);
-    return Promise.resolve({ tokens: data.tokens, status: data.status });
+    return Promise.resolve({ tokens: existing.tokens, status: existing.status });
   };
 
   const setTokens = tokens => {
-    storage[`oidc.${configurationName}`] = JSON.stringify({ tokens });
+    writeJson(storage, `oidc.${configurationName}`, { tokens });
   };
 
   const setSessionStateAsync = async sessionState => {
-    storage[`oidc.session_state.${configurationName}`] = sessionState;
+    writeRaw(storage, `oidc.session_state.${configurationName}`, sessionState);
   };
 
   const getSessionStateAsync = async () => {
@@ -39,15 +78,15 @@ export const initSession = (
   };
 
   const setNonceAsync = nonce => {
-    loginStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
+    writeRaw(loginStorage, `oidc.nonce.${configurationName}`, nonce?.nonce);
   };
 
   const setDemonstratingProofOfPossessionJwkAsync = (jwk: JsonWebKey) => {
-    storage[`oidc.jwk.${configurationName}`] = JSON.stringify(jwk);
+    writeJson(storage, `oidc.jwk.${configurationName}`, jwk);
   };
 
   const getDemonstratingProofOfPossessionJwkAsync = () => {
-    return JSON.parse(storage[`oidc.jwk.${configurationName}`]);
+    return parseJsonOrNull<JsonWebKey>(storage[`oidc.jwk.${configurationName}`]);
   };
 
   const getNonceAsync = async () => {
@@ -56,7 +95,7 @@ export const initSession = (
   };
 
   const setDemonstratingProofOfPossessionNonce = async (dpopNonce: string) => {
-    storage[`oidc.dpop_nonce.${configurationName}`] = dpopNonce;
+    writeRaw(storage, `oidc.dpop_nonce.${configurationName}`, dpopNonce);
   };
 
   const getDemonstratingProofOfPossessionNonce = (): string => {
@@ -64,31 +103,38 @@ export const initSession = (
   };
 
   const getTokens = () => {
-    if (!storage[`oidc.${configurationName}`]) {
+    const parsed = parseJsonOrNull(storage[`oidc.${configurationName}`]) as {
+      tokens: any;
+    } | null;
+    if (!parsed) {
       return null;
     }
-    return JSON.stringify({ tokens: JSON.parse(storage[`oidc.${configurationName}`]).tokens });
+    return JSON.stringify({ tokens: parsed.tokens });
   };
 
   const getLoginParamsCache = {};
   const setLoginParams = data => {
+    if (data === undefined || data === null) {
+      delete getLoginParamsCache[configurationName];
+      delete loginStorage[`oidc.login.${configurationName}`];
+      return;
+    }
     getLoginParamsCache[configurationName] = data;
-    loginStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
+    writeJson(loginStorage, `oidc.login.${configurationName}`, data);
   };
   const getLoginParams = () => {
-    const dataString = loginStorage[`oidc.login.${configurationName}`];
-
-    if (!dataString) {
+    if (getLoginParamsCache[configurationName]) {
+      return getLoginParamsCache[configurationName];
+    }
+    const parsed = parseJsonOrNull(loginStorage[`oidc.login.${configurationName}`]);
+    if (parsed === null) {
       console.warn(
         `storage[oidc.login.${configurationName}] is empty, you should have an bad OIDC or code configuration somewhere.`,
       );
       return null;
     }
-
-    if (!getLoginParamsCache[configurationName]) {
-      getLoginParamsCache[configurationName] = JSON.parse(dataString);
-    }
-    return getLoginParamsCache[configurationName];
+    getLoginParamsCache[configurationName] = parsed;
+    return parsed;
   };
 
   const getStateAsync = async () => {
@@ -96,7 +142,7 @@ export const initSession = (
   };
 
   const setStateAsync = async (state: string) => {
-    loginStorage[`oidc.state.${configurationName}`] = state;
+    writeRaw(loginStorage, `oidc.state.${configurationName}`, state);
   };
 
   const getCodeVerifierAsync = async () => {
@@ -104,7 +150,7 @@ export const initSession = (
   };
 
   const setCodeVerifierAsync = async codeVerifier => {
-    loginStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
+    writeRaw(loginStorage, `oidc.code_verifier.${configurationName}`, codeVerifier);
   };
 
   return {

@@ -165,6 +165,71 @@ describe('initSession', () => {
     });
   });
 
+  describe('undefined/null guards (regression: #871 / #1257 / #1274)', () => {
+    let storage: Storage;
+    let session: ReturnType<typeof initSession>;
+
+    beforeEach(() => {
+      storage = makeStorage();
+      session = initSession(configName, storage);
+    });
+
+    it('setLoginParams(undefined) does not poison storage with the literal "undefined"', () => {
+      session.setLoginParams(undefined);
+      expect(storage[`oidc.login.${configName}`]).toBeUndefined();
+      expect(() => session.getLoginParams()).not.toThrow();
+      expect(session.getLoginParams()).toBeNull();
+    });
+
+    it('setLoginParams(null) clears storage rather than writing "null"', () => {
+      session.setLoginParams({ callbackPath: '/cb', extras: null, scope: 'openid' });
+      session.setLoginParams(null);
+      expect(storage[`oidc.login.${configName}`]).toBeUndefined();
+      expect(session.getLoginParams()).toBeNull();
+    });
+
+    it('getLoginParams tolerates a pre-existing poisoned "undefined" value', () => {
+      // simulate storage poisoned by an older version of the library
+      storage[`oidc.login.${configName}`] = 'undefined';
+      expect(() => session.getLoginParams()).not.toThrow();
+      expect(session.getLoginParams()).toBeNull();
+    });
+
+    it('getLoginParams tolerates a pre-existing poisoned "null" value', () => {
+      storage[`oidc.login.${configName}`] = 'null';
+      expect(() => session.getLoginParams()).not.toThrow();
+      expect(session.getLoginParams()).toBeNull();
+    });
+
+    it('initAsync tolerates a pre-existing poisoned "undefined" tokens entry', async () => {
+      storage[`oidc.${configName}`] = 'undefined';
+      await expect(session.initAsync()).resolves.toEqual({ tokens: null, status: null });
+    });
+
+    it('getTokens returns null for a pre-existing poisoned tokens entry', () => {
+      storage[`oidc.${configName}`] = 'undefined';
+      expect(() => session.getTokens()).not.toThrow();
+      expect(session.getTokens()).toBeNull();
+    });
+
+    it('setNonceAsync({nonce: undefined}) does not poison storage', async () => {
+      await session.setNonceAsync({ nonce: undefined as unknown as string });
+      expect(storage[`oidc.nonce.${configName}`]).toBeUndefined();
+      const { nonce } = await session.getNonceAsync();
+      expect(nonce).toBeUndefined();
+    });
+
+    it('setStateAsync(undefined) does not poison storage', async () => {
+      await session.setStateAsync(undefined as unknown as string);
+      expect(storage[`oidc.state.${configName}`]).toBeUndefined();
+    });
+
+    it('setCodeVerifierAsync(undefined) does not poison storage', async () => {
+      await session.setCodeVerifierAsync(undefined);
+      expect(storage[`oidc.code_verifier.${configName}`]).toBeUndefined();
+    });
+  });
+
   describe('two-tab isolation', () => {
     it('two sessions sharing tokenStorage but with independent loginStateStorages do not overwrite each other', async () => {
       const sharedTokenStorage = makeStorage();

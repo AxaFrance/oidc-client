@@ -541,14 +541,34 @@ export const initWorkerAsync = async (
 
   const getLoginParamsCache = {};
   const setLoginParams = data => {
+    if (data === undefined || data === null) {
+      delete getLoginParamsCache[configurationName];
+      delete localStorage[`oidc.login.${configurationName}`];
+      return;
+    }
     getLoginParamsCache[configurationName] = data;
     localStorage[`oidc.login.${configurationName}`] = JSON.stringify(data);
   };
 
   const getLoginParams = () => {
+    if (getLoginParamsCache[configurationName]) {
+      return getLoginParamsCache[configurationName];
+    }
     const dataString = localStorage[`oidc.login.${configurationName}`];
-    if (!getLoginParamsCache[configurationName]) {
+    // Guard against the literal strings "undefined" / "null" written by older
+    // builds of this library through bracket-notation assignment.
+    if (
+      typeof dataString !== 'string' ||
+      dataString === '' ||
+      dataString === 'undefined' ||
+      dataString === 'null'
+    ) {
+      return null;
+    }
+    try {
       getLoginParamsCache[configurationName] = JSON.parse(dataString);
+    } catch {
+      return null;
     }
     return getLoginParamsCache[configurationName];
   };
