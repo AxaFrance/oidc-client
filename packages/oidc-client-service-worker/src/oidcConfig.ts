@@ -94,9 +94,16 @@ const getMatchingOidcConfigurations = (database: Database, url: string): OidcCon
   });
 };
 
+const bypassedDestinations = ['image', 'font', 'media', 'document', 'iframe', 'script'];
+
+const shouldBypassDestination = (destination: string, mode: string): boolean => {
+  return bypassedDestinations.includes(destination) && mode !== 'navigate';
+};
+
 export {
   getMatchingOidcConfigurations as getCurrentDatabasesTokenEndpoint,
   isAccessTokenDomainRequest,
   isOidcServerRequest,
+  shouldBypassDestination,
   shouldBypassNonOidcRequest,
 };

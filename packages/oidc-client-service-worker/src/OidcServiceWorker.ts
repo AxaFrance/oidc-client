@@ -2,7 +2,11 @@ import { acceptAnyDomainToken, scriptFilename, TOKEN } from './constants';
 import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent } from './dpop';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
-import { getCurrentDatabasesTokenEndpoint, shouldBypassNonOidcRequest } from './oidcConfig';
+import {
+  getCurrentDatabasesTokenEndpoint,
+  shouldBypassDestination,
+  shouldBypassNonOidcRequest,
+} from './oidcConfig';
 import { Database, MessageEventData, OidcConfig, TrustedDomains } from './types';
 import {
   checkDomain,
@@ -109,8 +113,7 @@ const handleFetch = (event: FetchEvent): void => {
   /**
    * Exit early for requests that do not need to have an auth token attached.
    */
-  const bypassedDestinations = ['image', 'font', 'media', 'document', 'iframe', 'script'];
-  if (bypassedDestinations.includes(event.request.destination)) {
+  if (shouldBypassDestination(event.request.destination, event.request.mode)) {
     return; // Don't call event.respondWith() - let browser handle naturally
   }
 

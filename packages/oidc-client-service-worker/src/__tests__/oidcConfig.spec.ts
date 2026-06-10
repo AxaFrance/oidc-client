@@ -4,6 +4,7 @@ import {
   getCurrentDatabasesTokenEndpoint,
   isAccessTokenDomainRequest,
   isOidcServerRequest,
+  shouldBypassDestination,
   shouldBypassNonOidcRequest,
 } from '../oidcConfig';
 import { Database, TrustedDomains } from '../types';
@@ -267,5 +268,37 @@ describe('shouldBypassNonOidcRequest', () => {
         null,
       ),
     ).toBe(false);
+  });
+});
+
+describe('shouldBypassDestination', () => {
+  it('should bypass image requests with non-navigate mode', () => {
+    expect(shouldBypassDestination('image', 'no-cors')).toBe(true);
+  });
+
+  it('should bypass font requests with non-navigate mode', () => {
+    expect(shouldBypassDestination('font', 'cors')).toBe(true);
+  });
+
+  it('should bypass document requests with non-navigate mode', () => {
+    expect(shouldBypassDestination('document', 'cors')).toBe(true);
+  });
+
+  it('should NOT bypass document requests with navigate mode', () => {
+    expect(shouldBypassDestination('document', 'navigate')).toBe(false);
+  });
+
+  it('should NOT bypass requests with navigate mode even for other bypassed destinations', () => {
+    expect(shouldBypassDestination('iframe', 'navigate')).toBe(false);
+    expect(shouldBypassDestination('script', 'navigate')).toBe(false);
+  });
+
+  it('should NOT bypass non-listed destinations', () => {
+    expect(shouldBypassDestination('', 'cors')).toBe(false);
+    expect(shouldBypassDestination('worker', 'same-origin')).toBe(false);
+  });
+
+  it('should bypass media requests with non-navigate mode', () => {
+    expect(shouldBypassDestination('media', 'no-cors')).toBe(true);
   });
 });
