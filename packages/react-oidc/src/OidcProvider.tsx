@@ -47,12 +47,14 @@ export type OidcProviderProps = {
 export type OidcSessionProps = {
   configurationName: string;
   loadingComponent: PropsWithChildren<any>;
+  loadingTimeoutMs?: number;
 };
 
 const OidcSession: FC<PropsWithChildren<OidcSessionProps>> = ({
   loadingComponent,
   children,
   configurationName,
+  loadingTimeoutMs,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const getOidc = OidcClient.get;
@@ -70,6 +72,20 @@ const OidcSession: FC<PropsWithChildren<OidcSessionProps>> = ({
       isMounted = false;
     };
   }, [configurationName]);
+
+  useEffect(() => {
+    if (!isLoading || !loadingTimeoutMs) {
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      const oidcClient = OidcClient.get(configurationName);
+      oidcClient.publishEvent(OidcClient.eventNames.loadingTimeout_error, {
+        timeoutMs: loadingTimeoutMs,
+      });
+    }, loadingTimeoutMs);
+    return () => clearTimeout(timeoutId);
+  }, [isLoading, configurationName, loadingTimeoutMs]);
+
   const LoadingComponent = loadingComponent;
   return (
     <>{isLoading ? <LoadingComponent configurationName={configurationName} /> : <>{children}</>}</>
@@ -159,7 +175,8 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
         name === OidcClient.eventNames.loginAsync_begin ||
         name === OidcClient.eventNames.loginCallbackAsync_end ||
         name === OidcClient.eventNames.loginAsync_error ||
-        name === OidcClient.eventNames.loginCallbackAsync_error
+        name === OidcClient.eventNames.loginCallbackAsync_error ||
+        name === OidcClient.eventNames.loadingTimeout_error
       ) {
         setEvent({ name, data });
       } else if (
@@ -180,6 +197,26 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
       setEvent(defaultEventState);
     };
   }, [configuration, configurationName]);
+
+  const loadingTimeoutMs = configuration?.loading_timeout_ms;
+
+  useEffect(() => {
+    if (!loadingTimeoutMs) {
+      return;
+    }
+    const eventName = event.name;
+    const isInAuthenticatingState = eventName === OidcClient.eventNames.loginAsync_begin;
+    if (!isInAuthenticatingState) {
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      const oidcInstance = getOidc(configurationName);
+      oidcInstance.publishEvent(OidcClient.eventNames.loadingTimeout_error, {
+        timeoutMs: loadingTimeoutMs,
+      });
+    }, loadingTimeoutMs);
+    return () => clearTimeout(timeoutId);
+  }, [event.name, configurationName, loadingTimeoutMs]);
 
   const SessionLostComponent = sessionLostComponent;
   const AuthenticatingComponent = authenticatingComponent;
@@ -211,6 +248,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
           <AuthenticatingComponent configurationName={configurationName} />
         </Switch>
       );
+    case OidcClient.eventNames.loadingTimeout_error:
     case OidcClient.eventNames.loginAsync_error:
     case OidcClient.eventNames.loginCallbackAsync_error:
       return (
@@ -252,7 +290,11 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
             withCustomHistory={withCustomHistory}
             location={location ?? new OidcLocation()}
           >
-            <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>
+            <OidcSession
+              loadingComponent={LoadingComponent}
+              configurationName={configurationName}
+              loadingTimeoutMs={loadingTimeoutMs}
+            >
               {children}
             </OidcSession>
           </OidcRoutes>
