@@ -1,0 +1,22 @@
+id: d5d07cea-49f4-44fe-8fe4-bd13ae90e091
+cwd: /Users/a115vc/Desktop/GnOuGo/clone-issue-1683
+git_root: /Users/a115vc/Desktop/GnOuGo/clone-issue-1683
+repository: AxaFrance/oidc-client
+host_type: github
+branch: fix/issue-1683
+name: |-
+  You are a coding agent operating on a local project through a controlled session filesystem.
+  Implement the requested change by editing files directly when necessary.
+  Only create, update, rename, or delete files required by the task.
+  Respect the project structure and avoid unrelated formatting changes.
+  When finished, return a concise summary and list the files changed.
+
+  [PROJECT ROOT]
+  /Users/a115vc/Desktop/GnOuGo/clone-issue-1683
+
+  [TASK]
+  Fix GitHub issue #1683: navigation requests to new window/t...
+user_named: false
+summary_count: 0
+created_at: 2026-06-10T15:48:31.846Z
+updated_at: 2026-06-10T15:48:31.926Z
