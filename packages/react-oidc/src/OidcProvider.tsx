@@ -42,6 +42,8 @@ export type OidcProviderProps = {
   onEvent?: (configuration: string, name: string, data: any) => void;
   getFetch?: () => Fetch;
   location?: ILOidcLocation;
+  navigationTimeoutMs?: number;
+  onNavigateAfterCallback?: (callbackPath: string) => Promise<void>;
 };
 
 export type OidcSessionProps = {
@@ -101,6 +103,8 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   onEvent = null,
   getFetch = null,
   location = null,
+  navigationTimeoutMs,
+  onNavigateAfterCallback,
 }) => {
   if (configuration && configuration.redirect_uri && configuration.silent_redirect_uri) {
     if (configuration.redirect_uri === configuration.silent_redirect_uri) {
@@ -250,6 +254,8 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
             authenticatingComponent={authenticatingComponent}
             configurationName={configurationName}
             withCustomHistory={withCustomHistory}
+            navigationTimeoutMs={navigationTimeoutMs}
+            onNavigateAfterCallback={onNavigateAfterCallback}
             location={location ?? new OidcLocation()}
           >
             <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>

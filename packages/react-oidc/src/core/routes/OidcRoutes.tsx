@@ -16,6 +16,8 @@ type OidcRoutesProps = {
   silent_login_uri?: string;
   withCustomHistory?: () => CustomHistory;
   location: ILOidcLocation;
+  navigationTimeoutMs?: number;
+  onNavigateAfterCallback?: (callbackPath: string) => Promise<void>;
 };
 
 const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
@@ -27,6 +29,8 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
   children,
   configurationName,
   withCustomHistory = null,
+  navigationTimeoutMs,
+  onNavigateAfterCallback,
 }) => {
   // This exist because in next.js window outside useEffect is null
   const pathname = window ? getPath(window.location.href) : '';
@@ -62,6 +66,8 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
           callBackSuccess={callbackSuccessComponent}
           configurationName={configurationName}
           withCustomHistory={withCustomHistory}
+          navigationTimeoutMs={navigationTimeoutMs}
+          onNavigateAfterCallback={onNavigateAfterCallback}
         />
       );
     default:

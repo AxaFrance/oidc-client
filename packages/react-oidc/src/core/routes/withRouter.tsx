@@ -38,11 +38,11 @@ export const CreateEvent =
 type WindowHistoryState = typeof window.history.state;
 
 export interface ReactOidcHistory {
-  replaceState: (url?: string | null, stateHistory?: WindowHistoryState) => void;
+  replaceState: (url?: string | null, stateHistory?: WindowHistoryState) => void | Promise<void>;
 }
 
 export type CustomHistory = {
-  replaceState(url?: string | null, stateHistory?: WindowHistoryState): void;
+  replaceState(url?: string | null, stateHistory?: WindowHistoryState): void | Promise<void>;
 };
 
 const getHistory = (
