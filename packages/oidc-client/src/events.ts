@@ -27,4 +27,5 @@ export const eventNames = {
   syncTokensAsync_end: 'syncTokensAsync_end',
   syncTokensAsync_error: 'syncTokensAsync_error',
   tokensInvalidAndWaitingActionsToRefresh: 'tokensInvalidAndWaitingActionsToRefresh',
+  loadingTimeout_error: 'loadingTimeout_error',
 };

@@ -46,6 +46,7 @@ export type OidcConfiguration = {
   demonstrating_proof_of_possession?: boolean;
   demonstrating_proof_of_possession_configuration?: DemonstratingProofOfPossessionConfiguration;
   preload_user_info?: boolean;
+  loading_timeout_ms?: number;
 };
 
 export interface DemonstratingProofOfPossessionConfiguration {
