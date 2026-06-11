@@ -13,11 +13,20 @@ export const CallBackSuccess: ComponentType<any> = () => (
   </div>
 );
 
-const CallbackManager: ComponentType<any> = ({
+export type CallbackManagerProps = {
+  callBackError?: ComponentType<any>;
+  callBackSuccess?: ComponentType<any>;
+  configurationName: string;
+  withCustomHistory?: (() => { replaceState: (url?: string | null) => void }) | null;
+  navigateAfterCallback?: ((callbackPath: string) => Promise<void>) | null;
+};
+
+const CallbackManager: ComponentType<CallbackManagerProps> = ({
   callBackError,
   callBackSuccess,
   configurationName,
   withCustomHistory,
+  navigateAfterCallback,
 }) => {
   const [isError, setIsError] = useState(false);
   useEffect(() => {
@@ -26,8 +35,17 @@ const CallbackManager: ComponentType<any> = ({
       const getOidc = OidcClient.get;
       try {
         const { callbackPath } = await getOidc(configurationName).loginCallbackAsync();
-        const history = withCustomHistory ? withCustomHistory() : getCustomHistory();
-        history.replaceState(callbackPath || '/');
+        const targetPath = callbackPath || '/';
+        if (navigateAfterCallback) {
+          await navigateAfterCallback(targetPath);
+        } else {
+          const history = withCustomHistory ? withCustomHistory() : getCustomHistory();
+          history.replaceState(targetPath);
+          await new Promise(resolve => setTimeout(resolve, 0));
+          if (window.location.pathname !== targetPath) {
+            throw new Error(`Navigation to "${targetPath}" did not commit`);
+          }
+        }
       } catch (error) {
         if (isMounted) {
           console.warn(error);
