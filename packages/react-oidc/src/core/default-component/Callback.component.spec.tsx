@@ -109,9 +109,7 @@ describe('CallbackManager', () => {
 
     window.location = { pathname: '/app', href: 'http://localhost/app' } as any;
 
-    render(
-      <CallbackManager configurationName="default" withCustomHistory={withCustomHistory} />,
-    );
+    render(<CallbackManager configurationName="default" withCustomHistory={withCustomHistory} />);
 
     await waitFor(() => {
       expect(withCustomHistory).toHaveBeenCalled();
