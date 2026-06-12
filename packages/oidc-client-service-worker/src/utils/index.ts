@@ -1,3 +1,4 @@
+export * from './destinations';
 export * from './domains';
 export * from './normalizeUrl';
 export * from './serializeHeaders';
