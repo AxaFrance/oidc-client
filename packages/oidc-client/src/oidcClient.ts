@@ -1,4 +1,5 @@
 import { fetchWithTokens } from './fetch';
+import { initWorkerAsync } from './initWorker.js';
 import { ILOidcLocation, OidcLocation } from './location';
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, OidcToken, Tokens, ValidToken } from './parseTokens.js';
@@ -129,6 +130,31 @@ export class OidcClient {
 
   userInfo<T extends OidcUserInfo = OidcUserInfo>(): T {
     return this._oidc.userInfo;
+  }
+
+  /**
+   * Sends a well-known message to the service worker without needing to
+   * manually construct a `postMessage` envelope.
+   *
+   * @param type - The message type (e.g. `'clear'`, `'setState'`).
+   * @param data - Optional data payload for the message.
+   * @returns The response from the service worker, or `null` if the SW is unavailable.
+   *
+   * @example
+   * ```ts
+   * const oidc = OidcClient.get('default');
+   * await oidc.signalServiceWorker('clear', { status: 'logout' });
+   * ```
+   */
+  async signalServiceWorker(type: string, data: Record<string, unknown> = {}): Promise<any> {
+    const serviceWorker = await initWorkerAsync(
+      this._oidc.configuration,
+      this._oidc.configurationName,
+    );
+    if (!serviceWorker) {
+      return null;
+    }
+    return serviceWorker.signalServiceWorker(type, data);
   }
 }
 

@@ -12,12 +12,12 @@ export default defineConfig({
     minify: false, //default esbuild
     sourcemap: true,
     lib: {
-      // Could also be a dictionary or array of multiple entry points
-      entry: resolve(__dirname, './src/OidcServiceWorker.ts'),
-      name: 'OidcServiceWorker',
+      // Multiple entry points: main SW bundle + protocol API
+      entry: {
+        OidcServiceWorker: resolve(__dirname, './src/OidcServiceWorker.ts'),
+        protocol: resolve(__dirname, './src/protocol.ts'),
+      },
       formats: ['es'],
-      // the proper extensions will be added
-      fileName: 'OidcServiceWorker',
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled

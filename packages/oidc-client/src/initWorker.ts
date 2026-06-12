@@ -673,6 +673,17 @@ export const initWorkerAsync = async (
     });
   };
 
+  const signalServiceWorker = async (
+    type: string,
+    data: Record<string, unknown> = {},
+  ): Promise<any> => {
+    return sendMessageAsync(registration)({
+      type,
+      data,
+      configurationName,
+    });
+  };
+
   return {
     clearAsync,
     initAsync,
@@ -692,5 +703,6 @@ export const initWorkerAsync = async (
     getDemonstratingProofOfPossessionNonce,
     setDemonstratingProofOfPossessionJwkAsync,
     getDemonstratingProofOfPossessionJwkAsync,
+    signalServiceWorker,
   };
 };
