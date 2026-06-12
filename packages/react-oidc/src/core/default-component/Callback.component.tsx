@@ -13,11 +13,22 @@ export const CallBackSuccess: ComponentType<any> = () => (
   </div>
 );
 
+const NAVIGATION_VERIFICATION_DELAY_MS = 200;
+
+export const verifyNavigationCommitted = (
+  targetPath: string,
+  windowInternal: Window = window,
+): boolean => {
+  const currentPath = windowInternal.location.pathname;
+  return currentPath === targetPath || targetPath === '/';
+};
+
 const CallbackManager: ComponentType<any> = ({
   callBackError,
   callBackSuccess,
   configurationName,
   withCustomHistory,
+  navigateAfterCallback,
 }) => {
   const [isError, setIsError] = useState(false);
   useEffect(() => {
@@ -25,9 +36,59 @@ const CallbackManager: ComponentType<any> = ({
     const playCallbackAsync = async () => {
       const getOidc = OidcClient.get;
       try {
-        const { callbackPath } = await getOidc(configurationName).loginCallbackAsync();
-        const history = withCustomHistory ? withCustomHistory() : getCustomHistory();
-        history.replaceState(callbackPath || '/');
+        const oidcClient = getOidc(configurationName);
+        const { callbackPath } = await oidcClient.loginCallbackAsync();
+        const targetPath = callbackPath || '/';
+
+        if (navigateAfterCallback) {
+          try {
+            await navigateAfterCallback(targetPath);
+            oidcClient.publishEvent(
+              OidcClient.eventNames.loginCallbackAsync_navigated,
+              { configurationName, callbackPath: targetPath },
+            );
+          } catch (navigationError) {
+            oidcClient.publishEvent(
+              OidcClient.eventNames.loginCallbackAsync_navigation_error,
+              { configurationName, callbackPath: targetPath, error: navigationError },
+            );
+            if (isMounted) {
+              console.warn(navigationError);
+              setIsError(true);
+            }
+          }
+        } else {
+          const history = withCustomHistory ? withCustomHistory() : getCustomHistory();
+          history.replaceState(targetPath);
+
+          await new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, NAVIGATION_VERIFICATION_DELAY_MS);
+          });
+
+          if (isMounted) {
+            const committed = verifyNavigationCommitted(targetPath);
+            if (committed) {
+              oidcClient.publishEvent(
+                OidcClient.eventNames.loginCallbackAsync_navigated,
+                { configurationName, callbackPath: targetPath },
+              );
+            } else {
+              oidcClient.publishEvent(
+                OidcClient.eventNames.loginCallbackAsync_navigation_error,
+                {
+                  configurationName,
+                  callbackPath: targetPath,
+                  error: new Error(
+                    `Navigation did not commit: expected "${targetPath}" but found "${window.location.pathname}"`,
+                  ),
+                },
+              );
+              setIsError(true);
+            }
+          }
+        }
       } catch (error) {
         if (isMounted) {
           console.warn(error);
