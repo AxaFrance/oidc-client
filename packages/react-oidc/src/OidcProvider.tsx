@@ -193,9 +193,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     if (timeoutMs <= 0) {
       return;
     }
-    const isStuck =
-      event.name === '' ||
-      event.name === OidcClient.eventNames.loginAsync_begin;
+    const isStuck = event.name === '' || event.name === OidcClient.eventNames.loginAsync_begin;
     if (!isStuck) {
       return;
     }

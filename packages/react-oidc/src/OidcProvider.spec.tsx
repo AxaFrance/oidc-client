@@ -1,17 +1,17 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockEventSubscribers: Array<{ id: string; func: (name: string, data: any) => void }> = [];
 const mockPublishEvent = vi.fn((eventName, data) => {
-  mockEventSubscribers.forEach((sub) => sub.func(eventName, data));
+  mockEventSubscribers.forEach(sub => sub.func(eventName, data));
 });
-const mockSubscribeEvents = vi.fn((func) => {
+const mockSubscribeEvents = vi.fn(func => {
   const id = Math.random().toString();
   mockEventSubscribers.push({ id, func });
   return id;
 });
-const mockRemoveEventSubscription = vi.fn((id) => {
-  mockEventSubscribers = mockEventSubscribers.filter((e) => e.id !== id);
+const mockRemoveEventSubscription = vi.fn(id => {
+  mockEventSubscribers = mockEventSubscribers.filter(e => e.id !== id);
 });
 
 vi.mock('@axa-fr/oidc-client', () => ({
@@ -71,11 +71,17 @@ vi.mock('@axa-fr/oidc-client', () => ({
     },
   },
   OidcLocation: class {
-    getCurrentHref() { return 'http://localhost/'; }
-    getPath() { return '/'; }
+    getCurrentHref() {
+      return 'http://localhost/';
+    }
+    getPath() {
+      return '/';
+    }
     open() {}
     reload() {}
-    getOrigin() { return 'http://localhost'; }
+    getOrigin() {
+      return 'http://localhost';
+    }
   },
   getFetchDefault: vi.fn(() => fetch),
 }));
@@ -134,7 +140,7 @@ describe('OidcProvider loading timeout', () => {
 
     // Simulate loginAsync_begin event
     act(() => {
-      mockEventSubscribers.forEach((sub) => sub.func('loginAsync_begin', {}));
+      mockEventSubscribers.forEach(sub => sub.func('loginAsync_begin', {}));
     });
 
     // Reset to track timeout event specifically
@@ -181,10 +187,7 @@ describe('OidcProvider loading timeout', () => {
       vi.advanceTimersByTime(60_000);
     });
 
-    expect(mockPublishEvent).not.toHaveBeenCalledWith(
-      'loadingTimeout_error',
-      expect.anything(),
-    );
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
   });
 
   it('should NOT fire loadingTimeout_error when loading_timeout_ms is negative (disabled)', async () => {
@@ -201,10 +204,7 @@ describe('OidcProvider loading timeout', () => {
       vi.advanceTimersByTime(60_000);
     });
 
-    expect(mockPublishEvent).not.toHaveBeenCalledWith(
-      'loadingTimeout_error',
-      expect.anything(),
-    );
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
   });
 
   it('should NOT fire loadingTimeout_error if provider leaves loading state before deadline', async () => {
@@ -224,7 +224,7 @@ describe('OidcProvider loading timeout', () => {
 
     // Simulate successful callback (leaving loading state)
     act(() => {
-      mockEventSubscribers.forEach((sub) => sub.func('loginCallbackAsync_end', {}));
+      mockEventSubscribers.forEach(sub => sub.func('loginCallbackAsync_end', {}));
     });
 
     mockPublishEvent.mockClear();
@@ -234,10 +234,7 @@ describe('OidcProvider loading timeout', () => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(mockPublishEvent).not.toHaveBeenCalledWith(
-      'loadingTimeout_error',
-      expect.anything(),
-    );
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
   });
 
   it('should use default timeout of 30000ms when loading_timeout_ms is not configured', async () => {
@@ -251,10 +248,7 @@ describe('OidcProvider loading timeout', () => {
       vi.advanceTimersByTime(29_999);
     });
 
-    expect(mockPublishEvent).not.toHaveBeenCalledWith(
-      'loadingTimeout_error',
-      expect.anything(),
-    );
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
 
     act(() => {
       vi.advanceTimersByTime(1);
