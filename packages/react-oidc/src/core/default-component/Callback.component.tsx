@@ -43,15 +43,16 @@ const CallbackManager: ComponentType<any> = ({
         if (navigateAfterCallback) {
           try {
             await navigateAfterCallback(targetPath);
-            oidcClient.publishEvent(
-              OidcClient.eventNames.loginCallbackAsync_navigated,
-              { configurationName, callbackPath: targetPath },
-            );
+            oidcClient.publishEvent(OidcClient.eventNames.loginCallbackAsync_navigated, {
+              configurationName,
+              callbackPath: targetPath,
+            });
           } catch (navigationError) {
-            oidcClient.publishEvent(
-              OidcClient.eventNames.loginCallbackAsync_navigation_error,
-              { configurationName, callbackPath: targetPath, error: navigationError },
-            );
+            oidcClient.publishEvent(OidcClient.eventNames.loginCallbackAsync_navigation_error, {
+              configurationName,
+              callbackPath: targetPath,
+              error: navigationError,
+            });
             if (isMounted) {
               console.warn(navigationError);
               setIsError(true);
@@ -61,7 +62,7 @@ const CallbackManager: ComponentType<any> = ({
           const history = withCustomHistory ? withCustomHistory() : getCustomHistory();
           history.replaceState(targetPath);
 
-          await new Promise<void>((resolve) => {
+          await new Promise<void>(resolve => {
             setTimeout(() => {
               resolve();
             }, NAVIGATION_VERIFICATION_DELAY_MS);
@@ -70,21 +71,18 @@ const CallbackManager: ComponentType<any> = ({
           if (isMounted) {
             const committed = verifyNavigationCommitted(targetPath);
             if (committed) {
-              oidcClient.publishEvent(
-                OidcClient.eventNames.loginCallbackAsync_navigated,
-                { configurationName, callbackPath: targetPath },
-              );
+              oidcClient.publishEvent(OidcClient.eventNames.loginCallbackAsync_navigated, {
+                configurationName,
+                callbackPath: targetPath,
+              });
             } else {
-              oidcClient.publishEvent(
-                OidcClient.eventNames.loginCallbackAsync_navigation_error,
-                {
-                  configurationName,
-                  callbackPath: targetPath,
-                  error: new Error(
-                    `Navigation did not commit: expected "${targetPath}" but found "${window.location.pathname}"`,
-                  ),
-                },
-              );
+              oidcClient.publishEvent(OidcClient.eventNames.loginCallbackAsync_navigation_error, {
+                configurationName,
+                callbackPath: targetPath,
+                error: new Error(
+                  `Navigation did not commit: expected "${targetPath}" but found "${window.location.pathname}"`,
+                ),
+              });
               setIsError(true);
             }
           }

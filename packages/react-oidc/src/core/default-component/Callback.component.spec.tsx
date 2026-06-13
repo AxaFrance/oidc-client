@@ -2,10 +2,7 @@ import { act, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import CallbackManager, {
-  CallBackSuccess,
-  verifyNavigationCommitted,
-} from './Callback.component';
+import CallbackManager, { CallBackSuccess, verifyNavigationCommitted } from './Callback.component';
 
 vi.mock('@axa-fr/oidc-client', () => ({
   OidcClient: {
@@ -90,10 +87,10 @@ describe('CallbackManager', () => {
     });
 
     expect(navigateAfterCallback).toHaveBeenCalledWith('/dashboard');
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      'loginCallbackAsync_navigated',
-      { configurationName: 'default', callbackPath: '/dashboard' },
-    );
+    expect(mockPublishEvent).toHaveBeenCalledWith('loginCallbackAsync_navigated', {
+      configurationName: 'default',
+      callbackPath: '/dashboard',
+    });
   });
 
   it('should emit navigation_error event when navigateAfterCallback rejects', async () => {
@@ -110,10 +107,11 @@ describe('CallbackManager', () => {
       );
     });
 
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      'loginCallbackAsync_navigation_error',
-      { configurationName: 'default', callbackPath: '/dashboard', error: navError },
-    );
+    expect(mockPublishEvent).toHaveBeenCalledWith('loginCallbackAsync_navigation_error', {
+      configurationName: 'default',
+      callbackPath: '/dashboard',
+      error: navError,
+    });
   });
 
   it('should render error component when navigateAfterCallback fails', async () => {
@@ -148,22 +146,18 @@ describe('CallbackManager', () => {
     });
 
     await act(async () => {
-      render(
-        <CallbackManager
-          configurationName="default"
-        />,
-      );
+      render(<CallbackManager configurationName="default" />);
       // Wait for the verification delay to pass
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 300));
     });
 
     expect(mockReplaceState).toHaveBeenCalledWith('/dashboard');
 
     await waitFor(() => {
-      expect(mockPublishEvent).toHaveBeenCalledWith(
-        'loginCallbackAsync_navigated',
-        { configurationName: 'default', callbackPath: '/dashboard' },
-      );
+      expect(mockPublishEvent).toHaveBeenCalledWith('loginCallbackAsync_navigated', {
+        configurationName: 'default',
+        callbackPath: '/dashboard',
+      });
     });
   });
 
@@ -178,13 +172,9 @@ describe('CallbackManager', () => {
     });
 
     await act(async () => {
-      render(
-        <CallbackManager
-          configurationName="default"
-        />,
-      );
+      render(<CallbackManager configurationName="default" />);
       // Wait for the verification delay to pass
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 300));
     });
 
     await waitFor(() => {
@@ -225,12 +215,7 @@ describe('CallbackManager', () => {
     });
 
     await act(async () => {
-      render(
-        <CallbackManager
-          configurationName="default"
-          withCustomHistory={withCustomHistory}
-        />,
-      );
+      render(<CallbackManager configurationName="default" withCustomHistory={withCustomHistory} />);
     });
 
     expect(withCustomHistory).toHaveBeenCalled();
@@ -245,10 +230,7 @@ describe('CallbackManager', () => {
     let container;
     await act(async () => {
       const result = render(
-        <CallbackManager
-          configurationName="default"
-          callBackError={ErrorComponent}
-        />,
+        <CallbackManager configurationName="default" callBackError={ErrorComponent} />,
       );
       container = result.container;
     });
@@ -259,9 +241,7 @@ describe('CallbackManager', () => {
   it('should render success component by default', () => {
     mockLoginCallbackAsync.mockReturnValue(new Promise(() => {})); // never resolves
 
-    const { getByText } = render(
-      <CallbackManager configurationName="default" />,
-    );
+    const { getByText } = render(<CallbackManager configurationName="default" />);
 
     expect(getByText('Authentication complete')).toBeTruthy();
   });
