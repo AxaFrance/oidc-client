@@ -8,7 +8,7 @@ describe('shouldBypassDestination', () => {
   describe('non-navigate requests with bypassed destinations', () => {
     it.each(bypassedDestinations)(
       'should bypass "%s" destination when mode is not navigate',
-      (destination) => {
+      destination => {
         expect(shouldBypassDestination(destination, 'cors')).toBe(true);
         expect(shouldBypassDestination(destination, 'same-origin')).toBe(true);
         expect(shouldBypassDestination(destination, 'no-cors')).toBe(true);
@@ -23,7 +23,7 @@ describe('shouldBypassDestination', () => {
 
     it.each(bypassedDestinations)(
       'should not bypass "%s" destination when mode is "navigate"',
-      (destination) => {
+      destination => {
         expect(shouldBypassDestination(destination, 'navigate')).toBe(false);
       },
     );
