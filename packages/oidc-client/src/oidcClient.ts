@@ -1,4 +1,9 @@
 import { fetchWithTokens } from './fetch';
+import {
+  ServiceWorkerSignalMessage,
+  ServiceWorkerSignalOptions,
+  signalServiceWorkerAsync,
+} from './initWorker.js';
 import { ILOidcLocation, OidcLocation } from './location';
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, OidcToken, Tokens, ValidToken } from './parseTokens.js';
@@ -129,6 +134,30 @@ export class OidcClient {
 
   userInfo<T extends OidcUserInfo = OidcUserInfo>(): T {
     return this._oidc.userInfo;
+  }
+
+  /**
+   * High-level helper to send a message to the OIDC service worker.
+   *
+   * Wraps the low-level `postMessage` + `MessageChannel` plumbing and
+   * returns the response posted back by the worker. Use the typed message
+   * symbols exported from `@axa-fr/oidc-client-service-worker/protocol`
+   * (`ServiceWorkerMessageType`) to build messages.
+   *
+   * @throws if no service worker is registered for the current
+   * configuration, or if the worker does not respond before the timeout
+   * elapses.
+   */
+  async signalServiceWorker<TResponse = unknown>(
+    message: ServiceWorkerSignalMessage,
+    options?: ServiceWorkerSignalOptions,
+  ): Promise<TResponse> {
+    return signalServiceWorkerAsync(
+      this._oidc.configuration,
+      this._oidc.configurationName,
+      message,
+      options,
+    ) as Promise<TResponse>;
   }
 }
 

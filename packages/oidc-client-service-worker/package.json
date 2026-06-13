@@ -5,6 +5,19 @@
   "private": false,
   "main": "dist/OidcServiceWorker.js",
   "types": "dist/OidcServiceWorker.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/OidcServiceWorker.d.ts",
+      "import": "./dist/OidcServiceWorker.js",
+      "default": "./dist/OidcServiceWorker.js"
+    },
+    "./protocol": {
+      "types": "./dist/protocol.d.ts",
+      "import": "./dist/protocol.js",
+      "default": "./dist/protocol.js"
+    },
+    "./package.json": "./package.json"
+  },
   "description": "OpenID Connect & OAuth authentication service worker",
   "files": [
     "dist",

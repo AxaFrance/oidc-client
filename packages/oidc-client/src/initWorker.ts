@@ -4,6 +4,20 @@ import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
 import codeVersion from './version.js';
 
+export const DEFAULT_SW_MESSAGE_TIMEOUT_MS = 5000;
+
+export interface ServiceWorkerSignalMessage {
+  type: string;
+  configurationName?: string;
+  data?: unknown;
+  tabId?: string;
+  [key: string]: unknown;
+}
+
+export interface ServiceWorkerSignalOptions {
+  timeoutMs?: number;
+}
+
 let keepAliveServiceWorkerTimeoutId = null;
 let keepAliveController: AbortController | undefined;
 
@@ -56,8 +70,6 @@ export const getTabId = (configurationName: string) => {
   sessionStorage.setItem(key, newTabId);
   return newTabId;
 };
-
-const DEFAULT_SW_MESSAGE_TIMEOUT_MS = 5000;
 
 const getServiceWorkerTarget = (registration: ServiceWorkerRegistration): ServiceWorker | null => {
   return (
@@ -673,6 +685,18 @@ export const initWorkerAsync = async (
     });
   };
 
+  const signalAsync = (
+    message: ServiceWorkerSignalMessage,
+    options?: ServiceWorkerSignalOptions,
+  ): Promise<any> =>
+    sendMessageAsync(
+      registration,
+      options,
+    )({
+      ...message,
+      configurationName: message.configurationName ?? configurationName,
+    });
+
   return {
     clearAsync,
     initAsync,
@@ -692,5 +716,30 @@ export const initWorkerAsync = async (
     getDemonstratingProofOfPossessionNonce,
     setDemonstratingProofOfPossessionJwkAsync,
     getDemonstratingProofOfPossessionJwkAsync,
+    signalAsync,
   };
+};
+
+/**
+ * Sends a typed message to the OIDC service worker for the given
+ * configuration. Wraps `MessageChannel` setup, request/response correlation
+ * and timeouts.
+ *
+ * Resolves with the SW response, rejects on timeout or when no SW is
+ * registered for the configuration. The provided `configurationName` is
+ * used when the message itself does not carry one.
+ */
+export const signalServiceWorkerAsync = async (
+  configuration: OidcConfiguration,
+  configurationName: string,
+  message: ServiceWorkerSignalMessage,
+  options?: ServiceWorkerSignalOptions,
+): Promise<any> => {
+  const worker = await initWorkerAsync(configuration, configurationName);
+  if (!worker) {
+    throw new Error(
+      `signalServiceWorkerAsync: no service worker registered for configuration "${configurationName}"`,
+    );
+  }
+  return worker.signalAsync(message, options);
 };

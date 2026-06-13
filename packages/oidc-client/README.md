@@ -434,6 +434,36 @@ pnpm start
 
 ```
 
+## Service worker protocol
+
+The `postMessage` protocol used between `OidcClient` and the service worker
+is publicly documented and versioned. Typed message constants, payload
+helpers and storage key conventions are exported from
+`@axa-fr/oidc-client` (and from
+`@axa-fr/oidc-client-service-worker/protocol`):
+
+```ts
+import {
+  OidcClient,
+  PROTOCOL_VERSION,
+  ServiceWorkerMessageType,
+  buildSecuredTokenPlaceholder,
+  TOKEN_PLACEHOLDERS,
+} from '@axa-fr/oidc-client';
+
+const oidcClient = OidcClient.get();
+
+const { state } = await oidcClient.signalServiceWorker<{ state: string }>({
+  type: ServiceWorkerMessageType.GET_STATE,
+  configurationName: 'default',
+  data: null,
+});
+```
+
+See [`PROTOCOL.md`](../oidc-client-service-worker/PROTOCOL.md) in the
+service-worker package for the full specification, including stability
+guarantees and per-message payload shapes.
+
 ## How It Works
 
 This component is a pure vanilla JS OIDC client library agnostic to any framework.
