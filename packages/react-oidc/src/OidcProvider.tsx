@@ -13,6 +13,7 @@ import {
   Authenticating,
   CallBackSuccess,
   Loading,
+  LoadingTimeout,
   SessionLost,
 } from './core/default-component/index.js';
 import ServiceWorkerNotSupported from './core/default-component/ServiceWorkerNotSupported.component.js';
@@ -31,6 +32,7 @@ export type OidcProviderProps = {
   authenticatingComponent?: ComponentType<any>;
   authenticatingErrorComponent?: ComponentType<any>;
   loadingComponent?: ComponentType<any>;
+  loadingTimeoutComponent?: ComponentType<any>;
   serviceWorkerNotSupportedComponent?: ComponentType<any>;
   configurationName?: string;
   configuration?: OidcConfiguration;
@@ -84,6 +86,8 @@ const Switch = ({ isLoading, loadingComponent, children, configurationName }) =>
   return <>{children}</>;
 };
 
+const DEFAULT_LOADING_TIMEOUT_MS = 30_000;
+
 export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   children,
   configuration,
@@ -91,6 +95,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   callbackSuccessComponent = CallBackSuccess,
   authenticatingComponent = Authenticating,
   loadingComponent = Loading,
+  loadingTimeoutComponent = LoadingTimeout,
   serviceWorkerNotSupportedComponent = ServiceWorkerNotSupported,
   authenticatingErrorComponent = AuthenticatingError,
   sessionLostComponent = SessionLost,
@@ -155,6 +160,8 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
           onLogoutFromSameTab();
         }
         // setEvent({name, data});
+      } else if (name === OidcClient.eventNames.loadingTimeout_error) {
+        setEvent({ name, data });
       } else if (
         name === OidcClient.eventNames.loginAsync_begin ||
         name === OidcClient.eventNames.loginCallbackAsync_end ||
@@ -181,9 +188,26 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     };
   }, [configuration, configurationName]);
 
+  useEffect(() => {
+    const timeoutMs = configuration?.loading_timeout_ms ?? DEFAULT_LOADING_TIMEOUT_MS;
+    if (timeoutMs <= 0) {
+      return;
+    }
+    const isStuck = event.name === '' || event.name === OidcClient.eventNames.loginAsync_begin;
+    if (!isStuck) {
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      const oidcInstance = getOidc(configurationName);
+      oidcInstance.publishEvent(OidcClient.eventNames.loadingTimeout_error, { timeoutMs });
+    }, timeoutMs);
+    return () => clearTimeout(timeoutId);
+  }, [event.name, configurationName, configuration]);
+
   const SessionLostComponent = sessionLostComponent;
   const AuthenticatingComponent = authenticatingComponent;
   const LoadingComponent = loadingComponent;
+  const LoadingTimeoutComponent = loadingTimeoutComponent;
   const ServiceWorkerNotSupportedComponent = serviceWorkerNotSupportedComponent;
   const AuthenticatingErrorComponent = authenticatingErrorComponent;
 
@@ -209,6 +233,16 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
           configurationName={configurationName}
         >
           <AuthenticatingComponent configurationName={configurationName} />
+        </Switch>
+      );
+    case OidcClient.eventNames.loadingTimeout_error:
+      return (
+        <Switch
+          loadingComponent={LoadingComponent}
+          isLoading={isLoading}
+          configurationName={configurationName}
+        >
+          <LoadingTimeoutComponent configurationName={configurationName} />
         </Switch>
       );
     case OidcClient.eventNames.loginAsync_error:
