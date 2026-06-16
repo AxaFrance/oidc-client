@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.12
+## 7.27.13
+
+- [7b97a98](https://github.com/AxaFrance/oidc-client/commit/7b97a98f47b54ae4a9bc13dfc732c3e153dd8e60) - Auto fix for issue #1681: OidcProvider can sit in loading/authenticating indefinitely with no timeout event (#1692) (release), 2026-06-16 by *Guillaume Chervet*
+
+
+## v7.27.12
 
 - [db7af26](https://github.com/AxaFrance/oidc-client/commit/db7af26e7979da303bc5d70df28a56854b8d5f3e) - Document and expose the public service worker message protocol (#1694) (release), 2026-06-16 by *Guillaume Chervet*
 
@@ -312,15 +317,5 @@
 ## v7.22.18
 
 - [5ee0cc8](https://github.com/AxaFrance/oidc-client/commit/5ee0cc8f6d823056da221ad081c3821ba9fac343) - fix(oidc): separate state, nonce and codeVerifier for each tab (release) (#1402), 2024-07-16 by *Miya*
-
-
-## v7.22.17
-
-- [b099078](https://github.com/AxaFrance/oidc-client/commit/b099078f9d4b61dffd03034f511a4f32e80977a8) - fix(oidc): clenup client internal promises when requests are finished (release) (#1417), 2024-07-15 by *wermanoid*
-- [01f0714](https://github.com/AxaFrance/oidc-client/commit/01f0714241e6442e6b58fcba8b86804ed75cec09) - tests(domain): Be more explicit about intent of test, is to not throw, not return undefined. (#1413), 2024-07-15 by *Jason Finch*
-- [b94fa5c](https://github.com/AxaFrance/oidc-client/commit/b94fa5ca90bd366c4f59a870c428f42872bfacaa) - docs: Minor language change. (#1412), 2024-07-15 by *Jason Finch*
-- [7caee91](https://github.com/AxaFrance/oidc-client/commit/7caee919b4854526dad83203216965746baecabe) - build(job): Update job scripts to v4. (earlier versions are marked deprecated) (#1411), 2024-07-15 by *Jason Finch*
-- [a46b1aa](https://github.com/AxaFrance/oidc-client/commit/a46b1aabe19db70beac342c557ae2c986d16eae7) - fix (FetchToken): Fix FetchToken param to be boolean (#1414), 2024-07-15 by *Jason Finch*
-- [a989ed2](https://github.com/AxaFrance/oidc-client/commit/a989ed29f46b66483bc2c7c51e73bcc19b2c9736) - build(lint): Update lint step to run. (#1409), 2024-07-13 by *Jason Finch*
 
 
