@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.11
+## 7.27.12
+
+- [db7af26](https://github.com/AxaFrance/oidc-client/commit/db7af26e7979da303bc5d70df28a56854b8d5f3e) - Document and expose the public service worker message protocol (#1694) (release), 2026-06-16 by *Guillaume Chervet*
+
+
+## v7.27.11
 
 
 
@@ -317,11 +322,5 @@
 - [7caee91](https://github.com/AxaFrance/oidc-client/commit/7caee919b4854526dad83203216965746baecabe) - build(job): Update job scripts to v4. (earlier versions are marked deprecated) (#1411), 2024-07-15 by *Jason Finch*
 - [a46b1aa](https://github.com/AxaFrance/oidc-client/commit/a46b1aabe19db70beac342c557ae2c986d16eae7) - fix (FetchToken): Fix FetchToken param to be boolean (#1414), 2024-07-15 by *Jason Finch*
 - [a989ed2](https://github.com/AxaFrance/oidc-client/commit/a989ed29f46b66483bc2c7c51e73bcc19b2c9736) - build(lint): Update lint step to run. (#1409), 2024-07-13 by *Jason Finch*
-
-
-## v7.22.16
-
-- [72a6373](https://github.com/AxaFrance/oidc-client/commit/72a6373402a53aaaf01ad7fac22f8ad8c6feaff0) - fix(oidc): improve error handling (release) (#1403), 2024-07-11 by *Miya*
-- [c56ceb8](https://github.com/AxaFrance/oidc-client/commit/c56ceb815b28dd5990fe4a1679a61bcebc7e525a) - docs(readme): Update README.md (#1407), 2024-07-12 by *Jason Finch*
 
 
