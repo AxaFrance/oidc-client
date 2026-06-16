@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.13
+## 7.27.14
+
+- [416a1b5](https://github.com/AxaFrance/oidc-client/commit/416a1b52c64e8d9c764f605f19c8a21fe3a5f467) - Auto fix for issue #1682: CallbackManager: no observable signal that post-callback navigation has committed (Safari edge case) (#1691) (release), 2026-06-16 by *Guillaume Chervet*
+
+
+## v7.27.13
 
 - [7b97a98](https://github.com/AxaFrance/oidc-client/commit/7b97a98f47b54ae4a9bc13dfc732c3e153dd8e60) - Auto fix for issue #1681: OidcProvider can sit in loading/authenticating indefinitely with no timeout event (#1692) (release), 2026-06-16 by *Guillaume Chervet*
 
@@ -312,10 +317,5 @@
 - [8797330](https://github.com/AxaFrance/oidc-client/commit/8797330ea5060a77b8d10a352ff166a33210f6aa) - refactor(lint): Fix minor lint issues, 2024-07-13 by *Jason Finch*
 - [bb7bc92](https://github.com/AxaFrance/oidc-client/commit/bb7bc929f7a1bc4f1d210216d89fad881056990f) - fix (lint): Fix all lint errors reporting by eslint., 2024-07-12 by *Jason Finch*
 - [cd2f57e](https://github.com/AxaFrance/oidc-client/commit/cd2f57edb99e04495b9884723cd05277a45aad43) - fix(demo): Update configurations.ts, 2024-07-16 by *Guillaume Chervet*
-
-
-## v7.22.18
-
-- [5ee0cc8](https://github.com/AxaFrance/oidc-client/commit/5ee0cc8f6d823056da221ad081c3821ba9fac343) - fix(oidc): separate state, nonce and codeVerifier for each tab (release) (#1402), 2024-07-16 by *Miya*
 
 
