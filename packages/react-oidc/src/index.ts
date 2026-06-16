@@ -1,4 +1,5 @@
 export { useOidcFetch, withOidcFetch } from './FetchToken.js';
+export type { OidcProviderProps } from './OidcProvider.js';
 export { OidcProvider } from './OidcProvider.js';
 export { OidcSecure, withOidcSecure } from './OidcSecure.js';
 export { useOidc, useOidcAccessToken, useOidcIdToken } from './ReactOidc.js';

@@ -41,6 +41,7 @@ export type OidcProviderProps = {
   onLogoutFromAnotherTab?: () => void;
   onLogoutFromSameTab?: () => void;
   withCustomHistory?: () => CustomHistory;
+  navigateAfterCallback?: (callbackPath: string) => Promise<void>;
   onEvent?: (configuration: string, name: string, data: any) => void;
   getFetch?: () => Fetch;
   location?: ILOidcLocation;
@@ -103,6 +104,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   onLogoutFromAnotherTab = null,
   onLogoutFromSameTab = null,
   withCustomHistory = null,
+  navigateAfterCallback = null,
   onEvent = null,
   getFetch = null,
   location = null,
@@ -284,6 +286,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
             authenticatingComponent={authenticatingComponent}
             configurationName={configurationName}
             withCustomHistory={withCustomHistory}
+            navigateAfterCallback={navigateAfterCallback}
             location={location ?? new OidcLocation()}
           >
             <OidcSession loadingComponent={LoadingComponent} configurationName={configurationName}>

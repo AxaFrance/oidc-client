@@ -10,6 +10,8 @@ export const eventNames = {
   loginCallbackAsync_begin: 'loginCallbackAsync_begin',
   loginCallbackAsync_end: 'loginCallbackAsync_end',
   loginCallbackAsync_error: 'loginCallbackAsync_error',
+  loginCallbackAsync_navigated: 'loginCallbackAsync_navigated',
+  loginCallbackAsync_navigation_error: 'loginCallbackAsync_navigation_error',
   refreshTokensAsync_begin: 'refreshTokensAsync_begin',
   refreshTokensAsync: 'refreshTokensAsync',
   refreshTokensAsync_end: 'refreshTokensAsync_end',
