@@ -89,6 +89,30 @@ const Switch = ({ isLoading, loadingComponent, children, configurationName }) =>
 
 const DEFAULT_LOADING_TIMEOUT_MS = 30_000;
 
+/**
+ * Returns true when an event signals that the OIDC client has reached an
+ * authenticated, idle state and the loading watchdog should be disarmed.
+ *
+ * The default `event.name === ''` state in {@link OidcProvider} is overloaded:
+ * it represents both "not started yet" and "done and idle". A silent session
+ * restore via `tryKeepExistingSessionAsync` does not emit
+ * `loginCallbackAsync_end`, so without these explicit ready signals the
+ * watchdog would fire against a fully authenticated app.
+ */
+const isReadySignal = (name: string, data: unknown): boolean => {
+  if (
+    name === OidcClient.eventNames.token_acquired ||
+    name === OidcClient.eventNames.token_renewed ||
+    name === OidcClient.eventNames.loginCallbackAsync_end
+  ) {
+    return true;
+  }
+  if (name === OidcClient.eventNames.tryKeepExistingSessionAsync_end) {
+    return (data as { success?: boolean } | null)?.success === true;
+  }
+  return false;
+};
+
 export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   children,
   configuration,
@@ -124,6 +148,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
 
   const loading = false;
   const [event, setEvent] = useState(defaultEventState);
+  const [isAuthenticatedAndIdle, setIsAuthenticatedAndIdle] = useState<boolean>(false);
   const [currentConfigurationName, setConfigurationName] = useState(configurationName);
 
   useEffect(() => {
@@ -142,6 +167,9 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   useEffect(() => {
     const oidc = getOidc(configurationName);
     const newSubscriptionId = oidc.subscribeEvents((name, data) => {
+      if (isReadySignal(name, data)) {
+        setIsAuthenticatedAndIdle(true);
+      }
       if (
         name === OidcClient.eventNames.refreshTokensAsync_error ||
         name === OidcClient.eventNames.syncTokensAsync_error
@@ -187,6 +215,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
       const previousOidc = getOidc(configurationName);
       previousOidc.removeEventSubscription(newSubscriptionId);
       setEvent(defaultEventState);
+      setIsAuthenticatedAndIdle(false);
     };
   }, [configuration, configurationName]);
 
@@ -195,16 +224,24 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     if (timeoutMs <= 0) {
       return;
     }
+    if (isAuthenticatedAndIdle) {
+      return;
+    }
+    const oidcInstance = getOidc(configurationName);
+    if (oidcInstance?.tokens != null) {
+      return;
+    }
     const isStuck = event.name === '' || event.name === OidcClient.eventNames.loginAsync_begin;
     if (!isStuck) {
       return;
     }
     const timeoutId = setTimeout(() => {
-      const oidcInstance = getOidc(configurationName);
-      oidcInstance.publishEvent(OidcClient.eventNames.loadingTimeout_error, { timeoutMs });
+      getOidc(configurationName).publishEvent(OidcClient.eventNames.loadingTimeout_error, {
+        timeoutMs,
+      });
     }, timeoutMs);
     return () => clearTimeout(timeoutId);
-  }, [event.name, configurationName, configuration]);
+  }, [event.name, isAuthenticatedAndIdle, configurationName, configuration]);
 
   const SessionLostComponent = sessionLostComponent;
   const AuthenticatingComponent = authenticatingComponent;

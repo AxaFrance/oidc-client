@@ -14,30 +14,30 @@ const mockRemoveEventSubscription = vi.fn(id => {
   mockEventSubscribers = mockEventSubscribers.filter(e => e.id !== id);
 });
 
+const mockOidcInstance: {
+  subscribeEvents: typeof mockSubscribeEvents;
+  removeEventSubscription: typeof mockRemoveEventSubscription;
+  publishEvent: typeof mockPublishEvent;
+  configuration: Record<string, string>;
+  tryKeepExistingSessionAsync: ReturnType<typeof vi.fn>;
+  tokens: unknown;
+} = {
+  subscribeEvents: mockSubscribeEvents,
+  removeEventSubscription: mockRemoveEventSubscription,
+  publishEvent: mockPublishEvent,
+  configuration: {
+    redirect_uri: 'http://localhost/callback',
+    silent_redirect_uri: 'http://localhost/silent-callback',
+    silent_login_uri: 'http://localhost/silent-login',
+  },
+  tryKeepExistingSessionAsync: vi.fn().mockResolvedValue(true),
+  tokens: null,
+};
+
 vi.mock('@axa-fr/oidc-client', () => ({
   OidcClient: {
-    getOrCreate: vi.fn(() => () => ({
-      subscribeEvents: mockSubscribeEvents,
-      removeEventSubscription: mockRemoveEventSubscription,
-      publishEvent: mockPublishEvent,
-      configuration: {
-        redirect_uri: 'http://localhost/callback',
-        silent_redirect_uri: 'http://localhost/silent-callback',
-        silent_login_uri: 'http://localhost/silent-login',
-      },
-      tryKeepExistingSessionAsync: vi.fn().mockResolvedValue(true),
-    })),
-    get: vi.fn(() => ({
-      subscribeEvents: mockSubscribeEvents,
-      removeEventSubscription: mockRemoveEventSubscription,
-      publishEvent: mockPublishEvent,
-      configuration: {
-        redirect_uri: 'http://localhost/callback',
-        silent_redirect_uri: 'http://localhost/silent-callback',
-        silent_login_uri: 'http://localhost/silent-login',
-      },
-      tryKeepExistingSessionAsync: vi.fn().mockResolvedValue(true),
-    })),
+    getOrCreate: vi.fn(() => () => mockOidcInstance),
+    get: vi.fn(() => mockOidcInstance),
     eventNames: {
       service_worker_not_supported_by_browser: 'service_worker_not_supported_by_browser',
       token_acquired: 'token_acquired',
@@ -97,6 +97,7 @@ describe('OidcProvider loading timeout', () => {
     vi.useFakeTimers();
     vi.clearAllMocks();
     mockEventSubscribers = [];
+    mockOidcInstance.tokens = null;
   });
 
   afterEach(() => {
@@ -255,6 +256,126 @@ describe('OidcProvider loading timeout', () => {
     });
 
     expect(mockPublishEvent).toHaveBeenCalledWith('loadingTimeout_error', { timeoutMs: 30_000 });
+  });
+
+  it('should NOT fire loadingTimeout_error after a silent session restore when authenticated', async () => {
+    render(
+      <OidcProvider
+        configuration={{ ...baseConfiguration, loading_timeout_ms: 500 }}
+        configurationName="default"
+      >
+        <div>App</div>
+      </OidcProvider>,
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    // Simulate a successful silent session restore (no loginCallbackAsync_end is emitted).
+    act(() => {
+      mockEventSubscribers.forEach(sub =>
+        sub.func('tryKeepExistingSessionAsync_end', { success: true }),
+      );
+    });
+
+    mockPublishEvent.mockClear();
+
+    act(() => {
+      vi.advanceTimersByTime(10_000);
+    });
+
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
+  });
+
+  it('should still fire loadingTimeout_error when silent session restore reports no existing session', async () => {
+    render(
+      <OidcProvider
+        configuration={{ ...baseConfiguration, loading_timeout_ms: 300 }}
+        configurationName="default"
+      >
+        <div>App</div>
+      </OidcProvider>,
+    );
+
+    act(() => {
+      mockEventSubscribers.forEach(sub =>
+        sub.func('tryKeepExistingSessionAsync_end', { success: false }),
+      );
+    });
+
+    mockPublishEvent.mockClear();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(mockPublishEvent).toHaveBeenCalledWith('loadingTimeout_error', { timeoutMs: 300 });
+  });
+
+  it('should NOT fire loadingTimeout_error when token_acquired fires before the deadline', async () => {
+    render(
+      <OidcProvider
+        configuration={{ ...baseConfiguration, loading_timeout_ms: 400 }}
+        configurationName="default"
+      >
+        <div>App</div>
+      </OidcProvider>,
+    );
+
+    act(() => {
+      mockEventSubscribers.forEach(sub => sub.func('token_acquired', {}));
+    });
+
+    mockPublishEvent.mockClear();
+
+    act(() => {
+      vi.advanceTimersByTime(10_000);
+    });
+
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
+  });
+
+  it('should NOT fire loadingTimeout_error when token_renewed fires before the deadline', async () => {
+    render(
+      <OidcProvider
+        configuration={{ ...baseConfiguration, loading_timeout_ms: 400 }}
+        configurationName="default"
+      >
+        <div>App</div>
+      </OidcProvider>,
+    );
+
+    act(() => {
+      mockEventSubscribers.forEach(sub => sub.func('token_renewed', {}));
+    });
+
+    mockPublishEvent.mockClear();
+
+    act(() => {
+      vi.advanceTimersByTime(10_000);
+    });
+
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
+  });
+
+  it('should NOT arm the watchdog when the OIDC client mounts already authenticated', async () => {
+    mockOidcInstance.tokens = { accessToken: 'existing-token' };
+
+    render(
+      <OidcProvider
+        configuration={{ ...baseConfiguration, loading_timeout_ms: 100 }}
+        configurationName="default"
+      >
+        <div>App</div>
+      </OidcProvider>,
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
   });
 
   it('should propagate loadingTimeout_error through onEvent callback', async () => {
