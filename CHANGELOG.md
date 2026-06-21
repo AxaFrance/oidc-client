@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.14
+## 7.27.15
+
+- [e4cd2bd](https://github.com/AxaFrance/oidc-client/commit/e4cd2bd885f404bedaa66200d10c6145f403823a) - Fix issue #1696: loadingTimeout_error fires on authenticated/idle state after a silent session restore (regression from #1681 / #1692) (#1697) (release), 2026-06-21 by *Guillaume Chervet*
+
+
+## v7.27.14
 
 - [416a1b5](https://github.com/AxaFrance/oidc-client/commit/416a1b52c64e8d9c764f605f19c8a21fe3a5f467) - Auto fix for issue #1682: CallbackManager: no observable signal that post-callback navigation has committed (Safari edge case) (#1691) (release), 2026-06-16 by *Guillaume Chervet*
 
@@ -303,19 +308,5 @@
 - [34bd8e4](https://github.com/AxaFrance/oidc-client/commit/34bd8e4b3388761b2127a9c73980d74edac7b3ad) - refactor(parameters): Default parameters should be last.sonarlint(typescript:S1788), 2024-07-21 by *Jason Finch*
 - [44fa6f2](https://github.com/AxaFrance/oidc-client/commit/44fa6f2678f989ee23a84a506aea3caf159b9c2c) - fix spelling `token_acquired`, 2024-07-21 by *Jason Finch*
 - [32a2af3](https://github.com/AxaFrance/oidc-client/commit/32a2af3028cd69581d1ab0ee183c7b3146998b41) - chore(lint): Fix lint warnings., 2024-07-21 by *Jason Finch*
-
-
-## v7.22.19
-
-- [2cf0b62](https://github.com/AxaFrance/oidc-client/commit/2cf0b6243b39f3927d75fb80a96030259b7c16a2) - fix(oidc): autorenew from custom fetch was broken (release), 2024-07-20 by *Guillaume Chervet*
-- [f1d9da4](https://github.com/AxaFrance/oidc-client/commit/f1d9da44647d5b754df9c73cadb899179a98982b) - fix(oidc): lint (alpha), 2024-07-19 by *Guillaume Chervet*
-- [e4f4d97](https://github.com/AxaFrance/oidc-client/commit/e4f4d9774acb94f968b566b69cb8f11581a76830) - chore: apply prettier in repo, 2024-07-18 by *Alex Werman*
-- [02b00e0](https://github.com/AxaFrance/oidc-client/commit/02b00e075aeb8a291e1fc72b28ffe4eab1787db4) - fix(eslint): Fix ESLint to run prettier, 2024-07-17 by *Jason Finch*
-- [9191b0c](https://github.com/AxaFrance/oidc-client/commit/9191b0c2f95491fd12cf93673bb468d9b6d61774) - chore(packages): Bump packages for eslint/prettier, 2024-07-17 by *Jason Finch*
-- [a082b20](https://github.com/AxaFrance/oidc-client/commit/a082b20a943ab6322e69c00770d8ba86c9b8eaa2) - fix (Lint): Fix lint errors after rebase., 2024-07-17 by *Jason Finch*
-- [f6cf194](https://github.com/AxaFrance/oidc-client/commit/f6cf194d9c14d7eba20f23a89e215bb9cc6cacd1) - refactor(silentcallback): Catch any errors in async playCallbackAsync, 2024-07-13 by *Jason Finch*
-- [8797330](https://github.com/AxaFrance/oidc-client/commit/8797330ea5060a77b8d10a352ff166a33210f6aa) - refactor(lint): Fix minor lint issues, 2024-07-13 by *Jason Finch*
-- [bb7bc92](https://github.com/AxaFrance/oidc-client/commit/bb7bc929f7a1bc4f1d210216d89fad881056990f) - fix (lint): Fix all lint errors reporting by eslint., 2024-07-12 by *Jason Finch*
-- [cd2f57e](https://github.com/AxaFrance/oidc-client/commit/cd2f57edb99e04495b9884723cd05277a45aad43) - fix(demo): Update configurations.ts, 2024-07-16 by *Guillaume Chervet*
 
 
