@@ -8,7 +8,7 @@ export interface SilentCallbackProps {
 const SilentCallbackManager: FC<SilentCallbackProps> = ({ configurationName }) => {
   useEffect(() => {
     const playCallbackAsync = async () => {
-      const oidc = OidcClient.get(configurationName);
+      const oidc = OidcClient.getOrThrow(configurationName);
       oidc.silentLoginCallbackAsync();
     };
 

@@ -13,7 +13,9 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({
   extras = null,
   configurationName = 'default',
 }) => {
-  const getOidc = OidcClient.get;
+  // Keep the previous fail-fast behaviour: this component cannot
+  // meaningfully render without an initialized OIDC configuration.
+  const getOidc = OidcClient.getOrThrow;
   const oidc = getOidc(configurationName);
   useEffect(() => {
     if (!oidc.tokens) {

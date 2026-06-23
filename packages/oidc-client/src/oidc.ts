@@ -183,13 +183,38 @@ export class Oidc {
       return oidcFactory(getFetch, location)(configuration, name);
     };
 
-  static get(name = 'default') {
-    const isInsideBrowser = typeof process === 'undefined';
-    if (!Object.prototype.hasOwnProperty.call(oidcDatabase, name) && isInsideBrowser) {
+  /**
+   * Retrieve an existing OIDC instance previously initialized via
+   * {@link Oidc.getOrCreate}.
+   *
+   * Since issue #1679, this method no longer throws when the requested
+   * configuration has not been initialized; it returns `null` instead.
+   * This makes hooks such as `useOidc`, `useOidcUser` and `useOidcIdToken`
+   * safe to call outside of an `<OidcProvider>` (e.g. in unit tests or
+   * Storybook stories).
+   *
+   * Use {@link Oidc.getOrThrow} to preserve the previous fail-fast
+   * behaviour.
+   */
+  static get(name = 'default'): Oidc | null {
+    if (!Object.prototype.hasOwnProperty.call(oidcDatabase, name)) {
+      return null;
+    }
+    return oidcDatabase[name];
+  }
+
+  /**
+   * Retrieve an existing OIDC instance, throwing an explicit error if it
+   * has not been initialized. This preserves the historical (pre-#1679)
+   * fail-fast behaviour of `Oidc.get`.
+   */
+  static getOrThrow(name = 'default'): Oidc {
+    const oidc = Oidc.get(name);
+    if (!oidc) {
       throw Error(`OIDC library does seem initialized.
 Please checkout that you are using OIDC hook inside a <OidcProvider configurationName="${name}"></OidcProvider> component.`);
     }
-    return oidcDatabase[name];
+    return oidc;
   }
 
   static eventNames = eventNames;

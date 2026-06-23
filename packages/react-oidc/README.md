@@ -281,6 +281,15 @@ const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPo
 
 ## How to consume
 
+> **Note (issue #1679):** `useOidc`, `useOidcUser`, `useOidcAccessToken` and
+> `useOidcIdToken` are safe to call **outside** of an `<OidcProvider>` (e.g.
+> in unit tests or Storybook stories). When no provider is mounted, they
+> emit a single `console.warn` per configuration name and return stable
+> default values (`isAuthenticated: false`, `oidcUser: null`,
+> `accessToken: null`, `idToken: null`, with no-op `login`/`logout`/
+> `renewTokens`/`reloadOidcUser`). Use `OidcClient.getOrThrow(name)` if you
+> prefer the previous fail-fast behaviour.
+
 "useOidc" returns all props from the Hook :
 
 ```javascript
