@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.17
+## 7.27.18
+
+- [e4afee9](https://github.com/AxaFrance/oidc-client/commit/e4afee9ccf68a3905c1d071223c2cea0a435fb8b) - Handle corrupted or missing OIDC state with a clear, descriptive error (#1700) (release), 2026-06-23 by *Guillaume Chervet*
+
+
+## v7.27.17
 
 - [940aa8d](https://github.com/AxaFrance/oidc-client/commit/940aa8da6427e95dd2aa380575c7a27c7c8f9aac) - fix: Prevent logoutAsync from clearing local session before navigation to avoid re-auth race (#1701) (release), 2026-06-23 by *Guillaume Chervet*
 
@@ -297,12 +302,5 @@
 ## v7.22.23
 
 - [d15a57d](https://github.com/AxaFrance/oidc-client/commit/d15a57d98309db99d3bcd8d1a6a4fbeffe1b5402) - Fix(oidc): usage of config option service_worker_register (#1440) (release), 2024-08-25 by *Thomas Miliopoulos*
-
-
-## v7.22.22
-
-- [d213de1](https://github.com/AxaFrance/oidc-client/commit/d213de1a49d891cc1c0f399621f696ed861c145e) - doc(oidc) :Update README.md (release), 2024-08-20 by *Guillaume Chervet*
-- [1159262](https://github.com/AxaFrance/oidc-client/commit/115926280965cffc5a4f7ea2234bf1a0017ff896) - fix(logout): should work correctly with multiple tabs (alpha) (#1435), 2024-08-13 by *wermanoid*
-- [23ae6ba](https://github.com/AxaFrance/oidc-client/commit/23ae6ba287a85cc879c92228feb3855dcbe2930e) - fix(oidc): Add undefined as union type into arguments for login, logout, renewTokens (#1429) (alpha), 2024-08-02 by *ShimpeiKamiguchi*
 
 
