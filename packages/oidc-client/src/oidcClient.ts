@@ -64,6 +64,32 @@ export class OidcClient {
     return this._oidc.logoutAsync(callbackPathOrUrl, extras);
   }
 
+  /**
+   * Drops the local OIDC session (tokens, user info, service-worker storage)
+   * and notifies same-tab listeners via the `logout_from_same_tab` event,
+   * without contacting the identity provider's `end_session_endpoint` and
+   * without revoking tokens.
+   *
+   * Use this for SPA-only logouts, service-worker-only flows, or
+   * error-recovery paths. For a standard OIDC RP-initiated logout (with
+   * token revocation and navigation to the IdP's end-session endpoint) use
+   * {@link logoutAsync} instead.
+   */
+  clearSessionAsync(): Promise<void> {
+    return this._oidc.clearSessionAsync();
+  }
+
+  /**
+   * `true` while a logout flow is in progress: between the moment
+   * {@link logoutAsync} starts and the moment the browser navigates away to
+   * the identity provider's end-session endpoint. UI guards and silent-renew
+   * handlers should check this flag to avoid kicking off a new auth flow
+   * during that window.
+   */
+  get isLoggingOut(): boolean {
+    return this._oidc.isLoggingOut === true;
+  }
+
   silentLoginCallbackAsync(): Promise<void> {
     return this._oidc.silentLoginCallbackAsync();
   }

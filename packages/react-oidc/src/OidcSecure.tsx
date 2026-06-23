@@ -16,7 +16,11 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({
   const getOidc = OidcClient.get;
   const oidc = getOidc(configurationName);
   useEffect(() => {
-    if (!oidc.tokens) {
+    // Skip auto re-login while a logout flow is in progress: in that window
+    // `tokens` has just been cleared but the browser has not yet navigated to
+    // the identity provider's end-session endpoint, and starting a new auth
+    // flow here would race the logout navigation (see issue #1677).
+    if (!oidc.tokens && !oidc.isLoggingOut) {
       oidc.loginAsync(callbackPath, extras);
     }
   }, [configurationName, callbackPath, extras]);

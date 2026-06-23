@@ -12,7 +12,7 @@ import {
 import { tryKeepSessionAsync } from './keepSession';
 import { ILOidcLocation, OidcLocation } from './location';
 import { defaultLoginAsync, loginCallbackAsync } from './login.js';
-import { destroyAsync, logoutAsync } from './logout.js';
+import { clearSessionAsync, destroyAsync, logoutAsync } from './logout.js';
 import { TokenRenewMode, Tokens } from './parseTokens.js';
 import { autoRenewTokens, renewTokensAndStartTimerAsync } from './renewTokens.js';
 import { fetchFromIssuer } from './requests.js';
@@ -99,6 +99,14 @@ export class Oidc {
   public checkSessionIFrame: CheckSessionIFrame;
   public getFetch: () => Fetch;
   public location: ILOidcLocation;
+  /**
+   * `true` while {@link logoutAsync} is executing or has scheduled a
+   * navigation to the identity provider's end-session endpoint that has not
+   * yet committed. Consumers (UI guards, silent-renew handlers, 401 retry
+   * interceptors, …) should check this flag and skip starting a new auth
+   * flow when it is set, even if `tokens` is null.
+   */
+  public isLoggingOut = false;
   constructor(
     configuration: OidcConfiguration,
     configurationName = 'default',
@@ -450,6 +458,27 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
   async destroyAsync(status) {
     return await destroyAsync(this)(status);
+  }
+
+  /**
+   * Drops the local OIDC session (tokens, user info, service-worker storage)
+   * and broadcasts `logout_from_same_tab`, without contacting the identity
+   * provider's `end_session_endpoint` and without revoking tokens.
+   *
+   * Use this for SPA-only logouts, service-worker-only flows, or
+   * error-recovery paths where a full IdP logout is not needed or not
+   * desirable. For a standard OIDC RP-initiated logout use
+   * {@link logoutAsync} instead.
+   */
+  clearSessionPromise: Promise<void> = null;
+  async clearSessionAsync(): Promise<void> {
+    if (this.clearSessionPromise) {
+      return this.clearSessionPromise;
+    }
+    this.clearSessionPromise = clearSessionAsync(this, oidcDatabase)();
+    return this.clearSessionPromise.finally(() => {
+      this.clearSessionPromise = null;
+    });
   }
 
   async logoutSameTabAsync(clientId: string, sub: any) {
