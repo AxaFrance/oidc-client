@@ -446,6 +446,19 @@ const synchroniseTokensAsync =
             );
 
             if (tokenResponse.success) {
+              // Guard against a missing/corrupted nonce reaching id_token validation.
+              // Without this guard, accessing `nonce.nonce` would throw a TypeError
+              // when the underlying storage has been cleared (private mode, manual
+              // clearing, browser eviction). We prefer a defined SESSION_LOST result
+              // so silent renew stays non-throwing for consumers.
+              // See https://github.com/AxaFrance/oidc-client/issues/1678
+              if (!nonce || !nonce.nonce) {
+                updateTokens(null);
+                oidc.publishEvent(eventNames.refreshTokensAsync_error, {
+                  message: 'refresh token: nonce missing from storage',
+                });
+                return { tokens: null, status: 'SESSION_LOST' };
+              }
               const { isValid, reason } = isTokensOidcValid(
                 tokenResponse.data,
                 nonce.nonce,
