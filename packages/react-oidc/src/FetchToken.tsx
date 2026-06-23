@@ -1,6 +1,8 @@
 import { Fetch, OidcClient } from '@axa-fr/oidc-client';
 import { useCallback } from 'react';
 
+import { tryGetOidcClient } from './oidcClientRegistry.js';
+
 export interface ComponentWithOidcFetchProps {
   fetch?: Fetch;
 }
@@ -15,6 +17,11 @@ const fetchWithToken =
   ) =>
   async (...params: Parameters<Fetch>) => {
     const oidc = getOidcWithConfigurationName();
+    // When no OIDC client is registered (e.g. in tests / Storybook),
+    // fall back to the plain fetch so callers do not crash.
+    if (!oidc) {
+      return await fetch(...params);
+    }
     const newFetch = oidc.fetchWithTokens(fetch, demonstratingProofOfPossession);
     return await newFetch(...params);
   };
@@ -41,11 +48,11 @@ export const useOidcFetch = (
   demonstratingProofOfPossession: boolean = false,
 ) => {
   const previousFetch = fetch || window.fetch;
-  const getOidc = OidcClient.get;
 
   const memoizedFetchCallback = useCallback(
     (input: RequestInfo | URL, init?: RequestInit) => {
-      const getOidcWithConfigurationName = () => getOidc(configurationName);
+      const getOidcWithConfigurationName = () =>
+        tryGetOidcClient(configurationName) as OidcClient | null;
       const newFetch = fetchWithToken(
         previousFetch,
         getOidcWithConfigurationName,

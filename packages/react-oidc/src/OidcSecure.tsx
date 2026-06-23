@@ -1,6 +1,8 @@
 import { OidcClient, StringMap } from '@axa-fr/oidc-client';
 import { FC, PropsWithChildren, useEffect } from 'react';
 
+import { tryGetOidcClient } from './oidcClientRegistry.js';
+
 export type OidcSecureProps = {
   callbackPath?: string;
   extras?: StringMap;
@@ -13,15 +15,14 @@ export const OidcSecure: FC<PropsWithChildren<OidcSecureProps>> = ({
   extras = null,
   configurationName = 'default',
 }) => {
-  const getOidc = OidcClient.get;
-  const oidc = getOidc(configurationName);
+  const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
   useEffect(() => {
-    if (!oidc.tokens) {
+    if (oidc && !oidc.tokens) {
       oidc.loginAsync(callbackPath, extras);
     }
   }, [configurationName, callbackPath, extras]);
 
-  if (!oidc.tokens) {
+  if (!oidc || !oidc.tokens) {
     return null;
   }
   return <>{children}</>;

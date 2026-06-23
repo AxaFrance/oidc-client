@@ -1,45 +1,51 @@
 import { OidcClient, StringMap, Tokens } from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
 
+import { OidcClientLike, tryGetOidcClient } from './oidcClientRegistry.js';
+
 const defaultConfigurationName = 'default';
 
-type GetOidcFn = {
-  (configurationName?: string): any;
+const hasTokens = (oidc: OidcClientLike | null): boolean => {
+  return oidc != null && (oidc as { tokens?: unknown }).tokens != null;
 };
 
-const defaultIsAuthenticated = (getOidc: GetOidcFn, configurationName: string) => {
-  let isAuthenticated = false;
-  const oidc = getOidc(configurationName);
-  if (oidc) {
-    isAuthenticated = getOidc(configurationName).tokens != null;
-  }
-  return isAuthenticated;
+const noop = (): void => {
+  // No-op when no OIDC client is registered. Documented in the README.
 };
+
+const emptyTokensResponse = (): OidcAccessToken & OidcIdToken => ({
+  accessToken: null,
+  accessTokenPayload: null,
+  idToken: null,
+  idTokenPayload: null,
+});
 
 export const useOidc = (configurationName = defaultConfigurationName) => {
-  const getOidc = OidcClient.get;
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
-    defaultIsAuthenticated(getOidc, configurationName),
+    hasTokens(tryGetOidcClient(configurationName)),
   );
 
   useEffect(() => {
     let isMounted = true;
-    const oidc = getOidc(configurationName);
+    const oidc = tryGetOidcClient(configurationName);
+    if (!oidc) {
+      return;
+    }
 
-    const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
+    const newSubscriptionId = (oidc as OidcClient).subscribeEvents((name: string, _data: any) => {
       if (
         name === OidcClient.eventNames.logout_from_another_tab ||
         name === OidcClient.eventNames.logout_from_same_tab ||
         name === OidcClient.eventNames.token_acquired
       ) {
         if (isMounted) {
-          setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
+          setIsAuthenticated(hasTokens(tryGetOidcClient(configurationName)));
         }
       }
     });
     return () => {
       isMounted = false;
-      oidc.removeEventSubscription(newSubscriptionId);
+      (oidc as OidcClient).removeEventSubscription(newSubscriptionId);
     };
   }, [configurationName]);
 
@@ -49,51 +55,60 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
     silentLoginOnly = false,
     scope: string = undefined,
   ) => {
-    return getOidc(configurationName).loginAsync(
-      callbackPath,
-      extras,
-      false,
-      scope,
-      silentLoginOnly,
-    );
+    const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
+    if (!oidc) {
+      return Promise.resolve();
+    }
+    return oidc.loginAsync(callbackPath, extras, false, scope, silentLoginOnly);
   };
   const logout = (
     callbackPath: string | null | undefined = undefined,
     extras: StringMap | undefined = undefined,
   ) => {
-    return getOidc(configurationName).logoutAsync(callbackPath, extras);
+    const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
+    if (!oidc) {
+      return Promise.resolve();
+    }
+    return oidc.logoutAsync(callbackPath, extras);
   };
   const renewTokens = async (
     extras: StringMap | undefined = undefined,
   ): Promise<OidcAccessToken | OidcIdToken> => {
-    const tokens = await getOidc(configurationName).renewTokensAsync(extras);
+    const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
+    if (!oidc) {
+      return emptyTokensResponse();
+    }
+    const tokens = (await oidc.renewTokensAsync(extras)) as unknown as Tokens;
 
     return {
       // @ts-ignore
-      accessToken: tokens.accessToken,
+      accessToken: tokens?.accessToken ?? null,
       // @ts-ignore
-      accessTokenPayload: tokens.accessTokenPayload,
+      accessTokenPayload: tokens?.accessTokenPayload ?? null,
       // @ts-ignore
-      idToken: tokens.idToken,
+      idToken: tokens?.idToken ?? null,
       // @ts-ignore
-      idTokenPayload: tokens.idTokenPayload,
+      idTokenPayload: tokens?.idTokenPayload ?? null,
     };
   };
   return { login, logout, renewTokens, isAuthenticated };
 };
 
-const accessTokenInitialState = { accessToken: null, accessTokenPayload: null };
+const accessTokenInitialState = {
+  accessToken: null,
+  accessTokenPayload: null,
+  generateDemonstrationOfProofOfPossessionAsync: null,
+};
 
-const initTokens = (configurationName: string) => {
-  const getOidc = OidcClient.get;
-  const oidc = getOidc(configurationName);
-  if (oidc.tokens) {
+const initTokens = (configurationName: string): OidcAccessToken => {
+  const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
+  if (oidc && oidc.tokens) {
     const tokens = oidc.tokens;
     return {
       accessToken: tokens.accessToken,
       accessTokenPayload: tokens.accessTokenPayload,
       generateDemonstrationOfProofOfPossessionAsync: oidc.configuration
-        .demonstrating_proof_of_possession
+        ?.demonstrating_proof_of_possession
         ? (url: string, method: string) =>
             oidc.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, method)
         : null,
@@ -109,21 +124,23 @@ export type OidcAccessToken = {
 };
 
 function getGenerateDemonstrationOfProofOfPossessionAsync(oidc: OidcClient, tokens: Tokens) {
-  return oidc.configuration.demonstrating_proof_of_possession
+  return oidc.configuration?.demonstrating_proof_of_possession
     ? (url: string, method: string, extras: StringMap = {}) =>
         oidc.generateDemonstrationOfProofOfPossessionAsync(tokens.accessToken, url, method, extras)
     : null;
 }
 
 export const useOidcAccessToken = (configurationName = defaultConfigurationName) => {
-  const getOidc = OidcClient.get;
   const [state, setAccessToken] = useState<OidcAccessToken>(() => initTokens(configurationName));
 
   useEffect(() => {
     let isMounted = true;
-    const oidc = getOidc(configurationName);
+    const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
+    if (!oidc) {
+      return;
+    }
 
-    const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
+    const newSubscriptionId = oidc.subscribeEvents((name: string, _data: any) => {
       if (
         name === OidcClient.eventNames.token_renewed ||
         name === OidcClient.eventNames.token_acquired ||
@@ -157,11 +174,10 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
 
 const idTokenInitialState = { idToken: null, idTokenPayload: null };
 
-const initIdToken = (configurationName: string) => {
-  const getOidc = OidcClient.get;
-  const oidc = getOidc(configurationName);
+const initIdToken = (configurationName: string): OidcIdToken => {
+  const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
 
-  if (oidc.tokens) {
+  if (oidc && oidc.tokens) {
     const tokens = oidc.tokens;
     return { idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload };
   }
@@ -174,14 +190,16 @@ export type OidcIdToken = {
 };
 
 export const useOidcIdToken = (configurationName = defaultConfigurationName) => {
-  const getOidc = OidcClient.get;
   const [state, setIDToken] = useState<OidcIdToken>(() => initIdToken(configurationName));
 
   useEffect(() => {
     let isMounted = true;
-    const oidc = getOidc(configurationName);
+    const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
+    if (!oidc) {
+      return;
+    }
 
-    const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
+    const newSubscriptionId = oidc.subscribeEvents((name: string, _data: any) => {
       if (
         name === OidcClient.eventNames.token_renewed ||
         name === OidcClient.eventNames.token_acquired ||
@@ -207,3 +225,6 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
   }, [configurationName]);
   return state;
 };
+
+// Re-exported so callers can use a no-op outside the hooks if needed.
+export const __noopForMissingProvider = noop;

@@ -449,6 +449,72 @@ const DisplayUserInfo = () => {
 };
 ```
 
+## Testing and Storybook: using `OidcMockProvider`
+
+When a component uses one of the OIDC hooks (`useOidc`, `useOidcUser`,
+`useOidcAccessToken`, `useOidcIdToken`, `useOidcFetch`) or `OidcSecure`,
+it does not need to be wrapped in a real `OidcProvider` in unit tests or
+Storybook stories: the hooks return safe unauthenticated defaults when no
+provider is mounted, and emit a one-time development warning so that
+genuine misconfigurations remain visible.
+
+For scenarios that need a specific simulated authentication state, the
+library ships an `OidcMockProvider` component that registers an in-memory
+mock client for its subtree:
+
+```jsx
+import {
+  OidcMockProvider,
+  useOidc,
+  useOidcUser,
+  useOidcAccessToken,
+} from '@axa-fr/react-oidc';
+
+const AuthenticatedScreen = () => {
+  const { isAuthenticated } = useOidc();
+  const { oidcUser } = useOidcUser();
+  const { accessToken } = useOidcAccessToken();
+  return (
+    <div>
+      <p>Authenticated: {String(isAuthenticated)}</p>
+      <p>User: {oidcUser?.name}</p>
+      <p>Access token: {accessToken}</p>
+    </div>
+  );
+};
+
+// In a test or Storybook story:
+<OidcMockProvider
+  configurationName="default"
+  value={{
+    isAuthenticated: true,
+    accessToken: 'fake-access-token',
+    idToken: 'fake-id-token',
+    user: { sub: '123', name: 'Jane Doe' },
+  }}
+>
+  <AuthenticatedScreen />
+</OidcMockProvider>;
+```
+
+For more advanced needs (custom `loginAsync` / `logoutAsync`
+implementations, manual setup in a test file, etc.) you can build and
+register a mock client imperatively:
+
+```js
+import { createMockOidcClient, registerMockOidcClient } from '@axa-fr/react-oidc';
+
+const mockClient = createMockOidcClient({
+  isAuthenticated: true,
+  user: { sub: '123', name: 'Jane Doe' },
+});
+registerMockOidcClient('default', mockClient);
+```
+
+Mock clients always take precedence over the real client registered by
+`OidcProvider`, which makes them ideal for unit tests, integration tests,
+and Storybook decorators.
+
 ## How to get a fetch that inject Access_Token: Hook method
 
 If you are not using the service worker. The Fetch function needs to send AccessToken.

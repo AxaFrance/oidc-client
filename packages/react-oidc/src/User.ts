@@ -1,6 +1,8 @@
 import { OidcClient, type OidcUserInfo } from '@axa-fr/oidc-client';
 import { useEffect, useRef, useState } from 'react';
 
+import { tryGetOidcClient } from './oidcClientRegistry.js';
+
 export enum OidcUserStatus {
   Unauthenticated = 'Unauthenticated',
   Loading = 'Loading user',
@@ -17,8 +19,8 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
   configurationName = 'default',
   demonstrating_proof_of_possession = false,
 ) => {
-  const oidc = OidcClient.get(configurationName);
-  const user = oidc.userInfo<T>();
+  const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
+  const user = oidc ? oidc.userInfo<T>() : null;
   const [oidcUser, setOidcUser] = useState<OidcUser<T>>({
     user: user,
     status: user ? OidcUserStatus.Loaded : OidcUserStatus.Unauthenticated,
@@ -27,9 +29,19 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
   const oidcPreviousUserIdRef = useRef<number>(user ? 1 : 0);
 
   useEffect(() => {
-    const oidc = OidcClient.get(configurationName);
+    const oidc = tryGetOidcClient(configurationName) as OidcClient | null;
     let isMounted = true;
-    if (oidc && oidc.tokens) {
+    if (!oidc) {
+      queueMicrotask(() => {
+        if (isMounted) {
+          setOidcUser({ user: null, status: OidcUserStatus.Unauthenticated });
+        }
+      });
+      return () => {
+        isMounted = false;
+      };
+    }
+    if (oidc.tokens) {
       const isCache = oidcUserId === oidcPreviousUserIdRef.current;
       if (isCache && oidc.userInfo<T>()) {
         return;

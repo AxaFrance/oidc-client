@@ -1,4 +1,8 @@
 export { useOidcFetch, withOidcFetch } from './FetchToken.js';
+export type { OidcClientLike } from './oidcClientRegistry.js';
+export { registerMockOidcClient, unregisterMockOidcClient } from './oidcClientRegistry.js';
+export type { OidcMockProviderProps, OidcMockTokens, OidcMockValue } from './OidcMockProvider.js';
+export { createMockOidcClient, OidcMockProvider } from './OidcMockProvider.js';
 export type { OidcProviderProps } from './OidcProvider.js';
 export { OidcProvider } from './OidcProvider.js';
 export { OidcSecure, withOidcSecure } from './OidcSecure.js';
