@@ -446,6 +446,41 @@ pnpm start
 
 ```
 
+## Handling missing or corrupted login state
+
+When the OIDC state or nonce is missing from storage at callback time (for
+example because the user is in a private browsing tab, cleared storage
+manually, or because the browser evicted the entry between the authorize
+redirect and the callback), the library now throws a typed
+`OidcStateError` instead of letting a generic `TypeError` escape.
+
+```ts
+import { isOidcStateError, OidcStateError, OidcStateErrorCode } from '@axa-fr/oidc-client';
+
+try {
+  await oidcClient.loginCallbackAsync();
+} catch (error) {
+  if (isOidcStateError(error)) {
+    switch (error.code) {
+      case OidcStateErrorCode.STATE_MISSING:
+        // The stored state was not found at callback time.
+        break;
+      case OidcStateErrorCode.STATE_MISMATCH:
+        // The state returned by the server does not match the stored one.
+        break;
+      case OidcStateErrorCode.NONCE_MISSING:
+        // The stored nonce was not found at callback time.
+        break;
+    }
+  }
+}
+```
+
+`OidcStateError` is an `Error` subclass, exposes a stable `code` field, and
+is also re-exported from `@axa-fr/react-oidc`. For silent renewal, a missing
+nonce no longer throws a `TypeError` — it is reported through the existing
+`SESSION_LOST` status so consumers can recover via the normal re-login flow.
+
 ## Service worker protocol
 
 The `postMessage` protocol used between `OidcClient` and the service worker

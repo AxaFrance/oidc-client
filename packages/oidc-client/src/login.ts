@@ -5,6 +5,7 @@ import { initWorkerAsync } from './initWorker.js';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
 import { ILOidcLocation } from './location';
 import Oidc from './oidc';
+import { OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 import { isTokensOidcValid } from './parseTokens.js';
 import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests.js';
 import { getParseQueryStringFromLocation } from './route-utils.js';
@@ -156,8 +157,28 @@ export const loginCallbackAsync =
           `Issuer not valid (expected: ${oidcServerConfiguration.issuer}, received: ${queryParams.iss})`,
         );
       }
-      if (queryParams.state && queryParams.state !== state) {
-        throw new Error(`State not valid (expected: ${state}, received: ${queryParams.state})`);
+      // Surface missing / mismatched login state as a typed, identifiable error
+      // rather than a generic TypeError when later dereferencing nonceData.nonce.
+      // See https://github.com/AxaFrance/oidc-client/issues/1678
+      if (queryParams.state) {
+        if (!state) {
+          throw new OidcStateError(
+            OidcStateErrorCode.STATE_MISSING,
+            'OIDC state is missing from storage. The login state may have been cleared between the authorization redirect and the callback (e.g., private browsing, storage cleared, or browser eviction).',
+          );
+        }
+        if (queryParams.state !== state) {
+          throw new OidcStateError(
+            OidcStateErrorCode.STATE_MISMATCH,
+            `OIDC state does not match the stored one (expected: ${state}, received: ${queryParams.state}).`,
+          );
+        }
+      }
+      if (!nonceData || !nonceData.nonce) {
+        throw new OidcStateError(
+          OidcStateErrorCode.NONCE_MISSING,
+          'OIDC nonce is missing from storage. The login state may have been cleared between the authorization redirect and the callback (e.g., private browsing, storage cleared, or browser eviction).',
+        );
       }
 
       const data = {

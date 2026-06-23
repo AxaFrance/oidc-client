@@ -13,8 +13,11 @@ export type {
 } from '@axa-fr/oidc-client';
 export type { OidcUserInfo } from '@axa-fr/oidc-client';
 export {
+  isOidcStateError,
   OidcClient,
   OidcLocation,
+  OidcStateError,
+  OidcStateErrorCode,
   TokenAutomaticRenewMode,
   TokenRenewMode,
 } from '@axa-fr/oidc-client';
