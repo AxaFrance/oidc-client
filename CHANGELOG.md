@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.15
+## 7.27.16
+
+- [cb8fc88](https://github.com/AxaFrance/oidc-client/commit/cb8fc88246229ee819a32a2164385ef05209b806) - Gracefully handle hooks outside OidcProvider and add test provider #1679 (#1698) (release), 2026-06-23 by *Guillaume Chervet*
+
+
+## v7.27.15
 
 - [e4cd2bd](https://github.com/AxaFrance/oidc-client/commit/e4cd2bd885f404bedaa66200d10c6145f403823a) - Fix issue #1696: loadingTimeout_error fires on authenticated/idle state after a silent session restore (regression from #1681 / #1692) (#1697) (release), 2026-06-21 by *Guillaume Chervet*
 
@@ -299,14 +304,5 @@
 ## v7.22.21
 
 - [318de92](https://github.com/AxaFrance/oidc-client/commit/318de922980c167dd9fc1a743d2dedd106b9a02d) - fix(oidc): Add null as union type into arguments for login, logout, renewTokens functions (#1427) (release), 2024-07-26 by *ShimpeiKamiguchi*
-
-
-## v7.22.20
-
-- [05ace2d](https://github.com/AxaFrance/oidc-client/commit/05ace2dce4a36493b1d127d049c3ef7d5ebd90b4) - fix(oidc): record tabIds when service worker receives init event (release), 2024-07-22 by *mkrzempek*
-- [6b5f6b4](https://github.com/AxaFrance/oidc-client/commit/6b5f6b428aba70b32d5264b0de89752a00b352e3) - refactor(initWorker): null coalescing, 2024-07-21 by *Jason Finch*
-- [34bd8e4](https://github.com/AxaFrance/oidc-client/commit/34bd8e4b3388761b2127a9c73980d74edac7b3ad) - refactor(parameters): Default parameters should be last.sonarlint(typescript:S1788), 2024-07-21 by *Jason Finch*
-- [44fa6f2](https://github.com/AxaFrance/oidc-client/commit/44fa6f2678f989ee23a84a506aea3caf159b9c2c) - fix spelling `token_acquired`, 2024-07-21 by *Jason Finch*
-- [32a2af3](https://github.com/AxaFrance/oidc-client/commit/32a2af3028cd69581d1ab0ee183c7b3146998b41) - chore(lint): Fix lint warnings., 2024-07-21 by *Jason Finch*
 
 
