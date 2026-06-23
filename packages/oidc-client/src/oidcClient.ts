@@ -38,8 +38,28 @@ export class OidcClient {
       return new OidcClient(Oidc.getOrCreate(getFetch, location)(configuration, name));
     };
 
-  static get(name = 'default'): OidcClient {
-    return new OidcClient(Oidc.get(name));
+  /**
+   * Retrieve an existing {@link OidcClient} by configuration name.
+   *
+   * Since issue #1679, this method returns `null` when the requested
+   * configuration has not been initialized, instead of throwing. This
+   * allows React hooks to be used safely outside of `<OidcProvider>`.
+   *
+   * Use {@link OidcClient.getOrThrow} to preserve the previous fail-fast
+   * behaviour.
+   */
+  static get(name = 'default'): OidcClient | null {
+    const oidc = Oidc.get(name);
+    return oidc ? new OidcClient(oidc) : null;
+  }
+
+  /**
+   * Retrieve an existing {@link OidcClient}, throwing if it has not been
+   * initialized. Equivalent to the pre-#1679 behaviour of
+   * {@link OidcClient.get}.
+   */
+  static getOrThrow(name = 'default'): OidcClient {
+    return new OidcClient(Oidc.getOrThrow(name));
   }
 
   static eventNames = Oidc.eventNames;

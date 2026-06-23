@@ -41,7 +41,9 @@ export const useOidcFetch = (
   demonstratingProofOfPossession: boolean = false,
 ) => {
   const previousFetch = fetch || window.fetch;
-  const getOidc = OidcClient.get;
+  // useOidcFetch relies on an initialized OIDC configuration to attach
+  // the bearer token, so we keep the original fail-fast behaviour.
+  const getOidc = OidcClient.getOrThrow;
 
   const memoizedFetchCallback = useCallback(
     (input: RequestInfo | URL, init?: RequestInit) => {

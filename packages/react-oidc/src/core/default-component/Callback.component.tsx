@@ -34,7 +34,7 @@ const CallbackManager: ComponentType<any> = ({
   useEffect(() => {
     let isMounted = true;
     const playCallbackAsync = async () => {
-      const getOidc = OidcClient.get;
+      const getOidc = OidcClient.getOrThrow;
       try {
         const oidcClient = getOidc(configurationName);
         const { callbackPath } = await oidcClient.loginCallbackAsync();

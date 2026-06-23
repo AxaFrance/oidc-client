@@ -4,7 +4,7 @@ import { ComponentType, useEffect } from 'react';
 const SilentLogin: ComponentType<any> = ({ configurationName }) => {
   const queryParams = getParseQueryStringFromLocation(window.location.href);
 
-  const getOidc = OidcClient.get;
+  const getOidc = OidcClient.getOrThrow;
   const oidc = getOidc(configurationName);
 
   let extras = null;

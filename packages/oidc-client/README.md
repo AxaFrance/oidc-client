@@ -315,11 +315,23 @@ export class OidcClient {
   static getOrCreate(getFetch: () => Fetch)(configuration: OidcConfiguration, name?: string): OidcClient;
 
   /**
-   * Retrieves an existing OidcClient instance with the specified name, or creates a new instance if it does not exist.
+   * Retrieves an existing OidcClient instance with the specified name.
+   * Since issue #1679, this returns `null` when no instance has been
+   * initialized for the given name (instead of throwing). Use
+   * `OidcClient.getOrThrow` to preserve the previous fail-fast behaviour.
    * @param name The name of the OidcClient instance to retrieve.
-   * @returns The existing OidcClient instance or a new instance with the specified name.
+   * @returns The existing OidcClient instance, or null if none exists.
    */
-  static get(name?: string): OidcClient;
+  static get(name?: string): OidcClient | null;
+
+  /**
+   * Same as `OidcClient.get` but throws an explicit error when no instance
+   * has been initialized for the given name. Useful when you want to fail
+   * fast on misconfiguration.
+   * @param name The name of the OidcClient instance to retrieve.
+   * @returns The existing OidcClient instance.
+   */
+  static getOrThrow(name?: string): OidcClient;
 
   /**
    * The names of the events supported by the Oidc class.

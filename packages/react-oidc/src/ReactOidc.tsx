@@ -1,6 +1,8 @@
 import { OidcClient, StringMap, Tokens } from '@axa-fr/oidc-client';
 import { useEffect, useState } from 'react';
 
+import { warnMissingConfigurationOnce } from './warnMissingConfiguration.js';
+
 const defaultConfigurationName = 'default';
 
 type GetOidcFn = {
@@ -11,7 +13,7 @@ const defaultIsAuthenticated = (getOidc: GetOidcFn, configurationName: string) =
   let isAuthenticated = false;
   const oidc = getOidc(configurationName);
   if (oidc) {
-    isAuthenticated = getOidc(configurationName).tokens != null;
+    isAuthenticated = oidc.tokens != null;
   }
   return isAuthenticated;
 };
@@ -25,6 +27,12 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
   useEffect(() => {
     let isMounted = true;
     const oidc = getOidc(configurationName);
+    // Hooks may be rendered outside of an <OidcProvider> (issue #1679):
+    // in that case `oidc` is null and we simply skip event subscription.
+    if (!oidc) {
+      warnMissingConfigurationOnce(configurationName);
+      return undefined;
+    }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (
@@ -48,25 +56,34 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
     extras: StringMap | undefined = undefined,
     silentLoginOnly = false,
     scope: string = undefined,
-  ) => {
-    return getOidc(configurationName).loginAsync(
-      callbackPath,
-      extras,
-      false,
-      scope,
-      silentLoginOnly,
-    );
+  ): Promise<unknown> => {
+    const oidc = getOidc(configurationName);
+    if (!oidc) {
+      warnMissingConfigurationOnce(configurationName);
+      return Promise.resolve();
+    }
+    return oidc.loginAsync(callbackPath, extras, false, scope, silentLoginOnly);
   };
   const logout = (
     callbackPath: string | null | undefined = undefined,
     extras: StringMap | undefined = undefined,
-  ) => {
-    return getOidc(configurationName).logoutAsync(callbackPath, extras);
+  ): Promise<void> => {
+    const oidc = getOidc(configurationName);
+    if (!oidc) {
+      warnMissingConfigurationOnce(configurationName);
+      return Promise.resolve();
+    }
+    return oidc.logoutAsync(callbackPath, extras);
   };
   const renewTokens = async (
     extras: StringMap | undefined = undefined,
   ): Promise<OidcAccessToken | OidcIdToken> => {
-    const tokens = await getOidc(configurationName).renewTokensAsync(extras);
+    const oidc = getOidc(configurationName);
+    if (!oidc) {
+      warnMissingConfigurationOnce(configurationName);
+      return { accessToken: null, accessTokenPayload: null, idToken: null, idTokenPayload: null };
+    }
+    const tokens = await oidc.renewTokensAsync(extras);
 
     return {
       // @ts-ignore
@@ -87,6 +104,9 @@ const accessTokenInitialState = { accessToken: null, accessTokenPayload: null };
 const initTokens = (configurationName: string) => {
   const getOidc = OidcClient.get;
   const oidc = getOidc(configurationName);
+  if (!oidc) {
+    return accessTokenInitialState;
+  }
   if (oidc.tokens) {
     const tokens = oidc.tokens;
     return {
@@ -122,6 +142,11 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
   useEffect(() => {
     let isMounted = true;
     const oidc = getOidc(configurationName);
+    // No provider in the tree (issue #1679): keep the default token state.
+    if (!oidc) {
+      warnMissingConfigurationOnce(configurationName);
+      return undefined;
+    }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (
@@ -161,6 +186,9 @@ const initIdToken = (configurationName: string) => {
   const getOidc = OidcClient.get;
   const oidc = getOidc(configurationName);
 
+  if (!oidc) {
+    return idTokenInitialState;
+  }
   if (oidc.tokens) {
     const tokens = oidc.tokens;
     return { idToken: tokens.idToken, idTokenPayload: tokens.idTokenPayload };
@@ -180,6 +208,11 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
   useEffect(() => {
     let isMounted = true;
     const oidc = getOidc(configurationName);
+    // No provider in the tree (issue #1679): keep the default id-token state.
+    if (!oidc) {
+      warnMissingConfigurationOnce(configurationName);
+      return undefined;
+    }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
       if (

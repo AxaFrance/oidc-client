@@ -1,6 +1,8 @@
 import { OidcClient, type OidcUserInfo } from '@axa-fr/oidc-client';
 import { useEffect, useRef, useState } from 'react';
 
+import { warnMissingConfigurationOnce } from './warnMissingConfiguration.js';
+
 export enum OidcUserStatus {
   Unauthenticated = 'Unauthenticated',
   Loading = 'Loading user',
@@ -18,7 +20,9 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
   demonstrating_proof_of_possession = false,
 ) => {
   const oidc = OidcClient.get(configurationName);
-  const user = oidc.userInfo<T>();
+  // When the hook is used outside of an <OidcProvider> (issue #1679),
+  // `OidcClient.get` returns null instead of throwing.
+  const user = oidc ? oidc.userInfo<T>() : null;
   const [oidcUser, setOidcUser] = useState<OidcUser<T>>({
     user: user,
     status: user ? OidcUserStatus.Loaded : OidcUserStatus.Unauthenticated,
@@ -29,7 +33,11 @@ export const useOidcUser = <T extends OidcUserInfo = OidcUserInfo>(
   useEffect(() => {
     const oidc = OidcClient.get(configurationName);
     let isMounted = true;
-    if (oidc && oidc.tokens) {
+    if (!oidc) {
+      warnMissingConfigurationOnce(configurationName);
+      return undefined;
+    }
+    if (oidc.tokens) {
       const isCache = oidcUserId === oidcPreviousUserIdRef.current;
       if (isCache && oidc.userInfo<T>()) {
         return;

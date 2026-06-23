@@ -7,6 +7,7 @@ import CallbackManager, { CallBackSuccess, verifyNavigationCommitted } from './C
 vi.mock('@axa-fr/oidc-client', () => ({
   OidcClient: {
     get: vi.fn(),
+    getOrThrow: vi.fn(),
     eventNames: {
       loginCallbackAsync_navigated: 'loginCallbackAsync_navigated',
       loginCallbackAsync_navigation_error: 'loginCallbackAsync_navigation_error',
@@ -58,7 +59,7 @@ describe('CallbackManager', () => {
     mockLoginCallbackAsync = vi.fn();
     mockReplaceState = vi.fn();
 
-    (OidcClient.get as ReturnType<typeof vi.fn>).mockReturnValue({
+    (OidcClient.getOrThrow as ReturnType<typeof vi.fn>).mockReturnValue({
       loginCallbackAsync: mockLoginCallbackAsync,
       publishEvent: mockPublishEvent,
     });
