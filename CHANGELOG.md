@@ -1,6 +1,11 @@
 # Changelog
 
-## 7.27.18
+## 7.27.19
+
+- [de47006](https://github.com/AxaFrance/oidc-client/commit/de470065418f3c98099f5df0a039bc33392cb74d) - Handle service worker AbortError on tab shutdown to avoid uncaught rejections (#1702) (release), 2026-06-24 by *Guillaume Chervet*
+
+
+## v7.27.18
 
 - [e4afee9](https://github.com/AxaFrance/oidc-client/commit/e4afee9ccf68a3905c1d071223c2cea0a435fb8b) - Handle corrupted or missing OIDC state with a clear, descriptive error (#1700) (release), 2026-06-23 by *Guillaume Chervet*
 
@@ -297,10 +302,5 @@
 - [35081e1](https://github.com/AxaFrance/oidc-client/commit/35081e16b947ebd490b83a1f6d6b9dc101363736) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client into HEAD, 2024-08-25 by *Guillaume Chervet*
 - [70dd233](https://github.com/AxaFrance/oidc-client/commit/70dd233f69f2b2a9c5da4a2514e2cc657cf435a2) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-08-25 by *Guillaume Chervet*
 - [47f9de1](https://github.com/AxaFrance/oidc-client/commit/47f9de1f648838ae085c45a5dcd55687f80829c5) - fix(oidc): remove no-existing property add typings (release), 2024-08-25 by *Guillaume Chervet*
-
-
-## v7.22.23
-
-- [d15a57d](https://github.com/AxaFrance/oidc-client/commit/d15a57d98309db99d3bcd8d1a6a4fbeffe1b5402) - Fix(oidc): usage of config option service_worker_register (#1440) (release), 2024-08-25 by *Thomas Miliopoulos*
 
 
