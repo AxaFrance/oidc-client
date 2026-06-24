@@ -172,7 +172,18 @@ let controllerChangeReloading = false;
 // Cache registration promises by URL so that navigator.serviceWorker.register (or a custom
 // service_worker_register) is called at most once per JavaScript session (page lifetime),
 // regardless of how many times initWorkerAsync is invoked.
-const registrationCache = new Map<string, Promise<ServiceWorkerRegistration>>();
+export const registrationCache = new Map<string, Promise<ServiceWorkerRegistration>>();
+
+// AbortError surfaces during transient lifecycle events (e.g. iOS Safari tab shutdown or
+// backgrounding) and does not represent a genuine configuration problem. We treat it as
+// non-fatal, clear the cache entry so future calls can retry, and fall back to the
+// non–service-worker path by returning null from initWorkerAsync.
+const isAbortError = (error: unknown): boolean => {
+  if (error instanceof DOMException) {
+    return error.name === 'AbortError';
+  }
+  return (error as { name?: string } | null)?.name === 'AbortError';
+};
 
 // Session-level guard to prevent infinite reload loops caused by SW update cycles.
 // The controllerchange listener triggers a page reload, but after reload the module-level
@@ -229,25 +240,34 @@ export const initWorkerAsync = async (
 
   const swUrl = `${serviceWorkerRelativeUrl}?v=${codeVersion}`;
 
+  const cacheKey = configuration.service_worker_register ? serviceWorkerRelativeUrl : swUrl;
+
+  if (!registrationCache.has(cacheKey)) {
+    registrationCache.set(
+      cacheKey,
+      configuration.service_worker_register
+        ? configuration.service_worker_register(serviceWorkerRelativeUrl)
+        : navigator.serviceWorker.register(swUrl, {
+            updateViaCache: 'none',
+          }),
+    );
+  }
+
   let registration: ServiceWorkerRegistration = null as any;
-  if (configuration.service_worker_register) {
-    if (!registrationCache.has(serviceWorkerRelativeUrl)) {
-      registrationCache.set(
-        serviceWorkerRelativeUrl,
-        configuration.service_worker_register(serviceWorkerRelativeUrl),
+  try {
+    registration = await registrationCache.get(cacheKey)!;
+  } catch (error) {
+    if (isAbortError(error)) {
+      // Drop the rejected promise so a later call can attempt registration again
+      // once the browser is in a stable state (e.g. tab is foregrounded again).
+      registrationCache.delete(cacheKey);
+      console.warn(
+        'oidc-client: service worker registration was aborted (likely tab shutdown or backgrounding); falling back to non–service-worker mode.',
+        error,
       );
+      return null;
     }
-    registration = await registrationCache.get(serviceWorkerRelativeUrl)!;
-  } else {
-    if (!registrationCache.has(swUrl)) {
-      registrationCache.set(
-        swUrl,
-        navigator.serviceWorker.register(swUrl, {
-          updateViaCache: 'none',
-        }),
-      );
-    }
-    registration = await registrationCache.get(swUrl)!;
+    throw error;
   }
 
   const versionMismatchKey = `oidc.sw.version_mismatch_reload.${configurationName}`;
