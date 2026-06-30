@@ -1,4 +1,5 @@
 import { eventNames } from './events.js';
+import { OidcServerError, OidcSilentLoginTimeoutError } from './oidcError.js';
 import { Tokens } from './parseTokens.js';
 import { autoRenewTokens } from './renewTokens.js';
 import timer from './timer.js';
@@ -97,7 +98,12 @@ export const _silentLoginAsync =
                 } else if (data.startsWith(key_exception)) {
                   const result = JSON.parse(e.data.replace(key_exception, ''));
                   publishEvent(eventNames.silentLoginAsync_error, result);
-                  reject(new Error(result.error));
+                  // Preserve the original message text (the raw exception
+                  // string forwarded by the silent-login iframe) so that
+                  // existing consumers matching on `error.message` keep
+                  // working, while exposing a typed `OidcServerError` for
+                  // those who prefer `instanceof` / `error.code`.
+                  reject(new OidcServerError(result.error, undefined, result.error));
                   clear();
                 }
               }
@@ -113,7 +119,7 @@ export const _silentLoginAsync =
             if (!isResolved) {
               clear();
               publishEvent(eventNames.silentLoginAsync_error, { reason: 'timeout' });
-              reject(new Error('timeout'));
+              reject(new OidcSilentLoginTimeoutError());
             }
           }, silentSigninTimeout);
         } catch (e) {
