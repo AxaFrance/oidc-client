@@ -5,6 +5,20 @@ export { OidcLocation } from './location.js';
 export { getFetchDefault } from './oidc.js';
 export type { OidcUserInfo } from './oidcClient.js';
 export { OidcClient } from './oidcClient.js';
+export {
+  isOidcError,
+  isOidcLoginRequiredError,
+  isOidcServerError,
+  isOidcSilentLoginTimeoutError,
+  isOidcTokenRequestFailedError,
+  OidcError,
+  OidcErrorCode,
+  OidcLoginRequiredError,
+  OidcServerError,
+  OidcSilentLoginTimeoutError,
+  OidcTokenRequestFailedError,
+  TokenRequestFailedPhase,
+} from './oidcError.js';
 export { isOidcStateError, OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 export type { Tokens } from './parseTokens.js';
 export { TokenRenewMode } from './parseTokens.js';

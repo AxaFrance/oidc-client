@@ -5,6 +5,12 @@ import { initWorkerAsync } from './initWorker.js';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
 import { ILOidcLocation } from './location';
 import Oidc from './oidc';
+import {
+  OidcLoginRequiredError,
+  OidcServerError,
+  OidcTokenRequestFailedError,
+  TokenRequestFailedPhase,
+} from './oidcError.js';
 import { OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 import { isTokensOidcValid } from './parseTokens.js';
 import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests.js';
@@ -146,9 +152,17 @@ export const loginCallbackAsync =
       }
 
       if (queryParams.error || queryParams.error_description) {
-        throw new Error(
-          `Error from OIDC server: ${queryParams.error} - ${queryParams.error_description}`,
-        );
+        // Surface IdP errors as a typed `OidcServerError` (or its
+        // `OidcLoginRequiredError` specialization for the very common
+        // `login_required` case) so consumers can branch on `instanceof`
+        // / `error.code` instead of pattern-matching the message text.
+        // The original message format is preserved for backwards
+        // compatibility. See https://github.com/AxaFrance/oidc-client/issues/1676
+        const message = `Error from OIDC server: ${queryParams.error} - ${queryParams.error_description}`;
+        if (queryParams.error === 'login_required') {
+          throw new OidcLoginRequiredError(queryParams.error_description, message);
+        }
+        throw new OidcServerError(queryParams.error, queryParams.error_description, message);
       }
 
       if (queryParams.iss && queryParams.iss !== oidcServerConfiguration.issuer) {
@@ -233,7 +247,10 @@ export const loginCallbackAsync =
       );
 
       if (!tokenResponse.success) {
-        throw new Error('Token request failed');
+        // Typed so consumers can distinguish a login-callback failure from
+        // refresh / cross-tab-sync failures (which share the same message
+        // text). See https://github.com/AxaFrance/oidc-client/issues/1676
+        throw new OidcTokenRequestFailedError(TokenRequestFailedPhase.LOGIN_CALLBACK);
       }
 
       let loginParams;
