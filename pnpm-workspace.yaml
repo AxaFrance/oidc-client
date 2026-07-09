@@ -1,3 +1,9 @@
 packages:
   - 'packages/*'
   - 'examples/*'
+allowBuilds:
+  esbuild: true
+  msw: true
+  sharp: true
+minimumReleaseAgeExclude:
+  - prettier@3.9.5
