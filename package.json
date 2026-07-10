@@ -48,11 +48,11 @@
     "prettier": "^3.9.5",
     "tslib": "^2.8.1",
     "tsx": "4.23.0",
-    "typescript": "7.0.2",
+    "typescript": "6.0.3",
     "vitest": "4.1.10"
   },
   "engines": {
-    "node": ">= 20.19.0"
+    "node": ">= 22.13.0"
   },
   "packageManager": "pnpm@11.10.0"
 }
