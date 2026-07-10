@@ -10,7 +10,6 @@ on:
       - main
 
 env:
-  PNPM_VERSION: 8.6.11
   NODE_VERSION: 20
 jobs:
   skip_ci:
@@ -34,7 +33,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
       - name: pnpm install root
         run: pnpm i --frozen-lockfile
