@@ -31,28 +31,28 @@
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.59.3",
-    "@typescript-eslint/parser": "^8.59.3",
-    "eslint": "^10.4.0",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
+    "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-n": "^18.0.1",
+    "eslint-plugin-n": "^18.2.1",
     "eslint-plugin-no-only-tests": "^3.4.0",
-    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-regexp": "^3.1.0",
+    "eslint-plugin-regexp": "^3.1.1",
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-testing-library": "^7.16.2",
-    "prettier": "^3.8.3",
+    "prettier": "^3.9.5",
     "tslib": "^2.8.1",
-    "tsx": "4.22.0",
-    "typescript": "6.0.3",
-    "vitest": "4.1.6"
+    "tsx": "4.23.0",
+    "typescript": "7.0.2",
+    "vitest": "4.1.10"
   },
   "engines": {
     "node": ">= 20.19.0"
   },
-  "packageManager": "pnpm@8.6.11"
+  "packageManager": "pnpm@11.10.0"
 }
