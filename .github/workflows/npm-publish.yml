@@ -67,8 +67,8 @@ jobs:
 
       - name: Configure git identity
         run: |
-          git config --global user.name "GitHub"
-          git config --global user.email "github-action@bot.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
       - name: Determine Alpha, Beta or Release
         id: which_tag
