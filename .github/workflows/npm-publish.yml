@@ -65,7 +65,7 @@ jobs:
           token: ${{ secrets.GIT_TOKEN }}
           fetch-depth: 0
 
-      - name: Configure git identity
+      - name: Configure git identity for versioning and release commits
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
