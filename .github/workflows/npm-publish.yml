@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GIT_TOKEN }}
           fetch-depth: 0
 
       - name: Configure git identity for versioning and release commits
@@ -95,13 +95,13 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         uses: mathieudutour/github-tag-action@v6.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN  }}
+          github_token: ${{ secrets.GIT_TOKEN  }}
       - name: Bump version and push tag
         id: tag_version
         if: steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         uses: mathieudutour/github-tag-action@v6.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN  }}
+          github_token: ${{ secrets.GIT_TOKEN  }}
           dry_run: true
       - name: Compute new version number to publish
         id: tag
@@ -272,7 +272,7 @@ jobs:
      #    uses: sonarsource/sonarcloud-github-action@master
      #    if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.head.repo.fork
      #    env:
-     #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+     #      GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
      #      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
      #    with:
      #      args: >
