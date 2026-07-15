@@ -1,6 +1,35 @@
 # Changelog
 
-## 7.27.19
+## 7.27.23
+
+- [b2cf323](https://github.com/AxaFrance/oidc-client/commit/b2cf323be58da2c7e66d73fb7040dfddb0ab683f) - [skip ci] Update to version 7.27.23 in package.json, 2026-07-15 by *github-actions[bot]*
+
+
+## v7.27.23
+
+- [87081bb](https://github.com/AxaFrance/oidc-client/commit/87081bbcd041a85ae8f0161b0dd241fe4a8c0279) - 7.27.23, 2026-07-15 by *github-actions[bot]*
+- [ad4036a](https://github.com/AxaFrance/oidc-client/commit/ad4036a3de0626eccb8ecfc6f6c2e3ad1b79211b) - Update npm-publish.yml (release), 2026-07-15 by *Guillaume Chervet*
+
+
+## v7.27.22
+
+- [c2d1602](https://github.com/AxaFrance/oidc-client/commit/c2d1602ce489fad13c0cc0187692f6a90cbd1a72) - fix: replace expired GIT_TOKEN with GITHUB_TOKEN in build job checkout (#1714) (release), 2026-07-14 by *Copilot*
+- [80e720f](https://github.com/AxaFrance/oidc-client/commit/80e720f7773fd3f2bf98755cda433ec3bcbdd25a) - Fix publish workflow failure caused by missing git identity during versioning (#1713) (release), 2026-07-14 by *Copilot*
+
+
+## v7.27.21
+
+- [832173f](https://github.com/AxaFrance/oidc-client/commit/832173ffa24f7c8b65e2246fe07ac0bd13b641b2) - fix running linters (release) (#1711), 2026-07-11 by *Guillaume Chervet*
+- [e0d3c7b](https://github.com/AxaFrance/oidc-client/commit/e0d3c7bcdf324583868aa2c6d6ebca452c30ea09) - fix: bump Node.js to v22 and pin TypeScript to 6.0.3 to unblock CI linter (#1708), 2026-07-10 by *Copilot*
+
+
+## v7.27.20
+
+- [a8ce57d](https://github.com/AxaFrance/oidc-client/commit/a8ce57dd6ff970c6608c3f99a0fafc0264e654b7) - fix: fixes vulnarabilities by updating dependencies (#1706) (release), 2026-07-10 by *Pavan Kumar Jadda*
+- [afad266](https://github.com/AxaFrance/oidc-client/commit/afad2667d38f700a839fe6cfbff2a7ce9a02b792) - fix: remove hardcoded pnpm version from GitHub Actions workflows (#1707), 2026-07-10 by *Copilot*
+
+
+## v7.27.19
 
 - [de47006](https://github.com/AxaFrance/oidc-client/commit/de470065418f3c98099f5df0a039bc33392cb74d) - Handle service worker AbortError on tab shutdown to avoid uncaught rejections (#1702) (release), 2026-06-24 by *Guillaume Chervet*
 
@@ -274,33 +303,5 @@
 ## v7.22.29
 
 - [e297a7b](https://github.com/AxaFrance/oidc-client/commit/e297a7b5bd9d3eebb7cea443185039a7cb74d2f4) - fix(oidc): navigator locks null (#1466) (release), 2024-09-29 by *Guillaume Chervet*
-
-
-## v7.22.28
-
-- [346bdce](https://github.com/AxaFrance/oidc-client/commit/346bdce138a6b43ab4b31b56447161f9a6cdadeb) - fix(oidc): fetchWithTokens was using a snapshot of tokens (#1465) (release), 2024-09-29 by *Guillaume Chervet*
-
-
-## v7.22.27
-
-- [6354370](https://github.com/AxaFrance/oidc-client/commit/63543705c9b9a8182d47564bfc24a811c1f50e84) - fix(oidc): user reload time before expiration (release) (#1464), 2024-09-28 by *Guillaume Chervet*
-
-
-## v7.22.26
-
-- [10e7257](https://github.com/AxaFrance/oidc-client/commit/10e7257a0d2257bd8905b3b00ca1fe7ad757e74c) - fix(oidc): lock unexpected behavior (#1459) (release), 2024-09-27 by *Guillaume Chervet*
-
-
-## v7.22.25
-
-- [3a0d48e](https://github.com/AxaFrance/oidc-client/commit/3a0d48ea0d3609d31de0f45d6aebfb1a23b25e73) - fix(oidc): number timer increase (#1457) (release), 2024-09-26 by *Guillaume Chervet*
-
-
-## v7.22.24
-
-- [b34eabf](https://github.com/AxaFrance/oidc-client/commit/b34eabf39ce108f8de93a49f1a4d9ec6e46d642c) - refactor(all): update dependencies (#1446) (release), 2024-09-02 by *Guillaume Chervet*
-- [35081e1](https://github.com/AxaFrance/oidc-client/commit/35081e16b947ebd490b83a1f6d6b9dc101363736) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client into HEAD, 2024-08-25 by *Guillaume Chervet*
-- [70dd233](https://github.com/AxaFrance/oidc-client/commit/70dd233f69f2b2a9c5da4a2514e2cc657cf435a2) - Merge branch 'main' of https://github.com/AxaFrance/oidc-client, 2024-08-25 by *Guillaume Chervet*
-- [47f9de1](https://github.com/AxaFrance/oidc-client/commit/47f9de1f648838ae085c45a5dcd55687f80829c5) - fix(oidc): remove no-existing property add typings (release), 2024-08-25 by *Guillaume Chervet*
 
 
