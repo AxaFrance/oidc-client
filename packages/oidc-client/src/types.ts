@@ -2,6 +2,8 @@ export type Fetch = typeof window.fetch;
 
 export type LogoutToken = 'access_token' | 'refresh_token';
 
+export type PushedAuthorizationRequestMode = 'disabled' | 'auto' | 'required';
+
 export type ServiceWorkerUpdateRequireCallback = (
   registration: any,
   stopKeepAlive: () => void,
@@ -30,6 +32,8 @@ export type OidcConfiguration = {
   refresh_time_before_tokens_expiration_in_second?: number;
   token_automatic_renew_mode?: TokenAutomaticRenewMode;
   token_request_timeout?: number;
+  par?: PushedAuthorizationRequestMode;
+  par_request_timeout?: number;
   service_worker_relative_url?: string;
   service_worker_register?: ServiceWorkerRegister;
   service_worker_keep_alive_path?: string;
@@ -70,6 +74,8 @@ export interface AuthorityConfiguration {
   authorization_endpoint: string;
   token_endpoint: string;
   revocation_endpoint: string;
+  pushed_authorization_request_endpoint?: string;
+  require_pushed_authorization_requests?: boolean;
   end_session_endpoint?: string;
   userinfo_endpoint?: string;
   check_session_iframe?: string;

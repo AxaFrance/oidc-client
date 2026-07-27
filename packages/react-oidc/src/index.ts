@@ -9,15 +9,19 @@ export type {
   Fetch,
   ILOidcLocation,
   OidcConfiguration,
+  PushedAuthorizationRequestMode,
   StringMap,
 } from '@axa-fr/oidc-client';
 export type { OidcUserInfo } from '@axa-fr/oidc-client';
 export {
   isOidcStateError,
+  isPushedAuthorizationRequestError,
   OidcClient,
   OidcLocation,
   OidcStateError,
   OidcStateErrorCode,
+  PushedAuthorizationRequestError,
+  PushedAuthorizationRequestErrorCode,
   TokenAutomaticRenewMode,
   TokenRenewMode,
 } from '@axa-fr/oidc-client';

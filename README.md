@@ -37,6 +37,7 @@ Demos:
 
 - **Secure** :
   - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
+  - With optional [Pushed Authorization Requests (PAR)](./packages/oidc-client/README.md#pushed-authorization-requests-par), authorization parameters can be sent directly to the authorization server instead of through the browser URL
   - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
   - OIDC using client side Code Credential Grant with pkce only
 - **Lightweight** : Unpacked Size on npm is **274 kB**, Minified `61.1kB`, Minified+GZIPPED `16.8kB` [Pkg stats via Bundlephobia.com](https://bundlephobia.com/package/@axa-fr/react-oidc)

@@ -219,6 +219,8 @@ const configuration = {
       userinfo_endpoint: String,
       end_session_endpoint: String,
       revocation_endpoint: String,
+      pushed_authorization_request_endpoint: String,
+      require_pushed_authorization_requests: Boolean,
       check_session_iframe: String,
       issuer: String,
     },
@@ -233,6 +235,8 @@ const configuration = {
     withCustomHistory: Function, // Override history modification, return an instance with replaceState(url, stateHistory) implemented (like History.replaceState())
     authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in seconds of the openid well-known URL, default is 1 hour
     authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in milliseconds of the openid well-known URL, default is 10 seconds, then an error is thrown
+    par: 'disabled' | 'auto' | 'required', // Pushed Authorization Requests mode, default is 'disabled'
+    par_request_timeout: Number, // PAR endpoint timeout in milliseconds, default is 10000
     monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
     onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user with the same subject is logged out from another tab when session_monitor is active
     onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when a user is logged out from the same tab when session_monitor is active
@@ -278,6 +282,29 @@ const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPo
 
 
 ```
+
+### Pushed Authorization Requests (PAR)
+
+PAR is configured on the nested OIDC `configuration` object:
+
+```tsx
+const configuration = {
+  client_id: 'spa-client',
+  redirect_uri: `${window.location.origin}/authentication/callback`,
+  scope: 'openid profile',
+  authority: 'https://issuer.example.com',
+  par: 'auto', // 'disabled' (default), 'auto', or 'required'
+};
+```
+
+`auto` uses the discovered `pushed_authorization_request_endpoint` when it is
+available. `required` fails before navigation if no endpoint is available.
+Once PAR is selected, a PAR endpoint error is surfaced and never silently
+downgraded. Browser deployments require the issuer's PAR endpoint to allow
+CORS from the application origin. See the
+[`@axa-fr/oidc-client` PAR documentation](../oidc-client/README.md#pushed-authorization-requests-par)
+for complete mode semantics, custom authority metadata, error handling, and
+security guidance.
 
 ## How to consume
 

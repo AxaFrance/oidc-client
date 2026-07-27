@@ -160,6 +160,8 @@ const propTypes = {
       userinfo_endpoint: PropTypes.string,
       end_session_endpoint: PropTypes.string,
       revocation_endpoint: PropTypes.string,
+      pushed_authorization_request_endpoint: PropTypes.string,
+      require_pushed_authorization_requests: PropTypes.bool,
       check_session_iframe: PropTypes.string,
       issuer: PropTypes.string,
     }),
@@ -172,6 +174,8 @@ const propTypes = {
     withCustomHistory: PropTypes.function, // Override history modification, return instance with replaceState(url, stateHistory) implemented (like History.replaceState())
     authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in second of openid wellknowurl, default is 1 hour
     authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in millisecond of openid wellknowurl, default is 10 seconds, then error is throwed
+    par: PropTypes.oneOf(['disabled', 'auto', 'required']), // Pushed Authorization Requests mode, default is 'disabled'
+    par_request_timeout: PropTypes.number, // PAR endpoint timeout in milliseconds, default is 10000
     monitor_session: PropTypes.boolean, // Add OpenId monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
     onLogoutFromAnotherTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user with the same subject is logged out from another tab when session_monitor is active
     onLogoutFromSameTab: Function, // Optional, can be set to override the default behavior, this function is triggered when user is logged out from same tab when session_monitor is active

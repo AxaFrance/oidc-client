@@ -26,6 +26,17 @@ export {
   SW_CONTROLLER_CHANGE_RELOAD_COUNT_KEY,
   TOKEN_PLACEHOLDERS,
 } from './protocol.js';
+export {
+  isPushedAuthorizationRequestError,
+  PushedAuthorizationRequestError,
+  PushedAuthorizationRequestErrorCode,
+} from './pushedAuthorizationRequestError.js';
 export { getParseQueryStringFromLocation, getPath } from './route-utils';
-export type { AuthorityConfiguration, Fetch, OidcConfiguration, StringMap } from './types.js';
+export type {
+  AuthorityConfiguration,
+  Fetch,
+  OidcConfiguration,
+  PushedAuthorizationRequestMode,
+  StringMap,
+} from './types.js';
 export { TokenAutomaticRenewMode } from './types.js';
