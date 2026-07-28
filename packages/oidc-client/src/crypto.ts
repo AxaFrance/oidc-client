@@ -1,8 +1,11 @@
 import { uint8ToUrlBase64 } from './jwt';
 
+const getWebCrypto = () => (typeof globalThis !== 'undefined' ? globalThis.crypto : undefined);
+
 const cryptoInfo = () => {
-  const hasCrypto = typeof window !== 'undefined' && !!(window.crypto as any);
-  const hasSubtleCrypto = hasCrypto && !!(window.crypto.subtle as any);
+  const webCrypto = getWebCrypto();
+  const hasCrypto = !!webCrypto;
+  const hasSubtleCrypto = !!webCrypto?.subtle;
   return { hasCrypto, hasSubtleCrypto };
 };
 const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -18,15 +21,11 @@ const bufferToString = (buffer: Uint8Array) => {
 
 export const generateRandom = (size: number) => {
   const buffer = new Uint8Array(size);
-  const { hasCrypto } = cryptoInfo();
-  if (hasCrypto) {
-    window.crypto.getRandomValues(buffer);
-  } else {
-    // fall back to Math.random() if nothing else is available
-    for (let i = 0; i < size; i += 1) {
-      buffer[i] = (Math.random() * charset.length) | 0;
-    }
+  const webCrypto = getWebCrypto();
+  if (!webCrypto?.getRandomValues) {
+    throw new Error('Web Crypto API is unavailable; secure random values cannot be generated.');
   }
+  webCrypto.getRandomValues(buffer);
   return bufferToString(buffer);
 };
 

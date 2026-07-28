@@ -1,6 +1,6 @@
 import { startCheckSessionAsync as defaultStartCheckSessionAsync } from './checkSession.js';
 import { CheckSessionIFrame } from './checkSessionIFrame.js';
-import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
+import { base64urlOfHashOfASCIIEncodingAsync, generateRandom } from './crypto';
 import { eventNames } from './events.js';
 import { initSession } from './initSession.js';
 import { getTabId, initWorkerAsync } from './initWorker.js';
@@ -92,10 +92,6 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc): Promise<LoginCallbac
   return { callbackPath };
 };
 
-const getRandomInt = max => {
-  return Math.floor(Math.random() * max);
-};
-
 export class Oidc {
   public configuration: OidcConfiguration;
   public userInfo: null;
@@ -178,7 +174,7 @@ export class Oidc {
   }
 
   subscribeEvents(func): string {
-    const id = getRandomInt(9999999999999).toString();
+    const id = generateRandom(16);
     this.events.push({ id, func });
     return id;
   }
