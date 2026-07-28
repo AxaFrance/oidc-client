@@ -1,13 +1,21 @@
 # Changelog
 
-## 7.27.23
+## 7.28.0
 
+- [87ed38b](https://github.com/AxaFrance/oidc-client/commit/87ed38bb864af0d2db246e2c225facd7be7e4e8d) - [skip ci] Update to version 7.28.0 in package.json, 2026-07-28 by *github-actions[bot]*
+
+
+## v7.28.0
+
+- [69aa8f1](https://github.com/AxaFrance/oidc-client/commit/69aa8f1e50709aa11067429acfc178f5e5dce23f) - 7.28.0, 2026-07-28 by *github-actions[bot]*
+- [638eee8](https://github.com/AxaFrance/oidc-client/commit/638eee8ab1bbfecfadfb05d64217c2ecec9749be) - feat(oidc-client): PAR (#1718) (release), 2026-07-28 by *Guillaume Chervet*
+- [f90927c](https://github.com/AxaFrance/oidc-client/commit/f90927c21f9bd0f94dc537391186937978a21b3d) - [skip ci] Generate changelog to version 7.27.23, 2026-07-15 by *github-actions[bot]*
 - [b2cf323](https://github.com/AxaFrance/oidc-client/commit/b2cf323be58da2c7e66d73fb7040dfddb0ab683f) - [skip ci] Update to version 7.27.23 in package.json, 2026-07-15 by *github-actions[bot]*
+- [87081bb](https://github.com/AxaFrance/oidc-client/commit/87081bbcd041a85ae8f0161b0dd241fe4a8c0279) - 7.27.23, 2026-07-15 by *github-actions[bot]*
 
 
 ## v7.27.23
 
-- [87081bb](https://github.com/AxaFrance/oidc-client/commit/87081bbcd041a85ae8f0161b0dd241fe4a8c0279) - 7.27.23, 2026-07-15 by *github-actions[bot]*
 - [ad4036a](https://github.com/AxaFrance/oidc-client/commit/ad4036a3de0626eccb8ecfc6f6c2e3ad1b79211b) - Update npm-publish.yml (release), 2026-07-15 by *Guillaume Chervet*
 
 
@@ -298,10 +306,5 @@
 ## v7.22.30
 
 - [8c98b27](https://github.com/AxaFrance/oidc-client/commit/8c98b2701e1118538455816ca458062cfc07d716) - fix(oidc): remove missing console.log (#1472) (release), 2024-10-01 by *Guillaume Chervet*
-
-
-## v7.22.29
-
-- [e297a7b](https://github.com/AxaFrance/oidc-client/commit/e297a7b5bd9d3eebb7cea443185039a7cb74d2f4) - fix(oidc): navigator locks null (#1466) (release), 2024-09-29 by *Guillaume Chervet*
 
 
