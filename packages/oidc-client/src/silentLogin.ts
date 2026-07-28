@@ -1,4 +1,11 @@
 import { eventNames } from './events.js';
+import {
+  createOAuthError,
+  deserializeOidcError,
+  OidcError,
+  OidcErrorCode,
+  OidcErrorPhase,
+} from './oidcError.js';
 import { Tokens } from './parseTokens.js';
 import { autoRenewTokens } from './renewTokens.js';
 import timer from './timer.js';
@@ -7,6 +14,7 @@ export type SilentLoginResponse = {
   tokens: Tokens;
   sessionState: string;
   error: string;
+  oidcError?: OidcError;
 };
 
 export type PublishEventFunction = (eventName: string, eventData: any) => void;
@@ -16,6 +24,7 @@ export const _silentLoginAsync =
     configurationName: string,
     configuration: OidcConfiguration,
     publishEvent: PublishEventFunction,
+    phase: OidcErrorPhase = 'login',
   ) =>
   (
     extras: StringMap = null,
@@ -91,13 +100,27 @@ export const _silentLoginAsync =
                   clear();
                 } else if (data.startsWith(key_error)) {
                   const result = JSON.parse(e.data.replace(key_error, ''));
-                  publishEvent(eventNames.silentLoginAsync_error, result);
-                  resolve({ error: 'oidc_' + result.error, tokens: null, sessionState: null });
+                  const error =
+                    deserializeOidcError(result.oidcError) ??
+                    createOAuthError(
+                      result.error,
+                      result.error_description,
+                      `Error from OIDC server: ${result.error} - ${result.error_description}`,
+                      phase,
+                    );
+                  publishEvent(eventNames.silentLoginAsync_error, error);
+                  resolve({
+                    error: 'oidc_' + result.error,
+                    tokens: null,
+                    sessionState: null,
+                    oidcError: error,
+                  });
                   clear();
                 } else if (data.startsWith(key_exception)) {
                   const result = JSON.parse(e.data.replace(key_exception, ''));
-                  publishEvent(eventNames.silentLoginAsync_error, result);
-                  reject(new Error(result.error));
+                  const error = deserializeOidcError(result.oidcError) ?? new Error(result.error);
+                  publishEvent(eventNames.silentLoginAsync_error, error);
+                  reject(error);
                   clear();
                 }
               }
@@ -112,8 +135,12 @@ export const _silentLoginAsync =
           setTimeout(() => {
             if (!isResolved) {
               clear();
-              publishEvent(eventNames.silentLoginAsync_error, { reason: 'timeout' });
-              reject(new Error('timeout'));
+              const error = new OidcError(OidcErrorCode.SILENT_LOGIN_TIMEOUT, 'timeout', {
+                phase,
+                retryable: true,
+              });
+              publishEvent(eventNames.silentLoginAsync_error, error);
+              reject(error);
             }
           }, silentSigninTimeout);
         } catch (e) {

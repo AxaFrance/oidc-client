@@ -1,11 +1,18 @@
-﻿import Oidc from './oidc';
+﻿import { eventNames } from './events';
+import Oidc from './oidc';
+import { createNetworkError, OidcError, OidcErrorCode, OidcErrorPhase } from './oidcError';
 import { getValidTokenAsync, OidcToken } from './parseTokens';
 import { syncTokensInfoAsync } from './renewTokens';
 import { Fetch } from './types';
 
 // @ts-ignore
 export const fetchWithTokens =
-  (fetch: Fetch, oidc: Oidc | null, demonstrating_proof_of_possession: boolean = false): Fetch =>
+  (
+    fetch: Fetch,
+    oidc: Oidc | null,
+    demonstrating_proof_of_possession: boolean = false,
+    phase: OidcErrorPhase = 'api_request',
+  ): Fetch =>
   async (...params: Parameters<Fetch>): Promise<Response> => {
     const [url, options, ...rest] = params;
     const optionTmp = options ? { ...options } : { method: 'GET' };
@@ -62,5 +69,34 @@ export const fetchWithTokens =
       }
     }
     const newOptions = { ...optionTmp, headers };
-    return await fetch(url, newOptions, ...rest);
+    let response: Response;
+    try {
+      response = await fetch(url, newOptions, ...rest);
+    } catch (cause) {
+      const error = createNetworkError(cause, phase);
+      if (phase === 'api_request') {
+        oidc.publishEvent(eventNames.apiRequest_error, error);
+      }
+      throw error;
+    }
+
+    if (
+      !response.ok &&
+      response.headers?.has('DPoP-Nonce') &&
+      (response.status === 400 ||
+        response.status === 401 ||
+        response.headers.get('WWW-Authenticate')?.includes('use_dpop_nonce'))
+    ) {
+      const error = new OidcError(OidcErrorCode.DPOP_NONCE_REQUIRED, 'DPoP nonce required', {
+        phase,
+        retryable: true,
+        status: response.status,
+        oauthError: 'use_dpop_nonce',
+      });
+      if (phase === 'api_request') {
+        oidc.publishEvent(eventNames.apiRequest_error, error);
+      }
+    }
+
+    return response;
   };

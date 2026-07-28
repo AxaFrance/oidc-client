@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { eventNames } from './events';
 import { ILOidcLocation } from './location';
 import { clearSessionAsync, logoutAsync } from './logout';
+import { OidcErrorCode } from './oidcError';
 
 describe('Logout test suite', () => {
   const expectedFinalUrl =
@@ -293,6 +294,63 @@ describe('Logout test suite', () => {
 
     expect(navigated).toBe(false);
     expect(events).toContain(eventNames.logout_from_same_tab);
+    expect(oidc.isLoggingOut).toBe(false);
+  });
+
+  it('keeps revocation best-effort and publishes a typed logout error', async () => {
+    const events: Array<{ name: string; data: any }> = [];
+    const oidc: any = {
+      configuration: {
+        authority: 'http://api',
+        client_id: 'client',
+        logout_tokens_to_invalidate: ['access_token'],
+      },
+      tokens: {
+        accessToken: 'access-token',
+        idToken: 'id-token',
+        idTokenPayload: { sub: 'subject' },
+      },
+      isLoggingOut: false,
+      initAsync: vi.fn(async () => ({
+        revocationEndpoint: 'http://api/revoke',
+      })),
+      destroyAsync: vi.fn(async () => {
+        oidc.tokens = null;
+      }),
+      logoutSameTabAsync: vi.fn(),
+      publishEvent: (name: string, data: unknown) => events.push({ name, data }),
+    };
+    const location: ILOidcLocation = {
+      getCurrentHref: () => '',
+      getOrigin: () => 'http://client',
+      getPath: () => '/',
+      open: vi.fn(),
+      reload: vi.fn(),
+    };
+    const fetchMock = vi.fn(async () => {
+      return new Response(JSON.stringify({ error: 'temporarily_unavailable' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    });
+
+    await logoutAsync(
+      oidc,
+      { default: oidc },
+      fetchMock,
+      console,
+      location,
+    )(null, {
+      'no_reload:oidc': 'true',
+    });
+
+    expect(events.find(event => event.name === eventNames.logoutAsync_error)?.data).toMatchObject({
+      code: OidcErrorCode.REQUEST_FAILED,
+      phase: 'logout',
+      retryable: true,
+      status: 503,
+      oauthError: 'temporarily_unavailable',
+    });
     expect(oidc.isLoggingOut).toBe(false);
   });
 

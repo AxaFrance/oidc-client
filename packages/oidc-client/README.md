@@ -510,6 +510,57 @@ pnpm start
 
 ```
 
+## Strongly typed OIDC errors
+
+Known authentication, callback, refresh and network failures are exposed as
+`OidcError`. Its stable `code` and `phase` fields can be inspected without
+matching the human-readable `message`; existing messages remain unchanged.
+
+```ts
+import { OidcError, OidcErrorCode } from '@axa-fr/oidc-client';
+
+try {
+  await oidcClient.loginCallbackAsync();
+} catch (error) {
+  if (error instanceof OidcError && error.code === OidcErrorCode.LOGIN_REQUIRED) {
+    await oidcClient.loginAsync();
+  }
+}
+```
+
+Automatic renewal and the existing `renewTokensAsync` method remain
+non-throwing for terminal OIDC failures. Use the strict variant when the caller
+needs a rejected promise:
+
+```ts
+try {
+  const tokens = await oidcClient.renewTokensOrThrowAsync();
+} catch (error) {
+  if (error instanceof OidcError) {
+    console.error(error.code, error.phase, error.retryable);
+  }
+}
+```
+
+Failures from intentionally non-throwing flows are also provided to event
+subscribers. Existing event payload fields are preserved; refresh payloads add
+an `error` field, while user-info, logout and protected API failures use their
+dedicated error events.
+
+```ts
+oidcClient.subscribeEvents((name, data) => {
+  const error = data instanceof OidcError ? data : data?.error;
+  if (error instanceof OidcError) {
+    console.error(name, error.code, error.status);
+  }
+});
+```
+
+`retryable` means that retrying automatically, without user interaction, may
+succeed. For example, network failures, HTTP 408/429/5xx responses and DPoP
+nonce challenges are retryable; `login_required` requires an interactive
+login and is therefore not.
+
 ## Handling missing or corrupted login state
 
 When the OIDC state or nonce is missing from storage at callback time (for

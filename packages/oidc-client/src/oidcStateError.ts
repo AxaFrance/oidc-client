@@ -1,3 +1,5 @@
+import { OidcError, OidcErrorCode as BaseOidcErrorCode, OidcErrorPhase } from './oidcError.js';
+
 /**
  * Stable, machine-readable codes for OIDC state / nonce failures occurring
  * between the authorization redirect and the callback handling.
@@ -28,13 +30,19 @@ export type OidcStateErrorCode = (typeof OidcStateErrorCode)[keyof typeof OidcSt
  * Consumers can use `instanceof OidcStateError` and inspect `code` instead of
  * relying on the (unstable) error message text.
  */
-export class OidcStateError extends Error {
-  readonly code: OidcStateErrorCode;
+export class OidcStateError extends OidcError {
+  declare readonly code: OidcStateErrorCode;
 
-  constructor(code: OidcStateErrorCode, message: string) {
-    super(message);
+  constructor(
+    code: OidcStateErrorCode,
+    message: string,
+    phase: Extract<OidcErrorPhase, 'callback' | 'refresh'> = 'callback',
+  ) {
+    super(code as BaseOidcErrorCode, message, {
+      phase,
+      retryable: false,
+    });
     this.name = 'OidcStateError';
-    this.code = code;
 
     // Keep prototype chain intact when transpiled to ES5.
     Object.setPrototypeOf(this, OidcStateError.prototype);

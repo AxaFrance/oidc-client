@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { OidcError } from './oidcError';
 import { isOidcStateError, OidcStateError, OidcStateErrorCode } from './oidcStateError';
 
 describe('OidcStateError', () => {
@@ -12,6 +13,7 @@ describe('OidcStateError', () => {
   it('is an Error subclass with name "OidcStateError"', () => {
     const err = new OidcStateError(OidcStateErrorCode.STATE_MISSING, 'missing');
     expect(err).toBeInstanceOf(Error);
+    expect(err).toBeInstanceOf(OidcError);
     expect(err).toBeInstanceOf(OidcStateError);
     expect(err.name).toBe('OidcStateError');
   });
@@ -20,6 +22,8 @@ describe('OidcStateError', () => {
     const err = new OidcStateError(OidcStateErrorCode.STATE_MISMATCH, 'mismatch happened');
     expect(err.code).toBe('STATE_MISMATCH');
     expect(err.message).toBe('mismatch happened');
+    expect(err.phase).toBe('callback');
+    expect(err.retryable).toBe(false);
   });
 
   it('is detectable via isOidcStateError', () => {

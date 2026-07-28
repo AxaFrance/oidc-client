@@ -8,6 +8,7 @@ import {
 import {
   performAuthorizationRequestAsync,
   performPushedAuthorizationRequestAsync,
+  performTokenRequestAsync,
 } from './requests';
 import { Fetch } from './types';
 
@@ -229,6 +230,67 @@ describe('performAuthorizationRequestAsync', () => {
     expect(Object.fromEntries(redirect.searchParams)).toEqual({
       client_id: 'client',
       request_uri: 'urn:ietf:params:oauth:request_uri:abc/123',
+    });
+  });
+});
+
+describe('token endpoint error details', () => {
+  it('preserves OAuth details, HTTP status and the DPoP nonce on a non-2xx response', async () => {
+    const fetchMock = vi.fn(async () => {
+      return new Response(
+        JSON.stringify({
+          error: 'use_dpop_nonce',
+          error_description: 'A fresh proof is required',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'DPoP-Nonce': 'server-nonce',
+          },
+        },
+      );
+    });
+
+    const response = await performTokenRequestAsync(asFetch(fetchMock))(
+      'https://issuer.example.com/token',
+      { grant_type: 'refresh_token' },
+      {},
+      null,
+      { DPoP: 'proof' },
+      'access_token_or_id_token_invalid',
+    );
+
+    expect(response).toMatchObject({
+      success: false,
+      status: 400,
+      oauthError: 'use_dpop_nonce',
+      oauthErrorDescription: 'A fresh proof is required',
+      demonstratingProofOfPossessionNonce: 'server-nonce',
+    });
+  });
+
+  it.each([408, 429, 500])('preserves retryable HTTP status %s for the caller', async status => {
+    const fetchMock = vi.fn(async () => {
+      return new Response(JSON.stringify({ error: 'temporarily_unavailable' }), {
+        status,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    });
+
+    const response = await performTokenRequestAsync(asFetch(fetchMock))(
+      'https://issuer.example.com/token',
+      { grant_type: 'refresh_token' },
+      {},
+      null,
+      {},
+      'access_token_or_id_token_invalid',
+    );
+
+    expect(response).toMatchObject({
+      success: false,
+      status,
+      oauthError: 'temporarily_unavailable',
     });
   });
 });

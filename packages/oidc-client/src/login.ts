@@ -5,6 +5,15 @@ import { initWorkerAsync } from './initWorker.js';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
 import { ILOidcLocation } from './location';
 import Oidc from './oidc';
+import {
+  createNetworkError,
+  createOAuthError,
+  isNetworkErrorCause,
+  isOidcError,
+  isRetryableHttpStatus,
+  OidcError,
+  OidcErrorCode,
+} from './oidcError.js';
 import { OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 import { isTokensOidcValid } from './parseTokens.js';
 import {
@@ -123,8 +132,11 @@ export const defaultLoginAsync =
           pushedAuthorizationRequest,
         );
       } catch (exception) {
-        publishEvent(eventNames.loginAsync_error, exception);
-        throw exception;
+        const error = isNetworkErrorCause(exception)
+          ? createNetworkError(exception, 'login')
+          : exception;
+        publishEvent(eventNames.loginAsync_error, error);
+        throw error;
       }
     };
     return loginLocalAsync();
@@ -176,8 +188,11 @@ export const loginCallbackAsync =
       }
 
       if (queryParams.error || queryParams.error_description) {
-        throw new Error(
+        throw createOAuthError(
+          queryParams.error,
+          queryParams.error_description,
           `Error from OIDC server: ${queryParams.error} - ${queryParams.error_description}`,
+          isSilentSignin ? 'refresh' : 'callback',
         );
       }
 
@@ -195,12 +210,14 @@ export const loginCallbackAsync =
           throw new OidcStateError(
             OidcStateErrorCode.STATE_MISSING,
             'OIDC state is missing from storage. The login state may have been cleared between the authorization redirect and the callback (e.g., private browsing, storage cleared, or browser eviction).',
+            isSilentSignin ? 'refresh' : 'callback',
           );
         }
         if (queryParams.state !== state) {
           throw new OidcStateError(
             OidcStateErrorCode.STATE_MISMATCH,
             `OIDC state does not match the stored one (expected: ${state}, received: ${queryParams.state}).`,
+            isSilentSignin ? 'refresh' : 'callback',
           );
         }
       }
@@ -208,6 +225,7 @@ export const loginCallbackAsync =
         throw new OidcStateError(
           OidcStateErrorCode.NONCE_MISSING,
           'OIDC nonce is missing from storage. The login state may have been cleared between the authorization redirect and the callback (e.g., private browsing, storage cleared, or browser eviction).',
+          isSilentSignin ? 'refresh' : 'callback',
         );
       }
 
@@ -235,11 +253,12 @@ export const loginCallbackAsync =
 
       const url = oidcServerConfiguration.tokenEndpoint;
       const headersExtras = {};
+      let demonstratingProofOfPossessionJwk;
       if (configuration.demonstrating_proof_of_possession) {
         if (serviceWorker) {
           headersExtras['DPoP'] = `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${oidc.configurationName}`;
         } else {
-          const jwk = await generateJwkAsync(window)(
+          demonstratingProofOfPossessionJwk = await generateJwkAsync(window)(
             configuration.demonstrating_proof_of_possession_configuration.generateKeyAlgorithm,
           );
           const session = initSession(
@@ -247,23 +266,65 @@ export const loginCallbackAsync =
             configuration.storage,
             configuration.login_state_storage ?? configuration.storage,
           );
-          await session.setDemonstratingProofOfPossessionJwkAsync(jwk);
+          await session.setDemonstratingProofOfPossessionJwkAsync(
+            demonstratingProofOfPossessionJwk,
+          );
           headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(window)(
             configuration.demonstrating_proof_of_possession_configuration,
-          )(jwk, 'POST', url);
+          )(demonstratingProofOfPossessionJwk, 'POST', url);
         }
       }
 
-      const tokenResponse = await performFirstTokenRequestAsync(storage)(
+      let tokenResponse = await performFirstTokenRequestAsync(storage)(
         url,
         { ...data, ...extras },
         headersExtras,
         oidc.configuration.token_renew_mode,
         tokenRequestTimeout,
+        configuration.demonstrating_proof_of_possession,
       );
 
+      if (
+        !tokenResponse.success &&
+        tokenResponse.oauthError === 'use_dpop_nonce' &&
+        tokenResponse.demonstratingProofOfPossessionNonce &&
+        configuration.demonstrating_proof_of_possession
+      ) {
+        await storage.setDemonstratingProofOfPossessionNonce(
+          tokenResponse.demonstratingProofOfPossessionNonce,
+        );
+        if (!serviceWorker) {
+          headersExtras['DPoP'] = await generateJwtDemonstratingProofOfPossessionAsync(window)(
+            configuration.demonstrating_proof_of_possession_configuration,
+          )(demonstratingProofOfPossessionJwk, 'POST', url, {
+            nonce: tokenResponse.demonstratingProofOfPossessionNonce,
+          });
+        }
+        tokenResponse = await performFirstTokenRequestAsync(storage)(
+          url,
+          { ...data, ...extras },
+          headersExtras,
+          oidc.configuration.token_renew_mode,
+          tokenRequestTimeout,
+        );
+      } else if (!tokenResponse.success && configuration.demonstrating_proof_of_possession) {
+        await Promise.all([storage.setCodeVerifierAsync(null), storage.setStateAsync(null)]);
+      }
+
       if (!tokenResponse.success) {
-        throw new Error('Token request failed');
+        const code =
+          tokenResponse.oauthError === 'use_dpop_nonce'
+            ? OidcErrorCode.DPOP_NONCE_REQUIRED
+            : OidcErrorCode.TOKEN_REQUEST_FAILED;
+        throw new OidcError(code, 'Token request failed', {
+          phase: isSilentSignin ? 'refresh' : 'callback',
+          retryable:
+            code === OidcErrorCode.DPOP_NONCE_REQUIRED ||
+            isRetryableHttpStatus(tokenResponse.status),
+          status: tokenResponse.status,
+          oauthError: tokenResponse.oauthError,
+          oauthErrorDescription: tokenResponse.oauthErrorDescription,
+        });
       }
 
       let loginParams;
@@ -273,7 +334,10 @@ export const loginCallbackAsync =
 
       // @ts-ignore
       if (tokenResponse.data.state !== extras.state) {
-        throw new Error('state is not valid');
+        throw new OidcError(OidcErrorCode.INVALID_STATE, 'state is not valid', {
+          phase: isSilentSignin ? 'refresh' : 'callback',
+          retryable: false,
+        });
       }
       const { isValid, reason } = isTokensOidcValid(
         formattedTokens,
@@ -281,7 +345,14 @@ export const loginCallbackAsync =
         oidcServerConfiguration,
       );
       if (!isValid) {
-        throw new Error(`Tokens are not OpenID valid, reason: ${reason}`);
+        const message = `Tokens are not OpenID valid, reason: ${reason}`;
+        if (reason.startsWith('Nonce does not match')) {
+          throw new OidcError(OidcErrorCode.INVALID_NONCE, message, {
+            phase: isSilentSignin ? 'refresh' : 'callback',
+            retryable: false,
+          });
+        }
+        throw new Error(message);
       }
 
       if (serviceWorker) {
@@ -337,8 +408,12 @@ export const loginCallbackAsync =
         extras: loginParams.extras,
       };
     } catch (exception) {
-      console.error(exception);
-      oidc.publishEvent(eventNames.loginCallbackAsync_error, exception);
-      throw exception;
+      const error =
+        !isOidcError(exception) && isNetworkErrorCause(exception)
+          ? createNetworkError(exception, isSilentSignin ? 'refresh' : 'callback')
+          : exception;
+      console.error(error);
+      oidc.publishEvent(eventNames.loginCallbackAsync_error, error);
+      throw error;
     }
   };

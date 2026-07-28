@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ILOidcLocation } from './location';
 import { loginCallbackAsync } from './login';
+import { OidcError, OidcErrorCode } from './oidcError';
 import { OidcStateError, OidcStateErrorCode } from './oidcStateError';
 
 const makeStorage = (): Storage => {
@@ -147,5 +148,38 @@ describe('loginCallbackAsync — state/nonce guards (issue #1678)', () => {
     }
     expect(caught).toBeInstanceOf(OidcStateError);
     expect(caught).not.toBeInstanceOf(TypeError);
+  });
+});
+
+describe('loginCallbackAsync — OAuth errors', () => {
+  it.each([
+    ['login_required', OidcErrorCode.LOGIN_REQUIRED],
+    ['consent_required', OidcErrorCode.CONSENT_REQUIRED],
+    ['interaction_required', OidcErrorCode.INTERACTION_REQUIRED],
+    ['access_denied', OidcErrorCode.OAUTH_ERROR],
+  ] as const)('throws a typed %s callback error', async (oauthError, code) => {
+    const storage = makeStorage();
+    const description = 'Authentication is required';
+    const href = `http://localhost:4200/authentication/callback?error=${oauthError}&error_description=${encodeURIComponent(description)}`;
+    const { oidc, publishedEvents } = buildOidc({ href, storage });
+
+    let caught: unknown;
+    try {
+      await loginCallbackAsync(oidc)();
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).toBeInstanceOf(OidcError);
+    expect(caught).toMatchObject({
+      code,
+      phase: 'callback',
+      oauthError,
+      oauthErrorDescription: description,
+      message: `Error from OIDC server: ${oauthError} - ${description}`,
+    });
+    expect(publishedEvents.find(event => event.name === 'loginCallbackAsync_error')?.data).toBe(
+      caught,
+    );
   });
 });
