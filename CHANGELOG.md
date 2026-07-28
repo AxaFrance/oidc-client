@@ -1,13 +1,21 @@
 # Changelog
 
-## 7.28.0
+## 7.28.1
 
+- [84bbd03](https://github.com/AxaFrance/oidc-client/commit/84bbd033197363e00aecfd92e78f3dd8f2806d22) - [skip ci] Update to version 7.28.1 in package.json, 2026-07-28 by *github-actions[bot]*
+
+
+## v7.28.1
+
+- [c144177](https://github.com/AxaFrance/oidc-client/commit/c14417787846f0bf6079c54c2baf61900353aeff) - 7.28.1, 2026-07-28 by *github-actions[bot]*
+- [8de7e31](https://github.com/AxaFrance/oidc-client/commit/8de7e316cc14d3f420808e36fb390c4e99b3cc65) - fix(all): remove Math.random (release) (#1719), 2026-07-28 by *Guillaume Chervet*
+- [c1235d2](https://github.com/AxaFrance/oidc-client/commit/c1235d2ab53c11faa3275112e345130252ae87aa) - [skip ci] Generate changelog to version 7.28.0, 2026-07-28 by *github-actions[bot]*
 - [87ed38b](https://github.com/AxaFrance/oidc-client/commit/87ed38bb864af0d2db246e2c225facd7be7e4e8d) - [skip ci] Update to version 7.28.0 in package.json, 2026-07-28 by *github-actions[bot]*
+- [69aa8f1](https://github.com/AxaFrance/oidc-client/commit/69aa8f1e50709aa11067429acfc178f5e5dce23f) - 7.28.0, 2026-07-28 by *github-actions[bot]*
 
 
 ## v7.28.0
 
-- [69aa8f1](https://github.com/AxaFrance/oidc-client/commit/69aa8f1e50709aa11067429acfc178f5e5dce23f) - 7.28.0, 2026-07-28 by *github-actions[bot]*
 - [638eee8](https://github.com/AxaFrance/oidc-client/commit/638eee8ab1bbfecfadfb05d64217c2ecec9749be) - feat(oidc-client): PAR (#1718) (release), 2026-07-28 by *Guillaume Chervet*
 - [f90927c](https://github.com/AxaFrance/oidc-client/commit/f90927c21f9bd0f94dc537391186937978a21b3d) - [skip ci] Generate changelog to version 7.27.23, 2026-07-15 by *github-actions[bot]*
 - [b2cf323](https://github.com/AxaFrance/oidc-client/commit/b2cf323be58da2c7e66d73fb7040dfddb0ab683f) - [skip ci] Update to version 7.27.23 in package.json, 2026-07-15 by *github-actions[bot]*
@@ -301,10 +309,5 @@
 ## v7.22.31
 
 - [cc731c1](https://github.com/AxaFrance/oidc-client/commit/cc731c15f1d72ce4d21a7958ca15128ae1dcdd89) - fix(oidc): force sw update when new registration appears (release) (#1449), 2024-10-02 by *wermanoid*
-
-
-## v7.22.30
-
-- [8c98b27](https://github.com/AxaFrance/oidc-client/commit/8c98b2701e1118538455816ca458062cfc07d716) - fix(oidc): remove missing console.log (#1472) (release), 2024-10-01 by *Guillaume Chervet*
 
 
