@@ -22,12 +22,7 @@ export const OidcErrorCode = {
 export type OidcErrorCode = (typeof OidcErrorCode)[keyof typeof OidcErrorCode];
 
 export type OidcErrorPhase =
-  | 'login'
-  | 'callback'
-  | 'refresh'
-  | 'logout'
-  | 'userinfo'
-  | 'api_request';
+  'login' | 'callback' | 'refresh' | 'logout' | 'userinfo' | 'api_request';
 
 export type OidcErrorOptions = {
   phase: OidcErrorPhase;
