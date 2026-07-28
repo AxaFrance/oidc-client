@@ -23,6 +23,7 @@ const configuration = {
   silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore the session
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
 };
 
 const onEvent = (configurationName, eventName, data) => {

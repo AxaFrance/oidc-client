@@ -119,6 +119,7 @@ const configuration = {
   silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
   scope: 'openid profile email api offline_access', // offline_access scope allow your client to retrieve the refresh_token
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
   service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
 };
@@ -558,6 +559,7 @@ const configuration = {
   silent_redirect_uri: 'http://localhost:3001/#authentication/silent-callback', // Optional activate silent-login that use cookies between OIDC server and client javascript to restore the session
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
 };
 
 const onEvent = (configurationName, eventName, data) => {
@@ -607,6 +609,7 @@ export const configurationIdentityServerWithHash = {
   silent_redirect_uri: window.location.origin + '#authentication-silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
   refresh_time_before_tokens_expiration_in_second: 70,
   service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,

@@ -147,6 +147,7 @@ export const configuration = {
   silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
   service_worker_relative_url: '/OidcServiceWorker.js', // just comment that line to disable service worker mode
   service_worker_only: false,
   demonstrating_proof_of_possession: false,
@@ -597,6 +598,7 @@ export const configurationIdentityServerWithHash = {
   silent_redirect_uri: window.location.origin + '#authentication-silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
   refresh_time_before_tokens_expiration_in_second: 70,
   service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,
