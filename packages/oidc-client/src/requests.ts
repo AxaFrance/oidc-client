@@ -3,6 +3,10 @@ import { deriveChallengeAsync, generateRandom } from './crypto.js';
 import { ILOidcLocation } from './location';
 import { OidcAuthorizationServiceConfiguration } from './oidc.js';
 import { parseOriginalTokens } from './parseTokens.js';
+import {
+  PushedAuthorizationRequestError,
+  PushedAuthorizationRequestErrorCode,
+} from './pushedAuthorizationRequestError.js';
 import { Fetch, StringMap } from './types.js';
 
 const oneHourSecond = 60 * 60;
@@ -39,8 +43,12 @@ const internalFetch =
     let response;
     try {
       const controller = new AbortController();
-      setTimeout(() => controller.abort(), timeoutMs);
-      response = await fetch(url, { ...headers, signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        response = await fetch(url, { ...headers, signal: controller.signal });
+      } finally {
+        clearTimeout(timeoutId);
+      }
     } catch (e: any) {
       if (e.name === 'AbortError' || e.message === 'Network request failed') {
         if (numberRetry <= 1) {
@@ -116,6 +124,99 @@ type PerformTokenRequestResponse = {
   demonstratingProofOfPossessionNonce?: string;
 };
 
+export type PushedAuthorizationRequestResponse = {
+  request_uri: string;
+  expires_in: number;
+};
+
+const getResponseJsonAsync = async (response: Response): Promise<any> => {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+};
+
+export const performPushedAuthorizationRequestAsync =
+  (fetch: Fetch) =>
+  async (
+    url: string,
+    details: StringMap,
+    timeoutMs = 10000,
+  ): Promise<PushedAuthorizationRequestResponse> => {
+    if (details.request_uri !== undefined) {
+      throw new PushedAuthorizationRequestError(
+        PushedAuthorizationRequestErrorCode.REQUEST_FAILED,
+        'The request_uri parameter must not be included in a pushed authorization request.',
+      );
+    }
+
+    const formBody = [];
+    for (const property in details) {
+      const encodedKey = encodeURIComponent(property);
+      const encodedValue = encodeURIComponent(details[property]);
+      formBody.push(`${encodedKey}=${encodedValue}`);
+    }
+
+    let response: Response;
+    try {
+      response = await internalFetch(fetch)(
+        url,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          },
+          body: formBody.join('&'),
+        },
+        timeoutMs,
+      );
+    } catch (cause) {
+      throw new PushedAuthorizationRequestError(
+        PushedAuthorizationRequestErrorCode.REQUEST_FAILED,
+        'The pushed authorization request could not be sent.',
+        { cause },
+      );
+    }
+
+    const data = await getResponseJsonAsync(response);
+    if (response.status !== 201) {
+      const oauthError = typeof data?.error === 'string' ? data.error : undefined;
+      const oauthErrorDescription =
+        typeof data?.error_description === 'string' ? data.error_description : undefined;
+      const serverError = [oauthError, oauthErrorDescription].filter(Boolean).join(': ');
+      throw new PushedAuthorizationRequestError(
+        PushedAuthorizationRequestErrorCode.REQUEST_FAILED,
+        `The pushed authorization request failed with HTTP status ${response.status}${
+          serverError ? ` (${serverError})` : ''
+        }.`,
+        {
+          status: response.status,
+          oauthError,
+          oauthErrorDescription,
+        },
+      );
+    }
+
+    if (
+      typeof data?.request_uri !== 'string' ||
+      data.request_uri.length === 0 ||
+      !Number.isInteger(data?.expires_in) ||
+      data.expires_in <= 0
+    ) {
+      throw new PushedAuthorizationRequestError(
+        PushedAuthorizationRequestErrorCode.INVALID_RESPONSE,
+        'The pushed authorization response must contain a non-empty request_uri and a positive integer expires_in.',
+        { status: response.status },
+      );
+    }
+
+    return {
+      request_uri: data.request_uri,
+      expires_in: data.expires_in,
+    };
+  };
+
 export const performTokenRequestAsync =
   (fetch: Fetch) =>
   async (
@@ -177,7 +278,16 @@ export const performTokenRequestAsync =
   };
 
 export const performAuthorizationRequestAsync =
-  (storage: any, oidcLocation: ILOidcLocation) => async (url, extras: StringMap) => {
+  (storage: any, oidcLocation: ILOidcLocation) =>
+  async (
+    url,
+    extras: StringMap,
+    pushedAuthorizationRequest?: {
+      endpoint: string;
+      fetch: Fetch;
+      timeoutMs?: number;
+    },
+  ) => {
     extras = extras ? { ...extras } : {};
     const codeVerifier = generateRandom(128);
     const codeChallenge = await deriveChallengeAsync(codeVerifier);
@@ -185,6 +295,19 @@ export const performAuthorizationRequestAsync =
     await storage.setStateAsync(extras.state);
     extras.code_challenge = codeChallenge;
     extras.code_challenge_method = 'S256';
+
+    if (pushedAuthorizationRequest) {
+      const response = await performPushedAuthorizationRequestAsync(
+        pushedAuthorizationRequest.fetch,
+      )(pushedAuthorizationRequest.endpoint, extras, pushedAuthorizationRequest.timeoutMs);
+      oidcLocation.open(
+        `${url}?client_id=${encodeURIComponent(extras.client_id)}&request_uri=${encodeURIComponent(
+          response.request_uri,
+        )}`,
+      );
+      return;
+    }
+
     let queryString = '';
     if (extras) {
       for (const [key, value] of Object.entries(extras)) {

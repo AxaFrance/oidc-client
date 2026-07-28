@@ -7,9 +7,13 @@ import { ILOidcLocation } from './location';
 import Oidc from './oidc';
 import { OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 import { isTokensOidcValid } from './parseTokens.js';
+import {
+  PushedAuthorizationRequestError,
+  PushedAuthorizationRequestErrorCode,
+} from './pushedAuthorizationRequestError.js';
 import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests.js';
 import { getParseQueryStringFromLocation } from './route-utils.js';
-import { OidcConfiguration, StringMap } from './types.js';
+import { Fetch, OidcConfiguration, StringMap } from './types.js';
 
 export type InitAsyncFunction = (authority: string, authorityConfiguration: any) => Promise<any>;
 
@@ -20,6 +24,7 @@ export const defaultLoginAsync =
     publishEvent: (string, any) => void,
     initAsync: InitAsyncFunction,
     oidcLocation: ILOidcLocation,
+    getFetch: () => Fetch = () => window.fetch,
   ) =>
   (
     callbackPath: string = undefined,
@@ -88,9 +93,34 @@ export const defaultLoginAsync =
           response_type: 'code',
           ...extraFinal,
         };
+
+        const parMode = configuration.par ?? 'disabled';
+        const pushedAuthorizationRequestEndpoint =
+          oidcServerConfiguration.pushedAuthorizationRequestEndpoint;
+        const serverRequiresPar = oidcServerConfiguration.requirePushedAuthorizationRequests;
+        if (
+          !pushedAuthorizationRequestEndpoint &&
+          (parMode === 'required' || (parMode === 'auto' && serverRequiresPar))
+        ) {
+          throw new PushedAuthorizationRequestError(
+            PushedAuthorizationRequestErrorCode.ENDPOINT_UNAVAILABLE,
+            'Pushed Authorization Requests are required, but the authorization server metadata does not provide a pushed_authorization_request_endpoint.',
+          );
+        }
+
+        const pushedAuthorizationRequest =
+          parMode !== 'disabled' && pushedAuthorizationRequestEndpoint
+            ? {
+                endpoint: pushedAuthorizationRequestEndpoint,
+                fetch: getFetch(),
+                timeoutMs: configuration.par_request_timeout,
+              }
+            : undefined;
+
         await performAuthorizationRequestAsync(storage, oidcLocation)(
           oidcServerConfiguration.authorizationEndpoint,
           extraInternal,
+          pushedAuthorizationRequest,
         );
       } catch (exception) {
         publishEvent(eventNames.loginAsync_error, exception);

@@ -147,6 +147,7 @@ export const configuration = {
   silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
   service_worker_relative_url: '/OidcServiceWorker.js', // just comment that line to disable service worker mode
   service_worker_only: false,
   demonstrating_proof_of_possession: false,
@@ -219,6 +220,8 @@ const configuration = {
       userinfo_endpoint: String,
       end_session_endpoint: String,
       revocation_endpoint: String,
+      pushed_authorization_request_endpoint: String,
+      require_pushed_authorization_requests: Boolean,
       check_session_iframe: String,
       issuer: String,
     },
@@ -232,6 +235,8 @@ const configuration = {
     token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
     authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in seconds of the openid well-known URL, default is 1 hour
     authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in milliseconds of the openid well-known URL, default is 10 seconds, then an error is thrown
+    par: 'disabled' | 'auto' | 'required', // Pushed Authorization Requests mode, default is 'disabled'
+    par_request_timeout: Number, // PAR endpoint timeout in milliseconds, default is 10000
     monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
     token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
     token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted, // Optional, default is TokenAutomaticRenewMode.AutomaticBeforeTokensExpiration
@@ -271,6 +276,65 @@ const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPo
 
 
 ```
+
+## Pushed Authorization Requests (PAR)
+
+The client supports [OAuth 2.0 Pushed Authorization Requests (RFC 9126)](https://www.rfc-editor.org/rfc/rfc9126.html).
+Enable it with the `par` configuration option:
+
+- `'disabled'` (default) preserves the existing front-channel authorization
+  request. PAR metadata is ignored in this mode.
+- `'auto'` uses PAR when discovery (or `authority_configuration`) provides a
+  `pushed_authorization_request_endpoint`. It keeps the existing front-channel
+  flow when the endpoint is absent, unless the server metadata says
+  `require_pushed_authorization_requests: true`.
+- `'required'` always requires PAR and fails before browser navigation when no
+  PAR endpoint is available.
+
+```ts
+import {
+  isPushedAuthorizationRequestError,
+  OidcClient,
+  PushedAuthorizationRequestErrorCode,
+} from '@axa-fr/oidc-client';
+
+const oidcClient = OidcClient.getOrCreate()({
+  client_id: 'spa-client',
+  redirect_uri: `${window.location.origin}/authentication/callback`,
+  scope: 'openid profile',
+  authority: 'https://issuer.example.com',
+  par: 'auto',
+  par_request_timeout: 10000,
+});
+
+try {
+  await oidcClient.loginAsync('/');
+} catch (error) {
+  if (
+    isPushedAuthorizationRequestError(error) &&
+    error.code === PushedAuthorizationRequestErrorCode.ENDPOINT_UNAVAILABLE
+  ) {
+    // PAR was required locally or by server metadata, but no endpoint was provided.
+  }
+}
+```
+
+When PAR is selected, all authorization parameters, including `state`, `nonce`,
+PKCE and login `extras`, are sent as
+`application/x-www-form-urlencoded` data to the PAR endpoint. The browser is
+then redirected with only `client_id` and the returned `request_uri`.
+
+If the PAR endpoint returns an error or an invalid response, the login rejects
+with `PushedAuthorizationRequestError`; the client does not silently downgrade
+to a front-channel request. The error exposes a stable `code` and, when
+available, `status`, `oauthError`, and `oauthErrorDescription`.
+
+For a browser-based client, the authorization server must allow CORS requests
+from the application origin to its PAR endpoint. Public SPA clients must also
+be allowed to call PAR without a client secret; never embed a client secret in
+browser code. If discovery is not available, set
+`pushed_authorization_request_endpoint` (and optionally
+`require_pushed_authorization_requests`) in `authority_configuration`.
 
 ## API
 
@@ -534,6 +598,7 @@ export const configurationIdentityServerWithHash = {
   silent_redirect_uri: window.location.origin + '#authentication-silent-callback',
   scope: 'openid profile email api offline_access',
   authority: 'https://demo.duendesoftware.com',
+  par: 'auto',
   refresh_time_before_tokens_expiration_in_second: 70,
   service_worker_relative_url: '/OidcServiceWorker.js',
   service_worker_only: false,

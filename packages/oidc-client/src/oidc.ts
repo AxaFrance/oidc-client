@@ -35,6 +35,8 @@ export const getFetchDefault = () => {
 export interface OidcAuthorizationServiceConfigurationJson {
   check_session_iframe?: string;
   issuer: string;
+  pushed_authorization_request_endpoint?: string;
+  require_pushed_authorization_requests?: boolean;
 }
 
 export class OidcAuthorizationServiceConfiguration {
@@ -45,6 +47,8 @@ export class OidcAuthorizationServiceConfiguration {
   private revocationEndpoint: string;
   private userInfoEndpoint: string;
   private endSessionEndpoint: string;
+  private pushedAuthorizationRequestEndpoint: string;
+  private requirePushedAuthorizationRequests: boolean;
 
   constructor(request: any) {
     this.authorizationEndpoint = request.authorization_endpoint;
@@ -54,6 +58,9 @@ export class OidcAuthorizationServiceConfiguration {
     this.checkSessionIframe = request.check_session_iframe;
     this.issuer = request.issuer;
     this.endSessionEndpoint = request.end_session_endpoint;
+    this.pushedAuthorizationRequestEndpoint = request.pushed_authorization_request_endpoint;
+    this.requirePushedAuthorizationRequests =
+      request.require_pushed_authorization_requests ?? false;
   }
 }
 
@@ -148,6 +155,8 @@ export class Oidc {
         configuration.demonstrating_proof_of_possession_configuration ??
         defaultDemonstratingProofOfPossessionConfiguration,
       preload_user_info: configuration.preload_user_info ?? false,
+      par: configuration.par ?? 'disabled',
+      par_request_timeout: configuration.par_request_timeout ?? 10000,
     };
 
     this.getFetch = getFetch ?? getFetchDefault;
@@ -281,6 +290,10 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
           userinfo_endpoint: authorityConfiguration.userinfo_endpoint,
           check_session_iframe: authorityConfiguration.check_session_iframe,
           issuer: authorityConfiguration.issuer,
+          pushed_authorization_request_endpoint:
+            authorityConfiguration.pushed_authorization_request_endpoint,
+          require_pushed_authorization_requests:
+            authorityConfiguration.require_pushed_authorization_requests,
         });
       }
 
@@ -360,6 +373,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         this.publishEvent.bind(this),
         this.initAsync.bind(this),
         this.location,
+        this.getFetch,
       )(callbackPath, extras, isSilentSignin, scope);
     }
     return this.loginPromise.finally(() => {
