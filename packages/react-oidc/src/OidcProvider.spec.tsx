@@ -288,7 +288,7 @@ describe('OidcProvider loading timeout', () => {
     expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
   });
 
-  it('should still fire loadingTimeout_error when silent session restore reports no existing session', async () => {
+  it('should NOT fire loadingTimeout_error on an anonymous route when no session exists', async () => {
     render(
       <OidcProvider
         configuration={{ ...baseConfiguration, loading_timeout_ms: 300 }}
@@ -310,7 +310,61 @@ describe('OidcProvider loading timeout', () => {
       vi.advanceTimersByTime(300);
     });
 
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
+  });
+
+  it('should fire loadingTimeout_error when a protected route starts login after no session was found', async () => {
+    render(
+      <OidcProvider
+        configuration={{ ...baseConfiguration, loading_timeout_ms: 300 }}
+        configurationName="default"
+      >
+        <div>App</div>
+      </OidcProvider>,
+    );
+
+    act(() => {
+      mockEventSubscribers.forEach(sub =>
+        sub.func('tryKeepExistingSessionAsync_end', { success: false }),
+      );
+    });
+
+    act(() => {
+      mockEventSubscribers.forEach(sub => sub.func('loginAsync_begin', {}));
+    });
+
+    mockPublishEvent.mockClear();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
     expect(mockPublishEvent).toHaveBeenCalledWith('loadingTimeout_error', { timeoutMs: 300 });
+  });
+
+  it('should NOT fire loadingTimeout_error on an anonymous route when session restore fails', async () => {
+    render(
+      <OidcProvider
+        configuration={{ ...baseConfiguration, loading_timeout_ms: 300 }}
+        configurationName="default"
+      >
+        <div>App</div>
+      </OidcProvider>,
+    );
+
+    act(() => {
+      mockEventSubscribers.forEach(sub =>
+        sub.func('tryKeepExistingSessionAsync_error', { message: 'session restore failed' }),
+      );
+    });
+
+    mockPublishEvent.mockClear();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(mockPublishEvent).not.toHaveBeenCalledWith('loadingTimeout_error', expect.anything());
   });
 
   it('should NOT fire loadingTimeout_error when token_acquired fires before the deadline', async () => {

@@ -90,28 +90,17 @@ const Switch = ({ isLoading, loadingComponent, children, configurationName }) =>
 const DEFAULT_LOADING_TIMEOUT_MS = 30_000;
 
 /**
- * Returns true when an event signals that the OIDC client has reached an
- * authenticated, idle state and the loading watchdog should be disarmed.
- *
- * The default `event.name === ''` state in {@link OidcProvider} is overloaded:
- * it represents both "not started yet" and "done and idle". A silent session
- * restore via `tryKeepExistingSessionAsync` does not emit
- * `loginCallbackAsync_end`, so without these explicit ready signals the
- * watchdog would fire against a fully authenticated app.
+ * Returns true when an event signals that the OIDC client is no longer
+ * loading. Restoring the existing session is complete even when no session was
+ * found: an OidcSecure child will emit `loginAsync_begin` if the current route
+ * actually requires authentication.
  */
-const isReadySignal = (name: string, data: unknown): boolean => {
-  if (
-    name === OidcClient.eventNames.token_acquired ||
-    name === OidcClient.eventNames.token_renewed ||
-    name === OidcClient.eventNames.loginCallbackAsync_end
-  ) {
-    return true;
-  }
-  if (name === OidcClient.eventNames.tryKeepExistingSessionAsync_end) {
-    return (data as { success?: boolean } | null)?.success === true;
-  }
-  return false;
-};
+const isLoadingEndSignal = (name: string): boolean =>
+  name === OidcClient.eventNames.token_acquired ||
+  name === OidcClient.eventNames.token_renewed ||
+  name === OidcClient.eventNames.loginCallbackAsync_end ||
+  name === OidcClient.eventNames.tryKeepExistingSessionAsync_end ||
+  name === OidcClient.eventNames.tryKeepExistingSessionAsync_error;
 
 export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   children,
@@ -148,7 +137,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
 
   const loading = false;
   const [event, setEvent] = useState(defaultEventState);
-  const [isAuthenticatedAndIdle, setIsAuthenticatedAndIdle] = useState<boolean>(false);
+  const [isLoadingWatchdogActive, setIsLoadingWatchdogActive] = useState<boolean>(true);
   const [currentConfigurationName, setConfigurationName] = useState(configurationName);
 
   useEffect(() => {
@@ -167,8 +156,10 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
   useEffect(() => {
     const oidc = getOidc(configurationName);
     const newSubscriptionId = oidc.subscribeEvents((name, data) => {
-      if (isReadySignal(name, data)) {
-        setIsAuthenticatedAndIdle(true);
+      if (name === OidcClient.eventNames.loginAsync_begin) {
+        setIsLoadingWatchdogActive(true);
+      } else if (isLoadingEndSignal(name)) {
+        setIsLoadingWatchdogActive(false);
       }
       if (
         name === OidcClient.eventNames.refreshTokensAsync_error ||
@@ -215,7 +206,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
       const previousOidc = getOidc(configurationName);
       previousOidc.removeEventSubscription(newSubscriptionId);
       setEvent(defaultEventState);
-      setIsAuthenticatedAndIdle(false);
+      setIsLoadingWatchdogActive(true);
     };
   }, [configuration, configurationName]);
 
@@ -224,7 +215,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
     if (timeoutMs <= 0) {
       return;
     }
-    if (isAuthenticatedAndIdle) {
+    if (!isLoadingWatchdogActive) {
       return;
     }
     const oidcInstance = getOidc(configurationName);
@@ -241,7 +232,7 @@ export const OidcProvider: FC<PropsWithChildren<OidcProviderProps>> = ({
       });
     }, timeoutMs);
     return () => clearTimeout(timeoutId);
-  }, [event.name, isAuthenticatedAndIdle, configurationName, configuration]);
+  }, [event.name, isLoadingWatchdogActive, configurationName, configuration]);
 
   const SessionLostComponent = sessionLostComponent;
   const AuthenticatingComponent = authenticatingComponent;
