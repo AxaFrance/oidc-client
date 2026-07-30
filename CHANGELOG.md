@@ -1,13 +1,21 @@
 # Changelog
 
-## 7.28.1
+## 7.28.2
 
+- [cdf423e](https://github.com/AxaFrance/oidc-client/commit/cdf423ef7bbeccc3127055d1b9c401a5bfb5fa81) - [skip ci] Update to version 7.28.2 in package.json, 2026-07-30 by *github-actions[bot]*
+
+
+## v7.28.2
+
+- [7950214](https://github.com/AxaFrance/oidc-client/commit/79502145c05480ae9e69dc1b46f38c97ab7d0680) - 7.28.2, 2026-07-30 by *github-actions[bot]*
+- [bd1f087](https://github.com/AxaFrance/oidc-client/commit/bd1f087747d5342fa68dd84d3e4fb8ba38171768) - fix(oidc-react): Side effect on anonymous routes when reaching watchdog timeout (release) (#1722), 2026-07-30 by *Guillaume Chervet*
+- [01bd60a](https://github.com/AxaFrance/oidc-client/commit/01bd60a962271ad9ba9b84a450bd5c9c3dbf3b92) - [skip ci] Generate changelog to version 7.28.1, 2026-07-28 by *github-actions[bot]*
 - [84bbd03](https://github.com/AxaFrance/oidc-client/commit/84bbd033197363e00aecfd92e78f3dd8f2806d22) - [skip ci] Update to version 7.28.1 in package.json, 2026-07-28 by *github-actions[bot]*
+- [c144177](https://github.com/AxaFrance/oidc-client/commit/c14417787846f0bf6079c54c2baf61900353aeff) - 7.28.1, 2026-07-28 by *github-actions[bot]*
 
 
 ## v7.28.1
 
-- [c144177](https://github.com/AxaFrance/oidc-client/commit/c14417787846f0bf6079c54c2baf61900353aeff) - 7.28.1, 2026-07-28 by *github-actions[bot]*
 - [8de7e31](https://github.com/AxaFrance/oidc-client/commit/8de7e316cc14d3f420808e36fb390c4e99b3cc65) - fix(all): remove Math.random (release) (#1719), 2026-07-28 by *Guillaume Chervet*
 - [c1235d2](https://github.com/AxaFrance/oidc-client/commit/c1235d2ab53c11faa3275112e345130252ae87aa) - [skip ci] Generate changelog to version 7.28.0, 2026-07-28 by *github-actions[bot]*
 - [87ed38b](https://github.com/AxaFrance/oidc-client/commit/87ed38bb864af0d2db246e2c225facd7be7e4e8d) - [skip ci] Update to version 7.28.0 in package.json, 2026-07-28 by *github-actions[bot]*
@@ -304,10 +312,5 @@
 ## v7.22.32
 
 - [3f885fc](https://github.com/AxaFrance/oidc-client/commit/3f885fc158ded05ea37b9d7925bd801b63321231) - fix(oidc): remove console.log (release), 2024-10-04 by *Guillaume Chervet*
-
-
-## v7.22.31
-
-- [cc731c1](https://github.com/AxaFrance/oidc-client/commit/cc731c15f1d72ce4d21a7958ca15128ae1dcdd89) - fix(oidc): force sw update when new registration appears (release) (#1449), 2024-10-02 by *wermanoid*
 
 
