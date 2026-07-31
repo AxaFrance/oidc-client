@@ -2,6 +2,14 @@ import { eventNames } from './events';
 import { initSession } from './initSession.js';
 import { initWorkerAsync } from './initWorker.js';
 import { ILOidcLocation } from './location';
+import {
+  createNetworkError,
+  isNetworkErrorCause,
+  isOidcError,
+  isRetryableHttpStatus,
+  OidcError,
+  OidcErrorCode,
+} from './oidcError.js';
 import { performRevocationRequestAsync, TOKEN_TYPE } from './requests.js';
 import timer from './timer.js';
 import { StringMap } from './types.js';
@@ -115,10 +123,17 @@ export const logoutAsync =
   (oidc, oidcDatabase, fetch, console, oicLocation: ILOidcLocation) =>
   async (callbackPathOrUrl: string | null | undefined = undefined, extras: StringMap = null) => {
     const configuration = oidc.configuration;
-    const oidcServerConfiguration = await oidc.initAsync(
-      configuration.authority,
-      configuration.authority_configuration,
-    );
+    let oidcServerConfiguration;
+    try {
+      oidcServerConfiguration = await oidc.initAsync(
+        configuration.authority,
+        configuration.authority_configuration,
+      );
+    } catch (cause) {
+      const error = isNetworkErrorCause(cause) ? createNetworkError(cause, 'logout') : cause;
+      oidc.publishEvent(eventNames.logoutAsync_error, error);
+      throw error;
+    }
     if (callbackPathOrUrl && typeof callbackPathOrUrl !== 'string') {
       callbackPathOrUrl = undefined;
       console.warn('callbackPathOrUrl path is not a string');
@@ -187,14 +202,33 @@ export const logoutAsync =
             // Revocation must be awaited *before* navigation, so a cancelled
             // navigation can never leave valid tokens behind both in storage
             // and on the authorization server.
-            await Promise.all(promises);
+            const results = await Promise.all(promises);
+            for (const result of results) {
+              if (!result.success) {
+                oidc.publishEvent(
+                  eventNames.logoutAsync_error,
+                  new OidcError(OidcErrorCode.REQUEST_FAILED, 'Token revocation request failed', {
+                    phase: 'logout',
+                    retryable: isRetryableHttpStatus(result.status),
+                    status: result.status,
+                    oauthError: result.oauthError,
+                    oauthErrorDescription: result.oauthErrorDescription,
+                  }),
+                );
+              }
+            }
           }
         }
       } catch (exception) {
+        const error =
+          !isOidcError(exception) && isNetworkErrorCause(exception)
+            ? createNetworkError(exception, 'logout')
+            : exception;
+        oidc.publishEvent(eventNames.logoutAsync_error, error);
         console.warn(
           'logoutAsync: error when revoking tokens, if the error persist, you ay configure property logout_tokens_to_invalidate from configuration to avoid this error',
         );
-        console.warn(exception);
+        console.warn(error);
       }
 
       const oidcExtras = extractExtras(extras, ':oidc');
@@ -236,6 +270,11 @@ export const logoutAsync =
       // If anything went wrong, reset the flag so the app is not stuck in a
       // "logging out forever" state.
       oidc.isLoggingOut = false;
-      throw exception;
+      const error =
+        !isOidcError(exception) && isNetworkErrorCause(exception)
+          ? createNetworkError(exception, 'logout')
+          : exception;
+      oidc.publishEvent(eventNames.logoutAsync_error, error);
+      throw error;
     }
   };

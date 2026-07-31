@@ -2,11 +2,48 @@ import { eventNames } from './events';
 import { initSession } from './initSession.js';
 import { initWorkerAsync, sleepAsync } from './initWorker.js';
 import Oidc from './oidc.js';
+import {
+  createNetworkError,
+  isNetworkErrorCause,
+  isOidcError,
+  isRetryableHttpStatus,
+  OidcError,
+  OidcErrorCode,
+} from './oidcError.js';
+import { OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 import { computeTimeLeft, isTokensOidcValid, setTokens, Tokens } from './parseTokens.js';
 import { performTokenRequestAsync } from './requests';
 import { _silentLoginAsync } from './silentLogin';
 import timer from './timer.js';
 import { OidcConfiguration, StringMap, TokenAutomaticRenewMode } from './types.js';
+
+export type RenewTokensResult = {
+  tokens: Tokens | null;
+  status: string | null;
+  error?: OidcError;
+};
+
+const createRefreshTokenError = (
+  message: string,
+  response?: {
+    status?: number;
+    oauthError?: string;
+    oauthErrorDescription?: string;
+  },
+): OidcError => {
+  const code =
+    response?.oauthError === 'use_dpop_nonce'
+      ? OidcErrorCode.DPOP_NONCE_REQUIRED
+      : OidcErrorCode.TOKEN_REQUEST_FAILED;
+  return new OidcError(code, message, {
+    phase: 'refresh',
+    retryable:
+      code === OidcErrorCode.DPOP_NONCE_REQUIRED || isRetryableHttpStatus(response?.status),
+    status: response?.status,
+    oauthError: response?.oauthError,
+    oauthErrorDescription: response?.oauthErrorDescription,
+  });
+};
 
 async function syncTokens(
   oidc: Oidc,
@@ -17,7 +54,7 @@ async function syncTokens(
   const updateTokens = tokens => {
     oidc.tokens = tokens;
   };
-  const { tokens, status } = await synchroniseTokensAsync(oidc)(
+  const result = await synchroniseTokensAsync(oidc)(
     updateTokens,
     0,
     0,
@@ -25,6 +62,7 @@ async function syncTokens(
     extras,
     scope,
   );
+  const { tokens, status } = result;
 
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if (!serviceWorker) {
@@ -38,12 +76,12 @@ async function syncTokens(
 
   if (!oidc.tokens) {
     await oidc.destroyAsync(status);
-    return null;
+    return { ...result, tokens: null } as RenewTokensResult;
   }
-  return tokens;
+  return { ...result, tokens } as RenewTokensResult;
 }
 
-export async function renewTokensAndStartTimerAsync(
+export async function renewTokensAndStartTimerResultAsync(
   oidc,
   forceRefresh = false,
   extras: StringMap = null,
@@ -52,14 +90,14 @@ export async function renewTokensAndStartTimerAsync(
   const configuration = oidc.configuration;
   const lockResourcesName = `${configuration.client_id}_${oidc.configurationName}_${configuration.authority}`;
 
-  let tokens: null;
+  let result: RenewTokensResult;
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if ((configuration?.storage === window?.sessionStorage && !serviceWorker) || !navigator.locks) {
-    tokens = await syncTokens(oidc, forceRefresh, extras, scope);
+    result = await syncTokens(oidc, forceRefresh, extras, scope);
   } else {
-    let status: any = 'retry';
-    while (status === 'retry') {
-      status = await navigator.locks.request(
+    let lockResult: any = 'retry';
+    while (lockResult === 'retry') {
+      lockResult = await navigator.locks.request(
         lockResourcesName,
         { ifAvailable: true },
         async lock => {
@@ -73,11 +111,11 @@ export async function renewTokensAndStartTimerAsync(
         },
       );
     }
-    tokens = status;
+    result = lockResult;
   }
 
-  if (!tokens) {
-    return null;
+  if (!result.tokens) {
+    return result;
   }
 
   if (oidc.timeoutId) {
@@ -85,7 +123,17 @@ export async function renewTokensAndStartTimerAsync(
     oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
   }
 
-  return oidc.tokens;
+  return { ...result, tokens: oidc.tokens };
+}
+
+export async function renewTokensAndStartTimerAsync(
+  oidc,
+  forceRefresh = false,
+  extras: StringMap = null,
+  scope: string = null,
+) {
+  const result = await renewTokensAndStartTimerResultAsync(oidc, forceRefresh, extras, scope);
+  return result.tokens;
 }
 
 export const autoRenewTokens = (
@@ -227,6 +275,7 @@ const synchroniseTokensAsync =
     forceRefresh = false,
     extras: StringMap = null,
     scope: string = null,
+    lastError: OidcError = null,
   ) => {
     if (!navigator.onLine && document.hidden) {
       return { tokens: oidc.tokens, status: 'GIVE_UP' };
@@ -248,8 +297,12 @@ const synchroniseTokensAsync =
 
     if (tryNumber >= maxTries || backgroundTry >= maxBackgroundTries) {
       updateTokens(null);
-      oidc.publishEvent(eventNames.refreshTokensAsync_error, { message: 'refresh token' });
-      return { tokens: null, status: 'SESSION_LOST' };
+      const error = lastError ?? createRefreshTokenError('refresh token');
+      oidc.publishEvent(eventNames.refreshTokensAsync_error, {
+        message: 'refresh token',
+        error,
+      });
+      return { tokens: null, status: 'SESSION_LOST', error };
     }
 
     if (!extras) {
@@ -262,6 +315,7 @@ const synchroniseTokensAsync =
         oidc.configurationName,
         oidc.configuration,
         oidc.publishEvent.bind(oidc),
+        'refresh',
       )(extras, state, scope);
     };
     const localSilentLoginAsync = async () => {
@@ -302,27 +356,42 @@ const synchroniseTokensAsync =
         const silent_token_response = await silentLoginAsync(silentLoginInput);
         if (!silent_token_response) {
           updateTokens(null);
+          const error = createRefreshTokenError('refresh token silent not active');
           oidc.publishEvent(eventNames.refreshTokensAsync_error, {
             message: 'refresh token silent not active',
+            error,
           });
-          return { tokens: null, status: 'SESSION_LOST' };
+          return { tokens: null, status: 'SESSION_LOST', error };
         }
         if (silent_token_response.error) {
           updateTokens(null);
+          const error =
+            silent_token_response.oidcError ??
+            new OidcError(OidcErrorCode.OAUTH_ERROR, 'refresh token silent', {
+              phase: 'refresh',
+              retryable: false,
+              oauthError: silent_token_response.error,
+            });
           oidc.publishEvent(eventNames.refreshTokensAsync_error, {
             message: 'refresh token silent',
+            error,
           });
-          return { tokens: null, status: 'SESSION_LOST' };
+          return { tokens: null, status: 'SESSION_LOST', error };
         }
 
         updateTokens(silent_token_response.tokens);
         oidc.publishEvent(Oidc.eventNames.token_renewed, {});
         return { tokens: silent_token_response.tokens, status: 'LOGGED' };
       } catch (exceptionSilent: any) {
-        console.error(exceptionSilent);
+        const error =
+          isOidcError(exceptionSilent) || !isNetworkErrorCause(exceptionSilent)
+            ? exceptionSilent
+            : createNetworkError(exceptionSilent, 'refresh');
+        console.error(error);
         oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
           message: 'exceptionSilent',
-          exception: exceptionSilent.message,
+          exception: error.message,
+          error: isOidcError(error) ? error : undefined,
         });
         return await synchroniseTokensAsync(oidc)(
           updateTokens,
@@ -331,6 +400,7 @@ const synchroniseTokensAsync =
           forceRefresh,
           extras,
           scope,
+          isOidcError(error) ? error : lastError,
         );
       }
     };
@@ -346,10 +416,14 @@ const synchroniseTokensAsync =
       switch (status) {
         case synchroniseTokensStatus.SESSION_LOST:
           updateTokens(null);
-          oidc.publishEvent(eventNames.refreshTokensAsync_error, {
-            message: 'refresh token session lost',
-          });
-          return { tokens: null, status: 'SESSION_LOST' };
+          {
+            const error = lastError ?? createRefreshTokenError('refresh token session lost');
+            oidc.publishEvent(eventNames.refreshTokensAsync_error, {
+              message: 'refresh token session lost',
+              error,
+            });
+            return { tokens: null, status: 'SESSION_LOST', error };
+          }
         case synchroniseTokensStatus.NOT_CONNECTED:
           updateTokens(null);
           return { tokens: null, status: null };
@@ -435,7 +509,7 @@ const synchroniseTokensAsync =
                 'POST',
               );
             }
-            const tokenResponse = await performTokenRequestAsync(oidc.getFetch())(
+            let tokenResponse = await performTokenRequestAsync(oidc.getFetch())(
               url,
               details,
               finalExtras,
@@ -444,6 +518,43 @@ const synchroniseTokensAsync =
               configuration.token_renew_mode,
               timeoutMs,
             );
+
+            if (
+              !tokenResponse.success &&
+              tokenResponse.oauthError === 'use_dpop_nonce' &&
+              tokenResponse.demonstratingProofOfPossessionNonce &&
+              configuration.demonstrating_proof_of_possession
+            ) {
+              const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
+              if (serviceWorker) {
+                await serviceWorker.setDemonstratingProofOfPossessionNonce(
+                  tokenResponse.demonstratingProofOfPossessionNonce,
+                );
+              } else {
+                const session = initSession(
+                  oidc.configurationName,
+                  configuration.storage,
+                  configuration.login_state_storage ?? configuration.storage,
+                );
+                await session.setDemonstratingProofOfPossessionNonce(
+                  tokenResponse.demonstratingProofOfPossessionNonce,
+                );
+              }
+              headersExtras['DPoP'] = await oidc.generateDemonstrationOfProofOfPossessionAsync(
+                tokens.accessToken,
+                url,
+                'POST',
+              );
+              tokenResponse = await performTokenRequestAsync(oidc.getFetch())(
+                url,
+                details,
+                finalExtras,
+                tokens,
+                headersExtras,
+                configuration.token_renew_mode,
+                timeoutMs,
+              );
+            }
 
             if (tokenResponse.success) {
               // Guard against a missing/corrupted nonce reaching id_token validation.
@@ -454,10 +565,16 @@ const synchroniseTokensAsync =
               // See https://github.com/AxaFrance/oidc-client/issues/1678
               if (!nonce || !nonce.nonce) {
                 updateTokens(null);
+                const error = new OidcStateError(
+                  OidcStateErrorCode.NONCE_MISSING,
+                  'refresh token: nonce missing from storage',
+                  'refresh',
+                );
                 oidc.publishEvent(eventNames.refreshTokensAsync_error, {
                   message: 'refresh token: nonce missing from storage',
+                  error,
                 });
-                return { tokens: null, status: 'SESSION_LOST' };
+                return { tokens: null, status: 'SESSION_LOST', error };
               }
               const { isValid, reason } = isTokensOidcValid(
                 tokenResponse.data,
@@ -466,10 +583,21 @@ const synchroniseTokensAsync =
               );
               if (!isValid) {
                 updateTokens(null);
+                const error = new OidcError(
+                  reason.startsWith('Nonce does not match')
+                    ? OidcErrorCode.INVALID_NONCE
+                    : OidcErrorCode.TOKEN_REQUEST_FAILED,
+                  `refresh token return not valid tokens, reason: ${reason}`,
+                  {
+                    phase: 'refresh',
+                    retryable: false,
+                  },
+                );
                 oidc.publishEvent(eventNames.refreshTokensAsync_error, {
                   message: `refresh token return not valid tokens, reason: ${reason}`,
+                  error,
                 });
-                return { tokens: null, status: 'SESSION_LOST' };
+                return { tokens: null, status: 'SESSION_LOST', error };
               }
               updateTokens(tokenResponse.data);
               if (tokenResponse.demonstratingProofOfPossessionNonce) {
@@ -495,17 +623,20 @@ const synchroniseTokensAsync =
               oidc.publishEvent(Oidc.eventNames.token_renewed, { reason: 'REFRESH_TOKEN' });
               return { tokens: tokenResponse.data, status: 'LOGGED_IN' };
             } else {
+              const error = createRefreshTokenError('Token request failed', tokenResponse);
               oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
                 message: 'bad request',
                 tokenResponse,
+                error,
               });
 
               if (tokenResponse.status >= 400 && tokenResponse.status < 500) {
                 updateTokens(null);
                 oidc.publishEvent(eventNames.refreshTokensAsync_error, {
                   message: `session lost: ${tokenResponse.status}`,
+                  error,
                 });
-                return { tokens: null, status: 'SESSION_LOST' };
+                return { tokens: null, status: 'SESSION_LOST', error };
               }
 
               return await synchroniseTokensAsync(oidc)(
@@ -515,6 +646,7 @@ const synchroniseTokensAsync =
                 forceRefresh,
                 extras,
                 scope,
+                error,
               );
             }
           };
@@ -522,11 +654,16 @@ const synchroniseTokensAsync =
         }
       }
     } catch (exception: any) {
-      console.error(exception);
+      const error =
+        isOidcError(exception) || !isNetworkErrorCause(exception)
+          ? exception
+          : createNetworkError(exception, 'refresh');
+      console.error(error);
 
       oidc.publishEvent(eventNames.refreshTokensAsync_silent_error, {
         message: 'exception',
-        exception: exception.message,
+        exception: error.message,
+        error: isOidcError(error) ? error : undefined,
       });
       // we need to break the loop or errors, as direct call of synchroniseTokensAsync
       // inside of synchroniseTokensAsync will cause an infinite loop and kill the browser stack
@@ -540,6 +677,7 @@ const synchroniseTokensAsync =
             forceRefresh,
             extras,
             scope,
+            isOidcError(error) ? error : lastError,
           )
             .then(resolve)
             .catch(reject);

@@ -110,10 +110,18 @@ export const performRevocationRequestAsync =
       timeoutMs,
     );
     if (response.status !== 200) {
-      return { success: false };
+      const data = await getResponseJsonAsync(response);
+      return {
+        success: false,
+        status: response.status,
+        oauthError: typeof data?.error === 'string' ? data.error : undefined,
+        oauthErrorDescription:
+          typeof data?.error_description === 'string' ? data.error_description : undefined,
+      };
     }
     return {
       success: true,
+      status: response.status,
     };
   };
 
@@ -122,6 +130,8 @@ type PerformTokenRequestResponse = {
   status?: number;
   data?: any;
   demonstratingProofOfPossessionNonce?: string;
+  oauthError?: string;
+  oauthErrorDescription?: string;
 };
 
 export type PushedAuthorizationRequestResponse = {
@@ -255,10 +265,19 @@ export const performTokenRequestAsync =
       timeoutMs,
     );
     if (response.status !== 200) {
+      const data = await getResponseJsonAsync(response);
       return {
         success: false,
         status: response.status,
-        demonstratingProofOfPossessionNonce: null,
+        data,
+        oauthError: typeof data?.error === 'string' ? data.error : undefined,
+        oauthErrorDescription:
+          typeof data?.error_description === 'string' ? data.error_description : undefined,
+        demonstratingProofOfPossessionNonce: response.headers?.has(
+          demonstratingProofOfPossessionNonceResponseHeader,
+        )
+          ? response.headers.get(demonstratingProofOfPossessionNonceResponseHeader)
+          : null,
       };
     }
     const tokens = await response.json();
@@ -325,7 +344,14 @@ export const performAuthorizationRequestAsync =
 const demonstratingProofOfPossessionNonceResponseHeader = 'DPoP-Nonce';
 export const performFirstTokenRequestAsync =
   (storage: any) =>
-  async (url, formBodyExtras, headersExtras, tokenRenewMode: string, timeoutMs = 10000) => {
+  async (
+    url,
+    formBodyExtras,
+    headersExtras,
+    tokenRenewMode: string,
+    timeoutMs = 10000,
+    shouldPreserveLoginStateForDpopRetry = false,
+  ): Promise<PerformTokenRequestResponse> => {
     formBodyExtras = formBodyExtras ? { ...formBodyExtras } : {};
     formBodyExtras.code_verifier = await storage.getCodeVerifierAsync();
     const formBody = [];
@@ -347,10 +373,27 @@ export const performFirstTokenRequestAsync =
       },
       timeoutMs,
     );
-    await Promise.all([storage.setCodeVerifierAsync(null), storage.setStateAsync(null)]);
     if (response.status !== 200) {
-      return { success: false, status: response.status };
+      const data = await getResponseJsonAsync(response);
+      const oauthError = typeof data?.error === 'string' ? data.error : undefined;
+      if (!(shouldPreserveLoginStateForDpopRetry && oauthError === 'use_dpop_nonce')) {
+        await Promise.all([storage.setCodeVerifierAsync(null), storage.setStateAsync(null)]);
+      }
+      return {
+        success: false,
+        status: response.status,
+        data,
+        oauthError,
+        oauthErrorDescription:
+          typeof data?.error_description === 'string' ? data.error_description : undefined,
+        demonstratingProofOfPossessionNonce: response.headers?.has(
+          demonstratingProofOfPossessionNonceResponseHeader,
+        )
+          ? response.headers.get(demonstratingProofOfPossessionNonceResponseHeader)
+          : null,
+      };
     }
+    await Promise.all([storage.setCodeVerifierAsync(null), storage.setStateAsync(null)]);
     let demonstratingProofOfPossessionNonce: string = null;
     if (response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)) {
       demonstratingProofOfPossessionNonce = response.headers.get(

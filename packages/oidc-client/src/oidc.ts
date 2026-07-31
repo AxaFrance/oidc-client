@@ -13,8 +13,19 @@ import { tryKeepSessionAsync } from './keepSession';
 import { ILOidcLocation, OidcLocation } from './location';
 import { defaultLoginAsync, loginCallbackAsync } from './login.js';
 import { clearSessionAsync, destroyAsync, logoutAsync } from './logout.js';
+import {
+  createOAuthError,
+  isOidcError,
+  OidcError,
+  OidcErrorCode,
+  serializeOidcError,
+} from './oidcError.js';
 import { TokenRenewMode, Tokens } from './parseTokens.js';
-import { autoRenewTokens, renewTokensAndStartTimerAsync } from './renewTokens.js';
+import {
+  autoRenewTokens,
+  renewTokensAndStartTimerResultAsync,
+  RenewTokensResult,
+} from './renewTokens.js';
 import { fetchFromIssuer } from './requests.js';
 import { getParseQueryStringFromLocation } from './route-utils.js';
 import defaultSilentLoginAsync from './silentLogin.js';
@@ -170,6 +181,7 @@ export class Oidc {
     this.destroyAsync.bind(this);
     this.logoutAsync.bind(this);
     this.renewTokensAsync.bind(this);
+    this.renewTokensOrThrowAsync.bind(this);
     this.initAsync(this.configuration.authority, this.configuration.authority_configuration);
   }
 
@@ -248,13 +260,26 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
       const location = this.location;
       const queryParams = getParseQueryStringFromLocation(location.getCurrentHref());
       if (queryParams.error) {
+        const error = createOAuthError(
+          queryParams.error,
+          queryParams.error_description,
+          `Error from OIDC server: ${queryParams.error} - ${queryParams.error_description}`,
+          'refresh',
+        );
         window.parent.postMessage(
-          `${this.configurationName}_oidc_error:${JSON.stringify({ error: queryParams.error })}`,
+          `${this.configurationName}_oidc_error:${JSON.stringify({
+            error: queryParams.error,
+            error_description: queryParams.error_description,
+            oidcError: serializeOidcError(error),
+          })}`,
           location.getOrigin(),
         );
       } else {
         window.parent.postMessage(
-          `${this.configurationName}_oidc_exception:${JSON.stringify({ error: exception == null ? '' : exception.toString() })}`,
+          `${this.configurationName}_oidc_exception:${JSON.stringify({
+            error: exception == null ? '' : exception.toString(),
+            oidcError: isOidcError(exception) ? serializeOidcError(exception) : undefined,
+          })}`,
           location.getOrigin(),
         );
       }
@@ -474,21 +499,48 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     });
   }
 
-  renewTokensPromise: Promise<any> = null;
+  renewTokensPromise: Promise<RenewTokensResult> = null;
 
-  async renewTokensAsync(extras: StringMap = null, scope: string = null) {
+  private async renewTokensResultAsync(
+    extras: StringMap = null,
+    scope: string = null,
+  ): Promise<RenewTokensResult | null> {
     if (this.renewTokensPromise !== null) {
       return this.renewTokensPromise;
     }
     if (!this.timeoutId) {
-      return;
+      return null;
     }
     timer.clearTimeout(this.timeoutId);
-    // @ts-ignore
-    this.renewTokensPromise = renewTokensAndStartTimerAsync(this, true, extras, scope);
-    return this.renewTokensPromise.finally(() => {
-      this.renewTokensPromise = null;
+    const promise = renewTokensAndStartTimerResultAsync(this, true, extras, scope);
+    this.renewTokensPromise = promise;
+    return promise.finally(() => {
+      if (this.renewTokensPromise === promise) {
+        this.renewTokensPromise = null;
+      }
     });
+  }
+
+  async renewTokensAsync(
+    extras: StringMap = null,
+    scope: string = null,
+  ): Promise<Tokens | null | undefined> {
+    const result = await this.renewTokensResultAsync(extras, scope);
+    return result?.tokens;
+  }
+
+  async renewTokensOrThrowAsync(extras: StringMap = null, scope: string = null): Promise<Tokens> {
+    const result = await this.renewTokensResultAsync(extras, scope);
+    if (result?.error) {
+      throw result.error;
+    }
+    if (!result?.tokens) {
+      throw new OidcError(OidcErrorCode.TOKEN_REQUEST_FAILED, 'Token renewal failed', {
+        phase: 'refresh',
+        retryable: false,
+      });
+    }
+    return result.tokens;
   }
 
   async destroyAsync(status) {

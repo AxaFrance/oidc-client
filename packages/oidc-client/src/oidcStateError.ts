@@ -1,3 +1,10 @@
+import {
+  isOidcError,
+  OidcError,
+  OidcErrorCode as BaseOidcErrorCode,
+  OidcErrorPhase,
+} from './oidcError.js';
+
 /**
  * Stable, machine-readable codes for OIDC state / nonce failures occurring
  * between the authorization redirect and the callback handling.
@@ -21,20 +28,32 @@ export const OidcStateErrorCode = {
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type OidcStateErrorCode = (typeof OidcStateErrorCode)[keyof typeof OidcStateErrorCode];
 
+const oidcStateErrorCodes = new Set<string>(Object.values(OidcStateErrorCode));
+
+export const isOidcStateErrorCode = (value: unknown): value is OidcStateErrorCode =>
+  typeof value === 'string' && oidcStateErrorCodes.has(value);
+
 /**
  * Typed error thrown when the OIDC login state or nonce is missing,
  * corrupted, or does not match the value returned by the authorization server.
  *
- * Consumers can use `instanceof OidcStateError` and inspect `code` instead of
- * relying on the (unstable) error message text.
+ * Consumers should prefer {@link isOidcStateError} and inspect `code` instead
+ * of relying on the (unstable) error message text, especially when errors may
+ * cross a postMessage boundary during silent renew.
  */
-export class OidcStateError extends Error {
-  readonly code: OidcStateErrorCode;
+export class OidcStateError extends OidcError {
+  declare readonly code: OidcStateErrorCode;
 
-  constructor(code: OidcStateErrorCode, message: string) {
-    super(message);
+  constructor(
+    code: OidcStateErrorCode,
+    message: string,
+    phase: Extract<OidcErrorPhase, 'callback' | 'refresh'> = 'callback',
+  ) {
+    super(code as BaseOidcErrorCode, message, {
+      phase,
+      retryable: false,
+    });
     this.name = 'OidcStateError';
-    this.code = code;
 
     // Keep prototype chain intact when transpiled to ES5.
     Object.setPrototypeOf(this, OidcStateError.prototype);
@@ -46,5 +65,7 @@ export class OidcStateError extends Error {
  * specifically to state/nonce failures.
  */
 export const isOidcStateError = (value: unknown): value is OidcStateError => {
-  return value instanceof OidcStateError;
+  return (
+    value instanceof OidcStateError || (isOidcError(value) && isOidcStateErrorCode(value.code))
+  );
 };

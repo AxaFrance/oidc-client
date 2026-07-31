@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { OidcError } from './oidcError';
 import {
   isPushedAuthorizationRequestError,
   PushedAuthorizationRequestError,
@@ -27,12 +28,15 @@ describe('PushedAuthorizationRequestError', () => {
     );
 
     expect(error).toBeInstanceOf(Error);
+    expect(error).toBeInstanceOf(OidcError);
     expect(error.name).toBe('PushedAuthorizationRequestError');
     expect(error.code).toBe('REQUEST_FAILED');
     expect(error.status).toBe(400);
     expect(error.oauthError).toBe('invalid_request');
     expect(error.oauthErrorDescription).toBe('Invalid redirect URI');
     expect(error.cause).toBe(cause);
+    expect(error.phase).toBe('login');
+    expect(error.retryable).toBe(true);
     expect(isPushedAuthorizationRequestError(error)).toBe(true);
     expect(isPushedAuthorizationRequestError(new Error('other'))).toBe(false);
   });
