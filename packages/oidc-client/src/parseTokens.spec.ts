@@ -36,9 +36,9 @@ describe('ParseTokens test Suite', () => {
           refresh_time_before_tokens_expiration_in_second: 0,
         },
         syncTokensInfoAsync: async () => synchroniseTokensStatus.TOKENS_VALID,
-        renewTokensAsync: async (_extras: StringMap): Promise<undefined> => {
+        renewTokensAsync: async (_extras: StringMap): Promise<null> => {
           await sleepAsync({ milliseconds: 10 });
-          return undefined;
+          return null;
         },
       };
       const result = await getValidTokenAsync(oidc, 1, 1);

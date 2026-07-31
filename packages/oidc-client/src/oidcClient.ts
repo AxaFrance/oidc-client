@@ -114,10 +114,7 @@ export class OidcClient {
     return this._oidc.silentLoginCallbackAsync();
   }
 
-  renewTokensAsync(
-    extras: StringMap = null,
-    scope: string = null,
-  ): Promise<Tokens | null | undefined> {
+  renewTokensAsync(extras: StringMap = null, scope: string = null): Promise<Tokens | null> {
     return this._oidc.renewTokensAsync(extras, scope);
   }
 
