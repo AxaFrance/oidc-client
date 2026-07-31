@@ -9,7 +9,7 @@ import { Fetch } from './types';
 export const fetchWithTokens =
   (
     fetch: Fetch,
-    oidc: Oidc | null,
+    oidc: Oidc,
     demonstrating_proof_of_possession: boolean = false,
     phase: OidcErrorPhase = 'api_request',
   ): Fetch =>

@@ -350,7 +350,7 @@ export const performFirstTokenRequestAsync =
     headersExtras,
     tokenRenewMode: string,
     timeoutMs = 10000,
-    preserveLoginStateForDpopRetry = false,
+    shouldPreserveLoginStateForDpopRetry = false,
   ): Promise<PerformTokenRequestResponse> => {
     formBodyExtras = formBodyExtras ? { ...formBodyExtras } : {};
     formBodyExtras.code_verifier = await storage.getCodeVerifierAsync();
@@ -376,7 +376,7 @@ export const performFirstTokenRequestAsync =
     if (response.status !== 200) {
       const data = await getResponseJsonAsync(response);
       const oauthError = typeof data?.error === 'string' ? data.error : undefined;
-      if (!(preserveLoginStateForDpopRetry && oauthError === 'use_dpop_nonce')) {
+      if (!(shouldPreserveLoginStateForDpopRetry && oauthError === 'use_dpop_nonce')) {
         await Promise.all([storage.setCodeVerifierAsync(null), storage.setStateAsync(null)]);
       }
       return {

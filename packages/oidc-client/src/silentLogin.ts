@@ -11,9 +11,9 @@ import { autoRenewTokens } from './renewTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration, StringMap } from './types.js';
 export type SilentLoginResponse = {
-  tokens: Tokens;
-  sessionState: string;
-  error: string;
+  tokens: Tokens | null;
+  sessionState: string | null;
+  error?: string;
   oidcError?: OidcError;
 };
 
