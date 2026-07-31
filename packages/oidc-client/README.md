@@ -591,10 +591,12 @@ try {
 }
 ```
 
-`OidcStateError` is an `Error` subclass, exposes a stable `code` field, and
-is also re-exported from `@axa-fr/react-oidc`. For silent renewal, a missing
-nonce no longer throws a `TypeError` — it is reported through the existing
-`SESSION_LOST` status so consumers can recover via the normal re-login flow.
+`OidcStateError` is an `Error` subclass, exposes a stable `code` field, and is
+also re-exported from `@axa-fr/react-oidc`. When errors cross the silent-renew
+iframe boundary, prefer `isOidcStateError(error)` plus `error.code` over a
+plain `instanceof` check. For silent renewal, a missing nonce no longer throws
+a `TypeError` — it is reported through the existing `SESSION_LOST` status so
+consumers can recover via the normal re-login flow.
 
 ## Service worker protocol
 

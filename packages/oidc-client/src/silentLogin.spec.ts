@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { OidcError, OidcErrorCode, serializeOidcError } from './oidcError';
+import { isOidcStateError, OidcStateError, OidcStateErrorCode } from './oidcStateError';
 import { _silentLoginAsync } from './silentLogin';
 
 const installDom = () => {
@@ -105,6 +106,53 @@ describe('_silentLoginAsync typed errors', () => {
       code: OidcErrorCode.LOGIN_REQUIRED,
       phase: 'refresh',
       oauthError: 'login_required',
+    });
+  });
+
+  it('keeps serialized OidcStateError instances detectable after the iframe round-trip', async () => {
+    const { contentWindow, getListener } = installDom();
+    const publishEvent = vi.fn();
+    const original = new OidcStateError(
+      OidcStateErrorCode.NONCE_MISSING,
+      'refresh token: nonce missing from storage',
+      'refresh',
+    );
+
+    const promise = _silentLoginAsync(
+      'default',
+      {
+        authority: 'https://issuer.example.com',
+        client_id: 'client',
+        redirect_uri: 'https://client.example.com/callback',
+        scope: 'openid',
+        silent_login_uri: 'https://issuer.example.com/silent-login',
+        silent_redirect_uri: 'https://client.example.com/silent-callback',
+        silent_login_timeout: 1000,
+      },
+      publishEvent,
+      'refresh',
+    )();
+    getListener()({
+      origin: 'https://issuer.example.com',
+      source: contentWindow,
+      data: `default_oidc_exception:${JSON.stringify({
+        error: original.toString(),
+        oidcError: serializeOidcError(original),
+      })}`,
+    } as unknown as MessageEvent);
+
+    let thrownError: unknown;
+    try {
+      await promise;
+    } catch (error) {
+      thrownError = error;
+    }
+
+    expect(isOidcStateError(thrownError)).toBe(true);
+    expect(thrownError).toMatchObject({
+      code: OidcStateErrorCode.NONCE_MISSING,
+      phase: 'refresh',
+      name: 'OidcStateError',
     });
   });
 });

@@ -10,6 +10,7 @@ import {
   OidcError,
   OidcErrorCode,
 } from './oidcError.js';
+import { OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 import { computeTimeLeft, isTokensOidcValid, setTokens, Tokens } from './parseTokens.js';
 import { performTokenRequestAsync } from './requests';
 import { _silentLoginAsync } from './silentLogin';
@@ -564,13 +565,10 @@ const synchroniseTokensAsync =
               // See https://github.com/AxaFrance/oidc-client/issues/1678
               if (!nonce || !nonce.nonce) {
                 updateTokens(null);
-                const error = new OidcError(
-                  OidcErrorCode.NONCE_MISSING,
+                const error = new OidcStateError(
+                  OidcStateErrorCode.NONCE_MISSING,
                   'refresh token: nonce missing from storage',
-                  {
-                    phase: 'refresh',
-                    retryable: false,
-                  },
+                  'refresh',
                 );
                 oidc.publishEvent(eventNames.refreshTokensAsync_error, {
                   message: 'refresh token: nonce missing from storage',

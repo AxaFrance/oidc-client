@@ -1,4 +1,9 @@
-import { OidcError, OidcErrorCode as BaseOidcErrorCode, OidcErrorPhase } from './oidcError.js';
+import {
+  isOidcError,
+  OidcError,
+  OidcErrorCode as BaseOidcErrorCode,
+  OidcErrorPhase,
+} from './oidcError.js';
 
 /**
  * Stable, machine-readable codes for OIDC state / nonce failures occurring
@@ -23,12 +28,18 @@ export const OidcStateErrorCode = {
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type OidcStateErrorCode = (typeof OidcStateErrorCode)[keyof typeof OidcStateErrorCode];
 
+const oidcStateErrorCodes = new Set<string>(Object.values(OidcStateErrorCode));
+
+export const isOidcStateErrorCode = (value: unknown): value is OidcStateErrorCode =>
+  typeof value === 'string' && oidcStateErrorCodes.has(value);
+
 /**
  * Typed error thrown when the OIDC login state or nonce is missing,
  * corrupted, or does not match the value returned by the authorization server.
  *
- * Consumers can use `instanceof OidcStateError` and inspect `code` instead of
- * relying on the (unstable) error message text.
+ * Consumers should prefer {@link isOidcStateError} and inspect `code` instead
+ * of relying on the (unstable) error message text, especially when errors may
+ * cross a postMessage boundary during silent renew.
  */
 export class OidcStateError extends OidcError {
   declare readonly code: OidcStateErrorCode;
@@ -54,5 +65,7 @@ export class OidcStateError extends OidcError {
  * specifically to state/nonce failures.
  */
 export const isOidcStateError = (value: unknown): value is OidcStateError => {
-  return value instanceof OidcStateError;
+  return (
+    value instanceof OidcStateError || (isOidcError(value) && isOidcStateErrorCode(value.code))
+  );
 };

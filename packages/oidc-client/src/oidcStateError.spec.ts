@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { OidcError } from './oidcError';
+import { deserializeOidcError, OidcError, serializeOidcError } from './oidcError';
 import { isOidcStateError, OidcStateError, OidcStateErrorCode } from './oidcStateError';
 
 describe('OidcStateError', () => {
@@ -33,5 +33,19 @@ describe('OidcStateError', () => {
     expect(isOidcStateError(null)).toBe(false);
     expect(isOidcStateError(undefined)).toBe(false);
     expect(isOidcStateError({ code: 'STATE_MISSING' })).toBe(false);
+  });
+
+  it('stays detectable after serialization and deserialization', () => {
+    const err = new OidcStateError(OidcStateErrorCode.NONCE_MISSING, 'nonce missing', 'refresh');
+    const reconstructed = deserializeOidcError(serializeOidcError(err));
+
+    expect(reconstructed).toBeInstanceOf(OidcError);
+    expect(reconstructed).not.toBeInstanceOf(OidcStateError);
+    expect(isOidcStateError(reconstructed)).toBe(true);
+    expect(reconstructed).toMatchObject({
+      code: OidcStateErrorCode.NONCE_MISSING,
+      phase: 'refresh',
+      name: 'OidcStateError',
+    });
   });
 });
