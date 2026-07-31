@@ -200,7 +200,7 @@ export interface OidcToken {
     token_automatic_renew_mode?: TokenAutomaticRenewMode;
     refresh_time_before_tokens_expiration_in_second?: number;
   };
-  renewTokensAsync: (extras: StringMap) => Promise<Tokens | null>;
+  renewTokensAsync: (extras: StringMap) => Promise<Tokens | null | undefined>;
 }
 
 export const getValidTokenAsync = async (

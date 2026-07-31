@@ -521,9 +521,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     });
   }
 
-  async renewTokensAsync(extras: StringMap = null, scope: string = null): Promise<Tokens | null> {
+  async renewTokensAsync(
+    extras: StringMap = null,
+    scope: string = null,
+  ): Promise<Tokens | null | undefined> {
     const result = await this.renewTokensResultAsync(extras, scope);
-    return result?.tokens ?? null;
+    return result?.tokens;
   }
 
   async renewTokensOrThrowAsync(extras: StringMap = null, scope: string = null): Promise<Tokens> {
