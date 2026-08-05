@@ -155,19 +155,25 @@ jobs:
             exit 1
           fi
 
-          package_dirs=(
-            "packages/oidc-client-service-worker"
-            "packages/oidc-client"
-            "packages/react-oidc"
-          )
+          EXPECTED_VERSION="$version" node <<'NODE'
+          const fs = require('node:fs');
 
-          for package_dir in "${package_dirs[@]}"; do
-            echo "Updating $package_dir to $version"
-            (
-              cd "$package_dir"
-              npm version "$version" --no-git-tag-version --allow-same-version
-            )
-          done
+          const expectedVersion = process.env.EXPECTED_VERSION;
+          const packageDirs = [
+            'packages/oidc-client-service-worker',
+            'packages/oidc-client',
+            'packages/react-oidc',
+          ];
+
+          for (const packageDir of packageDirs) {
+            console.log(`Updating ${packageDir} to ${expectedVersion}`);
+
+            const packageJsonPath = `${packageDir}/package.json`;
+            const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+            packageJson.version = expectedVersion;
+            fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
+          }
+          NODE
 
           printf "export default '%s';\n" "$version" > packages/oidc-client-service-worker/src/version.ts
           printf "export default '%s';\n" "$version" > packages/oidc-client/src/version.ts
