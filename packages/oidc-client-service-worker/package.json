@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/oidc-client-service-worker",
-  "version": "7.29.0",
+  "version": "7.29.1",
   "type": "module",
   "private": false,
   "main": "dist/OidcServiceWorker.js",
@@ -43,7 +43,6 @@
     "test:watch": "vitest --coverage",
     "coverage": "vitest run --coverage",
     "clean": "rimraf dist",
-    "prepare": "pnpm run clean && pnpm run build",
     "lint": "eslint src"
   },
   "devDependencies": {

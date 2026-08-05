@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/react-oidc",
-  "version": "7.29.0",
+  "version": "7.29.1",
   "private": false,
   "type": "module",
   "main": "./dist/index.umd.cjs",
@@ -36,7 +36,6 @@
     "test": "vitest --root . --coverage",
     "clean": "rimraf dist",
     "postinstall": "echo 'WARNING keep sink OidcServiceWorker.js version file'",
-    "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
     "lint": "eslint src"
   },
   "dependencies": {

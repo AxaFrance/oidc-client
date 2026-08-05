@@ -1,6 +1,6 @@
 {
   "name": "@axa-fr/oidc-client",
-  "version": "7.29.0",
+  "version": "7.29.1",
   "private": false,
   "type": "module",
   "main": "./dist/index.umd.cjs",
@@ -50,7 +50,6 @@
     "copy-service-worker": "cpy ./node_modules/@axa-fr/oidc-client-service-worker/dist/OidcTrustedDomains.js ./node_modules/@axa-fr/oidc-client-service-worker/dist/OidcServiceWorker.js ./dist",
     "build": "tsc && vite build",
     "test": "vitest --root . --coverage",
-    "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
     "postinstall": "echo 'WARNING keep sink OidcServiceWorker.js version file'"
   },
   "license": "MIT",
