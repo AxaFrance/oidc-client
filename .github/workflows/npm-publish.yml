@@ -338,14 +338,20 @@ jobs:
 
           for index in "${!package_dirs[@]}"; do
             package_dir="${package_dirs[$index]}"
+            package_path="./${package_dir}"
             package_name="${package_names[$index]}"
+
+            if [[ ! -d "$package_path" ]]; then
+              echo "::error::Package directory $package_path does not exist."
+              exit 1
+            fi
 
             if npm view "${package_name}@${EXPECTED_VERSION}" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
               echo "${package_name}@${EXPECTED_VERSION} already exists on npm; skipping publish."
               continue
             fi
 
-            npm publish "$package_dir" --access public --tag "$publish_tag" --registry=https://registry.npmjs.org/
+            npm publish "$package_path" --access public --tag "$publish_tag" --registry=https://registry.npmjs.org/
             published_count=$((published_count + 1))
           done
 
