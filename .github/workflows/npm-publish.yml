@@ -228,23 +228,40 @@ jobs:
 
           node <<'NODE'
           const fs = require('node:fs');
+          const path = require('node:path');
 
           const expectedVersion = process.env.EXPECTED_VERSION;
-          const packageDependencyUpdates = [
-            {
-              path: 'packages/oidc-client/package.json',
-              dependencies: ['@axa-fr/oidc-client-service-worker'],
-            },
-            {
-              path: 'packages/react-oidc/package.json',
-              dependencies: ['@axa-fr/oidc-client', '@axa-fr/oidc-client-service-worker'],
-            },
+          const lifecycleScriptBackupPath = path.join(
+            process.env.RUNNER_TEMP ?? process.cwd(),
+            'npm-publish-lifecycle-scripts.json',
+          );
+          const packagePaths = [
+            'packages/oidc-client-service-worker/package.json',
+            'packages/oidc-client/package.json',
+            'packages/react-oidc/package.json',
           ];
+          const dependencyUpdates = {
+            'packages/oidc-client/package.json': ['@axa-fr/oidc-client-service-worker'],
+            'packages/react-oidc/package.json': [
+              '@axa-fr/oidc-client',
+              '@axa-fr/oidc-client-service-worker',
+            ],
+          };
+          const publishLifecycleScripts = [
+            'prepublishOnly',
+            'prepack',
+            'prepare',
+            'postpack',
+            'publish',
+            'postpublish',
+          ];
+          const lifecycleScriptBackup = {};
 
-          for (const { path, dependencies } of packageDependencyUpdates) {
-            const packageJson = JSON.parse(fs.readFileSync(path, 'utf8'));
+          for (const packagePath of packagePaths) {
+            const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+            lifecycleScriptBackup[packagePath] = packageJson.scripts ?? null;
 
-            for (const dependencyName of dependencies) {
+            for (const dependencyName of dependencyUpdates[packagePath] ?? []) {
               if (!packageJson.dependencies?.[dependencyName]) {
                 console.error(`${packageJson.name} is missing dependency ${dependencyName}.`);
                 process.exit(1);
@@ -253,8 +270,18 @@ jobs:
               packageJson.dependencies[dependencyName] = expectedVersion;
             }
 
-            fs.writeFileSync(path, `${JSON.stringify(packageJson, null, 2)}\n`);
+            for (const scriptName of publishLifecycleScripts) {
+              delete packageJson.scripts?.[scriptName];
+            }
+
+            fs.writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
           }
+
+          fs.mkdirSync(path.dirname(lifecycleScriptBackupPath), { recursive: true });
+          fs.writeFileSync(
+            lifecycleScriptBackupPath,
+            `${JSON.stringify(lifecycleScriptBackup, null, 2)}\n`,
+          );
           NODE
 
       - name: Verify package versions before publish
@@ -288,9 +315,25 @@ jobs:
             const workspaceDependencies = Object.entries(packageJson.dependencies ?? {})
               .filter(([, version]) => version === 'workspace:*')
               .map(([dependencyName]) => dependencyName);
+            const publishLifecycleScripts = [
+              'prepublishOnly',
+              'prepack',
+              'prepare',
+              'postpack',
+              'publish',
+              'postpublish',
+            ];
+            const lifecycleScripts = publishLifecycleScripts.filter(
+              scriptName => packageJson.scripts?.[scriptName],
+            );
 
             if (workspaceDependencies.length > 0) {
               console.error(`${packageJson.name} still contains workspace dependencies: ${workspaceDependencies.join(', ')}.`);
+              hasError = true;
+            }
+
+            if (lifecycleScripts.length > 0) {
+              console.error(`${packageJson.name} still contains publish lifecycle scripts: ${lifecycleScripts.join(', ')}.`);
               hasError = true;
             }
           }
@@ -394,7 +437,7 @@ jobs:
             fi
           done
 
-      - name: Restore workspace dependencies after publish
+      - name: Restore package manifests after publish
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         shell: bash
         run: |
@@ -402,22 +445,38 @@ jobs:
 
           node <<'NODE'
           const fs = require('node:fs');
+          const path = require('node:path');
 
-          const packageDependencyUpdates = [
-            {
-              path: 'packages/oidc-client/package.json',
-              dependencies: ['@axa-fr/oidc-client-service-worker'],
-            },
-            {
-              path: 'packages/react-oidc/package.json',
-              dependencies: ['@axa-fr/oidc-client', '@axa-fr/oidc-client-service-worker'],
-            },
+          const lifecycleScriptBackupPath = path.join(
+            process.env.RUNNER_TEMP ?? process.cwd(),
+            'npm-publish-lifecycle-scripts.json',
+          );
+          const packagePaths = [
+            'packages/oidc-client-service-worker/package.json',
+            'packages/oidc-client/package.json',
+            'packages/react-oidc/package.json',
           ];
+          const dependencyUpdates = {
+            'packages/oidc-client/package.json': ['@axa-fr/oidc-client-service-worker'],
+            'packages/react-oidc/package.json': [
+              '@axa-fr/oidc-client',
+              '@axa-fr/oidc-client-service-worker',
+            ],
+          };
 
-          for (const { path, dependencies } of packageDependencyUpdates) {
-            const packageJson = JSON.parse(fs.readFileSync(path, 'utf8'));
+          if (!fs.existsSync(lifecycleScriptBackupPath)) {
+            console.error(`Lifecycle script backup does not exist: ${lifecycleScriptBackupPath}.`);
+            process.exit(1);
+          }
 
-            for (const dependencyName of dependencies) {
+          const lifecycleScriptBackup = JSON.parse(
+            fs.readFileSync(lifecycleScriptBackupPath, 'utf8'),
+          );
+
+          for (const packagePath of packagePaths) {
+            const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+
+            for (const dependencyName of dependencyUpdates[packagePath] ?? []) {
               if (!packageJson.dependencies?.[dependencyName]) {
                 console.error(`${packageJson.name} is missing dependency ${dependencyName}.`);
                 process.exit(1);
@@ -426,8 +485,16 @@ jobs:
               packageJson.dependencies[dependencyName] = 'workspace:*';
             }
 
-            fs.writeFileSync(path, `${JSON.stringify(packageJson, null, 2)}\n`);
+            if (lifecycleScriptBackup[packagePath] == null) {
+              delete packageJson.scripts;
+            } else {
+              packageJson.scripts = lifecycleScriptBackup[packagePath];
+            }
+
+            fs.writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
           }
+
+          fs.rmSync(lifecycleScriptBackupPath, { force: true });
           NODE
 
       - name: Commit, tag and push release
