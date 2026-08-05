@@ -1,13 +1,20 @@
 # Changelog
 
-## 7.29.0
+## v7.29.1
 
+- [6f83c671](https://github.com/AxaFrance/oidc-client/commit/6f83c67152871291723782192721f90386dcd140) - [skip ci] Update to version 7.29.1 in package.json, 2026-08-05 by *github-actions[bot]*
+- [e880d47a](https://github.com/AxaFrance/oidc-client/commit/e880d47ad37194d21e80897d343eabd08ff66625) - fix(ci): publish npm (release), 2026-08-05 by *Guillaume Chervet*
+- [6a0b8511](https://github.com/AxaFrance/oidc-client/commit/6a0b8511bef2b33082ebdc5c77b855190e9d2064) - fix(ci): npm publish (release), 2026-08-05 by *Guillaume Chervet*
+- [aff49c35](https://github.com/AxaFrance/oidc-client/commit/aff49c355c178d7fd54386d357e8f60e90a4b3ae) - fix(ci): publish npm (release), 2026-08-05 by *Guillaume Chervet*
+- [61edf77f](https://github.com/AxaFrance/oidc-client/commit/61edf77f448db74aac2c709e7bb82eeb4752f88f) - fix(ci): publish npm (release), 2026-08-05 by *Guillaume Chervet*
+- [9e1a60f6](https://github.com/AxaFrance/oidc-client/commit/9e1a60f6b54226e12adff103ce07557a1c79c08e) - fix(ci): publish npm (release), 2026-08-05 by *Guillaume Chervet*
+- [cf4b796e](https://github.com/AxaFrance/oidc-client/commit/cf4b796e9e1e6ae9d82e1b8d02e9acf03a48d9c5) - [skip ci] Generate changelog to version 7.29.0, 2026-07-31 by *github-actions[bot]*
 - [8207e25c](https://github.com/AxaFrance/oidc-client/commit/8207e25c892f63399522123ff01702337694b48a) - [skip ci] Update to version 7.29.0 in package.json, 2026-07-31 by *github-actions[bot]*
+- [a0b3dbd7](https://github.com/AxaFrance/oidc-client/commit/a0b3dbd710ebc361e11d4abec364bc6f7fbd25df) - 7.29.0, 2026-07-31 by *github-actions[bot]*
 
 
 ## v7.29.0
 
-- [a0b3dbd7](https://github.com/AxaFrance/oidc-client/commit/a0b3dbd710ebc361e11d4abec364bc6f7fbd25df) - 7.29.0, 2026-07-31 by *github-actions[bot]*
 - [2d671ac9](https://github.com/AxaFrance/oidc-client/commit/2d671ac95a13a0effc1472e3fac0d4a32250fc2e) - feat(oidc-client): add typed-error (#1720) (release), 2026-07-31 by *Guillaume Chervet*
 - [ad25121d](https://github.com/AxaFrance/oidc-client/commit/ad25121d7164052890296eea064baaf267433c4d) - [skip ci] Generate changelog to version 7.28.2, 2026-07-30 by *github-actions[bot]*
 - [cdf423ef](https://github.com/AxaFrance/oidc-client/commit/cdf423ef7bbeccc3127055d1b9c401a5bfb5fa81) - [skip ci] Update to version 7.28.2 in package.json, 2026-07-30 by *github-actions[bot]*
