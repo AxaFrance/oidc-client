@@ -58,6 +58,7 @@ jobs:
     needs: skip_ci
     permissions:
       contents: write
+      id-token: write
     environment: react-oidc
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
@@ -137,6 +138,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install npm with trusted publishing support
+        run: npm install --global "npm@^11.5.1"
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -349,17 +354,8 @@ jobs:
         shell: bash
         env:
           EXPECTED_VERSION: ${{ steps.tag.outputs.new_version }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-
-          if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
-            echo "::error::NPM_TOKEN is required to publish packages."
-            exit 1
-          fi
-
-          printf '//registry.npmjs.org/:_authToken=%s\n' "${NODE_AUTH_TOKEN}" > ~/.npmrc
-          chmod 0600 ~/.npmrc
 
           package_dirs=(
             "packages/oidc-client-service-worker"
