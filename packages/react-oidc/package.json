@@ -36,6 +36,7 @@
     "test": "vitest --root . --coverage",
     "clean": "rimraf dist",
     "postinstall": "echo 'WARNING keep sink OidcServiceWorker.js version file'",
+    "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
     "lint": "eslint src"
   },
   "dependencies": {

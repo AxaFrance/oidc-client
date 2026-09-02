@@ -224,6 +224,7 @@ jobs:
         working-directory: ./packages/react-oidc
 
       - name: Prepare package manifests for npm publish
+        id: prepare_publish_manifests
         if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
         shell: bash
         env:
@@ -264,7 +265,13 @@ jobs:
 
           for (const packagePath of packagePaths) {
             const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-            lifecycleScriptBackup[packagePath] = packageJson.scripts ?? null;
+
+            if (!packageJson.scripts?.prepare) {
+              console.error(`${packageJson.name} is missing the required prepare script.`);
+              process.exit(1);
+            }
+
+            lifecycleScriptBackup[packagePath] = { ...packageJson.scripts };
 
             for (const dependencyName of dependencyUpdates[packagePath] ?? []) {
               if (!packageJson.dependencies?.[dependencyName]) {
@@ -434,7 +441,7 @@ jobs:
           done
 
       - name: Restore package manifests after publish
-        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        if: always() && steps.prepare_publish_manifests.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
@@ -471,6 +478,12 @@ jobs:
 
           for (const packagePath of packagePaths) {
             const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+            const originalScripts = lifecycleScriptBackup[packagePath];
+
+            if (!originalScripts?.prepare) {
+              console.error(`${packageJson.name} has no prepare script in the lifecycle script backup.`);
+              process.exit(1);
+            }
 
             for (const dependencyName of dependencyUpdates[packagePath] ?? []) {
               if (!packageJson.dependencies?.[dependencyName]) {
@@ -481,10 +494,15 @@ jobs:
               packageJson.dependencies[dependencyName] = 'workspace:*';
             }
 
-            if (lifecycleScriptBackup[packagePath] == null) {
-              delete packageJson.scripts;
-            } else {
-              packageJson.scripts = lifecycleScriptBackup[packagePath];
+            packageJson.scripts = originalScripts;
+
+            const unRestoredDependencies = (dependencyUpdates[packagePath] ?? []).filter(
+              dependencyName => packageJson.dependencies?.[dependencyName] !== 'workspace:*',
+            );
+
+            if (!packageJson.scripts.prepare || unRestoredDependencies.length > 0) {
+              console.error(`${packageJson.name} was not restored to its workspace state.`);
+              process.exit(1);
             }
 
             fs.writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
@@ -505,7 +523,12 @@ jobs:
             exit 1
           fi
 
-          git add .
+          git add \
+            packages/oidc-client-service-worker/package.json \
+            packages/oidc-client-service-worker/src/version.ts \
+            packages/oidc-client/package.json \
+            packages/oidc-client/src/version.ts \
+            packages/react-oidc/package.json
           git commit -m "[skip ci] Update to version ${{ steps.tag.outputs.new_version }} in package.json"
           git tag "$release_tag"
           git push --set-upstream origin "HEAD:main" --follow-tags -f
