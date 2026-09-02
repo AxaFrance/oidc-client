@@ -135,10 +135,11 @@ jobs:
             echo "new_version=$version-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
 
       - name: Install npm with trusted publishing support
         run: npm install --global "npm@^11.5.1"
