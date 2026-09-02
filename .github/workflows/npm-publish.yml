@@ -138,11 +138,27 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
-          registry-url: https://registry.npmjs.org/
           package-manager-cache: false
 
       - name: Install npm with trusted publishing support
         run: npm install --global "npm@^11.5.1"
+
+      - name: Verify npm trusted publishing prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          npm --version
+
+          if [[ -n "${NODE_AUTH_TOKEN:-}" ]]; then
+            echo "::error::NODE_AUTH_TOKEN must be unset for npm trusted publishing."
+            exit 1
+          fi
+
+          if [[ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" || -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]]; then
+            echo "::error::GitHub Actions did not expose the OIDC token request environment."
+            exit 1
+          fi
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
