@@ -1,7 +1,17 @@
 # Changelog
 
+## v7.29.2
+
+- [8e7d95fb](https://github.com/AxaFrance/oidc-client/commit/8e7d95fba420b1dc5515b2e9e7ccd1f5e08f6b6e) - [skip ci] Update to version 7.29.2 in package.json, 2026-09-02 by *github-actions[bot]*
+- [658d033f](https://github.com/AxaFrance/oidc-client/commit/658d033f02de693c03cd07a9a9dbab1d694d14f4) - fix: publish npm (release), 2026-09-02 by *Guillaume Chervet*
+- [99eb8992](https://github.com/AxaFrance/oidc-client/commit/99eb8992664560757d3e5e2799057d0b69088e1e) - fix: npm publish (release), 2026-09-02 by *Guillaume Chervet*
+- [afeeb194](https://github.com/AxaFrance/oidc-client/commit/afeeb194e2145491ec3598538b101b88488bd764) - fix: publish (release), 2026-09-02 by *Guillaume Chervet*
+- [b896d948](https://github.com/AxaFrance/oidc-client/commit/b896d94843f37cee8f051790a02a25504367a968) - fix: publish now with npm OIDC  (release), 2026-09-01 by *Guillaume Chervet*
+
+
 ## v7.29.1
 
+- [8af7d30f](https://github.com/AxaFrance/oidc-client/commit/8af7d30f1a70427626284826ee87d81d46f64685) - [skip ci] Generate changelog to version 7.29.1, 2026-08-05 by *github-actions[bot]*
 - [6f83c671](https://github.com/AxaFrance/oidc-client/commit/6f83c67152871291723782192721f90386dcd140) - [skip ci] Update to version 7.29.1 in package.json, 2026-08-05 by *github-actions[bot]*
 - [e880d47a](https://github.com/AxaFrance/oidc-client/commit/e880d47ad37194d21e80897d343eabd08ff66625) - fix(ci): publish npm (release), 2026-08-05 by *Guillaume Chervet*
 - [6a0b8511](https://github.com/AxaFrance/oidc-client/commit/6a0b8511bef2b33082ebdc5c77b855190e9d2064) - fix(ci): npm publish (release), 2026-08-05 by *Guillaume Chervet*
@@ -315,12 +325,5 @@
 ## v7.23.1
 
 - [0f69a114](https://github.com/AxaFrance/oidc-client/commit/0f69a114564134dee63f78654b9af82f0b291ec9) - fix(oidc): login async promise (release), 2024-11-27 by *Guillaume Chervet*
-
-
-## v7.23.0
-
-- [30fda231](https://github.com/AxaFrance/oidc-client/commit/30fda231324b18bb026de30e537e0bce7cc3bbc1) - feat(oidc-react): add missing scope property in login route (release), 2024-11-22 by *Guillaume Chervet*
-- [4d77aae5](https://github.com/AxaFrance/oidc-client/commit/4d77aae5ec4564f1866ebc9ba5e9f2ad1bd51b63) - fix(oidc): dpop typo (#1482), 2024-11-08 by *Guillaume Chervet*
-- [08a21f89](https://github.com/AxaFrance/oidc-client/commit/08a21f89842f1aa8123bfd1eea046a8f1d4a8e96) - fix(demo): better demo (#1480), 2024-11-05 by *Guillaume Chervet*
 
 
