@@ -11,6 +11,7 @@ describe('Route test Suite', () => {
     ['capacitor://localhost/index.html', '/index.html'],
     ['capacitor://localhost/pathname#hash?search=test', '/pathname#hash'],
     ['http://example.com:3000/', ''],
+    ['https://example.com/authentication/callback?state=abc&code=def#', '/authentication/callback'],
   ])('getPath should return the full path of an url', (uri, expected) => {
     const path = getPath(uri);
     expect(path).toBe(expected);
