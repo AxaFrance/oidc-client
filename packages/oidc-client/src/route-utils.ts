@@ -45,7 +45,7 @@ export const getPath = (href: string) => {
   }
   let { hash } = location;
 
-  if (hash === '#_=_') {
+  if (hash === '#' || hash === '#_=_') {
     hash = '';
   }
 
