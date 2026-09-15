@@ -1,6 +1,13 @@
 # Contributing to @axa-fr/oidc-client
 
-First, ensure you have the [latest `pnpm`](https://pnpm.io/).
+First, ensure you have Node.js 22.22.2+, 24.15.0+, or 26+ and the version of
+[pnpm](https://pnpm.io/) specified in `package.json`.
+
+The workspace uses TypeScript 7 for the `tsc` command through the
+`@typescript/native` npm alias. The `typescript` dependency aliases
+`@typescript/typescript6` to provide the compiler API required by typescript-eslint
+and vite-plugin-dts. This follows the
+[TypeScript side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6-0).
 
 To get started with the repository:
 
