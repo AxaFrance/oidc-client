@@ -1,7 +1,16 @@
 # Changelog
 
+## v7.29.3
+
+- [84649474](https://github.com/AxaFrance/oidc-client/commit/846494746b2bba4571aa8b4f60e3c7ccd5f2fbe4) - [skip ci] Update to version 7.29.3 in package.json, 2026-09-15 by *github-actions[bot]*
+- [3b18c50d](https://github.com/AxaFrance/oidc-client/commit/3b18c50d5fa7ab61522a7d962cfac7748fb7b638) - Make React Oidc publish reruns idempotent when versions already exist on npm (#1728) (release), 2026-09-15 by *Copilot*
+- [eb0f40a1](https://github.com/AxaFrance/oidc-client/commit/eb0f40a1a5c4740be3ec13d4e83b716110bdd327) - chore(deps): update all pnpm workspace dependencies (#1727) (release), 2026-09-15 by *Guillaume Chervet*
+- [f91327ff](https://github.com/AxaFrance/oidc-client/commit/f91327ff95a465cc8ab2ec635ef3147bb8eb59c4) - fix(oidc): ignore bare trailing hash in getPath (release) (#1725), 2026-09-13 by *Paul Martin*
+
+
 ## v7.29.2
 
+- [9325ced4](https://github.com/AxaFrance/oidc-client/commit/9325ced4f10433e3db00c273749989c08727dcfa) - [skip ci] Generate changelog to version 7.29.2, 2026-09-02 by *github-actions[bot]*
 - [8e7d95fb](https://github.com/AxaFrance/oidc-client/commit/8e7d95fba420b1dc5515b2e9e7ccd1f5e08f6b6e) - [skip ci] Update to version 7.29.2 in package.json, 2026-09-02 by *github-actions[bot]*
 - [658d033f](https://github.com/AxaFrance/oidc-client/commit/658d033f02de693c03cd07a9a9dbab1d694d14f4) - fix: publish npm (release), 2026-09-02 by *Guillaume Chervet*
 - [99eb8992](https://github.com/AxaFrance/oidc-client/commit/99eb8992664560757d3e5e2799057d0b69088e1e) - fix: npm publish (release), 2026-09-02 by *Guillaume Chervet*
@@ -320,10 +329,5 @@
 ## v7.24.0
 
 - [de5da362](https://github.com/AxaFrance/oidc-client/commit/de5da362de4e3f10d46ffdfafd324e14e173b78c) - feat(scope): scope can be change dynamically (release) (#1489), 2025-01-03 by *Guillaume Chervet*
-
-
-## v7.23.1
-
-- [0f69a114](https://github.com/AxaFrance/oidc-client/commit/0f69a114564134dee63f78654b9af82f0b291ec9) - fix(oidc): login async promise (release), 2024-11-27 by *Guillaume Chervet*
 
 
