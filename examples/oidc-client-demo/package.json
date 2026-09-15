@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "@axa-fr/oidc-client": "workspace:~",
-    "typescript": "6.0.3",
-    "web-vitals": "5.2.0"
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "web-vitals": "6.2.1"
   },
   "scripts": {
     "start": "vite",
@@ -27,8 +27,8 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "25.8.0",
+    "@types/node": "26.5.1",
     "cross-env": "^10.1.0",
-    "vite": "8.0.13"
+    "vite": "8.3.0"
   }
 }

@@ -5,8 +5,8 @@
     "strict": true,
     "allowJs": true,
     "noEmit": true,
-    "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true
