@@ -419,8 +419,7 @@ jobs:
           done
 
           if [[ "$published_count" -eq 0 ]]; then
-            echo "::error::No expected package was published."
-            exit 1
+            echo "All expected package versions already exist on npm; skipping publish."
           fi
 
           echo "published_count=$published_count" >> "$GITHUB_OUTPUT"
