@@ -82,11 +82,11 @@ const shouldBypassNonOidcRequest = (
 };
 
 const getMatchingOidcConfigurations = (database: Database, url: string): OidcConfig[] => {
+  const normalizedUrl = normalizeUrl(url);
   return Object.values(database).filter(config => {
     const { oidcServerConfiguration } = config || {};
     const { tokenEndpoint, revocationEndpoint } = oidcServerConfiguration || {};
 
-    const normalizedUrl = normalizeUrl(url);
     return (
       (tokenEndpoint && normalizedUrl.startsWith(normalizeUrl(tokenEndpoint))) ||
       (revocationEndpoint && normalizedUrl.startsWith(normalizeUrl(revocationEndpoint)))

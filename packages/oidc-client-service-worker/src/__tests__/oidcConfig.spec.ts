@@ -35,6 +35,54 @@ const oidcServerConfigDefault = {
 };
 
 describe('getCurrentDatabasesTokenEndpoint', () => {
+  it.each([
+    ['https://EXAMPLE.com:443/token?code=example', 'https://example.com/token'],
+    ['http://example.com:80/token', 'http://EXAMPLE.com/token'],
+    ['https://example.com/token/child', 'https://example.com/token'],
+    ['https://example.com/token2', 'https://example.com/token'],
+    ['not-a-url', 'not-a-url'],
+  ])('preserves normalization and prefix matching for %s', (url, endpoint) => {
+    const database: Database = {
+      uninitialized: { ...oidcConfigDefaults, oidcServerConfiguration: null },
+      token: {
+        ...oidcConfigDefaults,
+        oidcServerConfiguration: { ...oidcServerConfigDefault, tokenEndpoint: endpoint },
+      },
+      revocation: {
+        ...oidcConfigDefaults,
+        oidcServerConfiguration: { ...oidcServerConfigDefault, revocationEndpoint: endpoint },
+      },
+      emptyEndpoints: {
+        ...oidcConfigDefaults,
+        oidcServerConfiguration: { ...oidcServerConfigDefault },
+      },
+    };
+
+    const result = getCurrentDatabasesTokenEndpoint(database, url);
+
+    expect(result).toEqual([database.token, database.revocation]);
+    expect(result[0]).toBe(database.token);
+    expect(result[1]).toBe(database.revocation);
+  });
+
+  it('returns no matches for an empty database', () => {
+    expect(getCurrentDatabasesTokenEndpoint({}, 'https://example.com/token')).toEqual([]);
+  });
+
+  it('keeps non-default ports distinct', () => {
+    const database: Database = {
+      config: {
+        ...oidcConfigDefaults,
+        oidcServerConfiguration: {
+          ...oidcServerConfigDefault,
+          tokenEndpoint: 'https://example.com:8443/token',
+        },
+      },
+    };
+
+    expect(getCurrentDatabasesTokenEndpoint(database, 'https://example.com/token')).toEqual([]);
+  });
+
   it('should return configs with matching token endpoint', () => {
     const database: Database = {
       config1: {

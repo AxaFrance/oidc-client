@@ -1,8 +1,9 @@
-function serializeHeaders(headers: Headers) {
+function serializeHeaders(headers: Headers): Record<string, string> {
   const headersObj: Record<string, string> = {};
   for (const key of headers.keys()) {
-    if (headers.has(key)) {
-      headersObj[key] = headers.get(key) as string;
+    const value = headers.get(key);
+    if (value !== null) {
+      headersObj[key] = value;
     }
   }
   return headersObj;
