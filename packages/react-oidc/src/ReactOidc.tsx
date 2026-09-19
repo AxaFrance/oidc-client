@@ -9,14 +9,18 @@ type GetOidcFn = {
   (configurationName?: string): any;
 };
 
-const defaultIsAuthenticated = (getOidc: GetOidcFn, configurationName: string) => {
-  let isAuthenticated = false;
+const defaultIsAuthenticated = (getOidc: GetOidcFn, configurationName: string): boolean => {
   const oidc = getOidc(configurationName);
-  if (oidc) {
-    isAuthenticated = oidc.tokens != null;
-  }
-  return isAuthenticated;
+  return oidc ? oidc.tokens != null : false;
 };
+
+const isTokenStateEvent = (name: string): boolean =>
+  name === OidcClient.eventNames.token_renewed ||
+  name === OidcClient.eventNames.token_acquired ||
+  name === OidcClient.eventNames.logout_from_another_tab ||
+  name === OidcClient.eventNames.logout_from_same_tab ||
+  name === OidcClient.eventNames.refreshTokensAsync_error ||
+  name === OidcClient.eventNames.syncTokensAsync_error;
 
 export const useOidc = (configurationName = defaultConfigurationName) => {
   const getOidc = OidcClient.get;
@@ -149,14 +153,7 @@ export const useOidcAccessToken = (configurationName = defaultConfigurationName)
     }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-      if (
-        name === OidcClient.eventNames.token_renewed ||
-        name === OidcClient.eventNames.token_acquired ||
-        name === OidcClient.eventNames.logout_from_another_tab ||
-        name === OidcClient.eventNames.logout_from_same_tab ||
-        name === OidcClient.eventNames.refreshTokensAsync_error ||
-        name === OidcClient.eventNames.syncTokensAsync_error
-      ) {
+      if (isTokenStateEvent(name)) {
         if (isMounted) {
           const tokens = oidc.tokens;
           setAccessToken(
@@ -215,14 +212,7 @@ export const useOidcIdToken = (configurationName = defaultConfigurationName) => 
     }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-      if (
-        name === OidcClient.eventNames.token_renewed ||
-        name === OidcClient.eventNames.token_acquired ||
-        name === OidcClient.eventNames.logout_from_another_tab ||
-        name === OidcClient.eventNames.logout_from_same_tab ||
-        name === OidcClient.eventNames.refreshTokensAsync_error ||
-        name === OidcClient.eventNames.syncTokensAsync_error
-      ) {
+      if (isTokenStateEvent(name)) {
         if (isMounted) {
           const tokens = oidc.tokens;
           setIDToken(

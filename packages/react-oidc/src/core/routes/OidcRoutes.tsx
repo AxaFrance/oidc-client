@@ -44,32 +44,26 @@ const OidcRoutes: FC<PropsWithChildren<OidcRoutesProps>> = ({
 
   const callbackPath = getPath(redirect_uri);
 
-  if (silent_redirect_uri) {
-    if (path === getPath(silent_redirect_uri)) {
-      return <SilentCallbackComponent configurationName={configurationName} />;
-    }
+  if (silent_redirect_uri && path === getPath(silent_redirect_uri)) {
+    return <SilentCallbackComponent configurationName={configurationName} />;
   }
 
-  if (silent_login_uri) {
-    if (path === getPath(silent_login_uri)) {
-      return <SilentLoginComponent configurationName={configurationName} />;
-    }
+  if (silent_login_uri && path === getPath(silent_login_uri)) {
+    return <SilentLoginComponent configurationName={configurationName} />;
   }
 
-  switch (path) {
-    case callbackPath:
-      return (
-        <CallbackComponent
-          callBackError={callbackErrorComponent}
-          callBackSuccess={callbackSuccessComponent}
-          configurationName={configurationName}
-          withCustomHistory={withCustomHistory}
-          navigateAfterCallback={navigateAfterCallback}
-        />
-      );
-    default:
-      return <>{children}</>;
+  if (path === callbackPath) {
+    return (
+      <CallbackComponent
+        callBackError={callbackErrorComponent}
+        callBackSuccess={callbackSuccessComponent}
+        configurationName={configurationName}
+        withCustomHistory={withCustomHistory}
+        navigateAfterCallback={navigateAfterCallback}
+      />
+    );
   }
+  return <>{children}</>;
 };
 
 export default React.memo(OidcRoutes);

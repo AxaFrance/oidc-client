@@ -1,22 +1,26 @@
-import { OidcSecure, useOidcFetch, withOidcFetch } from '@axa-fr/react-oidc';
-import React, { useEffect, useState } from 'react';
+import {
+  type Fetch,
+  OidcSecure,
+  type OidcUserInfo,
+  useOidcFetch,
+  withOidcFetch,
+} from '@axa-fr/react-oidc';
+import React, { type ReactElement, useEffect, useState } from 'react';
 
-const DisplayUserInfo = ({ fetch }) => {
-  const [oidcUser, setOidcUser] = useState(null);
-  const [isLoading, setLoading] = useState(true);
+const fetchUserInfoAsync = async (fetch: Fetch): Promise<OidcUserInfo | null> => {
+  const response = await fetch('https://demo.duendesoftware.com/connect/userinfo');
+  return response.status === 200 ? response.json() : null;
+};
+
+const DisplayUserInfo = ({ fetch }: { fetch: Fetch }): ReactElement => {
+  const [oidcUser, setOidcUser] = useState<OidcUserInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserInfoAsync = async () => {
-      const res = await fetch('https://demo.duendesoftware.com/connect/userinfo');
-      if (res.status !== 200) {
-        return null;
-      }
-      return res.json();
-    };
     let isMounted = true;
-    fetchUserInfoAsync().then(userInfo => {
+    fetchUserInfoAsync(fetch).then(userInfo => {
       if (isMounted) {
-        setLoading(false);
+        setIsLoading(false);
         setOidcUser(userInfo);
       }
     });
@@ -49,7 +53,10 @@ export const FetchUserHoc = () => (
   </OidcSecure>
 );
 
-export const FetchUserHook = (props: any) => {
+export const FetchUserHook = (props: {
+  configurationName?: string;
+  demonstratingProofOfPossession?: boolean;
+}): ReactElement => {
   const { fetch } = useOidcFetch(
     window.fetch,
     props.configurationName,
