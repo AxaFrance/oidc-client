@@ -69,6 +69,14 @@ export const TOKEN_TYPE = {
   access_token: 'access_token',
 };
 
+const encodeFormBody = (details: StringMap): string => {
+  const formBody: string[] = [];
+  for (const property in details) {
+    formBody.push(`${encodeURIComponent(property)}=${encodeURIComponent(details[property])}`);
+  }
+  return formBody.join('&');
+};
+
 export const performRevocationRequestAsync =
   fetch =>
   async (
@@ -90,13 +98,7 @@ export const performRevocationRequestAsync =
       }
     }
 
-    const formBody = [];
-    for (const property in details) {
-      const encodedKey = encodeURIComponent(property);
-      const encodedValue = encodeURIComponent(details[property]);
-      formBody.push(`${encodedKey}=${encodedValue}`);
-    }
-    const formBodyString = formBody.join('&');
+    const formBodyString = encodeFormBody(details);
 
     const response = await internalFetch(fetch)(
       url,
@@ -161,12 +163,7 @@ export const performPushedAuthorizationRequestAsync =
       );
     }
 
-    const formBody = [];
-    for (const property in details) {
-      const encodedKey = encodeURIComponent(property);
-      const encodedValue = encodeURIComponent(details[property]);
-      formBody.push(`${encodedKey}=${encodedValue}`);
-    }
+    const formBodyString = encodeFormBody(details);
 
     let response: Response;
     try {
@@ -177,7 +174,7 @@ export const performPushedAuthorizationRequestAsync =
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
           },
-          body: formBody.join('&'),
+          body: formBodyString,
         },
         timeoutMs,
       );
@@ -244,13 +241,7 @@ export const performTokenRequestAsync =
       }
     }
 
-    const formBody = [];
-    for (const property in details) {
-      const encodedKey = encodeURIComponent(property);
-      const encodedValue = encodeURIComponent(details[property]);
-      formBody.push(`${encodedKey}=${encodedValue}`);
-    }
-    const formBodyString = formBody.join('&');
+    const formBodyString = encodeFormBody(details);
 
     const response = await internalFetch(fetch)(
       url,
@@ -354,13 +345,7 @@ export const performFirstTokenRequestAsync =
   ): Promise<PerformTokenRequestResponse> => {
     formBodyExtras = formBodyExtras ? { ...formBodyExtras } : {};
     formBodyExtras.code_verifier = await storage.getCodeVerifierAsync();
-    const formBody = [];
-    for (const property in formBodyExtras) {
-      const encodedKey = encodeURIComponent(property);
-      const encodedValue = encodeURIComponent(formBodyExtras[property]);
-      formBody.push(`${encodedKey}=${encodedValue}`);
-    }
-    const formBodyString = formBody.join('&');
+    const formBodyString = encodeFormBody(formBodyExtras);
     const response = await internalFetch(fetch)(
       url,
       {
