@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.29.4
+
+- [58ff7b53](https://github.com/AxaFrance/oidc-client/commit/58ff7b539e340b315dda2a30ee884cdd2e07a9c0) - [skip ci] Update to version 7.29.4 in package.json, 2026-09-19 by *github-actions[bot]*
+- [95ab5aa4](https://github.com/AxaFrance/oidc-client/commit/95ab5aa41904bf837c97c2c876e0d26892b2c3e2) - Clarify package documentation and replace architecture images with Mermaid (#1730) (release), 2026-09-19 by *Copilot*
+
+
 ## v7.29.3
 
+- [e470a539](https://github.com/AxaFrance/oidc-client/commit/e470a539874b0f8521718a3ad85764dd50d1da08) - [skip ci] Generate changelog to version 7.29.3, 2026-09-15 by *github-actions[bot]*
 - [84649474](https://github.com/AxaFrance/oidc-client/commit/846494746b2bba4571aa8b4f60e3c7ccd5f2fbe4) - [skip ci] Update to version 7.29.3 in package.json, 2026-09-15 by *github-actions[bot]*
 - [3b18c50d](https://github.com/AxaFrance/oidc-client/commit/3b18c50d5fa7ab61522a7d962cfac7748fb7b638) - Make React Oidc publish reruns idempotent when versions already exist on npm (#1728) (release), 2026-09-15 by *Copilot*
 - [eb0f40a1](https://github.com/AxaFrance/oidc-client/commit/eb0f40a1a5c4740be3ec13d4e83b716110bdd327) - chore(deps): update all pnpm workspace dependencies (#1727) (release), 2026-09-15 by *Guillaume Chervet*
@@ -324,10 +331,5 @@
 ## v7.24.1
 
 - [3fe05117](https://github.com/AxaFrance/oidc-client/commit/3fe05117c29704f9be56604eb9ffa7195bcdc517) - refactor(react-oidc): react 19 compatibility (#1493) (release), 2025-01-10 by *Guillaume Chervet*
-
-
-## v7.24.0
-
-- [de5da362](https://github.com/AxaFrance/oidc-client/commit/de5da362de4e3f10d46ffdfafd324e14e173b78c) - feat(scope): scope can be change dynamically (release) (#1489), 2025-01-03 by *Guillaume Chervet*
 
 
