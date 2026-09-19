@@ -1,659 +1,396 @@
 # @axa-fr/oidc-client
 
-[![Continuous Integration](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaGuilDEv/react-oidc/actions/workflows/npm-publish.yml)
-[![npm downloads](https://img.shields.io/npm/dw/@axa-fr/oidc-client)](https://www.npmjs.com/package/@axa-fr/oidc-client)
+A framework-independent OpenID Connect (OIDC) client for browser applications, written in TypeScript. It supports Authorization Code Flow with PKCE, session restoration, token renewal, multiple named configurations, optional service-worker token isolation, Pushed Authorization Requests (PAR), and DPoP.
 
-**@axa-fr/oidc-client** the lightest and securest library to manage authentication with OpenID Connect (OIDC) and OAuth2 protocol. It is compatible with all OIDC providers.
-**@axa-fr/oidc-client** is a pure javascript library. It works with any JavaScript framework or library.
+For React applications, use [`@axa-fr/react-oidc`](../react-oidc/README.md).
 
-We provide a wrapper **@axa-fr/react-oidc** for **React** (compatible next.js) and we expect soon to provide one for **Vue**, **Angular** and **Svelte**.
+- [Quick start](#quick-start)
+- [Service worker](#service-worker)
+- [Configuration](#configuration)
+- [Token renewal](#token-renewal)
+- [Pushed Authorization Requests (PAR)](#pushed-authorization-requests-par)
+- [DPoP](#dpop)
+- [API](#api)
+- [Errors and events](#errors-and-events)
+- [Named configurations and routing](#named-configurations-and-routing)
+- [Service-worker protocol](#service-worker-protocol)
+- [Examples and further reading](#examples-and-further-reading)
 
-- Try the react demo at https://black-rock-0dc6b0d03.1.azurestaticapps.net/ (most advanced)
-- Try the pure javascript demo at https://icy-glacier-004ab4303.2.azurestaticapps.net/
+<a id="getting-started"></a>
 
-<p align="center">
-    <img src="https://raw.githubusercontent.com/AxaFrance/oidc-client/main/docs/img/introduction.gif"
-     alt="Sample React Oicd"
-      />
-</p>
-
-- [About](#about)
-- [Getting Started](#getting-started)
-- [Run The Demo](#run-the-demo)
-- [How It Works](#how-it-works)
-- [Hash route](#Hash-route)
-- [Service Worker Support](#service-worker-support)
-
-## About
-
-@axa-fr/oidc-client is:
-
-- **Secure** :
-  - With Demonstrating Proof of Possession (DPoP), your access_token and refresh_token are not usable outside your browser context (big protection)
-  - With the use of Service Worker, your tokens (refresh_token and/or access_token) are not accessible to the JavaScript client code (if you follow good practices from [`FAQ`](https://github.com/AxaFrance/oidc-client/blob/main/FAQ.md) section)
-  - OIDC using client side Code Credential Grant with pkce only
-- **Lightweight** : Unpacked Size on npm is **274 kB**
-- **Simple**
-  - refresh_token and access_token are auto refreshed in background
-  - with the use of the Service Worker, you do not need to inject the access_token in every fetch, you have only to configure OidcTrustedDomains.js file
-- **Multiple Authentication** :
-  - You can authenticate many times to the same provider with different scope (for example you can acquire a new 'payment' scope for a payment)
-  - You can authenticate to multiple different providers inside the same SPA (single page application) website
-- **Flexible** :
-  - Work with Service Worker (more secure) and without for older browser (less secure).
-  - You can disable Service Worker if you want (but less secure) and just use SessionStorage or LocalStorage mode.
-
-![](https://github.com/AxaGuilDEv/react-oidc/blob/master/docs/img/schema_pcke_client_side_with_service_worker.png?raw=true)
-
-The service worker catch **access_token** and **refresh_token** that will never be accessible to the client.
-
-### Getting Started
+## Quick start
 
 ```sh
-npm install @axa-fr/oidc-client --save
-
-# To install or update OidcServiceWorker.js file, you can run
-node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
-
-# If you have a "public" folder, the 2 files will be created :
-# ./public/OidcServiceWorker.js <-- will be updated at each "npm install"
-# ./public/OidcTrustedDomains.js <-- won't be updated if already exist
+npm install @axa-fr/oidc-client
 ```
 
-WARNING : If you use Service Worker mode, the OidcServiceWorker.js file should always be up to date with the version of the library. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
+Register a **public browser client** with your identity provider:
 
-```sh
-  "scripts": {
-    ...
-    "postinstall": "node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public"
-  },
+1. Enable Authorization Code Flow with PKCE.
+2. Register your application's exact callback URL, such as `https://app.example.com/authentication/callback`, and its post-logout URL.
+3. Allow your application's origin to call the provider's browser-accessible endpoints through CORS.
+4. Choose the scopes your application needs. Request `offline_access` only if your provider uses it to issue refresh tokens.
+
+Never put a client secret in browser code. Replace the example issuer and client ID below with your own values. Configure your web server to serve the application on the callback route as well as `/`.
+
+Add these elements to your page:
+
+```html
+<p id="session-status" role="status">Loading session…</p>
+<button id="login" type="button" hidden>Sign in</button>
+<button id="logout" type="button" hidden>Sign out</button>
 ```
 
-If you need a very secure mode where refresh_token and access_token will be hide behind a service worker that will proxify requests.
-The only file you should edit is "OidcTrustedDomains.js".
+Run this module when those elements are available, including on the callback route:
 
 ```javascript
-// OidcTrustedDomains.js
-
-// Add bellow trusted domains, access tokens will automatically injected to be send to
-// trusted domain can also be a path like https://www.myapi.com/users,
-// then all subroute like https://www.myapi.com/useers/1 will be authorized to send access_token to.
-
-// Domains used by OIDC server must be also declared here
-const trustedDomains = {
-  default: {
-    oidcDomains: ['https://demo.duendesoftware.com'],
-    accessTokenDomains: ['https://www.myapi.com/users'],
-  },
-};
-
-// Service worker will continue to give access token to the JavaScript client
-// Ideal to hide refresh token from client JavaScript, but to retrieve access_token for some
-// scenarios which require it. For example, to send it via websocket connection.
-trustedDomains.config_show_access_token = {
-  oidcDomains: ['https://demo.duendesoftware.com'],
-  accessTokenDomains: ['https://www.myapi.com/users'],
-  showAccessToken: false,
-  // convertAllRequestsToCorsExceptNavigate: false, // default value is false
-  // setAccessTokenToNavigateRequests: true, // default value is true
-  // bypassAllNonOidcRequests: false, // default value is false; when true, requests outside OIDC and accessTokenDomains are handled by the browser
-};
-
-// DPoP (Demonstrating Proof of Possession) will be activated for the following domains
-trustedDomains.config_with_dpop = {
-  domains: ['https://demo.duendesoftware.com'],
-  demonstratingProofOfPossession: true,
-  demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true, // default value is false, inject DPOP token only when DPOP header is present
-  // Optional, more details bellow
-  /*demonstratingProofOfPossessionConfiguration: {  
-      importKeyAlgorithm: {
-        name: 'ECDSA',
-        namedCurve: 'P-256',
-        hash: {name: 'ES256'}
-      },
-      signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
-      generateKeyAlgorithm: {
-        name: 'ECDSA',
-        namedCurve: 'P-256'
-      },
-      digestAlgorithm: { name: 'SHA-256' },
-      jwtHeaderAlgorithm : 'ES256'
-    }*/
-};
-
-// Setting allowMultiTabLogin to true will enable storing login-specific parameters (state, nonce, code verifier)
-// separately for each tab. This will prevent errors when logins are initiated from multiple tabs.
-// IMPORTANT: When allowMultiTabLogin is true, you MUST use the OIDC fetch provided by
-// oidcClient.fetchWithTokens(fetch) for API requests. The service worker embeds a tab-specific
-// token placeholder in the Authorization header, which it then replaces with the real access token.
-// Using a plain fetch or axios without the OIDC fetch wrapper will result in requests being sent
-// without an Authorization header (401 errors), because the service worker cannot determine which
-// tab's token to inject without the placeholder.
-// Example with axios: configure it to use the OIDC fetch as its adapter or use the OIDC fetch directly.
-trustedDomains.config_multi_tab_login = {
-  domains: ['https://demo.duendesoftware.com'],
-  allowMultiTabLogin: true,
-};
-```
-
-The code of the demo :
-
-```js
 import { OidcClient } from '@axa-fr/oidc-client';
 
-export const configuration = {
-  client_id: 'interactive.public.short',
-  redirect_uri: window.location.origin + '/#/authentication/callback',
-  silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
-  scope: 'openid profile email api offline_access',
-  authority: 'https://demo.duendesoftware.com',
-  par: 'auto',
-  service_worker_relative_url: '/OidcServiceWorker.js', // just comment that line to disable service worker mode
-  service_worker_only: false,
-  demonstrating_proof_of_possession: false,
+const configuration = {
+  client_id: 'your-public-client',
+  authority: 'https://issuer.example.com',
+  redirect_uri: `${window.location.origin}/authentication/callback`,
+  scope: 'openid profile',
 };
 
-const href = window.location.href;
-const oidcClient = OidcClient.getOrCreate()(configuration);
+const oidcClient = OidcClient.getOrCreate(() => fetch)(configuration);
+const status = document.getElementById('session-status');
+const loginButton = document.getElementById('login');
+const logoutButton = document.getElementById('logout');
 
-// Use the fetch bellow to inject access_token and DPOP tokens automatically
-const oidcFetch = oidcClient.fetchWithTokens(fetch);
+function showError() {
+  status.textContent = 'Authentication could not be completed. Please try again.';
+}
 
-// You can inject you own fetch (default Fetch Interface) function and location object (respecting IOidcLocation interface)
-// import {OidcLocation} from '@axa-fr/oidc-client'
-// const oidcClient = OidcClient.getOrCreate(() => fetch, new OidcLocation())(configuration);
-
-console.log(href);
-
-oidcClient.tryKeepExistingSessionAsync().then(() => {
-  if (href.includes(configuration.redirect_uri)) {
-    oidcClient.loginCallbackAsync().then(() => {
-      window.location.href = '/';
-    });
-    document.body.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
-            <h2>Loading</h2>
-        </div>`;
-    return;
-  }
-
-  let tokens = oidcClient.tokens;
-
-  if (tokens) {
-    // @ts-ignore
-    window.logout = () => oidcClient.logoutAsync();
-    document.body.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
-            <button onclick="window.logout()">Logout</button>
-            <h2>Authenticated</h2>
-            <pre>${JSON.stringify(tokens, null, '\t')}</pre>
-        </div>`;
-  } else {
-    // @ts-ignore
-    window.login = () => oidcClient.loginAsync('/');
-    document.body.innerHTML = `<div>
-            <h1>@axa-fr/oidc-client demo</h1>
-            <button onclick="window.login()">Login</button>
-        </div>`;
-  }
+loginButton.addEventListener('click', () => {
+  oidcClient.loginAsync('/').catch(showError);
 });
+logoutButton.addEventListener('click', () => {
+  oidcClient.logoutAsync('/').catch(showError);
+});
+
+async function start() {
+  if (window.location.pathname === new URL(configuration.redirect_uri).pathname) {
+    const { callbackPath } = await oidcClient.loginCallbackAsync();
+    window.history.replaceState(null, '', callbackPath || '/');
+  } else {
+    await oidcClient.tryKeepExistingSessionAsync();
+  }
+
+  const isAuthenticated = oidcClient.tokens != null;
+  status.textContent = isAuthenticated ? 'Signed in' : 'Not signed in';
+  loginButton.hidden = isAuthenticated;
+  logoutButton.hidden = !isAuthenticated;
+}
+
+start().catch(showError);
 ```
+
+This minimal example uses browser storage, not a service worker. Read the next section before choosing a token-storage strategy for production.
+
+### Call a protected API
+
+Use the client's fetch wrapper after authentication:
+
+```javascript
+const oidcFetch = oidcClient.fetchWithTokens(fetch);
+const response = await oidcFetch('https://api.example.com/profile');
+
+if (!response.ok) {
+  throw new Error(`API request failed with status ${response.status}`);
+}
+const profile = await response.json();
+```
+
+The wrapper attaches an access token, or a token placeholder when the service worker hides it, and integrates with token renewal. Only use it for API URLs you trust: the wrapper itself is not a destination allowlist. HTTP error responses still need an explicit `response.ok` check.
+
+<a id="service-worker-support"></a>
+
+## Service worker
+
+The optional service worker can keep access and refresh tokens outside the application's JavaScript context and attach access tokens to configured API requests. It does **not** prevent XSS: injected code can still act through your application and make requests. Continue to use normal XSS defenses, carefully restrict trusted destinations, and avoid rendering or logging raw tokens.
+
+```mermaid
+sequenceDiagram
+    participant App as Browser application
+    participant IdP as Identity provider
+    participant SW as OIDC service worker
+    participant API as Trusted API
+    App->>IdP: Authorization request with PKCE
+    IdP-->>App: Redirect with authorization code
+    App->>SW: Token request
+    SW->>IdP: Exchange code and verifier
+    IdP-->>SW: Tokens
+    SW-->>App: Token placeholders and session information
+    App->>SW: Protected API request
+    SW->>API: Request with access token
+    API-->>App: Response through service worker
+```
+
+The diagram shows worker mode with access-token hiding enabled. The ID token and decoded claims may still be available to application code.
+
+### Install and update the worker
+
+```sh
+node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public
+```
+
+Replace `public` with your application's static-assets directory, and ensure that directory exists before running the command. This creates or updates `OidcServiceWorker.js` and creates `OidcTrustedDomains.js` if it does not already exist. Keep the worker version aligned with the client package; for example, merge this script into your `package.json`:
+
+```json
+{
+  "scripts": {
+    "postinstall": "node ./node_modules/@axa-fr/oidc-client/bin/copy-service-worker-files.mjs public"
+  }
+}
+```
+
+Edit `public/OidcTrustedDomains.js`, not the generated worker:
+
+```javascript
+const trustedDomains = {
+  default: {
+    oidcDomains: [/^https:\/\/issuer\.example\.com(?:\/|$)/],
+    accessTokenDomains: [/^https:\/\/api\.example\.com\//],
+  },
+};
+```
+
+Include the provider's endpoint origins if they differ from its issuer URL. Keep access-token destinations as narrow as possible; patterns can include paths. String entries are interpreted as regular-expression prefixes, not exact origin matches. The example uses anchored regular expressions with escaped dots and hostname boundaries to avoid unintended matches. The `default` key must match the OIDC configuration name.
+
+Add these options to your client configuration:
+
+```javascript
+service_worker_relative_url: '/OidcServiceWorker.js',
+service_worker_only: true,
+```
+
+Serve the worker from a URL whose scope covers your application, using HTTPS (or localhost for development). With `service_worker_only: true`, login requires an available service worker. With `false` (the default), the client can fall back to browser storage when worker mode is unavailable. Choose that fallback deliberately.
+
+### Trusted-domain options
+
+These options belong in each named entry in `OidcTrustedDomains.js`, not in `OidcConfiguration`.
+
+| Option                                                    | Purpose                                                                                                                                                            |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `oidcDomains`                                             | Provider URLs the worker is allowed to handle.                                                                                                                     |
+| `accessTokenDomains`                                      | API URLs to which the worker may attach an access token.                                                                                                           |
+| `domains`                                                 | Shorthand for a shared provider/API destination list; separate lists give finer control.                                                                           |
+| `showAccessToken`                                         | Defaults to `false`. Set to `true` only when an integration requires the real access token in application JavaScript; refresh tokens remain hidden in worker mode. |
+| `allowMultiTabLogin`                                      | Isolates login state, nonce, and PKCE verifier by tab. Requires the OIDC fetch wrapper for protected API requests; see below.                                      |
+| `convertAllRequestsToCorsExceptNavigate`                  | Defaults to `false`; optionally changes non-navigation requests to CORS mode.                                                                                      |
+| `setAccessTokenToNavigateRequests`                        | Defaults to `true`; controls token attachment to matching navigation requests.                                                                                     |
+| `bypassAllNonOidcRequests`                                | Defaults to `false`. When enabled for all initialized worker configurations, requests outside OIDC and access-token destinations are left to the browser.          |
+| `demonstratingProofOfPossession`                          | Enables worker-side DPoP for this configuration.                                                                                                                   |
+| `demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent` | Defaults to `true` when worker DPoP is enabled. Requires a DPoP header before worker-side DPoP injection; set to `false` to remove that condition.                 |
+| `demonstratingProofOfPossessionConfiguration`             | Overrides the worker's cryptographic algorithms; see [DPoP](#dpop).                                                                                                |
+
+With `allowMultiTabLogin: true`, **use `oidcClient.fetchWithTokens(fetch)` for protected API requests**. Its tab-specific token placeholder tells the worker which session to use. Plain `fetch` or a default Axios request does not provide that marker, so automatic token attachment cannot select the tab's token and requests may receive HTTP 401. Use the OIDC fetch directly, or an integration that actually routes requests through it.
 
 ## Configuration
 
-```javascript
+The public [`OidcConfiguration` type](./src/types.ts) is the complete reference. Required fields are `client_id`, `authority`, `redirect_uri`, and `scope`.
 
-const configuration = {
-    client_id: String.isRequired, // oidc client id
-    redirect_uri: String.isRequired, // oidc redirect url
-    silent_redirect_uri: String, // Optional activate silent-signin that use cookies between OIDC server and client javascript to restore sessions
-    silent_login_uri: String, // Optional, route that triggers the signin
-    silent_login_timeout: Number, // Optional, default is 12000 milliseconds
-    scope: String.isRequired, // oidc scope (you need to set "offline_access")
-    authority: String.isRequired,
-    storage: Storage, // Default sessionStorage, you can set localStorage, but it is not secure
-    login_state_storage: Storage, // Optional. Storage used only for authorization flow state (state, code_verifier, nonce, login params). Defaults to the value of `storage`. Set to sessionStorage when using storage: localStorage to prevent race conditions when multiple tabs start the login flow simultaneously.
-    authority_configuration: {
-      // Optional for providers that do not implement OIDC server auto-discovery via a .wellknown URL
-      authorization_endpoint: String,
-      token_endpoint: String,
-      userinfo_endpoint: String,
-      end_session_endpoint: String,
-      revocation_endpoint: String,
-      pushed_authorization_request_endpoint: String,
-      require_pushed_authorization_requests: Boolean,
-      check_session_iframe: String,
-      issuer: String,
-    },
-    refresh_time_before_tokens_expiration_in_second: Number, // default is 120 seconds
-    service_worker_relative_url: String,
-    service_worker_keep_alive_path: String, // default is "/"
-    service_worker_only: Boolean, // default false, if true, the user will not be able to login if the service worker is not available on its browser
-    service_worker_activate: () => boolean, // you can take the control of the service worker default activation which use user agent string, if return false, the service worker mode will not be used
-    service_worker_register: (url: string) => Promise<ServiceWorkerRegistration>, // Optional, you can take the control of the service worker registration
-    extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server (more info: https://github.com/openid/AppAuth-JS)
-    token_request_extras: StringMap | undefined, // ex: {'prompt': 'consent', 'access_type': 'offline'} list of key/value that is sent to the OIDC server during token request (more info: https://github.com/openid/AppAuth-JS)
-    authority_time_cache_wellknowurl_in_second: 60 * 60, // Time to cache in seconds of the openid well-known URL, default is 1 hour
-    authority_timeout_wellknowurl_in_millisecond: 10000, // Timeout in milliseconds of the openid well-known URL, default is 10 seconds, then an error is thrown
-    par: 'disabled' | 'auto' | 'required', // Pushed Authorization Requests mode, default is 'disabled'
-    par_request_timeout: Number, // PAR endpoint timeout in milliseconds, default is 10000
-    monitor_session: Boolean, // Add OpenID monitor session, default is false (more information https://openid.net/specs/openid-connect-session-1_0.html), if you need to set it to true consider https://infi.nl/nieuws/spa-necromancy/
-    token_renew_mode: String, // Optional, update tokens based on the selected token(s) lifetime: "access_token_or_id_token_invalid" (default), "access_token_invalid", "id_token_invalid"
-    token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted, // Optional, default is TokenAutomaticRenewMode.AutomaticBeforeTokensExpiration
-    // TokenAutomaticRenewMode.AutomaticBeforeTokensExpiration: renew tokens automatically before they expire
-    // TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted: renew tokens automatically only when fetch is executed
-    // It requires you to use fetch given by oidcClient.fetchWithTokens(fetch) or to use oidcClient.getValidTokenAsync()
-    logout_tokens_to_invalidate: Array<string>, // Optional tokens to invalidate during logout, default: ['access_token', 'refresh_token']
-    location: ILOidcLocation, // Optional, default is window.location, you can inject your own location object respecting the ILOidcLocation interface
-    demonstrating_proof_of_possession: Boolean, // Optional, default is false, if true, the the Demonstrating Proof of Possession will be activated //https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access
-    demonstrating_proof_of_possession_configuration: DemonstratingProofOfPossessionConfiguration // Optional, more details bellow
+| Option                                            | Default / behavior                                                                                                                                                                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `authority_configuration`                         | Supply endpoint metadata instead of discovery. See `AuthorityConfiguration` in the type reference, including PAR metadata.                                                                                   |
+| `storage`                                         | `sessionStorage` when worker storage is not used. `localStorage` persists across tabs and browser sessions, but both are accessible to application JavaScript.                                               |
+| `login_state_storage`                             | Defaults to `storage`; separates authorization state, verifier, nonce, and login parameters from token storage. If tokens use `localStorage`, consider `sessionStorage` here to avoid cross-tab login races. |
+| `silent_redirect_uri`                             | Enables the iframe-based silent-login flow. Must differ from `redirect_uri`; register it with the provider.                                                                                                  |
+| `silent_login_uri`                                | Page that starts silent login; derived from `silent_redirect_uri` if omitted.                                                                                                                                |
+| `silent_login_timeout`                            | `12000` milliseconds.                                                                                                                                                                                        |
+| `refresh_time_before_tokens_expiration_in_second` | `120` seconds; the client applies random jitter when this setting is greater than 60.                                                                                                                        |
+| `token_renew_mode`                                | `'access_token_or_id_token_invalid'`; alternatives are `'access_token_invalid'` and `'id_token_invalid'`.                                                                                                    |
+| `token_automatic_renew_mode`                      | `TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration`; see [token renewal](#token-renewal).                                                                                                               |
+| `token_request_timeout`                           | Token-request timeout in milliseconds.                                                                                                                                                                       |
+| `extras`                                          | Additional authorization-request parameters, such as `{ prompt: 'consent' }`.                                                                                                                                |
+| `token_request_extras`                            | Additional token-request parameters. Never use this to embed a browser client secret.                                                                                                                        |
+| `par`, `par_request_timeout`                      | `'disabled'` and `10000` milliseconds; see [PAR](#pushed-authorization-requests-par).                                                                                                                        |
+| `authority_time_cache_wellknowurl_in_second`      | Discovery-cache lifetime; defaults to one hour.                                                                                                                                                              |
+| `authority_timeout_wellknowurl_in_millisecond`    | Discovery timeout; defaults to `10000` milliseconds.                                                                                                                                                         |
+| `monitor_session`                                 | `false`; enables OIDC session monitoring when supported by the provider and browser.                                                                                                                         |
+| `logout_tokens_to_invalidate`                     | `['access_token', 'refresh_token']`; token types to revoke during standard logout.                                                                                                                           |
+| `preload_user_info`                               | `false`; fetch user information during login/session restoration instead of waiting for a consumer.                                                                                                          |
+| `demonstrating_proof_of_possession`               | `false`; see [DPoP](#dpop).                                                                                                                                                                                  |
+| `demonstrating_proof_of_possession_configuration` | Cryptographic settings for client-side DPoP.                                                                                                                                                                 |
+| `service_worker_relative_url`                     | URL of the worker; omit to disable worker mode.                                                                                                                                                              |
+| `service_worker_only`                             | `false`; disallows browser-storage fallback when `true`.                                                                                                                                                     |
+| `service_worker_keep_alive_path`                  | `'/'`; path used by worker keep-alive requests.                                                                                                                                                              |
+| `service_worker_activate`                         | Function to override the default browser-based activation decision.                                                                                                                                          |
+| `service_worker_register`                         | Custom `(url) => Promise<ServiceWorkerRegistration>` registration function.                                                                                                                                  |
+| `loading_timeout_ms`                              | Used by the React provider's loading watchdog; see the [React guide](../react-oidc/README.md#custom-components-and-provider-options).                                                                        |
+
+### Silent login
+
+Silent login uses an iframe and the provider's existing session. It depends on provider support and browser cookie/privacy policies; it is not a guaranteed replacement for refresh tokens.
+
+For a vanilla application, implement both the `silent_login_uri` page and the `silent_redirect_uri` callback page. The login page starts `loginAsync` with `isSilentSignin: true` (the third argument); the callback page calls `silentLoginCallbackAsync()`. Keep these routes separate from the interactive callback. The React provider handles these routes for you; its [silent-login route implementation](../react-oidc/src/core/default-component/SilentLogin.component.tsx) is also a reference for forwarding silent-login parameters.
+
+## Token renewal
+
+By default, the client schedules renewal before tokens expire. It uses a refresh token when available, or the configured silent-login flow. Refresh-token issuance and lifetime remain provider decisions.
+
+For renewal only when an API request needs it:
+
+```typescript
+import { TokenAutomaticRenewMode } from '@axa-fr/oidc-client';
+
+const renewalOptions = {
+  token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticOnlyWhenFetchExecuted,
 };
-
-
-interface DemonstratingProofOfPossessionConfiguration {
-  generateKeyAlgorithm:  RsaHashedKeyGenParams | EcKeyGenParams,
-          digestAlgorithm: AlgorithmIdentifier,
-          importKeyAlgorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
-          signAlgorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
-          jwtHeaderAlgorithm: string
-};
-
-// default value of demonstrating_proof_of_possession_configuration
-const defaultDemonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration ={
-  importKeyAlgorithm: {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: {name: 'ES256'}
-  },
-  signAlgorithm: {name: 'ECDSA', hash: {name: 'SHA-256'}},
-  generateKeyAlgorithm: {
-    name: 'ECDSA',
-    namedCurve: 'P-256'
-  },
-  digestAlgorithm: { name: 'SHA-256' },
-  jwtHeaderAlgorithm : 'ES256'
-};
-
-
 ```
+
+Merge this option into your configuration and use `fetchWithTokens(fetch)` or `getValidTokenAsync()` before protected requests. Plain fetch does not trigger this renewal mode.
+
+- `renewTokensAsync(extras?, scope?)` requests renewal and preserves the non-throwing behavior for terminal OIDC failures.
+- `renewTokensOrThrowAsync(extras?, scope?)` returns tokens or rejects, for callers that need explicit failure handling.
+- Automatic renewal reports failures through [events](#errors-and-events).
 
 ## Pushed Authorization Requests (PAR)
 
-The client supports [OAuth 2.0 Pushed Authorization Requests (RFC 9126)](https://www.rfc-editor.org/rfc/rfc9126.html).
-Enable it with the `par` configuration option:
+[PAR (RFC 9126)](https://www.rfc-editor.org/rfc/rfc9126.html) sends authorization parameters to the provider before navigating the browser.
 
-- `'disabled'` (default) preserves the existing front-channel authorization
-  request. PAR metadata is ignored in this mode.
-- `'auto'` uses PAR when discovery (or `authority_configuration`) provides a
-  `pushed_authorization_request_endpoint`. It keeps the existing front-channel
-  flow when the endpoint is absent, unless the server metadata says
-  `require_pushed_authorization_requests: true`.
-- `'required'` always requires PAR and fails before browser navigation when no
-  PAR endpoint is available.
+| `par` mode             | Behavior                                                                                                                                              |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `'disabled'` (default) | Uses the normal front-channel request and ignores PAR metadata.                                                                                       |
+| `'auto'`               | Uses a discovered or configured `pushed_authorization_request_endpoint`. Falls back only when no endpoint exists and the server does not require PAR. |
+| `'required'`           | Requires a PAR endpoint; fails before navigation if none is available.                                                                                |
 
-```ts
-import {
-  isPushedAuthorizationRequestError,
-  OidcClient,
-  PushedAuthorizationRequestErrorCode,
-} from '@axa-fr/oidc-client';
+If metadata says `require_pushed_authorization_requests: true`, `'auto'` also fails when the endpoint is missing. Set `par_request_timeout` to adjust the default 10-second timeout.
 
-const oidcClient = OidcClient.getOrCreate()({
-  client_id: 'spa-client',
-  redirect_uri: `${window.location.origin}/authentication/callback`,
-  scope: 'openid profile',
-  authority: 'https://issuer.example.com',
-  par: 'auto',
-  par_request_timeout: 10000,
-});
+Once PAR is selected, the client sends authorization parameters (including state, nonce, PKCE, and login extras) as `application/x-www-form-urlencoded` data. The subsequent browser redirect carries `client_id` and the returned `request_uri`. An endpoint failure or invalid response **never silently downgrades** to the front-channel flow.
 
-try {
-  await oidcClient.loginAsync('/');
-} catch (error) {
-  if (
-    isPushedAuthorizationRequestError(error) &&
-    error.code === PushedAuthorizationRequestErrorCode.ENDPOINT_UNAVAILABLE
-  ) {
-    // PAR was required locally or by server metadata, but no endpoint was provided.
-  }
-}
+Failures use `PushedAuthorizationRequestError`, with codes from `PushedAuthorizationRequestErrorCode`: `ENDPOINT_UNAVAILABLE`, `REQUEST_FAILED`, or `INVALID_RESPONSE`. Use `isPushedAuthorizationRequestError(error)` and inspect `code`, plus `status`, `oauthError`, and `oauthErrorDescription` when available.
+
+The PAR endpoint must allow CORS from your application and accept public clients without a client secret. If discovery is unavailable, configure `pushed_authorization_request_endpoint` and, where applicable, `require_pushed_authorization_requests` in `authority_configuration`.
+
+## DPoP
+
+[Demonstrating Proof of Possession (RFC 9449)](https://www.rfc-editor.org/rfc/rfc9449.html) binds supported tokens to a key and uses signed proofs for requests. It requires support from the authorization server and resource server. It reduces the usefulness of a stolen token without its key; it does not make an application immune to XSS.
+
+For client-side DPoP, set `demonstrating_proof_of_possession: true` in the OIDC configuration and opt in for protected requests:
+
+```javascript
+const dpopFetch = oidcClient.fetchWithTokens(fetch, true);
+const response = await dpopFetch('https://api.example.com/profile', { method: 'GET' });
 ```
 
-When PAR is selected, all authorization parameters, including `state`, `nonce`,
-PKCE and login `extras`, are sent as
-`application/x-www-form-urlencoded` data to the PAR endpoint. The browser is
-then redirected with only `client_id` and the returned `request_uri`.
+Similarly, pass `true` as the second argument to `userInfoAsync(false, true)` if the user-info endpoint requires DPoP. For worker-side DPoP, configure `demonstratingProofOfPossession` in the matching trusted-domain entry and review `demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent`.
 
-If the PAR endpoint returns an error or an invalid response, the login rejects
-with `PushedAuthorizationRequestError`; the client does not silently downgrade
-to a front-channel request. The error exposes a stable `code` and, when
-available, `status`, `oauthError`, and `oauthErrorDescription`.
-
-For a browser-based client, the authorization server must allow CORS requests
-from the application origin to its PAR endpoint. Public SPA clients must also
-be allowed to call PAR without a client secret; never embed a client secret in
-browser code. If discovery is not available, set
-`pushed_authorization_request_endpoint` (and optionally
-`require_pushed_authorization_requests`) in `authority_configuration`.
+The default cryptographic configuration uses ECDSA P-256, SHA-256, and the `ES256` JWT algorithm. Override algorithms through `demonstrating_proof_of_possession_configuration` (client) or `demonstratingProofOfPossessionConfiguration` (worker). See [`DemonstratingProofOfPossessionConfiguration`](./src/types.ts).
 
 ## API
 
-```javascript
-/**
- * OidcClient is a class that acts as a wrapper around the `Oidc` object. It provides methods to handle event subscriptions, logins, logouts, token renewals, user information, etc.
- */
-export class OidcClient {
-  /**
-   * Creates an instance of OidcClient using a provided `Oidc` object.
-   * @param oidc The instance of the underlying Oidc object to use.
-   */
-  constructor(oidc: Oidc);
+See [`OidcClient`](./src/oidcClient.ts) for full TypeScript signatures.
 
-  /**
-   * Subscribes a function to events emitted by the underlying Oidc object.
-   * @param func The function to be called when an event is emitted.
-   * @returns A string that identifies the subscription and can be used to unsubscribe later.
-   */
-  subscribeEvents(func: EventSubscriber): string;
+| API                                                                                | Use                                                                                                                           |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `OidcClient.getOrCreate(getFetch, location?)(configuration, name?)`                | Create or reuse a named client. Pass `() => fetch` for the browser fetch implementation; the default name is `'default'`.     |
+| `OidcClient.get(name?)`                                                            | Retrieve an existing client, or `null` if it has not been initialized.                                                        |
+| `OidcClient.getOrThrow(name?)`                                                     | Retrieve an existing client, or throw on missing initialization.                                                              |
+| `tryKeepExistingSessionAsync()`                                                    | Restore an existing session; returns whether it was kept.                                                                     |
+| `loginAsync(callbackPath?, extras?, isSilentSignin?, scope?, silentLoginOnly?)`    | Start authentication. `callbackPath` is the application destination after the callback, not the registered `redirect_uri`.    |
+| `loginCallbackAsync()`                                                             | Complete interactive authentication, start automatic renewal, and return `{ callbackPath }`.                                  |
+| `silentLoginCallbackAsync()`                                                       | Complete the iframe silent-login callback.                                                                                    |
+| `logoutAsync(callbackPathOrUrl?, extras?)`                                         | Clear the session, revoke configured tokens, and use the provider's logout endpoint when available.                           |
+| `clearSessionAsync()`                                                              | Clear the local session without provider logout or token revocation.                                                          |
+| `isLoggingOut`                                                                     | Indicates logout is in progress; avoid starting a competing login flow.                                                       |
+| `renewTokensAsync(extras?, scope?)`                                                | Request token renewal.                                                                                                        |
+| `renewTokensOrThrowAsync(extras?, scope?)`                                         | Request renewal with a rejected promise on failure.                                                                           |
+| `getValidTokenAsync(waitMs?, numberWait?)`                                         | Wait for usable tokens; also supports on-demand renewal.                                                                      |
+| `fetchWithTokens(fetch, demonstratingProofOfPossession?)`                          | Wrap fetch for protected API requests.                                                                                        |
+| `userInfoAsync<T>(noCache?, demonstratingProofOfPossession?)`                      | Load user information, optionally bypassing the cache.                                                                        |
+| `userInfo<T>()`                                                                    | Read cached user information.                                                                                                 |
+| `tokens`, `configuration`                                                          | Inspect current session data and effective configuration. Tokens can contain worker placeholders; do not display or log them. |
+| `subscribeEvents(handler)`                                                         | Subscribe to `(eventName, data)` and receive a subscription ID.                                                               |
+| `removeEventSubscription(id)`                                                      | Remove an event subscription.                                                                                                 |
+| `OidcClient.eventNames`                                                            | Discover supported event names.                                                                                               |
+| `publishEvent(name, data)`                                                         | Publish an event to the client's subscribers.                                                                                 |
+| `generateDemonstrationOfProofOfPossessionAsync(accessToken, url, method, extras?)` | Low-level proof generation; prefer the fetch wrapper for normal requests.                                                     |
+| `signalServiceWorker(message, options?)`                                           | Send a typed worker-protocol message.                                                                                         |
 
-  /**
-   * Removes a subscription to a specified event.
-   * @param id The identifier of the subscription to remove, obtained during the initial subscription.
-   */
-  removeEventSubscription(id: string): void;
+You can inject a custom location adapter as the second argument to `getOrCreate`, using the exported `ILOidcLocation` interface and `OidcLocation` implementation.
 
-  /**
-   * Publishes an event with the specified name and associated data.
-   * @param eventName The name of the event to publish.
-   * @param data The data associated with the event.
-   */
-  publishEvent(eventName: string, data: any): void;
+## Errors and events
 
-  /**
-   * Creates a new instance of OidcClient using a fetch retrieval function `getFetch`, with a given OIDC configuration and an optional name.
-   * @param getFetch The function to retrieve the `Fetch` object.
-   * @param configuration The OIDC configuration to use for creating the OidcClient instance.
-   * @param name The optional name for the created OidcClient instance.
-   * @returns A new instance of OidcClient with the specified configuration.
-   */
-  static getOrCreate(getFetch: () => Fetch)(configuration: OidcConfiguration, name?: string): OidcClient;
+Known authentication, callback, renewal, and network failures use `OidcError`. Inspect stable `code` and `phase` fields rather than parsing messages. Other fields include `retryable`, optional `status`, `oauthError`, `oauthErrorDescription`, and `cause`.
 
-  /**
-   * Retrieves an existing OidcClient instance with the specified name.
-   * Since issue #1679, this returns `null` when no instance has been
-   * initialized for the given name (instead of throwing). Use
-   * `OidcClient.getOrThrow` to preserve the previous fail-fast behaviour.
-   * @param name The name of the OidcClient instance to retrieve.
-   * @returns The existing OidcClient instance, or null if none exists.
-   */
-  static get(name?: string): OidcClient | null;
-
-  /**
-   * Same as `OidcClient.get` but throws an explicit error when no instance
-   * has been initialized for the given name. Useful when you want to fail
-   * fast on misconfiguration.
-   * @param name The name of the OidcClient instance to retrieve.
-   * @returns The existing OidcClient instance.
-   */
-  static getOrThrow(name?: string): OidcClient;
-
-  /**
-   * The names of the events supported by the Oidc class.
-   */
-  static eventNames: Oidc.eventNames;
-
-  /**
-   * Attempts to keep the existing user session by calling the function of the underlying Oidc object.
-   * @returns A promise resolved with `true` if the user session was kept, otherwise `false`.
-   */
-  tryKeepExistingSessionAsync(): Promise<boolean>;
-
-  /**
-   * Starts the OIDC login process with specified options.
-   * @param callbackPath The callback path for authentication.
-   * @param extras Additional parameters to send to the OIDC server during the login request.
-   * @param isSilentSignin Indicates if the login is silent.
-   * @param scope The OIDC scope for the login request.
-   * @param silentLoginOnly Indicates if only silent login is allowed.
-   * @returns A promise resolved with the login information, or rejected with an error.
-   */
-  loginAsync(callbackPath?: string, extras?: StringMap, isSilentSignin?: boolean, scope?: string, silentLoginOnly?: boolean): Promise<unknown>;
-
-  /**
-   * Starts the OIDC logout process with specified options.
-   * @param callbackPathOrUrl The callback path or URL to use after logout.
-   * @param extras Additional parameters to send to the OIDC server during the logout request.
-   * {"no_reload:oidc":"true"} to avoid the page reload after logout.
-   * you can add extras like {"client_secret:revoke_refresh_token":"secret"} to revoke the refresh token with extra client secret. Any key ending with ":revoke_refresh_token" will be used to revoke the refresh token.
-   * you can add extras like {"client_secret:revoke_access_token":"secret"} to revoke the access token with extra client secret. Any key ending with ":revoke_access_token" will be used to revoke the access token.
-   * @returns A promise resolved when the logout is completed.
-   */
-  logoutAsync(callbackPathOrUrl?: string | null | undefined, extras?: StringMap): Promise<void>;
-
-  /**
-   * Performs the silent login process and retrieves user information.
-   * @returns A promise resolved when the silent login process is completed.
-   */
-  silentLoginCallbackAsync(): Promise<void>;
-
-  /**
-   * Renews the user's OIDC tokens.
-   * @param extras Additional parameters to send to the OIDC server during the token renewal request.
-   * @returns A promise resolved when the token renewal is completed.
-   */
-  renewTokensAsync(extras?: StringMap): Promise<void>;
-
-  /**
-   * Performs the callback process after a successful login and automatically renews tokens.
-   * @returns A promise resolved with the callback information, or rejected with an error.
-   */
-  loginCallbackAsync(): Promise<LoginCallback>;
-
-  /**
-   * Retrieves the current OIDC tokens for the user.
-   */
-  get tokens(): Tokens;
-
-  /**
-   * Retrieves the current OIDC configuration used by the OidcClient instance.
-   */
-  get configuration(): OidcConfiguration;
-
-  /**
-   * Retrieves the valid OIDC token for the user.
-   * @param waitMs The maximum wait time in milliseconds to obtain a valid token.
-   * @param numberWait The number of attempts to obtain a valid token.
-   * @returns A promise resolved with the valid token, or rejected with an error.
-   */
-  async getValidTokenAsync(waitMs = 200, numberWait = 50): Promise<ValidToken>;
-
-  /**
-   * Retrieves a new fetch function that inject bearer tokens (also DPOP tokens).
-   * @param fetch The current fetch function to use
-   * @param demonstrating_proof_of_possession Indicates whether the demonstration of proof of possession should be used.
-   * @returns Fetch A new fectch function that inject bearer tokens (also DPOP tokens).
-   */
-  fetchWithTokens(fetch: Fetch, demonstrating_proof_of_possession=false): Fetch;
-
-  /**
-   * Retrieves OIDC user information.
-   * @param noCache Indicates whether user information should be retrieved bypassing the cache.
-   * @param demonstrating_proof_of_possession Indicates whether the demonstration of proof of possession should be used.
-   * @returns A promise resolved with the user information, or rejected with an error.
-   */
-  async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(noCache = false, demonstrating_proof_of_possession=false): Promise<T>;
-
-  /**
-   * Generate Demonstration of proof of possession.
-   * @param accessToken The access token to use.
-   * @param url The url to use.
-   * @param method The method to use.
-   * @param extras Additional parameters to send to the OIDC server during the demonstration of proof of possession request.
-   * @returns A promise resolved with the proof of possession.
-   */
-  async generateDemonstrationOfProofOfPossessionAsync(accessToken:string, url:string, method:string, extras:StringMap= {}): Promise<string>;
-}
-
-```
-
-## Run The Demo
-
-```sh
-git clone https://github.com/AxaFrance/oidc-client.git
-cd oidc-client
-
-# oidc client demo
-cd /examples/oidc-client-demo
-pnpm install
-pnpm start
-# then navigate to http://localhost:5174
-
-```
-
-## Strongly typed OIDC errors
-
-Known authentication, callback, refresh and network failures are exposed as
-`OidcError`. Its stable `code` and `phase` fields can be inspected without
-matching the human-readable `message`; existing messages remain unchanged.
-
-```ts
+```typescript
 import { OidcError, OidcErrorCode } from '@axa-fr/oidc-client';
 
 try {
-  await oidcClient.loginCallbackAsync();
+  await oidcClient.renewTokensOrThrowAsync();
 } catch (error) {
   if (error instanceof OidcError && error.code === OidcErrorCode.LOGIN_REQUIRED) {
-    await oidcClient.loginAsync();
+    await oidcClient.loginAsync('/');
+  } else {
+    throw error;
   }
 }
 ```
 
-Automatic renewal and the existing `renewTokensAsync` method remain
-non-throwing for terminal OIDC failures. Use the strict variant when the caller
-needs a rejected promise:
+`retryable` means a retry without user interaction may succeed, not that one is always performed automatically. Network failures, HTTP 408/429/5xx responses, and DPoP nonce challenges can be retryable; `LOGIN_REQUIRED` needs an interactive login.
 
-```ts
-try {
-  const tokens = await oidcClient.renewTokensOrThrowAsync();
-} catch (error) {
-  if (error instanceof OidcError) {
-    console.error(error.code, error.phase, error.retryable);
-  }
-}
-```
+Non-throwing flows also expose errors through events. Refresh event payloads include an `error` field; user-info, logout, and protected API requests have dedicated error events. Log only selected diagnostic fields, not complete event payloads:
 
-Failures from intentionally non-throwing flows are also provided to event
-subscribers. Existing event payload fields are preserved; refresh payloads add
-an `error` field, while user-info, logout and protected API failures use their
-dedicated error events.
-
-```ts
-oidcClient.subscribeEvents((name, data) => {
+```typescript
+const subscriptionId = oidcClient.subscribeEvents((name, data) => {
   const error = data instanceof OidcError ? data : data?.error;
   if (error instanceof OidcError) {
-    console.error(name, error.code, error.status);
+    console.warn(name, error.code, error.phase, error.status);
   }
 });
+
+// When the subscriber is no longer needed:
+oidcClient.removeEventSubscription(subscriptionId);
 ```
 
-`retryable` means that retrying automatically, without user interaction, may
-succeed. For example, network failures, HTTP 408/429/5xx responses and DPoP
-nonce challenges are retryable; `login_required` requires an interactive
-login and is therefore not.
+### Missing or mismatched login state
 
-## Handling missing or corrupted login state
+`OidcStateError` extends `OidcError` and identifies callback-state failures:
 
-When the OIDC state or nonce is missing from storage at callback time (for
-example because the user is in a private browsing tab, cleared storage
-manually, or because the browser evicted the entry between the authorize
-redirect and the callback), the library now throws a typed
-`OidcStateError` instead of letting a generic `TypeError` escape.
+- `OidcStateErrorCode.STATE_MISSING`: stored authorization state is missing.
+- `OidcStateErrorCode.STATE_MISMATCH`: returned state does not match stored state.
+- `OidcStateErrorCode.NONCE_MISSING`: stored nonce is missing.
 
-```ts
-import { isOidcStateError, OidcStateError, OidcStateErrorCode } from '@axa-fr/oidc-client';
+Use `isOidcStateError(error)` and inspect `error.code`, especially for errors passed through silent-login handling. Storage clearing, eviction, and competing login attempts can cause these failures. Do not bypass state or nonce checks; offer a fresh login. During silent renewal, a missing nonce is reported through the session-lost flow.
 
-try {
-  await oidcClient.loginCallbackAsync();
-} catch (error) {
-  if (isOidcStateError(error)) {
-    switch (error.code) {
-      case OidcStateErrorCode.STATE_MISSING:
-        // The stored state was not found at callback time.
-        break;
-      case OidcStateErrorCode.STATE_MISMATCH:
-        // The state returned by the server does not match the stored one.
-        break;
-      case OidcStateErrorCode.NONCE_MISSING:
-        // The stored nonce was not found at callback time.
-        break;
-    }
-  }
-}
+## Named configurations and routing
+
+Use distinct names for separate providers or sessions with different scopes:
+
+```javascript
+const paymentsClient = OidcClient.getOrCreate(() => fetch)(paymentsConfiguration, 'payments');
+const existingClient = OidcClient.get('payments');
 ```
 
-`OidcStateError` is an `Error` subclass, exposes a stable `code` field, and is
-also re-exported from `@axa-fr/react-oidc`. When errors cross the silent-renew
-iframe boundary, prefer `isOidcStateError(error)` plus `error.code` over a
-plain `instanceof` check. For silent renewal, a missing nonce no longer throws
-a `TypeError` — it is reported through the existing `SESSION_LOST` status so
-consumers can recover via the normal re-login flow.
+Each name reuses its initialized configuration. Give configurations distinct callback routes and matching keys in `OidcTrustedDomains.js`.
 
-## Service worker protocol
+The library retains hash-route callback matching for legacy integrations. However, OAuth redirect URIs must not contain a fragment: use path-based callback URLs, as in the quick start, for new deployments. Existing hash-callback setups depend on provider-specific behavior and need matching application routing. Interactive and silent callback URLs must be different.
 
-The `postMessage` protocol used between `OidcClient` and the service worker
-is publicly documented and versioned. Typed message constants, payload
-helpers and storage key conventions are exported from
-`@axa-fr/oidc-client` (and from
-`@axa-fr/oidc-client-service-worker/protocol`):
+## Service-worker protocol
 
-```ts
-import {
-  OidcClient,
-  PROTOCOL_VERSION,
-  ServiceWorkerMessageType,
-  buildSecuredTokenPlaceholder,
-  TOKEN_PLACEHOLDERS,
-} from '@axa-fr/oidc-client';
+The worker's versioned `postMessage` protocol is documented in [`PROTOCOL.md`](../oidc-client-service-worker/PROTOCOL.md). Constants and helpers such as `PROTOCOL_VERSION`, `ServiceWorkerMessageType`, `TOKEN_PLACEHOLDERS`, and `buildSecuredTokenPlaceholder` are exported from `@axa-fr/oidc-client` and `@axa-fr/oidc-client-service-worker/protocol`.
 
-const oidcClient = OidcClient.get();
+```typescript
+import { OidcClient, ServiceWorkerMessageType } from '@axa-fr/oidc-client';
 
-const { state } = await oidcClient.signalServiceWorker<{ state: string }>({
+const client = OidcClient.getOrThrow();
+const result = await client.signalServiceWorker<{ state: string }>({
   type: ServiceWorkerMessageType.GET_STATE,
   configurationName: 'default',
   data: null,
 });
 ```
 
-See [`PROTOCOL.md`](../oidc-client-service-worker/PROTOCOL.md) in the
-service-worker package for the full specification, including stability
-guarantees and per-message payload shapes.
+This requires an active worker. See the protocol reference for payloads, timeouts, and compatibility guarantees; avoid logging protocol responses containing session state.
 
-## How It Works
+## Examples and further reading
 
-This component is a pure vanilla JS OIDC client library agnostic to any framework.
-It is a real alternative to existing oidc-client libraries.
+- [Vanilla JavaScript demo](../../examples/oidc-client-demo/README.md) — complete application and local development instructions.
+- [React guide](../react-oidc/README.md) and [React demo](../../examples/react-oidc-demo/README.md).
+- [FAQ and deployment guidance](../../FAQ.md).
+- [Service-worker source and protocol](../oidc-client-service-worker/PROTOCOL.md).
+- [Service-worker package guide](../oidc-client-service-worker/README.md).
 
-More information about OIDC
-
-- [French : Augmentez la sécurité et la simplicité de votre Système d’Information OpenID Connect](https://medium.com/just-tech-it-now/augmentez-la-s%C3%A9curit%C3%A9-et-la-simplicit%C3%A9-de-votre-syst%C3%A8me-dinformation-avec-oauth-2-0-cf0732d71284)
-- [English : Increase the security and simplicity of your information system with openid connect](https://medium.com/just-tech-it-now/increase-the-security-and-simplicity-of-your-information-system-with-openid-connect-fa8c26b99d6d)
-- [English: youtube OIDC](https://www.youtube.com/watch?v=frIJfavZkUE&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=1)
-- [French: youtube OIDC](https://www.youtube.com/watch?v=H-mLMGzQ_y0&list=PL8EMdIH6Mzxy2kHtsVOEWqNz-OaM_D_fB&index=2)
-
-## Hash route
-
-`@axa-fr/oidc-client` work also with hash route.
-
-```javascript
-export const configurationIdentityServerWithHash = {
-  client_id: 'interactive.public.short',
-  redirect_uri: window.location.origin + '#authentication-callback',
-  silent_redirect_uri: window.location.origin + '#authentication-silent-callback',
-  scope: 'openid profile email api offline_access',
-  authority: 'https://demo.duendesoftware.com',
-  par: 'auto',
-  refresh_time_before_tokens_expiration_in_second: 70,
-  service_worker_relative_url: '/OidcServiceWorker.js',
-  service_worker_only: false,
-};
-```
+The demos belong to the pnpm monorepo. Follow their READMEs rather than installing each workspace independently.
