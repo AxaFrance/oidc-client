@@ -300,14 +300,7 @@ The default navigation uses the browser History API and dispatches `popstate`. K
 
 For a router-specific integration, provide `navigateAfterCallback` to perform and await the router's navigation, or `withCustomHistory` to replace the default history adapter. These options belong on `OidcProvider`.
 
-Hash routes are supported:
-
-```typescript
-redirect_uri: `${window.location.origin}/#/authentication/callback`,
-silent_redirect_uri: `${window.location.origin}/#/authentication/silent-callback`,
-```
-
-Register the exact URLs with your provider if it permits hash callbacks. Interactive and silent callback URLs must be different.
+The library retains hash-route callback matching for legacy integrations, but OAuth redirect URIs must not contain a fragment. Prefer path-based callback URLs for new deployments, even if the rest of the application uses a hash router. Existing hash-callback setups depend on provider-specific behavior. Interactive and silent callback URLs must be different.
 
 ### Next.js
 

@@ -366,14 +366,7 @@ const existingClient = OidcClient.get('payments');
 
 Each name reuses its initialized configuration. Give configurations distinct callback routes and matching keys in `OidcTrustedDomains.js`.
 
-Hash routes are supported, for example:
-
-```javascript
-redirect_uri: `${window.location.origin}/#/authentication/callback`,
-silent_redirect_uri: `${window.location.origin}/#/authentication/silent-callback`,
-```
-
-Register those exact URLs if your provider permits them. Update your application's callback-route detection to match the hash route; the pathname-based quick start above is for ordinary paths. Interactive and silent callback URLs must be different.
+The library retains hash-route callback matching for legacy integrations. However, OAuth redirect URIs must not contain a fragment: use path-based callback URLs, as in the quick start, for new deployments. Existing hash-callback setups depend on provider-specific behavior and need matching application routing. Interactive and silent callback URLs must be different.
 
 ## Service-worker protocol
 
