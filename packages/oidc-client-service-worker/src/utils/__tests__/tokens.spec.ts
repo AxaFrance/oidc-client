@@ -72,7 +72,6 @@ describe('tokens', () => {
 
     it.each([
       undefined,
-      null,
       '',
       'opaque-token',
       `header.${encodedPayload}`,

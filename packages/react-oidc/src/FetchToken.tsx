@@ -7,18 +7,6 @@ export interface ComponentWithOidcFetchProps {
 
 const defaultConfigurationName = 'default';
 
-const fetchWithToken =
-  (
-    fetch: Fetch,
-    getOidcWithConfigurationName: () => OidcClient | null,
-    demonstratingProofOfPossession: boolean = false,
-  ) =>
-  async (...params: Parameters<Fetch>) => {
-    const oidc = getOidcWithConfigurationName();
-    const newFetch = oidc.fetchWithTokens(fetch, demonstratingProofOfPossession);
-    return await newFetch(...params);
-  };
-
 export const withOidcFetch =
   (
     fetch: Fetch = null,
@@ -46,14 +34,13 @@ export const useOidcFetch = (
   const getOidc = OidcClient.getOrThrow;
 
   const memoizedFetchCallback = useCallback(
-    (input: RequestInfo | URL, init?: RequestInit) => {
-      const getOidcWithConfigurationName = () => getOidc(configurationName);
-      const newFetch = fetchWithToken(
+    async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      const oidc = getOidc(configurationName);
+      const authenticatedFetch = oidc.fetchWithTokens(
         previousFetch,
-        getOidcWithConfigurationName,
         demonstratingProofOfPossession,
       );
-      return newFetch(input, init);
+      return await authenticatedFetch(input, init);
     },
     [previousFetch, configurationName, demonstratingProofOfPossession],
   );
