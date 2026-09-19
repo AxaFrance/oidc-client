@@ -3,13 +3,9 @@ export function replaceCodeVerifier(codeVerifier: string, newCodeVerifier: strin
   return codeVerifier.replace(regex, `&code_verifier=${newCodeVerifier}`);
 }
 
-export const extractConfigurationNameFromCodeVerifier = (chaine: string): string => {
+export const extractConfigurationNameFromCodeVerifier = (body: string): string => {
   const regex = /[?&]code_verifier=CODE_VERIFIER_SECURED_BY_OIDC_SERVICE_WORKER_([^&]+)/;
-  const match = chaine.match(regex);
+  const match = body.match(regex);
 
-  if (match && match.length > 0) {
-    return decodeURIComponent(match[1]);
-  } else {
-    return '';
-  }
+  return match ? decodeURIComponent(match[1]) : '';
 };

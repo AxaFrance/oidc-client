@@ -8,7 +8,6 @@ import {
   OidcServerConfiguration,
   Tokens,
 } from '../types';
-import { countLetter } from './strings';
 
 export const parseJwt = (payload: string) => {
   return JSON.parse(b64DecodeUnicode(payload.replaceAll(/-/g, '+').replaceAll(/_/g, '/')));
@@ -38,11 +37,8 @@ const extractTokenPayload = (token?: string) => {
     if (!token) {
       return null;
     }
-    if (countLetter(token, '.') === 2) {
-      return parseJwt(token.split('.')[1]);
-    } else {
-      return null;
-    }
+    const parts = token.split('.');
+    return parts.length === 3 ? parseJwt(parts[1]) : null;
   } catch (e) {
     console.warn(e);
   }

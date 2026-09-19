@@ -22,18 +22,16 @@ export const getLocation = (href: string) => {
     search = search.slice(1);
   }
 
-  return (
-    match && {
-      href,
-      protocol: match[1],
-      host: match[2],
-      hostname: match[3],
-      port: match[4],
-      path: match[5],
-      search,
-      hash,
-    }
-  );
+  return {
+    href,
+    protocol: match[1],
+    host: match[2],
+    hostname: match[3],
+    port: match[4],
+    path: match[5],
+    search,
+    hash,
+  };
 };
 
 export const getPath = (href: string) => {
@@ -65,17 +63,9 @@ export const getParseQueryStringFromLocation = (href: string) => {
 
 const parseQueryString = (queryString: string) => {
   const params: any = {};
-  let temp;
-  let i;
-  let l;
-
-  // Split into key/value pairs
-  const queries = queryString.split('&');
-
-  // Convert the array of strings into an object
-  for (i = 0, l = queries.length; i < l; i++) {
-    temp = queries[i].split('=');
-    params[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1]);
+  for (const query of queryString.split('&')) {
+    const [key, value] = query.split('=');
+    params[decodeURIComponent(key)] = decodeURIComponent(value);
   }
 
   return params;

@@ -13,9 +13,7 @@ const SilentLogin: ComponentType<any> = ({ configurationName }) => {
     if (key === 'state' || key === 'scope') {
       continue;
     }
-    if (extras === null) {
-      extras = {};
-    }
+    extras ??= {};
     extras[key] = value;
   }
 

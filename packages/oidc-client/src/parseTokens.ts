@@ -16,19 +16,12 @@ const extractTokenPayload = (token: string) => {
     if (!token) {
       return null;
     }
-    if (countLetter(token, '.') === 2) {
-      return parseJwt(token.split('.')[1]);
-    } else {
-      return null;
-    }
+    const parts = token.split('.');
+    return parts.length === 3 ? parseJwt(parts[1]) : null;
   } catch (e) {
     console.warn(e);
   }
   return null;
-};
-
-const countLetter = (str: string, find) => {
-  return str.split(find).length - 1;
 };
 
 export type Tokens = {
