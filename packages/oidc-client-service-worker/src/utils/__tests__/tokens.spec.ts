@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { OidcServerConfiguration } from '../../types';
 import { _hideTokens, extractTokenPayload, isTokensOidcValid, isTokensValid, parseJwt } from '..';
@@ -56,6 +56,45 @@ describe('tokens', () => {
   });
 
   describe('extractTokenPayload', () => {
+    const payload = { sub: 'unit-test', name: 'Test user' };
+    const encodedPayload = btoa(JSON.stringify(payload));
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it.each([`header.${encodedPayload}.signature`, `.${encodedPayload}.`])(
+      'extracts the payload from a three-part token: %s',
+      token => {
+        expect(extractTokenPayload(token)).toEqual(payload);
+      },
+    );
+
+    it.each([
+      undefined,
+      null,
+      '',
+      'opaque-token',
+      `header.${encodedPayload}`,
+      `header.${encodedPayload}.signature.extra`,
+      `header.${encodedPayload}.signature.`,
+    ])('returns null for a token without exactly three parts: %s', token => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      expect(extractTokenPayload(token)).toBeNull();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it.each(['header..signature', 'header.!.signature', 'header.bm90IGpzb24=.signature'])(
+      'warns and returns null when decoding fails: %s',
+      token => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+        expect(extractTokenPayload(token)).toBeNull();
+        expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
+      },
+    );
+
     it('can extract token payload', () => {
       const result = extractTokenPayload(
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',

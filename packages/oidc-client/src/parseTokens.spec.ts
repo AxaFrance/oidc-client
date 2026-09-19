@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { sleepAsync } from './initWorker';
 import {
@@ -13,6 +13,64 @@ import { synchroniseTokensStatus } from './renewTokens';
 import { StringMap, TokenAutomaticRenewMode } from './types';
 
 describe('ParseTokens test Suite', () => {
+  describe.each(['accessToken', 'idToken'])('%s payload extraction', tokenProperty => {
+    const payload = { sub: 'unit-test', name: 'Test user' };
+    const encodedPayload = btoa(JSON.stringify(payload));
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it.each([`header.${encodedPayload}.signature`, `.${encodedPayload}.`])(
+      'extracts the payload from a three-part token: %s',
+      token => {
+        const tokens = setTokens(
+          { [tokenProperty]: token, issuedAt: 1000, expiresIn: 60 },
+          null,
+          TokenRenewMode.access_token_invalid,
+        );
+
+        expect(tokens[`${tokenProperty}Payload`]).toEqual(payload);
+        expect(tokens[tokenProperty]).toBe(token);
+      },
+    );
+
+    it.each([
+      undefined,
+      null,
+      '',
+      'opaque-token',
+      `header.${encodedPayload}`,
+      `header.${encodedPayload}.signature.extra`,
+      `header.${encodedPayload}.signature.`,
+    ])('returns a null payload for a token without exactly three parts: %s', token => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const tokens = setTokens(
+        { [tokenProperty]: token, issuedAt: 1000, expiresIn: 60 },
+        null,
+        TokenRenewMode.access_token_invalid,
+      );
+
+      expect(tokens[`${tokenProperty}Payload`]).toBeNull();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it.each(['header..signature', 'header.!.signature', 'header.bm90IGpzb24=.signature'])(
+      'warns and returns a null payload when decoding fails: %s',
+      token => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+        const tokens = setTokens(
+          { [tokenProperty]: token, issuedAt: 1000, expiresIn: 60 },
+          null,
+          TokenRenewMode.access_token_invalid,
+        );
+
+        expect(tokens[`${tokenProperty}Payload`]).toBeNull();
+        expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
+      },
+    );
+  });
+
   const currentTimeUnixSecond = new Date().getTime() / 1000;
   describe.each([
     [currentTimeUnixSecond + 120, currentTimeUnixSecond - 10, true],
