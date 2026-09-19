@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.29.5
+
+- [9c9fefb1](https://github.com/AxaFrance/oidc-client/commit/9c9fefb1080a8b059a3b67f7f8030e2b0e2a018d) - [skip ci] Update to version 7.29.5 in package.json, 2026-09-19 by *github-actions[bot]*
+- [0a9dcf84](https://github.com/AxaFrance/oidc-client/commit/0a9dcf847eba12f63e97a9fd471d2cc2db9ade4b) - refactor: Add package regression tests and streamline token parsing and fetch hooks (#1732) (release), 2026-09-19 by *Copilot*
+
+
 ## v7.29.4
 
+- [29ae343c](https://github.com/AxaFrance/oidc-client/commit/29ae343c169003b0b515cb106c6df9b6527ac357) - [skip ci] Generate changelog to version 7.29.4, 2026-09-19 by *github-actions[bot]*
 - [58ff7b53](https://github.com/AxaFrance/oidc-client/commit/58ff7b539e340b315dda2a30ee884cdd2e07a9c0) - [skip ci] Update to version 7.29.4 in package.json, 2026-09-19 by *github-actions[bot]*
 - [95ab5aa4](https://github.com/AxaFrance/oidc-client/commit/95ab5aa41904bf837c97c2c876e0d26892b2c3e2) - Clarify package documentation and replace architecture images with Mermaid (#1730) (release), 2026-09-19 by *Copilot*
 
@@ -326,10 +333,5 @@
 
 - [07754f56](https://github.com/AxaFrance/oidc-client/commit/07754f5643cbe21e6e6eb248b8a6398bd0de2fd7) - fix(oidc): refresh silent signin scope=null (release) (#1503), 2025-01-24 by *Guillaume Chervet*
 - [2c083735](https://github.com/AxaFrance/oidc-client/commit/2c0837357b341eeeabbe16b40857240e7d2a596b) - feat(all): update libraries (#1494), 2025-01-12 by *Guillaume Chervet*
-
-
-## v7.24.1
-
-- [3fe05117](https://github.com/AxaFrance/oidc-client/commit/3fe05117c29704f9be56604eb9ffa7195bcdc517) - refactor(react-oidc): react 19 compatibility (#1493) (release), 2025-01-10 by *Guillaume Chervet*
 
 
