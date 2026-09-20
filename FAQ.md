@@ -47,8 +47,13 @@ Without a worker, token storage defaults to `sessionStorage`. You can choose
 Worker mode keeps access and refresh tokens in worker memory by default.
 Follow the [worker setup guide](./packages/oidc-client-service-worker/README.md#getting-started);
 installing the package alone does not serve or configure the worker files.
-Set `service_worker_only: true` if authentication must require worker support
-rather than permit fallback to browser storage.
+
+In React, `service_worker_only: true` makes the provider show its unsupported-worker
+screen when it receives the worker-unavailable event. **This is not a core-client
+guarantee against browser-storage fallback:** the vanilla client can still use
+browser storage when worker initialization returns no worker. If token isolation
+is mandatory, do not rely on this flag alone; verify worker availability and
+prevent authentication from proceeding without it in your integration.
 
 When testing a switch away from worker mode, unregister the application's old
 OIDC worker in browser developer tools and reload the page. Removing the
@@ -282,9 +287,9 @@ Check the deployment before changing authentication logic:
    maintain your trusted-domain entries yourself.
 4. In browser developer tools, inspect the active registration and which worker
    controls the tab. Already-open tabs and cached assets can complicate updates.
-5. Check secure-context support and registration errors. If you require
-   `service_worker_only: true`, an unavailable worker must not be treated as a
-   successful browser-storage login.
+5. Check secure-context support and registration errors. Review the
+   [`service_worker_only` limitation](#do-i-need-a-service-worker) before relying
+   on that flag to prevent browser-storage fallback.
 
 For an application under a subpath, account for the worker URL and allowed
 scope. `service_worker_register` allows custom registration, but does not bypass
