@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.29.6
+
+- [59afc43a](https://github.com/AxaFrance/oidc-client/commit/59afc43a04579293811563a9ebebb363357e0521) - [skip ci] Update to version 7.29.6 in package.json, 2026-09-20 by *github-actions[bot]*
+- [7463acfc](https://github.com/AxaFrance/oidc-client/commit/7463acfc45589823a47fad470ad07839ef1f1684) - Rework FAQ with verified troubleshooting guidance and Mermaid diagrams (release) (#1734), 2026-09-20 by *Copilot*
+
+
 ## v7.29.5
 
+- [722e93f4](https://github.com/AxaFrance/oidc-client/commit/722e93f4ba24a81149d5e08d324eb47381c233bf) - [skip ci] Generate changelog to version 7.29.5, 2026-09-19 by *github-actions[bot]*
 - [9c9fefb1](https://github.com/AxaFrance/oidc-client/commit/9c9fefb1080a8b059a3b67f7f8030e2b0e2a018d) - [skip ci] Update to version 7.29.5 in package.json, 2026-09-19 by *github-actions[bot]*
 - [0a9dcf84](https://github.com/AxaFrance/oidc-client/commit/0a9dcf847eba12f63e97a9fd471d2cc2db9ade4b) - refactor: Add package regression tests and streamline token parsing and fetch hooks (#1732) (release), 2026-09-19 by *Copilot*
 
@@ -327,11 +334,5 @@
 ## v7.25.1
 
 - [f0641a6f](https://github.com/AxaFrance/oidc-client/commit/f0641a6ff21a7cf600ee5e782a3e3114b462551c) - fix(oidc): remove use of localStorage for cache (release), 2025-02-05 by *Guillaume Chervet*
-
-
-## v7.25.0
-
-- [07754f56](https://github.com/AxaFrance/oidc-client/commit/07754f5643cbe21e6e6eb248b8a6398bd0de2fd7) - fix(oidc): refresh silent signin scope=null (release) (#1503), 2025-01-24 by *Guillaume Chervet*
-- [2c083735](https://github.com/AxaFrance/oidc-client/commit/2c0837357b341eeeabbe16b40857240e7d2a596b) - feat(all): update libraries (#1494), 2025-01-12 by *Guillaume Chervet*
 
 
