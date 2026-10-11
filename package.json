@@ -5,9 +5,8 @@
   "description": "Root package for the project",
   "license": "MIT",
   "workspaces": [
-    "packages/oidc-service-worker",
-    "packages/oidc-client",
-    "packages/react-oidc"
+    "packages/*",
+    "examples/*"
   ],
   "keywords": [
     "react",
