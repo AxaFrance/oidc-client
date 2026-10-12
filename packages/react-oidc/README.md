@@ -372,3 +372,7 @@ When no client has been initialized for a name, `useOidc`, `useOidcUser`, `useOi
 - [FAQ and deployment guidance](../../FAQ.md).
 
 The demos use the repository's pnpm workspace. Follow their READMEs for setup rather than installing each package separately.
+
+For source development, use the root [contributor commands](../../README.md#contribute)
+and the committed lockfile. Keep Vitest and coverage versions aligned; MSW stays
+on version 2 to satisfy Vitest's mocker peer dependency.
