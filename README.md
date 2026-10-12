@@ -165,6 +165,10 @@ Read the [contribution guide](./CONTRIBUTING.md) and
 [code of conduct](./CODE_OF_CONDUCT.md). The workspace contains the client, React
 bindings, service worker, and demo applications.
 
+GitHub Actions installs Node.js before pnpm. The Node setup steps disable
+automatic package-manager caching (`package-manager-cache: false`) so they do
+not try to invoke pnpm before it is installed.
+
 ```sh
 pnpm lint-fix
 pnpm lint
