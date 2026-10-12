@@ -11,7 +11,7 @@ on:
     #   - main
 
 env:
-  NODE_VERSION: 22    
+  NODE_VERSION: 22
 
 jobs:
   run-linters:
@@ -27,9 +27,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
+          version: 11.10.0
           run_install: false
 
       # ESLint and Prettier must be in `package.json`

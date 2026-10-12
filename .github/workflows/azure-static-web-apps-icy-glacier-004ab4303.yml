@@ -30,9 +30,13 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
+          version: 11.10.0
           run_install: false
       - name: pnpm install root
         run: pnpm i --frozen-lockfile

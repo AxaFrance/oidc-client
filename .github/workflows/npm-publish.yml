@@ -29,9 +29,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
+          version: 11.10.0
           run_install: false
 
       - name: pnpm i
@@ -160,9 +164,13 @@ jobs:
             exit 1
           fi
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
+          version: 11.10.0
           run_install: false
 
       - name: Update package versions to ${{ steps.tag.outputs.new_version }}
