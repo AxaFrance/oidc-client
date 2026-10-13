@@ -24,15 +24,20 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
+          version: 11.10.0
           run_install: false
       - name: pnpm install root
         run: pnpm i --frozen-lockfile

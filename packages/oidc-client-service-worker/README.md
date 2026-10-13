@@ -144,4 +144,7 @@ Protocol constants and types are exported from
 `@axa-fr/oidc-client-service-worker/protocol` and re-exported by
 `@axa-fr/oidc-client`.
 
+For source development, use the root [contributor commands](../../README.md#contribute)
+and the committed lockfile. Keep this package's Vitest and coverage versions aligned.
+
 [Back to the project overview](../../README.md)

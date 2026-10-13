@@ -394,3 +394,6 @@ This requires an active worker. See the protocol reference for payloads, timeout
 - [Service-worker package guide](../oidc-client-service-worker/README.md).
 
 The demos belong to the pnpm monorepo. Follow their READMEs rather than installing each workspace independently.
+
+For source development, use the root [contributor commands](../../README.md#contribute)
+and the committed lockfile. Keep this package's Vitest and coverage versions aligned.

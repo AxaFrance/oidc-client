@@ -24,14 +24,19 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
+          version: 11.10.0
           run_install: false
 
       - name: pnpm i
@@ -63,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GIT_TOKEN }}
           fetch-depth: 0
@@ -135,7 +140,7 @@ jobs:
             echo "new_version=$version-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
@@ -160,9 +165,13 @@ jobs:
             exit 1
           fi
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
+          version: 11.10.0
           run_install: false
 
       - name: Update package versions to ${{ steps.tag.outputs.new_version }}

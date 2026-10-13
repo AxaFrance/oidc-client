@@ -25,6 +25,24 @@ not guarantees that every reported problem is resolved.
 - [Should I use this client or a Backend for Frontend?](#should-i-use-this-client-or-a-backend-for-frontend)
 - [Does the service worker protect me from XSS?](#does-the-service-worker-protect-me-from-xss)
 - [What should I include in a bug report?](#what-should-i-include-in-a-bug-report)
+- [Why does CI fail to locate pnpm during Node setup?](#why-does-ci-fail-to-locate-pnpm-during-node-setup)
+- [Why can an Azure demo deployment fail after a successful build?](#why-can-an-azure-demo-deployment-fail-after-a-successful-build)
+
+## Why does CI fail to locate pnpm during Node setup?
+
+If Node setup attempts package-manager caching before pnpm is installed, it can
+fail with `Unable to locate executable file: pnpm`. The workflows set
+`package-manager-cache: false` on `actions/setup-node`, then enable Corepack and
+install the pinned pnpm version with `pnpm/action-setup` before installing
+dependencies. This fixes the setup failure; it does not bypass lint, tests, or
+build checks.
+
+## Why can an Azure demo deployment fail after a successful build?
+
+Azure Static Web Apps can reject a deployment when the app has reached its
+maximum number of staging environments. An app administrator must remove an
+unused staging environment before retrying the deployment. Updating npm
+dependencies does not resolve this Azure quota.
 
 ## Do I need a service worker?
 

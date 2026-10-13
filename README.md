@@ -165,6 +165,14 @@ Read the [contribution guide](./CONTRIBUTING.md) and
 [code of conduct](./CODE_OF_CONDUCT.md). The workspace contains the client, React
 bindings, service worker, and demo applications.
 
+Dependency updates must include the affected workspace manifests and
+`pnpm-lock.yaml`. Keep Vitest and `@vitest/coverage-v8` on matching versions.
+MSW remains on version 2 because Vitest's mocker requires that major version.
+
+GitHub Actions installs Node.js before pnpm. The Node setup steps disable
+automatic package-manager caching (`package-manager-cache: false`) so they do
+not try to invoke pnpm before it is installed.
+
 ```sh
 pnpm lint-fix
 pnpm lint
