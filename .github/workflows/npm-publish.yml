@@ -448,15 +448,17 @@ jobs:
             "@axa-fr/react-oidc"
           )
 
+          max_attempts=30
+
           for package_name in "${package_names[@]}"; do
             published_version=""
 
-            for attempt in {1..6}; do
+            for ((attempt=1; attempt<=max_attempts; attempt++)); do
               if published_version=$(npm view "${package_name}@${EXPECTED_VERSION}" version --registry=https://registry.npmjs.org/ 2>/dev/null) && [[ "$published_version" == "$EXPECTED_VERSION" ]]; then
                 break
               fi
 
-              echo "Waiting for ${package_name}@${EXPECTED_VERSION} to be available on npm (attempt ${attempt}/6)."
+              echo "Waiting for ${package_name}@${EXPECTED_VERSION} to be available on npm (attempt ${attempt}/${max_attempts})."
               sleep 10
             done
 
