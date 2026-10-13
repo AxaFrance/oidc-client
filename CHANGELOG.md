@@ -1,7 +1,15 @@
 # Changelog
 
+## v7.29.7
+
+- [90e5dcdd](https://github.com/AxaFrance/oidc-client/commit/90e5dcdd9c7eb3dc72684bdab71fdb88453fa4af) - [skip ci] Update to version 7.29.7 in package.json, 2026-10-13 by *github-actions[bot]*
+- [46712524](https://github.com/AxaFrance/oidc-client/commit/46712524936c8552ceb693e6845acc6290a84c2e) - Increase npm package verification retry attempts in release workflow (#1737) (release), 2026-10-13 by *Copilot*
+- [df8c4ba0](https://github.com/AxaFrance/oidc-client/commit/df8c4ba08cc104cb35a4b5ce042f526d64e8aeae) - Refresh workspace and CI toolchain metadata (#1736) (release), 2026-10-13 by *Copilot*
+
+
 ## v7.29.6
 
+- [67915c5d](https://github.com/AxaFrance/oidc-client/commit/67915c5db31c7e6048aef5cd1336e7a7adb2991a) - [skip ci] Generate changelog to version 7.29.6, 2026-09-20 by *github-actions[bot]*
 - [59afc43a](https://github.com/AxaFrance/oidc-client/commit/59afc43a04579293811563a9ebebb363357e0521) - [skip ci] Update to version 7.29.6 in package.json, 2026-09-20 by *github-actions[bot]*
 - [7463acfc](https://github.com/AxaFrance/oidc-client/commit/7463acfc45589823a47fad470ad07839ef1f1684) - Rework FAQ with verified troubleshooting guidance and Mermaid diagrams (release) (#1734), 2026-09-20 by *Copilot*
 
@@ -329,10 +337,5 @@
 ## v7.25.2
 
 - [15900f42](https://github.com/AxaFrance/oidc-client/commit/15900f42e42539a5b12a4c23959ec95c695426d9) - fix(oidc): MonitorSession/CheckSession initializes only on one tab (release) (#1513), 2025-02-05 by *Guillaume Chervet*
-
-
-## v7.25.1
-
-- [f0641a6f](https://github.com/AxaFrance/oidc-client/commit/f0641a6ff21a7cf600ee5e782a3e3114b462551c) - fix(oidc): remove use of localStorage for cache (release), 2025-02-05 by *Guillaume Chervet*
 
 
