@@ -358,6 +358,10 @@ Use `<OidcSecure configurationName="payments">` for that session's protected UI.
 
 See the [core errors and events guide](../oidc-client/README.md#errors-and-events) for renewal errors, missing/mismatched state, missing nonces, retryability, and recovery. The provider's custom error/session-loss screens and `onEvent` callback are the React integration points. For strict renewal outside a hook, use `OidcClient.getOrThrow(name).renewTokensOrThrowAsync()`.
 
+The `onEvent(configurationName, eventName, data)` callback receives the core client's [token synchronization events](../oidc-client/README.md#token-synchronization-events). A `syncTokensAsync_end` event can report session loss or deferred renewal; it does not guarantee a successful refresh or completed persistence. These events also occur during checks that reuse valid tokens, so avoid treating every begin/end pair as an application loading cycle.
+
+On `syncTokensAsync_error`, the provider calls `onSessionLost()` when supplied. Otherwise, it selects the session-loss screen, using `sessionLostComponent` if configured. The same handling already applies to `refreshTokensAsync_error`, including resolved renewal failures. Observing an error through `onEvent` does not suppress this handling or catch the synchronization exception. Keep callbacks lightweight and do not throw; log only selected error codes, phases, and statuses, never the complete payload or exception.
+
 When no client has been initialized for a name, `useOidc`, `useOidcUser`, `useOidcAccessToken`, and `useOidcIdToken` warn once per name and return unauthenticated/null defaults. This is useful in tests and Storybook, but does not initialize authentication.
 
 `OidcClient.get(name)` returns `null` for a missing client; `getOrThrow(name)` fails explicitly. `OidcSecure` and requests made through `useOidcFetch` require initialization and remain fail-fast. Mount a matching provider before using them.
