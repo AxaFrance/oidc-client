@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.29.8
+
+- [7c498e99](https://github.com/AxaFrance/oidc-client/commit/7c498e99bb265fa35c11814f7e7cc5105c8349c9) - [skip ci] Update to version 7.29.8 in package.json, 2026-10-15 by *github-actions[bot]*
+- [f2bfe0e6](https://github.com/AxaFrance/oidc-client/commit/f2bfe0e622688b5ff68cb251b0ad24c8c8d65817) - fix(oidc): emit syncTokensAsync_begin, syncTokensAsync_end and syncTokensAsync_error events (release) (#1738), 2026-10-15 by *Christopher Pruijsen*
+
+
 ## v7.29.7
 
+- [77a5ca3b](https://github.com/AxaFrance/oidc-client/commit/77a5ca3b8a82fe5d408252106c8012f5c1633404) - [skip ci] Generate changelog to version 7.29.7, 2026-10-13 by *github-actions[bot]*
 - [90e5dcdd](https://github.com/AxaFrance/oidc-client/commit/90e5dcdd9c7eb3dc72684bdab71fdb88453fa4af) - [skip ci] Update to version 7.29.7 in package.json, 2026-10-13 by *github-actions[bot]*
 - [46712524](https://github.com/AxaFrance/oidc-client/commit/46712524936c8552ceb693e6845acc6290a84c2e) - Increase npm package verification retry attempts in release workflow (#1737) (release), 2026-10-13 by *Copilot*
 - [df8c4ba0](https://github.com/AxaFrance/oidc-client/commit/df8c4ba08cc104cb35a4b5ce042f526d64e8aeae) - Refresh workspace and CI toolchain metadata (#1736) (release), 2026-10-13 by *Copilot*
@@ -332,10 +339,5 @@
 ## v7.25.3
 
 - [ca0f0645](https://github.com/AxaFrance/oidc-client/commit/ca0f0645c52dd827b97912d5ee6f1836e05f56e1) - fix(oidc): lost session back (release) (#1514), 2025-02-06 by *Guillaume Chervet*
-
-
-## v7.25.2
-
-- [15900f42](https://github.com/AxaFrance/oidc-client/commit/15900f42e42539a5b12a4c23959ec95c695426d9) - fix(oidc): MonitorSession/CheckSession initializes only on one tab (release) (#1513), 2025-02-05 by *Guillaume Chervet*
 
 
