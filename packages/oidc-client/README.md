@@ -345,6 +345,58 @@ const subscriptionId = oidcClient.subscribeEvents((name, data) => {
 oidcClient.removeEventSubscription(subscriptionId);
 ```
 
+### Token synchronization events
+
+Use `OidcClient.eventNames` with `subscribeEvents` to observe synchronization, including checks that reuse valid tokens without a refresh request. Automatic renewal checks can emit these events approximately once per second; browser scheduling and the time spent synchronizing can delay them.
+
+| Event                   | Payload                         | Meaning                                                                                                                                                                                    |
+| ----------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `syncTokensAsync_begin` | `{}`                            | Synchronization is starting.                                                                                                                                                               |
+| `syncTokensAsync_end`   | `{ status }`                    | Synchronization resolved; inspect `status` to determine the outcome.                                                                                                                       |
+| `syncTokensAsync_error` | `{ message, error, exception }` | Synchronization threw. `message` is `'sync tokens error'`; `exception` is the original thrown value, and `error` is that same value only when it is an `OidcError`, otherwise `undefined`. |
+
+One synchronization run emits a begin event followed by an end or error event. Internal refresh retries do not emit additional lifecycle pairs. When a cross-tab lock is needed but unavailable, `syncTokensAsync_lock_not_available` is emitted before synchronization begins and can repeat while waiting for the lock. The lifecycle events are emitted both with and without a lock.
+
+An end event reports resolution, including the following outcomes:
+
+| `status`         | Meaning                                                                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `'LOGGED_IN'`    | Tokens are valid, were refreshed, or were synchronized from another tab.                                                                                            |
+| `'LOGGED'`       | Silent login supplied tokens.                                                                                                                                       |
+| `'SESSION_LOST'` | Synchronization could not retain the session. Existing `refreshTokensAsync_error` events carry the renewal error.                                                   |
+| `'LOGGED_OUT'`   | Synchronization detected logout or missing stored tokens.                                                                                                           |
+| `'GIVE_UP'`      | Renewal was deferred, for example while offline in a hidden document or when waiting for an API request to trigger renewal. This does not establish token validity. |
+| `null`           | There were no current tokens to synchronize.                                                                                                                        |
+
+Resolved failures such as `'SESSION_LOST'` emit an end event rather than a synchronization error event. After an error event, the original synchronization exception is rethrown; no end event follows it.
+
+These events cover synchronization itself. Initial worker setup and lock acquisition happen before the begin event; subsequent storage updates, session destruction, and timer scheduling happen after the end event. Failures in those steps are outside this event boundary, so an end event does not guarantee that the renewal call has finished successfully.
+
+Keep subscribers lightweight and do not throw: subscriber exceptions propagate and can interrupt renewal. Log only selected diagnostic fields. The error payload contains the original exception, whose properties or cause may include sensitive data; do not log complete payloads, exceptions, or tokens.
+
+```typescript
+import { isOidcError, OidcClient } from '@axa-fr/oidc-client';
+
+// Use an already initialized client.
+const oidcClient = OidcClient.getOrThrow();
+const subscriptionId = oidcClient.subscribeEvents((name, data) => {
+  if (name === OidcClient.eventNames.syncTokensAsync_end) {
+    console.debug(name, data.status);
+  } else if (name === OidcClient.eventNames.syncTokensAsync_error) {
+    if (isOidcError(data.error)) {
+      console.warn(name, data.error.code, data.error.phase, data.error.status);
+    } else {
+      console.warn(name);
+    }
+  }
+});
+
+// When the subscriber is no longer needed:
+oidcClient.removeEventSubscription(subscriptionId);
+```
+
+React applications can observe the same payloads with the provider's `onEvent(configurationName, eventName, data)` callback. See [React error handling](../react-oidc/README.md#errors-and-missing-providers) for its session-loss response.
+
 ### Missing or mismatched login state
 
 `OidcStateError` extends `OidcError` and identifies callback-state failures:

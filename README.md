@@ -91,6 +91,11 @@ in the worker; the application receives placeholders instead. Without the worker
 the client manages tokens in browser storage and the authenticated fetch wrapper
 adds the access token to API requests.
 
+Observe renewal checks through `subscribeEvents` in the core client or `onEvent`
+in React. The [token synchronization events guide](./packages/oidc-client/README.md#token-synchronization-events)
+explains their payloads and timing: an `_end` event can also report session loss
+or deferred renewal, and does not guarantee that tokens were refreshed.
+
 ## Security and deployment
 
 - **Service-worker isolation is not an XSS or CSRF prevention mechanism.** Malicious

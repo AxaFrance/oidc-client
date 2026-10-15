@@ -54,15 +54,20 @@ async function syncTokens(
   const updateTokens = tokens => {
     oidc.tokens = tokens;
   };
-  const result = await synchroniseTokensAsync(oidc)(
-    updateTokens,
-    0,
-    0,
-    forceRefresh,
-    extras,
-    scope,
-  );
+  oidc.publishEvent(Oidc.eventNames.syncTokensAsync_begin, {});
+  let result;
+  try {
+    result = await synchroniseTokensAsync(oidc)(updateTokens, 0, 0, forceRefresh, extras, scope);
+  } catch (exception: any) {
+    oidc.publishEvent(Oidc.eventNames.syncTokensAsync_error, {
+      message: 'sync tokens error',
+      error: isOidcError(exception) ? exception : undefined,
+      exception,
+    });
+    throw exception;
+  }
   const { tokens, status } = result;
+  oidc.publishEvent(Oidc.eventNames.syncTokensAsync_end, { status });
 
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
   if (!serviceWorker) {

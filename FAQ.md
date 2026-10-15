@@ -13,6 +13,7 @@ not guarantees that every reported problem is resolved.
 - [Why does my API return 401, especially with multiple tabs?](#why-does-my-api-return-401-especially-with-multiple-tabs)
 - [Why does login fail when two tabs sign in together?](#why-does-login-fail-when-two-tabs-sign-in-together)
 - [How are tokens renewed?](#how-are-tokens-renewed)
+- [What do syncTokensAsync events mean?](#what-do-synctokensasync-events-mean)
 - [Why are tokens renewed every few seconds?](#why-are-tokens-renewed-every-few-seconds)
 - [Why does silent sign-in fail in some browsers?](#why-does-silent-sign-in-fail-in-some-browsers)
 - [Will I stay signed in after sleep or a browser restart?](#will-i-stay-signed-in-after-sleep-or-a-browser-restart)
@@ -199,6 +200,24 @@ at the provider/server.
 
 Related questions: [#1368](https://github.com/AxaFrance/oidc-client/issues/1368)
 and [#1070](https://github.com/AxaFrance/oidc-client/issues/1070).
+
+## What do syncTokensAsync events mean?
+
+`syncTokensAsync_begin` starts a synchronization run, and `syncTokensAsync_end`
+reports its resolved `status`. An end event can report `SESSION_LOST` or
+`GIVE_UP`; it does not guarantee a token refresh or completed storage updates.
+Automatic checks also emit these events when the existing tokens are still
+valid, and internal refresh retries share one lifecycle pair.
+
+`syncTokensAsync_error` reports an exception escaping synchronization, which is
+then rethrown. Resolved session-loss results retain their refresh error events
+and finish with `syncTokensAsync_end`. In React, a synchronization error calls
+`onSessionLost()` when supplied; otherwise, the provider selects its session-loss
+screen.
+
+See the [event payloads, boundaries, and subscription example](./packages/oidc-client/README.md#token-synchronization-events).
+Use `subscribeEvents` or React's `onEvent` to record selected diagnostic fields;
+do not log complete payloads or exceptions, which may contain sensitive data.
 
 ## Why are tokens renewed every few seconds?
 
