@@ -18,11 +18,15 @@ by the [root package manifest](../../package.json):
 corepack enable
 pnpm install --frozen-lockfile
 pnpm build
-pnpm --dir examples/react-oidc-demo start
+pnpm demo:server
 ```
 
-The start script refreshes the service worker assets before starting Vite. Open
-the URL printed in the terminal, normally `http://localhost:5173`.
+Keep the server running, then run `pnpm demo:react` in another terminal and open
+`http://localhost:5173`. These local scripts require the .NET 10 SDK and fixed
+registered ports; see the [OpenIddict fixture guide](../openiddict-server/README.md).
+Local mode requires `localhost`; the unregistered `127.0.0.1` and `[::1]` aliases
+are rejected.
+The original package start script also refreshes the worker before starting Vite.
 [`vite.config.js`](vite.config.js) does not fix a port; a busy port may cause Vite
 to choose another. Register the actual browser origin with your identity provider.
 
@@ -36,14 +40,22 @@ to choose another. Register the actual browser origin with your identity provide
 - [`public/OidcTrustedDomains.js`](public/OidcTrustedDomains.js) defines service
   worker trust rules for each configuration name.
 
-The default configuration uses the external
+Development defaults to local OpenIddict. Production builds and
+`VITE_OIDC_PROVIDER=duende` use the external
 [Duende demo provider](https://demo.duendesoftware.com), client ID
 `interactive.public.short`, and scopes `openid profile email api offline_access`.
 Use the provider's published sign-in options. Its accounts, availability, and
 registered redirect URLs are outside this repository's control.
 
-The following suffixes are appended to `window.location.origin`. For example, the
-default login callback is normally
+The local **RFC 8707 resources** page exercises Orders and Inventory audiences,
+shared refresh rotation, short-lived renewal, clearing and explicit errors.
+Compare `?dpop=true&worker=on` with `?dpop=true&worker=off`; local modes persist
+across redirects. The Google-labeled local entry is a synthetic public client.
+Local hash-example callbacks are registered fragment-free paths. DPoP and session
+monitoring use custom demo-only adapters, as documented in the fixture guide.
+
+In online mode, the following suffixes are appended to `window.location.origin`.
+For example, the default login callback is normally
 `http://localhost:5173/authentication/callback`.
 
 | Configuration                         | Login callback suffix                                  | Silent callback suffix                                        |
@@ -53,8 +65,12 @@ default login callback is normally
 | `config_with_hash`                    | `/multi-auth/authentification#authentication-callback` | `/multi-auth/authentification#authentication-silent-callback` |
 | Google                                | `/multi-auth/callback-google`                          | `/multi-auth/silent-callback-google`                          |
 
+Local mode uses the same paths except for `config_with_hash`, whose callbacks
+are `/multi-auth/authentification/hash-callback` and
+`/multi-auth/authentification/hash-silent-callback`, without fragments.
+
 The spelling `authentification` is intentional here: it matches the existing
-source. The hash variant also sets `silent_login_uri` to
+source. The online hash variant also sets `silent_login_uri` to
 `/multi-auth/authentification#authentication-silent-login`.
 The variants with `without_silent_login` or `without_refresh_token_silent_login`
 in their names disable the silent callback.
@@ -70,9 +86,10 @@ origin. Refresh-token, session-monitoring, PAR, and DPoP support depend on the
 provider. Silent sign-in can be affected by browser restrictions on third-party
 cookies.
 
-The Google entry is not a ready-to-use local registration: configure your own
-provider-approved browser flow and allowed URLs. Never ship a confidential client
-secret in browser code.
+The online Google example is not a ready-to-use registration: configure your own
+provider-approved browser flow and allowed URLs. The local Google-labeled example
+uses the synthetic fixture client instead. Never ship a confidential client secret
+in browser code.
 
 ## What to try
 
@@ -85,6 +102,7 @@ secret in browser code.
 | **Secure User Fetch Hoc**    | Calling the provider's user-info endpoint through `withOidcFetch`.                                                 |
 | **Secure User Fetch Hook**   | The same request through `useOidcFetch`.                                                                           |
 | **Multi Auth**               | Switching between named configurations and observing their independent authentication state.                       |
+| **RFC 8707 resources** | Calling two APIs with isolated audiences, renewing and clearing entries, and rejecting wrong targets. |
 
 Start with **Login** on Home, inspect Profile, and then try a protected page after
 logging out. Return to Home to renew tokens manually. The **Default configuration
@@ -96,15 +114,23 @@ sign-in, then explore session monitoring, hash callbacks, token visibility,
 separate OIDC/API trust rules, DPoP, and multi-tab login. The selected configuration
 name is kept in session storage. Some examples need provider-side setup; the
 separate-domain example includes an API placeholder rather than a working API.
-The fetch demonstrations call the Duende user-info endpoint, so adapt those
-requests as well when testing another provider.
+The fetch demonstrations derive userinfo from the selected authority and opt in
+to DPoP in local DPoP mode. Online separate-domain placeholders are unchanged;
+the local worker allows only the registered userinfo and API paths.
 
 ## Service worker behavior
 
-The default configuration enables `/OidcServiceWorker.js` but sets
+The online default configuration enables `/OidcServiceWorker.js` but sets
 `service_worker_only: false`, allowing fallback when the worker cannot be used.
-Use HTTPS or localhost for worker support. Review the active mode in browser
-developer tools instead of assuming tokens are always hidden.
+Local mode defaults to `worker=on` and requires worker support instead of falling
+back. Selecting `worker=off` uses browser storage; startup first unregisters the
+demo's OIDC worker and reloads if that worker still controls the page. Unrelated
+worker registrations are preserved.
+
+Close other tabs of this demo before switching storage modes, since worker
+registration is origin-wide. Tokens are not migrated between modes. Use HTTPS
+or localhost for worker support, and review the active mode in browser developer
+tools instead of assuming tokens are always hidden.
 
 In worker mode, access and refresh tokens normally remain in the worker, while
 the page receives placeholders. The `config_show_access_token` trust rule

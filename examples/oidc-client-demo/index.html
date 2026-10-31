@@ -5,7 +5,15 @@
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <title>React App</title>
+    <title>Native OIDC demo</title>
+    <style>
+      body { font: 16px system-ui; margin: 24px; max-width: 1100px; }
+      button { margin: 5px; padding: 10px; border: 0; border-radius: 5px; background: #075ccc; color: white; cursor: pointer; }
+      button:disabled { opacity: .5; }
+      pre {       white-space: pre-wrap;
+      overflow-wrap: anywhere; padding: 16px; background: #eef4fb; }
+      #resources { border-top: 2px solid #075ccc; margin-top: 30px; }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -15,6 +23,8 @@
       <a href="https://github.com/AxaFrance/oidc-client">github axa oidc-client</a>
     </p>
     <div id="root"></div>
+    <p id="demo-mode" data-testid="demo-mode"></p>
+    <div id="resources"></div>
     <div id="game"></div>
     <script crossorigin type="module" src="/src/index.tsx"></script>
   </body>

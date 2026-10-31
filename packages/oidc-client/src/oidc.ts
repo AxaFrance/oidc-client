@@ -414,9 +414,14 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         this.getFetch,
       )(callbackPath, extras, isSilentSignin, scope);
     })();
-    return this.loginPromise.finally(() => {
-      this.loginPromise = null;
-    });
+    return this.loginPromise
+      .catch(error => {
+        if (isSilentSignin) this._silentLoginErrorCallbackFromIFrame(error);
+        throw error;
+      })
+      .finally(() => {
+        this.loginPromise = null;
+      });
   }
 
   loginCallbackPromise: Promise<any> = null;

@@ -8,6 +8,7 @@ not guarantees that every reported problem is resolved.
 
 ## Contents
 
+- [How do I test RFC 8707 locally with OpenIddict?](#how-do-i-test-rfc-8707-locally-with-openiddict)
 - [Do I need a service worker?](#do-i-need-a-service-worker)
 - [Why is my access token a placeholder?](#why-is-my-access-token-a-placeholder)
 - [Why does my API return 401, especially with multiple tabs?](#why-does-my-api-return-401-especially-with-multiple-tabs)
@@ -30,6 +31,31 @@ not guarantees that every reported problem is resolved.
 - [What should I include in a bug report?](#what-should-i-include-in-a-bug-report)
 - [Why does CI fail to locate pnpm during Node setup?](#why-does-ci-fail-to-locate-pnpm-during-node-setup)
 - [Why can an Azure demo deployment fail after a successful build?](#why-can-an-azure-demo-deployment-fail-after-a-successful-build)
+
+## How do I test RFC 8707 locally with OpenIddict?
+
+Follow the [local fixture guide](./examples/openiddict-server/README.md). The
+development demos default to OpenIddict, while production builds still use
+Duende. Both demos expose separate Orders/Inventory API calls, renewal, local
+clearing, wrong-destination rejection and explicit provider errors. Run
+`pnpm test:server` and `pnpm test:e2e` for the server and browser suites.
+
+The fictional Alice sign-in requires no credentials. DPoP and session monitoring
+use custom loopback-only adapters; they are not native OpenIddict features or a
+production server. Local OAuth callbacks are fragment-free. Restarting the
+ephemeral-key server requires fresh authentication. Use exact `localhost` ports
+and clear site storage when switching providers. The browser suite captures
+credential-masked screenshots, not raw tokens or traces.
+
+Local mode rejects `127.0.0.1` and `[::1]` because only `localhost` browser origins
+are registered. Switching from `worker=on` to `worker=off` unregisters this demo's
+OIDC worker and reloads before using browser storage; unrelated workers are left
+alone. Close other tabs of the same demo before switching, since registrations
+are origin-wide. Tokens are not migrated between modes.
+
+The demo CI also type-checks the built packages. React packaging must copy only
+worker runtime assets: flattening the worker's nested declaration files can
+overwrite React's public type entry point and hide all its exported APIs.
 
 ## Why does CI fail to locate pnpm during Node setup?
 

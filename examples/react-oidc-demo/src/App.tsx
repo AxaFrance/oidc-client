@@ -3,11 +3,12 @@ import React, { useReducer } from 'react';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 
 import CodeExecutor from './CodeExecutor';
-import { configurationIdentityServer } from './configurations.js';
+import { configurationIdentityServer, demoEnvironment } from './configurations.js';
 import { FetchUserHoc, FetchUserHook } from './FetchUser.js';
 import { Home } from './Home.js';
 import { MultiAuthContainer } from './MultiAuth.js';
 import { Profile, SecureProfile } from './Profile.js';
+import { ResourcePlayground } from './ResourcePlayground';
 
 const OidcSecureHoc = withOidcSecure(Profile);
 
@@ -38,6 +39,12 @@ function App() {
     <>
       <OidcProvider configuration={configurationIdentityServer} onEvent={onEvent}>
         <BrowserRouter>
+          <p className="container mt-2" data-testid="demo-mode">
+            Provider:{' '}
+            {demoEnvironment.provider === 'openiddict' ? 'OpenIddict (local)' : 'Duende (online)'} |
+            Storage: {demoEnvironment.isWorker ? 'Service Worker' : 'Browser'} | Proof:{' '}
+            {demoEnvironment.isDpop ? 'DPoP' : 'Bearer'}
+          </p>
           <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
             <a className="navbar-brand" href="/">
               @axa-fr/react-oidc
@@ -60,6 +67,11 @@ function App() {
               id="navbarNav"
             >
               <ul className="navbar-nav">
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/resources">
+                    RFC 8707 resources
+                  </NavLink>
+                </li>
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/">
                     Home
@@ -108,6 +120,7 @@ function App() {
               <Route path="/user-fetch-secure-hoc" element={<FetchUserHoc></FetchUserHoc>} />
               <Route path="/user-fetch-secure-hook" element={<FetchUserHook></FetchUserHook>} />
               <Route path="/multi-auth/*" element={<MultiAuthContainer></MultiAuthContainer>} />
+              <Route path="/resources" element={<ResourcePlayground />} />
             </Routes>
           </div>
         </BrowserRouter>
@@ -117,7 +130,10 @@ function App() {
         <div className="card">
           <div className="card-body">
             <h5 className="card-title">Default configuration Events</h5>
-            <div style={{ overflowX: 'hidden', overflowY: 'scroll', maxHeight: '400px' }}>
+            <div
+              data-sensitive
+              style={{ overflowX: 'hidden', overflowY: 'scroll', maxHeight: '400px' }}
+            >
               {events.map(e => {
                 const date = new Date(e.date);
                 const dateFormated = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;

@@ -103,6 +103,11 @@ overwrite the public React type entry point.
 
 ## Resource-aware API hooks
 
+The [local React/OpenIddict playground](../../examples/openiddict-server/README.md)
+demonstrates both resource hooks against real, separately validated API audiences
+in Bearer/DPoP and browser/worker modes. Production demos retain Duende; local DPoP
+and session monitoring use explicitly documented custom demo-only adapters.
+
 The resource-token hook observes restored persisted tokens as well as newly
 acquired tokens. A clear operation cannot be undone by an in-flight cache lookup.
 
