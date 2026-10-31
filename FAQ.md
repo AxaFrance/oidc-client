@@ -47,6 +47,12 @@ ephemeral-key server requires fresh authentication. Use exact `localhost` ports
 and clear site storage when switching providers. The browser suite captures
 credential-masked screenshots, not raw tokens or traces.
 
+Local mode rejects `127.0.0.1` and `[::1]` because only `localhost` browser origins
+are registered. Switching from `worker=on` to `worker=off` unregisters this demo's
+OIDC worker and reloads before using browser storage; unrelated workers are left
+alone. Close other tabs of the same demo before switching, since registrations
+are origin-wide. Tokens are not migrated between modes.
+
 The demo CI also type-checks the built packages. React packaging must copy only
 worker runtime assets: flattening the worker's nested declaration files can
 overwrite React's public type entry point and hide all its exported APIs.

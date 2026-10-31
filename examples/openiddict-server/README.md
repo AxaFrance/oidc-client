@@ -35,8 +35,10 @@ same commands.
 | Inventory resource / API | `http://localhost:7003/` / `http://localhost:7003/api/inventory` |
 
 Use the exact `localhost` origins and ports: these are the registered callbacks
-and CORS origins. The server binds only loopback and refuses non-Development
-startup and non-loopback callers/hosts.
+and CORS origins. Local demo configuration rejects `127.0.0.1` and `[::1]`;
+being loopback does not make an origin a registered callback or trusted worker
+origin. The server binds only loopback and refuses non-Development startup and
+non-loopback callers/hosts.
 
 ## Provider and mode selection
 
@@ -50,6 +52,14 @@ Open either demo with `?dpop=true&worker=on`, `?dpop=true&worker=off`,
 in session storage across OAuth redirects. Log out and clear site storage when
 switching providers. Invalid settings fail explicitly; remove
 `oidc-demo-options` if saved settings are malformed.
+
+Local worker mode requires worker support instead of silently falling back.
+Switching to `worker=off` unregisters only the same-origin `/OidcServiceWorker.js`
+registration and reloads if it still controls the page, before either demo
+initializes OIDC. Unrelated workers and online Duende mode are unchanged. Cleanup
+failures stop startup with an explicit error. Close other tabs of the same demo
+before switching modes because registrations are origin-wide. Tokens are not
+migrated between storage modes; sign in again when prompted.
 
 OpenIddict rejects fragment-bearing OAuth callbacks. The native local callback
 is `/authentication/callback`; React's local hash example uses
@@ -124,6 +134,7 @@ pnpm test:e2e
 
 The E2E command starts and stops its own three servers; stop manually started
 instances first. It exercises both demos in Bearer/DPoP and browser/worker modes,
-the React named scenarios and protected/userinfo routes. Credential-masked PNGs
+same-tab worker/browser round trips, provider validation, the React named
+scenarios and protected/userinfo routes. Credential-masked PNGs
 are saved in [the screenshot folder](../e2e/screenshots/); GitHub Actions uploads
 only those PNGs, never traces or raw error snapshots.

@@ -23,8 +23,8 @@ export function getDemoEnvironment(options: {
     throw new Error('VITE_OIDC_PROVIDER must be openiddict or duende.');
   }
   if (provider === 'duende') return { provider, isDpop: false, isWorker: true };
-  if (!['localhost', '127.0.0.1', '[::1]'].includes(options.location.hostname)) {
-    throw new Error('The local OpenIddict demo requires a loopback browser origin.');
+  if (options.location.hostname !== 'localhost') {
+    throw new Error('The local OpenIddict demo requires the registered localhost browser origin.');
   }
   const saved = options.storage.getItem('oidc-demo-options');
   const previous: unknown = saved ? JSON.parse(saved) : {};
@@ -59,6 +59,34 @@ export function getDemoEnvironment(options: {
   };
   options.storage.setItem('oidc-demo-options', JSON.stringify(result));
   return result;
+}
+
+/** Releases this demo's OIDC worker before browser storage mode starts; false means reloading. */
+export async function prepareDemoWorkerAsync(environment: DemoEnvironment): Promise<boolean> {
+  if (environment.provider !== 'openiddict' || environment.isWorker || !navigator.serviceWorker)
+    return true;
+
+  const isDemoWorker = (worker: ServiceWorker | null): boolean => {
+    if (!worker) return false;
+    const url = new URL(worker.scriptURL);
+    return url.origin === window.location.origin && url.pathname === '/OidcServiceWorker.js';
+  };
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  for (const registration of registrations) {
+    if (
+      isDemoWorker(registration.active) ||
+      isDemoWorker(registration.waiting) ||
+      isDemoWorker(registration.installing)
+    ) {
+      if (!(await registration.unregister()))
+        throw new Error('Unable to unregister the demo OIDC worker before using browser storage.');
+    }
+  }
+  if (isDemoWorker(navigator.serviceWorker.controller)) {
+    window.location.reload();
+    return false;
+  }
+  return true;
 }
 
 /** Keeps online configuration unchanged and uses the registered local demo endpoints in development. */

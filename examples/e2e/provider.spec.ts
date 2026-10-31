@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { getDemoEnvironment, withDemoProvider } from '../shared/provider';
+import { getDemoEnvironment, prepareDemoWorkerAsync, withDemoProvider } from '../shared/provider';
 
 function storage(value: string | null = null): Storage {
   return {
@@ -79,6 +79,103 @@ for (const value of ['null', '[]', '{"isWorker":"yes"}', '{']) {
         storage: storage(value),
       }),
     ).toThrow();
+  });
+}
+
+test('local configuration rejects unregistered loopback hostnames', () => {
+  for (const hostname of ['127.0.0.1', '[::1]']) {
+    expect(() =>
+      getDemoEnvironment({
+        isDevelopment: true,
+        location: { hostname, search: '' },
+        storage: storage(),
+      }),
+    ).toThrow('localhost');
+  }
+});
+
+for (const state of ['active', 'waiting', 'installing', 'unrelated', 'failure']) {
+  test(`browser mode handles ${state} registrations without removing unrelated workers`, async () => {
+    const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+    const windowDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'window');
+    let removed = 0;
+    let reloaded = 0;
+    let inspected = 0;
+    const demoWorker = {
+      scriptURL: 'http://localhost:5173/OidcServiceWorker.js?provider=openiddict',
+    };
+    const registrations = [
+      {
+        active: state === 'active' || state === 'failure' ? demoWorker : null,
+        waiting: state === 'waiting' ? demoWorker : null,
+        installing: state === 'installing' ? demoWorker : null,
+        unregister: async (): Promise<boolean> => {
+          removed++;
+          return state !== 'failure';
+        },
+      },
+      ...['http://localhost:5173/pwa.js', 'http://localhost:5174/OidcServiceWorker.js'].map(
+        (scriptURL: string) => ({
+          active: { scriptURL },
+          waiting: null,
+          installing: null,
+          unregister: async (): Promise<boolean> => {
+            throw new Error('An unrelated worker must not be removed.');
+          },
+        }),
+      ),
+    ];
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: {
+        serviceWorker: {
+          controller:
+            state === 'active' || state === 'failure'
+              ? demoWorker
+              : { scriptURL: 'http://localhost:5173/pwa.js' },
+          getRegistrations: async (): Promise<typeof registrations> => {
+            inspected++;
+            return registrations;
+          },
+        },
+      },
+    });
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {
+        location: {
+          origin: 'http://localhost:5173',
+          reload: (): void => {
+            reloaded++;
+          },
+        },
+      },
+    });
+    try {
+      expect(
+        await prepareDemoWorkerAsync({ provider: 'duende', isWorker: false, isDpop: false }),
+      ).toBe(true);
+      expect(
+        await prepareDemoWorkerAsync({ provider: 'openiddict', isWorker: true, isDpop: false }),
+      ).toBe(true);
+      expect(inspected).toBe(0);
+      const startup = prepareDemoWorkerAsync({
+        provider: 'openiddict',
+        isWorker: false,
+        isDpop: false,
+      });
+      if (state === 'failure')
+        await expect(startup).rejects.toThrow('Unable to unregister the demo OIDC worker');
+      else expect(await startup).toBe(state !== 'active');
+      expect(inspected).toBe(1);
+      expect(removed).toBe(state === 'unrelated' ? 0 : 1);
+      expect(reloaded).toBe(state === 'active' ? 1 : 0);
+    } finally {
+      if (navigatorDescriptor) Object.defineProperty(globalThis, 'navigator', navigatorDescriptor);
+      else Reflect.deleteProperty(globalThis, 'navigator');
+      if (windowDescriptor) Object.defineProperty(globalThis, 'window', windowDescriptor);
+      else Reflect.deleteProperty(globalThis, 'window');
+    }
   });
 }
 

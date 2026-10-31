@@ -23,6 +23,8 @@ pnpm demo:server
 Keep the server running, then run `pnpm demo:native` in another terminal and open
 `http://localhost:5174/`. These scripts refresh the worker and require the .NET 10
 SDK and registered ports; see the [OpenIddict fixture guide](../openiddict-server/README.md).
+Local mode requires `localhost`; the unregistered `127.0.0.1` and `[::1]` aliases
+are rejected.
 The original package start script does not fix a port in
 [`vite.config.js`](vite.config.js); if that port is busy, Vite may choose another.
 The origin you use must match the identity provider's client registration.
@@ -31,7 +33,7 @@ The origin you use must match the identity provider's client registration.
 
 Development uses the local OpenIddict authority; production builds and
 `VITE_OIDC_PROVIDER=duende` retain the external configuration in [`src/index.tsx`](src/index.tsx).
-The external
+The external configuration uses the
 [Duende demo provider](https://demo.duendesoftware.com) with client ID
 `interactive.public.short` and scopes `openid profile email api offline_access`.
 Use the sign-in options published by that provider; this repository does not
@@ -45,15 +47,15 @@ storage with `?dpop=true&worker=on` or `?dpop=true&worker=off`. Local callbacks 
 hash callbacks remain unchanged. The fixture's DPoP adapter is demo-only, not
 native OpenIddict support.
 
-The callback URLs are built from `window.location.origin`. At the usual Vite
-origin, they are:
+Callback URLs are built from `window.location.origin`. The local fixture
+registers these path-based URLs; online mode retains the legacy hash suffixes:
 
-| Purpose         | Configured URL                                           |
-| --------------- | -------------------------------------------------------- |
-| Login callback  | `http://localhost:5173/#/authentication/callback`        |
-| Silent callback | `http://localhost:5173/#/authentication/silent-callback` |
+| Purpose         | Local OpenIddict URL                                         | Online suffix                        |
+| --------------- | ------------------------------------------------------------ | ------------------------------------ |
+| Login callback  | `http://localhost:5174/authentication/callback`                | `/#/authentication/callback`        |
+| Silent callback | `http://localhost:5174/authentication/silent-callback`         | `/#/authentication/silent-callback` |
 
-These are the demo's existing hash-based URLs, not a recommendation for a new
+The online suffixes are legacy hash-based URLs, not a recommendation for a new
 client registration. OAuth redirect URIs must not contain fragments, and a
 provider may reject this pattern. For a provider that requires path-based
 callbacks, update both the configuration and callback handling before registering
@@ -72,9 +74,12 @@ When using your own provider:
 - Update [`public/OidcTrustedDomains.js`](public/OidcTrustedDomains.js) to allow
   only the OIDC endpoints and API destinations you trust.
 
-This demo sets `service_worker_relative_url` to `/OidcServiceWorker.js` and
-`service_worker_only` to `true`: it requires service worker support and a secure
-context, such as HTTPS or localhost. See the
+Online mode and local `worker=on` require service worker support and a secure
+context, such as HTTPS or localhost. Local `worker=off` uses browser storage:
+startup unregisters only this demo's OIDC worker and reloads if it still controls
+the page before creating the client. Close other tabs of this demo when switching
+modes, since worker registration is origin-wide. Tokens are not migrated between
+modes. See the
 [service worker documentation](../../packages/oidc-client-service-worker/README.md)
 before changing its trust rules.
 

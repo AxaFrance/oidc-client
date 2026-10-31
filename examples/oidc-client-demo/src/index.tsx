@@ -1,6 +1,10 @@
 import { getParseQueryStringFromLocation, OidcClient } from '@axa-fr/oidc-client';
 
-import { getDemoEnvironment, withDemoProvider } from '../../shared/provider';
+import {
+  getDemoEnvironment,
+  prepareDemoWorkerAsync,
+  withDemoProvider,
+} from '../../shared/provider';
 import { displayResources } from './resources';
 
 class Router {
@@ -111,7 +115,7 @@ const display = (element: any) => {
 };
 
 // @ts-ignore
-export const execute = () => {
+export const execute = async (): Promise<void> => {
   const router = new Router();
 
   const root = document.getElementById('root');
@@ -123,6 +127,7 @@ export const execute = () => {
     location: window.location,
     storage: window.sessionStorage,
   });
+  if (!(await prepareDemoWorkerAsync(environment))) return;
   const configuration = withDemoProvider(
     {
       client_id: 'interactive.public.short',
@@ -233,4 +238,9 @@ export const execute = () => {
   });
 };
 
-execute();
+execute().catch((error: unknown): void => {
+  console.error('Native demo startup failed:', error);
+  const container = document.getElementById('root');
+  if (container)
+    container.textContent = error instanceof Error ? error.message : 'Native demo startup failed.';
+});
