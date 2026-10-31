@@ -94,6 +94,13 @@ flowchart LR
     Fetch --> API
 ```
 
+## Building the package
+
+Run `pnpm build` from the repository root to build the workspace dependencies.
+The package build copies only worker runtime assets into its distribution.
+Worker declarations are not flattened into React's output, where they could
+overwrite the public React type entry point.
+
 ## Resource-aware API hooks
 
 The [local React/OpenIddict playground](../../examples/openiddict-server/README.md)

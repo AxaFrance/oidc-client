@@ -46,6 +46,10 @@ ephemeral-key server requires fresh authentication. Use exact `localhost` ports
 and clear site storage when switching providers. The browser suite captures
 credential-masked screenshots, not raw tokens or traces.
 
+The demo CI also type-checks the built packages. React packaging must copy only
+worker runtime assets: flattening the worker's nested declaration files can
+overwrite React's public type entry point and hide all its exported APIs.
+
 ## Why does CI fail to locate pnpm during Node setup?
 
 If Node setup attempts package-manager caching before pnpm is installed, it can

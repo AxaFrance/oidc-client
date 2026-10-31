@@ -170,6 +170,9 @@ demo-only integrations, not native OpenIddict features or production security.
 See the fixture guide for registered origins, callback differences, provider
 limitations and the credential-masked [browser evidence](./examples/e2e/screenshots/).
 
+The local-demo Actions workflow checks the built packages' public types, both
+demo production builds, .NET tests and Chromium end-to-end scenarios.
+
 Try the hosted [React demo](https://black-rock-0dc6b0d03.1.azurestaticapps.net/) or
 [vanilla JavaScript demo](https://icy-glacier-004ab4303.2.azurestaticapps.net/).
 These are learning environments, not production security templates.
