@@ -389,19 +389,23 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     if (this.loginPromise !== null) {
       return this.loginPromise;
     }
-    if (extras?.[RESOURCE_LOGIN_PARAMETER] === undefined && this.configuration.resources?.length) {
-      await this.resourceTokens.clearAllAsync();
-    }
-    if (silentLoginOnly) {
-      this.loginPromise = defaultSilentLoginAsync(
-        window,
-        this.configurationName,
-        this.configuration,
-        this.publishEvent.bind(this),
-        this,
-      )(extras, scope);
-    } else {
-      this.loginPromise = defaultLoginAsync(
+    this.loginPromise = (async () => {
+      if (
+        extras?.[RESOURCE_LOGIN_PARAMETER] === undefined &&
+        this.configuration.resources?.length
+      ) {
+        await this.resourceTokens.clearAllAsync();
+      }
+      if (silentLoginOnly) {
+        return defaultSilentLoginAsync(
+          window,
+          this.configurationName,
+          this.configuration,
+          this.publishEvent.bind(this),
+          this,
+        )(extras, scope);
+      }
+      return defaultLoginAsync(
         this.configurationName,
         this.configuration,
         this.publishEvent.bind(this),
@@ -409,10 +413,15 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         this.location,
         this.getFetch,
       )(callbackPath, extras, isSilentSignin, scope);
-    }
-    return this.loginPromise.finally(() => {
-      this.loginPromise = null;
-    });
+    })();
+    return this.loginPromise
+      .catch(error => {
+        if (isSilentSignin) this._silentLoginErrorCallbackFromIFrame(error);
+        throw error;
+      })
+      .finally(() => {
+        this.loginPromise = null;
+      });
   }
 
   loginCallbackPromise: Promise<any> = null;

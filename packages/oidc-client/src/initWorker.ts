@@ -258,7 +258,8 @@ export const initWorkerAsync = async (
     return unavailable();
   }
 
-  const swUrl = `${serviceWorkerRelativeUrl}?v=${codeVersion}`;
+  const separator = serviceWorkerRelativeUrl.includes('?') ? '&' : '?';
+  const swUrl = `${serviceWorkerRelativeUrl}${separator}v=${codeVersion}`;
 
   const cacheKey = configuration.service_worker_register ? serviceWorkerRelativeUrl : swUrl;
 

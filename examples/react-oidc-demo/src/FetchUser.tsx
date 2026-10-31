@@ -7,8 +7,10 @@ import {
 } from '@axa-fr/react-oidc';
 import React, { type ReactElement, useEffect, useState } from 'react';
 
+import { configurationIdentityServer, demoEnvironment } from './configurations';
+
 const fetchUserInfoAsync = async (fetch: Fetch): Promise<OidcUserInfo | null> => {
-  const response = await fetch('https://demo.duendesoftware.com/connect/userinfo');
+  const response = await fetch(`${configurationIdentityServer.authority}/connect/userinfo`);
   return response.status === 200 ? response.json() : null;
 };
 
@@ -45,7 +47,11 @@ const DisplayUserInfo = ({ fetch }: { fetch: Fetch }): ReactElement => {
   );
 };
 
-const UserInfoWithFetchHoc = withOidcFetch(fetch)(DisplayUserInfo);
+const UserInfoWithFetchHoc = withOidcFetch(
+  fetch,
+  'default',
+  demoEnvironment.isDpop,
+)(DisplayUserInfo);
 
 export const FetchUserHoc = () => (
   <OidcSecure>
@@ -60,7 +66,7 @@ export const FetchUserHook = (props: {
   const { fetch } = useOidcFetch(
     window.fetch,
     props.configurationName,
-    props.demonstratingProofOfPossession ?? false,
+    props.demonstratingProofOfPossession ?? demoEnvironment.isDpop,
   );
   return (
     <OidcSecure configurationName={props.configurationName}>

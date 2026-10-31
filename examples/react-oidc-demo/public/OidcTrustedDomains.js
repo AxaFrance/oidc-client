@@ -6,6 +6,7 @@
 const trustedDomains = {
   default: ['https://demo.duendesoftware.com', 'https://kdhttps.auth0.com'],
   config_classic: ['https://demo.duendesoftware.com'],
+  config_without_discovery: ['https://demo.duendesoftware.com'],
   config_with_monitor_session: ['https://demo.duendesoftware.com'],
   config_without_silent_login: ['https://demo.duendesoftware.com'],
   config_without_refresh_token: ['https://demo.duendesoftware.com'],
@@ -41,4 +42,16 @@ trustedDomains.config_multi_tab_login = {
   domains: ['https://demo.duendesoftware.com'],
   allowMultiTabLogin: true,
 };
+if (self.location.hostname === 'localhost' && new URL(self.location.href).searchParams.get('provider') === 'openiddict') {
+  for (const name of Object.keys(trustedDomains)) {
+    trustedDomains[name] = {
+      oidcDomains: ['http://localhost:7001'],
+      accessTokenDomains: ['http://localhost:7001/connect/userinfo', 'http://localhost:7002/api/orders', 'http://localhost:7003/api/inventory'],
+      demonstratingProofOfPossession: true,
+      demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true,
+      showAccessToken: name === 'config_show_access_token',
+      allowMultiTabLogin: name === 'config_multi_tab_login' || name === 'config_with_dpop',
+    };
+  }
+}
 //# sourceMappingURL=OidcTrustedDomains.js.map

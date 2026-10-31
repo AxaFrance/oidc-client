@@ -96,6 +96,11 @@ flowchart LR
 
 ## Resource-aware API hooks
 
+The [local React/OpenIddict playground](../../examples/openiddict-server/README.md)
+demonstrates both resource hooks against real, separately validated API audiences
+in Bearer/DPoP and browser/worker modes. Production demos retain Duende; local DPoP
+and session monitoring use explicitly documented custom demo-only adapters.
+
 Use one `OidcProvider` with the
 [multi-API configuration](../oidc-client/README.md#resource-indicators-and-multiple-apis).
 `resource` selects the initial authorization grant; `resources` defines explicit

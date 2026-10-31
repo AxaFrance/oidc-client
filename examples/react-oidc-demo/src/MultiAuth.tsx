@@ -7,10 +7,13 @@ import {
 } from '@axa-fr/react-oidc';
 import React, { useReducer, useState } from 'react';
 
+import { withDemoProvider } from '../../shared/provider';
 import {
   configurationGoogle,
   configurationIdentityServer,
   configurationIdentityServerWithHash,
+  configurationIdentityServerWithoutDiscovery,
+  demoEnvironment,
 } from './configurations';
 import { FetchUserHook } from './FetchUser';
 import AuthenticatingError from './override/AuthenticateError.component';
@@ -19,6 +22,7 @@ import { CallBackSuccess } from './override/Callback.component';
 import Loading from './override/Loading.component';
 import ServiceWorkerNotSupported from './override/ServiceWorkerNotSupported.component';
 import SessionLost from './override/SessionLost.component';
+import { ResourcePlayground } from './ResourcePlayground';
 
 const fetchWithLogs =
   (fetch: Fetch) =>
@@ -56,6 +60,7 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
           </p>
           <select value={configurationName} onChange={handleConfigurationChange}>
             <option value="config_classic">config_classic</option>
+            <option value="config_without_discovery">config_without_discovery</option>
             <option value="config_with_monitor_session">config_with_monitor_session</option>
             <option value="config_without_refresh_token">config_without_refresh_token</option>
             <option value="config_without_silent_login">config_without_silent_login</option>
@@ -134,6 +139,11 @@ export const MultiAuthContainer = () => {
   const silent_redirect_uri =
     window.location.origin + '/multi-auth/authentification/silent-callback';
   const configurations = {
+    config_without_discovery: {
+      ...configurationIdentityServerWithoutDiscovery,
+      redirect_uri: callBack,
+      silent_redirect_uri,
+    },
     config_classic: {
       ...configurationIdentityServer,
       redirect_uri: callBack,
@@ -223,7 +233,7 @@ export const MultiAuthContainer = () => {
   return (
     <>
       <OidcProvider
-        configuration={configurations[configurationName]}
+        configuration={withDemoProvider(configurations[configurationName], demoEnvironment)}
         configurationName={configurationName}
         loadingComponent={Loading}
         authenticatingErrorComponent={AuthenticatingError}
@@ -245,7 +255,10 @@ export const MultiAuthContainer = () => {
         <div className="card">
           <div className="card-body">
             <h5 className="card-title">Current configuration Events</h5>
-            <div style={{ overflowX: 'hidden', overflowY: 'scroll', maxHeight: '400px' }}>
+            <div
+              data-sensitive
+              style={{ overflowX: 'hidden', overflowY: 'scroll', maxHeight: '400px' }}
+            >
               {events.map(e => {
                 const date = new Date(e.date);
                 const dateFormated = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
@@ -266,7 +279,8 @@ export const MultiAuthContainer = () => {
 const DisplayAccessToken = ({ configurationName }) => {
   const { accessToken, accessTokenPayload } = useOidcAccessToken(configurationName);
   const { idTokenPayload } = useOidcIdToken(configurationName);
-  const demonstratingProofOfPossession = configurationName == 'config_with_dpop';
+  const demonstratingProofOfPossession =
+    configurationName == 'config_with_dpop' || demoEnvironment.isDpop;
   if (!accessToken) {
     return <p>you are not authentified</p>;
   }
@@ -280,7 +294,11 @@ const DisplayAccessToken = ({ configurationName }) => {
             XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be
             accessible from your client side javascript.
           </p>
-          {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
+          {
+            <p data-sensitive className="card-text">
+              Access Token: {JSON.stringify(accessToken)}
+            </p>
+          }
           {accessTokenPayload != null && (
             <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>
           )}
@@ -294,6 +312,9 @@ const DisplayAccessToken = ({ configurationName }) => {
         configurationName={configurationName}
         demonstratingProofOfPossession={demonstratingProofOfPossession}
       />
+      {demoEnvironment.provider === 'openiddict' && (
+        <ResourcePlayground configurationName={configurationName} />
+      )}
     </>
   );
 };

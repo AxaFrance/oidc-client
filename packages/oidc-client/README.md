@@ -107,6 +107,12 @@ The wrapper attaches an access token, or a token placeholder when the service wo
 
 ## Resource indicators and multiple APIs
 
+For a runnable multi-API example, use the [local OpenIddict demos](../../examples/openiddict-server/README.md).
+They exercise resource isolation, shared refresh rotation and DPoP in browser and
+worker modes. Concurrent login requests retain one transaction while resource
+entries are cleared, and silent authorization failures before redirect are
+reported to the parent instead of becoming timeout-only errors.
+
 The additive `resource` option supports one absolute URI or an array of URIs.
 The client sends repeated `resource` parameters in authorization, PAR, code
 exchange, and refresh requests, preserving the existing scope encoding.
@@ -409,6 +415,10 @@ Failures use `PushedAuthorizationRequestError`, with codes from `PushedAuthoriza
 The PAR endpoint must allow CORS from your application and accept public clients without a client secret. If discovery is unavailable, configure `pushed_authorization_request_endpoint` and, where applicable, `require_pushed_authorization_requests` in `authority_configuration`.
 
 ## DPoP
+
+Generated `htu` values exclude query strings and fragments, as RFC 9449 requires;
+relative targets resolve against the current browser location. Worker registration
+also preserves existing URL query parameters when appending the SDK version.
 
 [Demonstrating Proof of Possession (RFC 9449)](https://www.rfc-editor.org/rfc/rfc9449.html) binds supported tokens to a key and uses signed proofs for requests. It requires support from the authorization server and resource server. It reduces the usefulness of a stolen token without its key; it does not make an application immune to XSS.
 

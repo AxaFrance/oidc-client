@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { initSession } from './initSession';
-import { registrationCache } from './initWorker';
+import { initWorkerAsync, registrationCache } from './initWorker';
 import { generateJwkAsync } from './jwt';
 import { Oidc } from './oidc';
 import { OidcClient } from './oidcClient';
-import { OidcErrorCode } from './oidcError';
+import { OidcError, OidcErrorCode } from './oidcError';
 import { parseJwt, parseOriginalTokens, TokenRenewMode, Tokens } from './parseTokens';
 import { getResourceContextName } from './protocol';
 import {
@@ -143,6 +143,70 @@ afterEach(async () => {
 });
 
 describe('resource-specific access tokens', () => {
+  it('forwards pre-redirect silent authorization failures instead of timing out', async () => {
+    oidc.configuration.silent_login_uri = 'https://app.example.com/silent-login';
+    oidc.configuration.silent_redirect_uri = 'https://app.example.com/silent-callback';
+    const postMessage = vi.fn();
+    vi.stubGlobal('window', { ...window, parent: { postMessage } });
+    const error = new OidcError(
+      OidcErrorCode.REQUEST_FAILED,
+      'The provider rejected the resource.',
+      {
+        phase: 'login',
+        retryable: false,
+        oauthError: 'invalid_target',
+      },
+    );
+    vi.spyOn(oidc, 'initAsync').mockRejectedValue(error);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    await expect(oidc.loginAsync(undefined, { _oidc_resource: resourceA }, true)).rejects.toBe(
+      error,
+    );
+    expect(postMessage).toHaveBeenCalledWith(
+      expect.stringContaining('invalid_target'),
+      'https://app.example.com',
+    );
+  });
+
+  it('shares concurrent login attempts before asynchronous resource clearing finishes', async () => {
+    let release: () => void;
+    const gate = new Promise<void>(resolve => {
+      release = resolve;
+    });
+    const clear = vi.spyOn(oidc.resourceTokens, 'clearAllAsync').mockReturnValue(gate);
+    vi.spyOn(oidc, 'initAsync').mockRejectedValue(new Error('Stop before authorization.'));
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const first = oidc.loginAsync();
+    const second = oidc.loginAsync();
+    expect(clear).toHaveBeenCalledOnce();
+    release();
+    await Promise.allSettled([first, second]);
+    expect(oidc.initAsync).toHaveBeenCalledOnce();
+    expect(oidc.loginPromise).toBeNull();
+  });
+
+  it('preserves configured worker query parameters when adding the version', async () => {
+    registrationCache.clear();
+    const register = vi.fn().mockRejectedValue(new Error('Stop before registration.'));
+    vi.stubGlobal('navigator', { serviceWorker: { register } });
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    await expect(
+      initWorkerAsync(
+        {
+          ...oidc.configuration,
+          service_worker_activate: () => true,
+          service_worker_relative_url: '/OidcServiceWorker.js?provider=openiddict',
+        },
+        'default',
+      ),
+    ).rejects.toThrow('Stop before registration.');
+    expect(register).toHaveBeenCalledWith(
+      `/OidcServiceWorker.js?provider=openiddict&v=${codeVersion}`,
+      { updateViaCache: 'none' },
+    );
+    registrationCache.clear();
+  });
+
   const installSilentFrame = () => {
     const frame = { contentWindow: {}, setAttribute: vi.fn(), style: {}, remove: vi.fn() };
     const append = vi.fn();

@@ -24,12 +24,19 @@
     "outdated": "pnpm outdated -r",
     "test": "pnpm --filter=./packages/* run test",
     "test:ci": "pnpm --filter=./packages/* run test --run",
-    "build": "pnpm -r --filter=./packages/* run build"
+    "build": "pnpm -r --filter=./packages/* run build",
+    "demo:server": "node examples/e2e/start-server.mjs",
+    "demo:react": "pnpm --dir examples/react-oidc-demo run prestart && pnpm --dir examples/react-oidc-demo exec vite --host localhost --port 5173 --strictPort",
+    "demo:native": "pnpm --dir examples/oidc-client-demo run postinstall && pnpm --dir examples/oidc-client-demo exec vite --host localhost --port 5174 --strictPort",
+    "test:e2e": "playwright test --config examples/e2e/playwright.config.ts",
+    "test:server": "dotnet test examples/openiddict-server.tests/OpenIddictDemo.Tests.csproj"
   },
   "devDependencies": {
+    "@axa-fr/oidc-client": "workspace:*",
     "@eslint/compat": "^2.1.1",
     "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.64.1",
     "@typescript-eslint/eslint-plugin": "^8.71.1",
     "@typescript-eslint/parser": "^8.71.1",
     "@typescript/native": "npm:typescript@7.0.2",

@@ -17,20 +17,33 @@ by the [root package manifest](../../package.json):
 corepack enable
 pnpm install --frozen-lockfile
 pnpm build
-pnpm --dir examples/oidc-client-demo start
+pnpm demo:server
 ```
 
-Open the URL printed by Vite, normally `http://localhost:5173`. No port is fixed in
+Keep the server running, then run `pnpm demo:native` in another terminal and open
+`http://localhost:5174/`. These scripts refresh the worker and require the .NET 10
+SDK and registered ports; see the [OpenIddict fixture guide](../openiddict-server/README.md).
+The original package start script does not fix a port in
 [`vite.config.js`](vite.config.js); if that port is busy, Vite may choose another.
 The origin you use must match the identity provider's client registration.
 
 ## Configuration and callbacks
 
-The `configuration` object in [`src/index.tsx`](src/index.tsx) uses the external
+Development uses the local OpenIddict authority; production builds and
+`VITE_OIDC_PROVIDER=duende` retain the external configuration in [`src/index.tsx`](src/index.tsx).
+The external
 [Duende demo provider](https://demo.duendesoftware.com) with client ID
 `interactive.public.short` and scopes `openid profile email api offline_access`.
 Use the sign-in options published by that provider; this repository does not
 manage its accounts, availability, or allowed redirect URLs.
+
+After local sign-in, the RFC 8707 playground calls two audience-isolated APIs,
+renews/clears Orders without replacing Inventory, and demonstrates explicit
+wrong-destination and provider errors. Compare Bearer/DPoP and worker/browser
+storage with `?dpop=true&worker=on` or `?dpop=true&worker=off`. Local callbacks use
+`/authentication/callback` and `/authentication/silent-callback`; online legacy
+hash callbacks remain unchanged. The fixture's DPoP adapter is demo-only, not
+native OpenIddict support.
 
 The callback URLs are built from `window.location.origin`. At the usual Vite
 origin, they are:
