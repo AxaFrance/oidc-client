@@ -25,6 +25,7 @@ not guarantees that every reported problem is resolved.
 - [Why is window.crypto.subtle unavailable?](#why-is-windowcryptosubtle-unavailable)
 - [How do I use multiple identity providers?](#how-do-i-use-multiple-identity-providers)
 - [How do I call multiple APIs with different audiences?](#how-do-i-call-multiple-apis-with-different-audiences)
+- [Why are React exports missing after a workspace build?](#why-are-react-exports-missing-after-a-workspace-build)
 - [Should I use this client or a Backend for Frontend?](#should-i-use-this-client-or-a-backend-for-frontend)
 - [Does the service worker protect me from XSS?](#does-the-service-worker-protect-me-from-xss)
 - [What should I include in a bug report?](#what-should-i-include-in-a-bug-report)
@@ -81,6 +82,10 @@ revoke the shared grant. Managed API origins require explicit resource selection
 automatic redirects are rejected. Worker mode also requires matching trusted
 domains and a compatible deployed worker.
 
+Default-token renewal remains separate from explicit resource acquisition, including
+single-resource grants. Restoring a stored resource token publishes its acquisition
+event; clearing prevents pending cache lookups from restoring it afterward.
+
 If the provider rejects `resource` with `invalid_target`, the client does not
 strip it or use another token. Additional resources/scopes may require silent
 authorization; missing callback routes, blocked cookies, `login_required`,
@@ -98,6 +103,13 @@ audience mappings rely on provider correctness. Use only providers known to
 honor resource indicators; the client does not add introspection or token exchange.
 After worker memory is lost, restore or reauthenticate the original session
 rather than attempting to reuse stale token placeholders.
+
+## Why are React exports missing after a workspace build?
+
+Build the workspace with `pnpm build`. React packaging must copy only the worker
+runtime assets; flattening nested worker declarations into React's distribution
+can overwrite its public `index.d.ts`. The React artifact test checks that all
+named exports survive packaging.
 
 ## Do I need a service worker?
 

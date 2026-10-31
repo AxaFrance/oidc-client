@@ -125,6 +125,11 @@ Use explicit resource selection for resource-managed API origins, including with
 `fetchWithTokens()`. Existing configurations without `resources` keep their
 current fetch behavior.
 
+Default-token renewal keeps its own entry even with a single configured resource.
+Restoring persisted resource tokens notifies subscribers, while resource clearing
+also invalidates in-flight cache lookups. Concurrent login calls share one
+authorization transaction while resource state is cleared.
+
 Providers must honor resource indicators. The client checks configured JWT
 audiences but cannot inspect opaque-token audiences. Unsupported targets,
 missing silent-login setup, login/consent requirements, and incompatible

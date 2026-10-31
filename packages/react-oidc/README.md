@@ -108,6 +108,9 @@ demonstrates both resource hooks against real, separately validated API audience
 in Bearer/DPoP and browser/worker modes. Production demos retain Duende; local DPoP
 and session monitoring use explicitly documented custom demo-only adapters.
 
+The resource-token hook observes restored persisted tokens as well as newly
+acquired tokens. A clear operation cannot be undone by an in-flight cache lookup.
+
 Use one `OidcProvider` with the
 [multi-API configuration](../oidc-client/README.md#resource-indicators-and-multiple-apis).
 `resource` selects the initial authorization grant; `resources` defines explicit

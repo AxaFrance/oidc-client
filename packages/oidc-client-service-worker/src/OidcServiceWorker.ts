@@ -3,7 +3,11 @@ import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent } from './dpop';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
 import { getCurrentDatabasesTokenEndpoint, shouldBypassNonOidcRequest } from './oidcConfig';
-import { getContextResource, getResourceConfiguration } from './resource';
+import {
+  getContextResource,
+  getResourceConfiguration,
+  RESOURCE_TOKEN_REQUEST_HEADER,
+} from './resource';
 import { getOrCreateResourceContext, getTokenContexts } from './tokenContexts';
 import { Database, MessageEventData, OidcConfig, TrustedDomains } from './types';
 import {
@@ -323,6 +327,9 @@ const handleFetch = (event: FetchEvent): void => {
                         ) {
                           const form = new URLSearchParams(actualBody);
                           const selected = form.getAll('resource');
+                          const resourceHeader = originalRequest.headers.get(
+                            RESOURCE_TOKEN_REQUEST_HEADER,
+                          );
                           const isRevocation =
                             currentDb.oidcServerConfiguration?.revocationEndpoint &&
                             url ===
@@ -330,11 +337,12 @@ const handleFetch = (event: FetchEvent): void => {
                             form.has('token');
                           if (isRevocation) {
                             currentDatabase = currentDb;
-                          } else if (
-                            selected.length === 1 &&
-                            currentDb.oidcConfiguration?.resources
-                          ) {
-                            const resource = selected[0];
+                          } else if (resourceHeader !== null) {
+                            const resource = decodeURIComponent(resourceHeader);
+                            if (selected.length !== 1 || selected[0] !== resource)
+                              throw new Error('The resource routing hint must match the request.');
+                            if (!currentDb.oidcConfiguration)
+                              throw new Error('The resource grant configuration is unavailable.');
                             const resourceConfiguration = getResourceConfiguration(
                               currentDb.oidcConfiguration.resources,
                               resource,
@@ -427,6 +435,7 @@ const handleFetch = (event: FetchEvent): void => {
                       throw new Error(
                         'The token placeholder does not identify an available grant.',
                       );
+                    delete headers[RESOURCE_TOKEN_REQUEST_HEADER];
                     const generation = currentDatabase.generation;
                     const grant = currentDatabase.refreshGrant ?? currentDatabase;
                     const grantGeneration = grant.generation;

@@ -122,6 +122,9 @@ the client URL mapping and worker trusted-domain rules. Managed API requests
 without resource selection do not receive an arbitrary/default worker token,
 including paths outside the permitted prefixes on registered API origins.
 The standard provider user-info flow retains its default token handling.
+Default renewal also retains its own token entry for single-resource grants.
+The client sends a worker-only routing hint for explicit resource refreshes;
+the worker verifies it against the OAuth resource and removes it before dispatch.
 Resource tokens are always masked, including with `showAccessToken: true`.
 Automatic API redirects are rejected.
 
