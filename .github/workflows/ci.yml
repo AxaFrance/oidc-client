@@ -33,28 +33,11 @@ jobs:
           version: 11.10.0
           run_install: false
 
-      # oidc-client
-      - name: Install dependencies (oidc-client)
+      - name: Install workspace dependencies
         run: pnpm i --frozen-lockfile
-        working-directory: ./packages/oidc-client
 
-      - name: pnpm prepare (oidc-client)
-        run: pnpm run prepare
-        working-directory: ./packages/oidc-client
+      - name: Build all packages
+        run: pnpm build
 
-      - name: Run test (oidc-client)
-        run: pnpm test -- --run
-        working-directory: ./packages/oidc-client
-
-      #react-oidc
-      - name: Install dependencies (react-oidc)
-        run: pnpm i --frozen-lockfile
-        working-directory: ./packages/react-oidc
-
-      - name: Run prepare (react-oidc)
-        run: pnpm run prepare
-        working-directory: ./packages/react-oidc
-
-      - name: Run test (react-oidc)
-        run: pnpm test -- --run
-        working-directory: ./packages/react-oidc
+      - name: Test all packages including the Service Worker
+        run: pnpm test:ci

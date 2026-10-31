@@ -1,4 +1,7 @@
 export const eventNames = {
+  resource_token_acquired: 'resource_token_acquired',
+  resource_token_cleared: 'resource_token_cleared',
+  resource_token_error: 'resource_token_error',
   service_worker_not_supported_by_browser: 'service_worker_not_supported_by_browser',
   token_acquired: 'token_acquired',
   logout_from_another_tab: 'logout_from_another_tab',

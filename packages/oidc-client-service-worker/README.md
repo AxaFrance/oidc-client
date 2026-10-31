@@ -11,6 +11,7 @@ package directly. The clients handle worker registration and communication.
 - [How it works](#how-it-works)
 - [Getting started](#getting-started)
 - [Trusted domains](#trusted-domains)
+- [Resource-specific token isolation](#resource-specific-token-isolation)
 - [Deployment and troubleshooting](#deployment-and-troubleshooting)
 - [Protocol reference](#protocol-reference)
 
@@ -83,6 +84,63 @@ application JavaScript while keeping the refresh token in the worker.
 
    Merge this with existing installation steps rather than replacing them.
    Deploy the copied worker with every client upgrade.
+
+## Resource-specific token isolation
+
+The clients' [RFC 8707 resource API](../oidc-client/README.md#resource-indicators-and-multiple-apis)
+uses nested resource entries in the existing named/tab session, not separate
+OIDC clients. Access tokens, authorization state, PKCE, grant references, and
+DPoP state remain associated with the selected resource. Default and sibling
+access tokens are not replaced by acquisition or renewal.
+Additional authorization requires a fresh ID token for the same authenticated
+subject and transaction nonce. A resource refresh may omit an ID token even
+after its earlier ID token expires.
+
+Configure `resources` in the client and allow both API origins in the worker:
+
+```javascript
+const trustedDomains = {
+  default: {
+    oidcDomains: [/^https:\/\/issuer\.example\.com(?:\/|$)/],
+    accessTokenDomains: [
+      /^https:\/\/orders\.example\.com(?:\/|$)/,
+      /^https:\/\/inventory\.example\.com(?:\/|$)/,
+    ],
+  },
+};
+```
+
+Use `fetchForResource()` or `useOidcFetchForResource()`, not automatic selection
+by URL. A selected placeholder must match its exact resource context and both
+the client URL mapping and worker trusted-domain rules. Managed API requests
+without resource selection do not receive an arbitrary/default worker token,
+including paths outside the permitted prefixes on registered API origins.
+The standard provider user-info flow retains its default token handling.
+Default renewal also retains its own token entry for single-resource grants.
+The client sends a worker-only routing hint for explicit resource refreshes;
+the worker verifies it against the OAuth resource and removes it before dispatch.
+Resource tokens are always masked, including with `showAccessToken: true`.
+Automatic API redirects are rejected.
+
+Shared refresh rotation is retained centrally; independently authorized
+resources keep their own grants. Clearing a resource resets only its entry;
+clearing the base session removes all nested entries. Late responses cannot
+recreate cleared state. Logout can revoke resource tokens through the exact
+trusted revocation endpoint.
+
+DPoP remains configured through this file's existing options. Resource API
+proofs use the selected real token and its bound key/nonce; the browser receives
+neither refresh tokens nor private keys from the resource API.
+API nonces are retained per resource separately from authorization-server
+nonces. API responses are not automatically retried.
+
+Resource support requires the `resourceTokenManagement` capability returned by
+protocol 1.1 workers. Copy and deploy the matching `OidcServiceWorker.js` with
+each client upgrade. Older/unavailable workers cause explicit resource errors,
+not browser-token fallback. Worker token memory is not durable: after loss,
+restore or reauthenticate the original session before requesting resource
+tokens. Resource entries cannot be reconstructed from stale placeholders.
+See the core guide for provider/opaque-token limitations.
 
 ## Trusted domains
 

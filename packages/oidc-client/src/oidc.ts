@@ -27,6 +27,13 @@ import {
   RenewTokensResult,
 } from './renewTokens.js';
 import { fetchFromIssuer } from './requests.js';
+import {
+  clearResourceTransaction,
+  getCallbackResource,
+  RESOURCE_LOGIN_PARAMETER,
+  resourceContextName,
+} from './resourceParameters';
+import { ResourceTokens } from './resourceTokens';
 import { getParseQueryStringFromLocation } from './route-utils.js';
 import defaultSilentLoginAsync from './silentLogin.js';
 import timer from './timer.js';
@@ -104,6 +111,7 @@ const loginCallbackWithAutoTokensRenewAsync = async (oidc): Promise<LoginCallbac
 };
 
 export class Oidc {
+  public resourceTokens: ResourceTokens;
   public configuration: OidcConfiguration;
   public userInfo: null;
   public tokens?: Tokens;
@@ -172,6 +180,7 @@ export class Oidc {
     this.userInfo = null;
     this.events = [];
     this.timeoutId = null;
+    this.resourceTokens = new ResourceTokens(this);
     this.loginCallbackWithAutoTokensRenewAsync.bind(this);
     this.initAsync.bind(this);
     this.loginCallbackAsync.bind(this);
@@ -244,12 +253,12 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
   static eventNames = eventNames;
 
-  _silentLoginCallbackFromIFrame() {
+  _silentLoginCallbackFromIFrame(tokens: Tokens = this.tokens, resource?: string) {
     if (this.configuration.silent_redirect_uri && this.configuration.silent_login_uri) {
       const location = this.location;
       const queryParams = getParseQueryStringFromLocation(location.getCurrentHref());
       window.parent.postMessage(
-        `${this.configurationName}_oidc_tokens:${JSON.stringify({ tokens: this.tokens, sessionState: queryParams.session_state })}`,
+        `${this.configurationName}_oidc_tokens:${JSON.stringify({ tokens, resource, sessionState: queryParams.session_state })}`,
         location.getOrigin(),
       );
     }
@@ -288,8 +297,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
   async silentLoginCallbackAsync() {
     try {
-      await this.loginCallbackAsync(true);
-      this._silentLoginCallbackFromIFrame();
+      const resource = getCallbackResource(this.configurationName, this.location.getCurrentHref());
+      const response = await this.loginCallbackAsync(true);
+      this._silentLoginCallbackFromIFrame(response.parsedTokens, resource);
     } catch (exception) {
       console.error(exception);
       this._silentLoginErrorCallbackFromIFrame(exception);
@@ -379,16 +389,23 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     if (this.loginPromise !== null) {
       return this.loginPromise;
     }
-    if (silentLoginOnly) {
-      this.loginPromise = defaultSilentLoginAsync(
-        window,
-        this.configurationName,
-        this.configuration,
-        this.publishEvent.bind(this),
-        this,
-      )(extras, scope);
-    } else {
-      this.loginPromise = defaultLoginAsync(
+    this.loginPromise = (async () => {
+      if (
+        extras?.[RESOURCE_LOGIN_PARAMETER] === undefined &&
+        this.configuration.resources?.length
+      ) {
+        await this.resourceTokens.clearAllAsync();
+      }
+      if (silentLoginOnly) {
+        return defaultSilentLoginAsync(
+          window,
+          this.configurationName,
+          this.configuration,
+          this.publishEvent.bind(this),
+          this,
+        )(extras, scope);
+      }
+      return defaultLoginAsync(
         this.configurationName,
         this.configuration,
         this.publishEvent.bind(this),
@@ -396,7 +413,7 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
         this.location,
         this.getFetch,
       )(callbackPath, extras, isSilentSignin, scope);
-    }
+    })();
     return this.loginPromise.finally(() => {
       this.loginPromise = null;
     });
@@ -409,12 +426,37 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     const loginCallbackLocalAsync = async (): Promise<InternalLoginCallback> => {
-      const response = await loginCallbackAsync(this)(isSilenSignin);
+      const resource = getCallbackResource(this.configurationName, this.location.getCurrentHref());
+      const response = await loginCallbackAsync(this)(isSilenSignin, resource);
       // @ts-ignore
       const parsedTokens = response.tokens;
       // @ts-ignore
+      if (resource !== undefined) {
+        if (
+          getCallbackResource(this.configurationName, this.location.getCurrentHref()) !== resource
+        ) {
+          throw new OidcError(
+            OidcErrorCode.RESOURCE_TOKEN_UNAVAILABLE,
+            'The resource authorization was cleared.',
+            { phase: 'callback', retryable: false },
+          );
+        }
+        await this.resourceTokens.acceptAuthorizationAsync(resource, parsedTokens);
+        clearResourceTransaction(this.configurationName, this.location.getCurrentHref());
+        return {
+          parsedTokens,
+          state: response.state,
+          callbackPath: response.callbackPath,
+          scope: response.scope,
+          extras: response.extras,
+        };
+      }
+      await this.resourceTokens.clearAllAsync();
       this.tokens = parsedTokens;
-      const serviceWorker = await initWorkerAsync(this.configuration, this.configurationName);
+      const serviceWorker = await initWorkerAsync(
+        this.configuration,
+        resourceContextName(this.configurationName, resource),
+      );
       if (!serviceWorker) {
         const session = initSession(
           this.configurationName,

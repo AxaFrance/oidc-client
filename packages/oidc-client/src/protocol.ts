@@ -15,7 +15,18 @@
 /**
  * Semver-protected version of the service worker `postMessage` protocol.
  */
-export const PROTOCOL_VERSION = '1.0.0' as const;
+export const PROTOCOL_VERSION = '1.1.0' as const;
+
+export type { OidcResourceConfiguration } from '@axa-fr/oidc-client-service-worker/protocol';
+export {
+  getContextResource,
+  getResourceConfiguration,
+  getResourceContextName,
+  isResourceOriginManaged,
+  isResourceUrlAllowed,
+  RESOURCE_TOKEN_REQUEST_HEADER,
+  validateResourceIdentifier,
+} from '@axa-fr/oidc-client-service-worker/protocol';
 
 /**
  * Every supported service worker message type. The values are also the
@@ -53,6 +64,10 @@ export interface ServiceWorkerMessage<TData = unknown> {
 }
 
 export interface ServiceWorkerResponse {
+  /** Resource isolation capability provided by protocol 1.1 workers. */
+  resourceTokenManagement?: boolean;
+  /** Worker-owned context names, without token or key material. */
+  resourceContexts?: string[];
   configurationName?: string;
   error?: unknown;
   [key: string]: unknown;

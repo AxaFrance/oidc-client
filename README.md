@@ -11,6 +11,7 @@ or the React components and hooks.
 - [Choose a package](#choose-a-package)
 - [Getting started](#getting-started)
 - [How it works](#how-it-works)
+- [Multiple APIs and resource indicators](#multiple-apis-and-resource-indicators)
 - [Security and deployment](#security-and-deployment)
 - [Run the demos](#run-the-demos)
 - [FAQ](#faq)
@@ -95,6 +96,47 @@ Observe renewal checks through `subscribeEvents` in the core client or `onEvent`
 in React. The [token synchronization events guide](./packages/oidc-client/README.md#token-synchronization-events)
 explains their payloads and timing: an `_end` event can also report session loss
 or deferred renewal, and does not guarantee that tokens were refreshed.
+
+## Multiple APIs and resource indicators
+
+[RFC 8707 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html)
+let one OIDC session acquire separate access tokens for explicitly configured
+APIs. Configure `resources` with permitted API URL prefixes and, for JWT access
+tokens, the provider's audience values. `resource` selects the resource or
+resources included in the initial authorization grant.
+
+```javascript
+// After signing in with the multi-API configuration linked below:
+const ordersFetch = oidcClient.fetchForResource('https://orders.example.com', fetch);
+const inventoryFetch = oidcClient.fetchForResource('https://inventory.example.com', fetch);
+const [orders, inventory] = await Promise.all([
+  ordersFetch('https://orders.example.com/v1/orders'),
+  inventoryFetch('https://inventory.example.com/v1/items'),
+]);
+if (!orders.ok || !inventory.ok) throw new Error('A protected API request failed.');
+```
+
+See the [complete multi-API configuration and lifecycle example](./packages/oidc-client/README.md#resource-indicators-and-multiple-apis)
+and [React resource hooks](./packages/react-oidc/README.md#resource-aware-api-hooks).
+Resource caches do not overwrite the default or sibling access tokens.
+Resource fetch rejects destinations outside its mappings and automatic
+redirects; a configured worker additionally enforces its trusted-domain rules.
+Use explicit resource selection for resource-managed API origins, including with
+`fetchWithTokens()`. Existing configurations without `resources` keep their
+current fetch behavior.
+
+Default-token renewal keeps its own entry even with a single configured resource.
+Restoring persisted resource tokens notifies subscribers, while resource clearing
+also invalidates in-flight cache lookups. Concurrent login calls share one
+authorization transaction while resource state is cleared.
+
+Providers must honor resource indicators. The client checks configured JWT
+audiences but cannot inspect opaque-token audiences. Unsupported targets,
+missing silent-login setup, login/consent requirements, and incompatible
+workers produce errors rather than a different-resource token fallback.
+Short-lived resource tokens cap the renewal margin at half their lifetime.
+Additional authorization requires a fresh ID token for the same user; resource
+refresh grants may omit ID tokens.
 
 ## Security and deployment
 

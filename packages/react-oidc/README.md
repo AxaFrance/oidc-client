@@ -7,6 +7,7 @@ The library supports Authorization Code Flow with PKCE, multiple named configura
 - [Quick start](#quick-start)
 - [Protect components](#protect-components)
 - [Call protected APIs](#call-protected-apis)
+- [Resource-aware API hooks](#resource-aware-api-hooks)
 - [User information and token hooks](#user-information-and-token-hooks)
 - [Service worker](#service-worker)
 - [Configuration, renewal, PAR, and DPoP](#configuration-renewal-par-and-dpop)
@@ -92,6 +93,78 @@ flowchart LR
     Client --> Fetch["OIDC fetch without worker"]
     Fetch --> API
 ```
+
+## Building the package
+
+Run `pnpm build` from the repository root to build the workspace dependencies.
+The package build copies only worker runtime assets into its distribution.
+Worker declarations are not flattened into React's output, where they could
+overwrite the public React type entry point.
+
+## Resource-aware API hooks
+
+The resource-token hook observes restored persisted tokens as well as newly
+acquired tokens. A clear operation cannot be undone by an in-flight cache lookup.
+
+Use one `OidcProvider` with the
+[multi-API configuration](../oidc-client/README.md#resource-indicators-and-multiple-apis).
+`resource` selects the initial authorization grant; `resources` defines explicit
+API URL mappings, scopes, and JWT audiences. These are separate from named
+configurations, which remain useful for different issuers or client registrations.
+
+```tsx
+import {
+  useOidcAccessTokenForResource,
+  useOidcFetchForResource,
+} from '@axa-fr/react-oidc';
+
+export function OrdersButton(): React.JSX.Element {
+  const resource = 'https://orders.example.com';
+  const { fetch: ordersFetch } = useOidcFetchForResource(resource);
+  const { isLoading, error, getAccessTokenAsync } = useOidcAccessTokenForResource(resource);
+
+  const load = async (): Promise<void> => {
+    try {
+      await getAccessTokenAsync();
+      const response = await ordersFetch('https://orders.example.com/v1/orders');
+      if (!response.ok) throw new Error(`Orders API returned ${response.status}`);
+      console.log(await response.json());
+    } catch (cause) {
+      // Replace with application error UI; never log token values.
+      console.error('Orders could not be loaded', cause);
+    }
+  };
+
+  return (
+    <>
+      <button disabled={isLoading} onClick={load}>Load orders</button>
+      {error && <p role="alert">Resource authorization failed: {error.message}</p>}
+    </>
+  );
+}
+```
+
+For the second API, call `useOidcFetchForResource('https://inventory.example.com')`
+with its own configured URL. A named client can be selected with
+`useOidcFetchForResource(resource, { configurationName: 'custom', fetch })` and
+`useOidcAccessTokenForResource(resource, 'custom')`.
+
+The token hook returns `token`, `isLoading`, `error`, `getAccessTokenAsync`, and
+`clearResourceTokensAsync`. It does not start authorization during rendering.
+Acquisition and fetch reject their promises on provider errors; the token hook
+also observes automatic resource-renewal errors. Clearing one entry is local-only.
+Changing the selected resource does not expose a late token from the previous one.
+
+Resource fetch resolves the current client lazily for each request and rejects
+missing configurations asynchronously. It requires permitted destinations and
+rejects automatic redirects. A matching worker additionally enforces trusted
+domains and retains real tokens/private keys. Preserve the existing DPoP setup;
+resource DPoP token types are honored without downgrading them to Bearer.
+Silent login/consent and opaque-token limitations are the same as the core guide.
+Resource renewal margins are capped at half the access-token lifetime.
+Additional authorization needs a fresh ID token for the same user and nonce;
+resource refresh may omit ID tokens.
+For Next.js, use these browser hooks in client components beneath the provider.
 
 ## Protect components
 

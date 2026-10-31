@@ -38,7 +38,11 @@ export type {
   AuthorityConfiguration,
   Fetch,
   OidcConfiguration,
+  OidcResourceConfiguration,
   PushedAuthorizationRequestMode,
+  ResourceAccessToken,
+  ResourceFetchOptions,
+  ResourceTokenOptions,
   StringMap,
 } from './types.js';
 export { TokenAutomaticRenewMode } from './types.js';

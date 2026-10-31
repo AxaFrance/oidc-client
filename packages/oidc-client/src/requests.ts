@@ -7,7 +7,7 @@ import {
   PushedAuthorizationRequestError,
   PushedAuthorizationRequestErrorCode,
 } from './pushedAuthorizationRequestError.js';
-import { Fetch, StringMap } from './types.js';
+import { Fetch, OAuthParameters, StringMap } from './types.js';
 
 const oneHourSecond = 60 * 60;
 export const fetchFromIssuer =
@@ -69,10 +69,14 @@ export const TOKEN_TYPE = {
   access_token: 'access_token',
 };
 
-const encodeFormBody = (details: StringMap): string => {
+const encodeFormBody = (details: OAuthParameters): string => {
   const formBody: string[] = [];
   for (const property in details) {
-    formBody.push(`${encodeURIComponent(property)}=${encodeURIComponent(details[property])}`);
+    const value = details[property];
+    const values = Array.isArray(value) ? value : [String(value)];
+    for (const item of values) {
+      formBody.push(`${encodeURIComponent(property)}=${encodeURIComponent(item)}`);
+    }
   }
   return formBody.join('&');
 };
@@ -153,7 +157,7 @@ export const performPushedAuthorizationRequestAsync =
   (fetch: Fetch) =>
   async (
     url: string,
-    details: StringMap,
+    details: OAuthParameters,
     timeoutMs = 10000,
   ): Promise<PushedAuthorizationRequestResponse> => {
     if (details.request_uri !== undefined) {
@@ -291,7 +295,7 @@ export const performAuthorizationRequestAsync =
   (storage: any, oidcLocation: ILOidcLocation) =>
   async (
     url,
-    extras: StringMap,
+    extras: OAuthParameters,
     pushedAuthorizationRequest?: {
       endpoint: string;
       fetch: Fetch;
@@ -311,7 +315,7 @@ export const performAuthorizationRequestAsync =
         pushedAuthorizationRequest.fetch,
       )(pushedAuthorizationRequest.endpoint, extras, pushedAuthorizationRequest.timeoutMs);
       oidcLocation.open(
-        `${url}?client_id=${encodeURIComponent(extras.client_id)}&request_uri=${encodeURIComponent(
+        `${url}?client_id=${encodeURIComponent(String(extras.client_id))}&request_uri=${encodeURIComponent(
           response.request_uri,
         )}`,
       );
@@ -321,12 +325,10 @@ export const performAuthorizationRequestAsync =
     let queryString = '';
     if (extras) {
       for (const [key, value] of Object.entries(extras)) {
-        if (queryString === '') {
-          queryString += '?';
-        } else {
-          queryString += '&';
+        for (const item of Array.isArray(value) ? value : [String(value)]) {
+          queryString += queryString === '' ? '?' : '&';
+          queryString += `${key}=${encodeURIComponent(item)}`;
         }
-        queryString += `${key}=${encodeURIComponent(value)}`;
       }
     }
     oidcLocation.open(`${url}${queryString}`);

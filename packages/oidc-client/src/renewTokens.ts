@@ -13,6 +13,7 @@ import {
 import { OidcStateError, OidcStateErrorCode } from './oidcStateError.js';
 import { computeTimeLeft, isTokensOidcValid, setTokens, Tokens } from './parseTokens.js';
 import { performTokenRequestAsync } from './requests';
+import { applyResourceParameters } from './resourceParameters';
 import { _silentLoginAsync } from './silentLogin';
 import timer from './timer.js';
 import { OidcConfiguration, StringMap, TokenAutomaticRenewMode } from './types.js';
@@ -97,7 +98,14 @@ export async function renewTokensAndStartTimerResultAsync(
 
   let result: RenewTokensResult;
   const serviceWorker = await initWorkerAsync(oidc.configuration, oidc.configurationName);
-  if ((configuration?.storage === window?.sessionStorage && !serviceWorker) || !navigator.locks) {
+  if (configuration.resources?.length && oidc.resourceTokens) {
+    result = await oidc.resourceTokens.withRefreshLockAsync(() =>
+      syncTokens(oidc, forceRefresh, extras, scope),
+    );
+  } else if (
+    (configuration?.storage === window?.sessionStorage && !serviceWorker) ||
+    !navigator.locks
+  ) {
     result = await syncTokens(oidc, forceRefresh, extras, scope);
   } else {
     let lockResult: any = 'retry';
@@ -494,12 +502,15 @@ const synchroniseTokensAsync =
             }
           }
           const localFunctionAsync = async () => {
-            const details = {
-              client_id: clientId,
-              redirect_uri: redirectUri,
-              grant_type: 'refresh_token',
-              refresh_token: tokens.refreshToken,
-            };
+            const details = applyResourceParameters(
+              {
+                client_id: clientId,
+                redirect_uri: redirectUri,
+                grant_type: 'refresh_token',
+                refresh_token: tokens.refreshToken,
+              },
+              configuration,
+            );
             const oidcServerConfiguration = await oidc.initAsync(
               authority,
               configuration.authority_configuration,
@@ -517,7 +528,7 @@ const synchroniseTokensAsync =
             let tokenResponse = await performTokenRequestAsync(oidc.getFetch())(
               url,
               details,
-              finalExtras,
+              applyResourceParameters(finalExtras, configuration),
               tokens,
               headersExtras,
               configuration.token_renew_mode,
