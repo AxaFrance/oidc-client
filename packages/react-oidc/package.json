@@ -31,12 +31,12 @@
   "scripts": {
     "copy-service-worker": "cpy ./node_modules/@axa-fr/oidc-client-service-worker/dist/* ./dist --flat",
     "start": "pnpm run copy-service-worker && vite",
-    "build": "vite build",
+    "build": "vite build && pnpm run copy-service-worker",
     "serve": "vite preview",
     "test": "vitest --root . --coverage",
     "clean": "rimraf dist",
     "postinstall": "echo 'WARNING keep sink OidcServiceWorker.js version file'",
-    "prepare": "pnpm run clean && pnpm run copy-service-worker && pnpm run build",
+    "prepare": "pnpm run clean && pnpm run build",
     "lint": "eslint src"
   },
   "dependencies": {

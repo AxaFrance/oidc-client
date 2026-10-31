@@ -1,5 +1,11 @@
 import { acceptAnyDomainToken, openidWellknownUrlEndWith, scriptFilename } from '../constants';
-import { Database, Domain, DomainDetails, OidcConfig, TrustedDomains } from '../types';
+import {
+  getResourceConfiguration,
+  isResourceOriginManaged,
+  isResourceUrlAllowed,
+} from '../resource';
+import { getTokenContextEntries } from '../tokenContexts';
+import { Database, Domain, DomainDetails, TrustedDomains } from '../types';
 import { normalizeUrl } from './normalizeUrl';
 
 export function checkDomain(domains: Domain[], endpoint: string) {
@@ -45,8 +51,20 @@ export const getCurrentDatabaseDomain = (
     return null;
   }
   const datatases = [];
-  for (const [key, currentDatabase] of Object.entries<OidcConfig>(database)) {
+  for (const [key, currentDatabase] of getTokenContextEntries(database)) {
     const oidcServerConfiguration = currentDatabase.oidcServerConfiguration;
+    const resources = currentDatabase.oidcConfiguration?.resources;
+    if (currentDatabase.resource) {
+      if (!isResourceUrlAllowed(getResourceConfiguration(resources, currentDatabase.resource), url))
+        continue;
+    } else if (
+      resources?.length &&
+      (!oidcServerConfiguration?.userInfoEndpoint ||
+        url !== normalizeUrl(oidcServerConfiguration.userInfoEndpoint)) &&
+      isResourceOriginManaged(resources, url)
+    ) {
+      continue;
+    }
 
     if (!oidcServerConfiguration) {
       continue;

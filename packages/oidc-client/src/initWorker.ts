@@ -1,5 +1,7 @@
 import { ILOidcLocation } from './location';
+import { OidcError, OidcErrorCode } from './oidcError';
 import { parseOriginalTokens } from './parseTokens.js';
+import { getContextResource } from './protocol';
 import timer from './timer.js';
 import { OidcConfiguration } from './types.js';
 import codeVersion from './version.js';
@@ -62,6 +64,9 @@ export const defaultServiceWorkerUpdateRequireCallback =
   };
 
 export const getTabId = (configurationName: string) => {
+  if (getContextResource(configurationName) !== undefined) {
+    configurationName = configurationName.split('#resource=')[0];
+  }
   const key = `oidc.tabId.${configurationName}`;
   const tabId = sessionStorage.getItem(key);
   if (tabId) return tabId;
@@ -224,6 +229,21 @@ export const initWorkerAsync = async (
   configurationName: string,
 ) => {
   const serviceWorkerRelativeUrl = configuration.service_worker_relative_url;
+  const resource = getContextResource(configurationName);
+  const baseConfigurationName = configurationName.split('#resource=')[0];
+  const unavailable = () => {
+    if (resource !== undefined && serviceWorkerRelativeUrl) {
+      throw new OidcError(
+        OidcErrorCode.RESOURCE_WORKER_UNSUPPORTED,
+        'Resource token isolation requires an available, compatible Service Worker.',
+        {
+          phase: 'refresh',
+          retryable: false,
+        },
+      );
+    }
+    return null;
+  };
 
   if (
     typeof window === 'undefined' ||
@@ -231,11 +251,11 @@ export const initWorkerAsync = async (
     !navigator.serviceWorker ||
     !serviceWorkerRelativeUrl
   ) {
-    return null;
+    return unavailable();
   }
 
   if (configuration.service_worker_activate() === false) {
-    return null;
+    return unavailable();
   }
 
   const swUrl = `${serviceWorkerRelativeUrl}?v=${codeVersion}`;
@@ -265,7 +285,7 @@ export const initWorkerAsync = async (
         'oidc-client: service worker registration was aborted (likely tab shutdown or backgrounding); falling back to non–service-worker mode.',
         error,
       );
-      return null;
+      return unavailable();
     }
     throw error;
   }
@@ -399,7 +419,7 @@ export const initWorkerAsync = async (
     }
   } catch (err: any) {
     console.warn(`Failed init ServiceWorker ${err?.toString?.() ?? String(err)}`);
-    return null;
+    return unavailable();
   }
 
   // 3) Register the controllerchange listener AFTER claim, and only once per page lifetime.
@@ -442,16 +462,42 @@ export const initWorkerAsync = async (
     where,
     oidcConfiguration: OidcConfiguration,
   ) => {
+    const workerConfiguration = {
+      token_renew_mode: oidcConfiguration.token_renew_mode,
+      client_id: oidcConfiguration.client_id,
+      scope: oidcConfiguration.scope,
+      resource: oidcConfiguration.resource,
+      resources: oidcConfiguration.resources,
+      service_worker_convert_all_requests_to_cors:
+        oidcConfiguration.service_worker_convert_all_requests_to_cors,
+    };
+    if (resource !== undefined) {
+      const capability = await sendMessageAsync(registration)({
+        type: 'init',
+        configurationName: baseConfigurationName,
+        data: {
+          oidcServerConfiguration,
+          where: 'resource-capability',
+          oidcConfiguration: workerConfiguration,
+        },
+      });
+      if (capability.resourceTokenManagement !== true) {
+        throw new OidcError(
+          OidcErrorCode.RESOURCE_WORKER_UNSUPPORTED,
+          'Update OidcServiceWorker.js before using resource tokens.',
+          {
+            phase: 'refresh',
+            retryable: false,
+          },
+        );
+      }
+    }
     const result = await sendMessageAsync(registration)({
       type: 'init',
       data: {
         oidcServerConfiguration,
         where,
-        oidcConfiguration: {
-          token_renew_mode: oidcConfiguration.token_renew_mode,
-          service_worker_convert_all_requests_to_cors:
-            oidcConfiguration.service_worker_convert_all_requests_to_cors,
-        },
+        oidcConfiguration: workerConfiguration,
       },
       configurationName,
     });
@@ -512,6 +558,7 @@ export const initWorkerAsync = async (
     return {
       tokens: parseOriginalTokens(result.tokens, null, oidcConfiguration.token_renew_mode),
       status: result.status,
+      resourceContexts: result.resourceContexts,
     };
   };
 
@@ -541,7 +588,7 @@ export const initWorkerAsync = async (
   };
 
   const setNonceAsync = nonce => {
-    sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
+    if (resource === undefined) sessionStorage[`oidc.nonce.${configurationName}`] = nonce.nonce;
     return sendMessageAsync(registration)({
       type: 'setNonce',
       data: { nonce },
@@ -558,6 +605,7 @@ export const initWorkerAsync = async (
 
     // @ts-ignore
     let nonce = result.nonce;
+    if (resource !== undefined) return { nonce };
     if (!nonce) {
       nonce = sessionStorage[`oidc.nonce.${configurationName}`];
       console.warn('nonce not found in service worker, using sessionStorage');
@@ -656,6 +704,7 @@ export const initWorkerAsync = async (
 
     // @ts-ignore
     let state = result.state;
+    if (resource !== undefined) return state;
     if (!state) {
       state = sessionStorage[`oidc.state.${configurationName}`];
       console.warn('state not found in service worker, using sessionStorage');
@@ -668,7 +717,7 @@ export const initWorkerAsync = async (
   };
 
   const setStateAsync = async (state: string) => {
-    sessionStorage[`oidc.state.${configurationName}`] = state;
+    if (resource === undefined) sessionStorage[`oidc.state.${configurationName}`] = state;
     return sendMessageAsync(registration)({
       type: 'setState',
       data: { state },
@@ -685,6 +734,7 @@ export const initWorkerAsync = async (
 
     // @ts-ignore
     let codeVerifier = result.codeVerifier;
+    if (resource !== undefined) return codeVerifier;
     if (!codeVerifier) {
       codeVerifier = sessionStorage[`oidc.code_verifier.${configurationName}`];
       console.warn('codeVerifier not found in service worker, using sessionStorage');
@@ -697,7 +747,8 @@ export const initWorkerAsync = async (
   };
 
   const setCodeVerifierAsync = async (codeVerifier: string) => {
-    sessionStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
+    if (resource === undefined)
+      sessionStorage[`oidc.code_verifier.${configurationName}`] = codeVerifier;
     return sendMessageAsync(registration)({
       type: 'setCodeVerifier',
       data: { codeVerifier },

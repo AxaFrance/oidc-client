@@ -46,6 +46,48 @@ considered _public_ and stable: tools that rely on the literal strings
 `init`, `claim`, `getState`, etc. will continue to work as long as the major
 `PROTOCOL_VERSION` is unchanged.
 
+## Resource contexts (protocol 1.1)
+
+`init` adds `resourceTokenManagement: true` and `resourceContexts: string[]`.
+The latter lists worker-owned nested context names, without token or key
+material. Clients must negotiate the capability on the base configuration
+before using resource operations; absence means unsupported, not permission
+to use default tokens or browser storage.
+
+The existing message names and placeholders are unchanged. A resource operation
+uses a context built with `getResourceContextName(configurationName, resource)`:
+
+```text
+default#resource=<encodeURIComponent(resource)>
+default#tabId=<effective-tab>#resource=<encodeURIComponent(resource)>
+```
+
+The worker validates the resource against the base client's `resources` registry
+and maintains a nested entry. The resource suffix does not create a different
+tab identity. Tokens carry `resourceContext` metadata: resource, issuer,
+client ID, base configuration name, authenticated subject, and grant owner.
+A `grantResource` of `null` refers to the default shared grant; a resource URI
+refers to an independently authorized grant.
+
+API placeholders require an exact resource-context match, permitted resource
+URL mapping, and existing trusted-domain authorization. Resource access tokens
+remain masked even if the default configuration exposes its access token.
+Resource code/refresh requests must select their intended resource and exact
+token endpoint; revocation uses the exact configured revocation endpoint.
+DPoP proofs use the real selected token and its grant's key. Token-endpoint
+nonces belong to the grant; API nonces are per resource and do not overwrite
+the grant nonce. API nonce responses are retained without automatic HTTP retries.
+Resource code exchange requires a fresh ID token with the transaction nonce and
+parent subject. Resource refresh responses may omit ID tokens; retained identity
+claims do not make an expired ID token invalidate a fresh resource access token.
+
+`clear` on a resource resets only that entry and rejects its late responses.
+`clear` on the base configuration removes all nested entries. The worker retains
+valid shared refresh rotation if only the requesting resource was cleared.
+Malformed resource contexts and initialization failures return logged error
+responses. These additions do not make worker memory persistent; stale
+placeholders cannot restore a lost parent grant.
+
 ## Message envelope
 
 Every message sent _to_ the service worker conforms to the following shape

@@ -1,3 +1,5 @@
+import type { OidcResourceConfiguration } from './resource';
+
 export type DomainDetails = {
   domains?: Domain[];
   oidcDomains?: Domain[];
@@ -42,6 +44,10 @@ export type OidcServerConfiguration = {
 export type OidcConfiguration = {
   token_renew_mode: string;
   demonstrating_proof_of_possession: boolean;
+  client_id?: string;
+  scope?: string;
+  resource?: string | readonly string[];
+  resources?: readonly OidcResourceConfiguration[];
 };
 
 export type Status =
@@ -95,6 +101,14 @@ export type Nonce = {
 } | null;
 
 export type OidcConfig = {
+  authorizationScope?: string;
+  requestedScope?: string;
+  demonstratingProofOfPossessionApiNonce?: string | null;
+  parentConfiguration?: OidcConfig;
+  resource?: string;
+  resourceEntries?: Record<string, OidcConfig>;
+  refreshGrant?: OidcConfig;
+  generation?: number;
   demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration | null;
   configurationName: string;
   tokens: Tokens | null;
@@ -117,6 +131,7 @@ export type OidcConfig = {
 };
 
 export type IdTokenPayload = {
+  sub?: string;
   iss: string;
   /**
    * (Expiration Time) Claim
@@ -130,17 +145,28 @@ export type IdTokenPayload = {
 };
 
 export type AccessTokenPayload = {
+  aud?: string | string[];
+  iss?: string;
   exp: number;
   sub: string;
   iat: number;
 };
 
 export type Tokens = {
+  scope?: string;
+  resourceContext?: {
+    resource: string;
+    issuer: string;
+    clientId: string;
+    configurationName: string;
+    subject: string;
+    grantResource: string | null;
+  };
   issued_at: number | string;
   access_token: string;
   accessTokenPayload: AccessTokenPayload | null;
   id_token: null | string;
-  idTokenPayload: IdTokenPayload;
+  idTokenPayload?: IdTokenPayload | null;
   refresh_token?: string;
   expiresAt: number;
   expires_in: number | string;

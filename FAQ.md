@@ -23,6 +23,7 @@ not guarantees that every reported problem is resolved.
 - [Can I use an existing PWA worker or a mobile WebView?](#can-i-use-an-existing-pwa-worker-or-a-mobile-webview)
 - [Why is window.crypto.subtle unavailable?](#why-is-windowcryptosubtle-unavailable)
 - [How do I use multiple identity providers?](#how-do-i-use-multiple-identity-providers)
+- [How do I call multiple APIs with different audiences?](#how-do-i-call-multiple-apis-with-different-audiences)
 - [Should I use this client or a Backend for Frontend?](#should-i-use-this-client-or-a-backend-for-frontend)
 - [Does the service worker protect me from XSS?](#does-the-service-worker-protect-me-from-xss)
 - [What should I include in a bug report?](#what-should-i-include-in-a-bug-report)
@@ -44,6 +45,39 @@ Azure Static Web Apps can reject a deployment when the app has reached its
 maximum number of staging environments. An app administrator must remove an
 unused staging environment before retrying the deployment. Updating npm
 dependencies does not resolve this Azure quota.
+
+## How do I call multiple APIs with different audiences?
+
+Use [resource-specific configuration and fetch](./packages/oidc-client/README.md#resource-indicators-and-multiple-apis)
+or the [React resource hooks](./packages/react-oidc/README.md#resource-aware-api-hooks).
+Register exact resource identifiers and permitted API URL prefixes in `resources`;
+use `resource` to include supported targets in the initial authorization grant.
+Scopes describe permissions, not audiences. For JWT tokens, configure the
+provider's `audiences` separately from the resource URI.
+
+Each resource has its own access-token entry. Shared refresh rotation does not
+replace sibling/default access tokens, and local resource clearing does not
+revoke the shared grant. Managed API origins require explicit resource selection;
+automatic redirects are rejected. Worker mode also requires matching trusted
+domains and a compatible deployed worker.
+
+If the provider rejects `resource` with `invalid_target`, the client does not
+strip it or use another token. Additional resources/scopes may require silent
+authorization; missing callback routes, blocked cookies, `login_required`,
+`consent_required`, and timeouts are explicit errors. Offer a user-driven
+authorization action instead of an automatic interactive redirect.
+Providers reusing an identical refresh token across separate authorization
+transactions must use an initial multi-resource grant for this API.
+Additional authorization must return a fresh ID token for the same user and
+nonce. Resource refresh may omit ID tokens, even after a previous ID token has
+expired. Resource renewal margins are capped at half the access-token lifetime
+to avoid immediate renewal loops for short-lived API tokens.
+
+Opaque tokens cannot be checked for an audience, and JWTs without configured
+audience mappings rely on provider correctness. Use only providers known to
+honor resource indicators; the client does not add introspection or token exchange.
+After worker memory is lost, restore or reauthenticate the original session
+rather than attempting to reuse stale token placeholders.
 
 ## Do I need a service worker?
 

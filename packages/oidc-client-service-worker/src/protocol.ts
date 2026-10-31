@@ -37,7 +37,17 @@ export type {
  * - The `PATCH` component changes for documentation or non-behavioural
  *   tweaks.
  */
-export const PROTOCOL_VERSION = '1.0.0' as const;
+export const PROTOCOL_VERSION = '1.1.0' as const;
+
+export type { OidcResourceConfiguration } from './resource';
+export {
+  getContextResource,
+  getResourceConfiguration,
+  getResourceContextName,
+  isResourceOriginManaged,
+  isResourceUrlAllowed,
+  validateResourceIdentifier,
+} from './resource';
 
 /**
  * Every supported service worker message type.
@@ -97,6 +107,10 @@ export interface ServiceWorkerMessage<
  * extend it with additional, well-known fields (see PROTOCOL.md).
  */
 export interface ServiceWorkerResponse {
+  /** Resource isolation capability provided by protocol 1.1 workers. */
+  resourceTokenManagement?: boolean;
+  /** Worker-owned context names, without token or key material. */
+  resourceContexts?: string[];
   configurationName?: string;
   /** Set by the SW when it cannot service the request. */
   error?: unknown;

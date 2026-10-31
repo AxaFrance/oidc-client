@@ -8,6 +8,7 @@ For React applications, use [`@axa-fr/react-oidc`](../react-oidc/README.md).
 - [Service worker](#service-worker)
 - [Configuration](#configuration)
 - [Token renewal](#token-renewal)
+- [Resource indicators and multiple APIs](#resource-indicators-and-multiple-apis)
 - [Pushed Authorization Requests (PAR)](#pushed-authorization-requests-par)
 - [DPoP](#dpop)
 - [API](#api)
@@ -103,6 +104,149 @@ const profile = await response.json();
 ```
 
 The wrapper attaches an access token, or a token placeholder when the service worker hides it, and integrates with token renewal. Only use it for API URLs you trust: the wrapper itself is not a destination allowlist. HTTP error responses still need an explicit `response.ok` check.
+
+## Resource indicators and multiple APIs
+
+The additive `resource` option supports one absolute URI or an array of URIs.
+The client sends repeated `resource` parameters in authorization, PAR, code
+exchange, and refresh requests, preserving the existing scope encoding.
+Use `resources` to register each managed resource exactly once and specify its
+permitted API URL prefixes. A resource is an API identifier, not a scope.
+
+This example is illustrative: replace the issuer, resource identifiers,
+audiences, scopes, and callback routes with values supported by your provider.
+It does not claim that the hosted demo providers support RFC 8707.
+
+```typescript
+import { OidcClient, type OidcConfiguration } from '@axa-fr/oidc-client';
+
+const ordersResource = 'https://orders.example.com';
+const inventoryResource = 'https://inventory.example.com';
+const configuration: OidcConfiguration = {
+  authority: 'https://issuer.example.com',
+  client_id: 'your-public-client',
+  redirect_uri: `${window.location.origin}/authentication/callback`,
+  silent_redirect_uri: `${window.location.origin}/authentication/silent-callback`,
+  silent_login_uri: `${window.location.origin}/authentication/silent-login`,
+  scope: 'openid profile offline_access orders.read inventory.read',
+  resource: [ordersResource, inventoryResource],
+  resources: [
+    {
+      resource: ordersResource,
+      allowedUrlPrefixes: ['https://orders.example.com/v1'],
+      scope: 'orders.read',
+      audiences: ['orders-api'],
+    },
+    {
+      resource: inventoryResource,
+      allowedUrlPrefixes: ['https://inventory.example.com/v1'],
+      scope: 'inventory.read',
+      audiences: ['inventory-api'],
+    },
+  ],
+};
+const oidcClient = OidcClient.getOrCreate(() => fetch)(configuration);
+
+// Process callbacks or restore the existing session as in the quick start,
+// and let the user sign in before acquiring resource tokens.
+async function loadApis(): Promise<void> {
+  const ordersFetch = oidcClient.fetchForResource(ordersResource, fetch);
+  const inventoryFetch = oidcClient.fetchForResource(inventoryResource, fetch);
+  const [orders, inventory] = await Promise.all([
+    ordersFetch('https://orders.example.com/v1/orders'),
+    inventoryFetch('https://inventory.example.com/v1/items'),
+  ]);
+  if (!orders.ok || !inventory.ok) throw new Error('A protected API request failed.');
+  const data = await Promise.all([orders.json(), inventory.json()]);
+  console.log(data); // API data, not tokens.
+}
+
+// Equivalent selection through the existing fetch pipeline:
+const selectedFetch = oidcClient.fetchWithTokens(fetch, false, { resource: ordersResource });
+
+const token = await oidcClient.getAccessTokenForResourceAsync(ordersResource);
+await oidcClient.getAccessTokenForResourceAsync(ordersResource, { forceRenew: true });
+const cached = oidcClient.getAccessTokenForResource(ordersResource); // token or null; no authorization
+await oidcClient.clearResourceTokensAsync(ordersResource);
+```
+
+`ResourceAccessToken` contains `resource`, `issuer`, `clientId`,
+`configurationName`, `accessToken`, Unix-seconds `expiresAt`, and optional
+`scope`/`tokenType`. It does not expose refresh tokens or DPoP private keys.
+In worker mode `accessToken` is a secured placeholder, even when default-token
+`showAccessToken` is enabled. Do not log token values or use placeholders outside
+the configured worker.
+
+### Acquisition, renewal, and clearing
+
+- Each existing OIDC client owns one reusable resource manager. Separate entries
+  retain default and sibling access tokens; no additional OIDC client is created.
+- Resources and requested scopes already included in the initial grant may use
+  its refresh token. Rotation is serialized with default-token renewal using
+  Web Locks, or a local queue when Web Locks are unavailable.
+- A new resource, additional scope, unavailable refresh token, or `invalid_grant`
+  triggers bounded silent authorization with `prompt=none`. Serve both silent
+  routes using the existing callback integration (React's provider supplies
+  this routing). Cookies, provider consent, and provider capabilities still apply.
+  Additional authorization requires a fresh ID token for the same authenticated
+  subject. Resource refresh may omit an ID token; an earlier ID token's expiration
+  does not prevent renewal of the resource access token.
+- Separately authorized resources retain independent grants. Providers reusing
+  the identical refresh token across separate authorization transactions are
+  rejected; use an initial multi-resource grant with such providers.
+- Resource tokens follow `token_automatic_renew_mode`; the fetch-only mode renews
+  on acquisition/fetch. Concurrent acquisition of the same resource is deduplicated.
+  The renewal margin is capped at half the issued access-token lifetime to avoid
+  immediate renewal loops for short-lived API tokens.
+- Clearing a resource is local-only: it drops that entry and its transaction
+  state, but does not revoke the shared grant or clear siblings. Session
+  clearing removes all resource entries. Logout follows
+  `logout_tokens_to_invalidate`, including resource access tokens and independent
+  refresh grants, deduplicating shared refresh tokens.
+- Resource entries follow the client's existing storage/tab configuration.
+  Resource responses cannot change the authenticated subject or recreate a
+  cleared entry. A new default authorization invalidates prior resource entries.
+
+### Destination and provider limitations
+
+- API prefixes match parsed HTTP(S) origins and pathname boundaries, not
+  hostname suffixes or regular expressions. Resource URIs may also be URNs.
+  Fragments, credentials, and encoded path separators are rejected for API URLs;
+  prefixes must not contain queries.
+- Resource fetch always rejects automatic redirects; `redirect: 'follow'` in
+  fetch options is rejected before acquisition. With `redirect: 'manual'`, handle the response
+  yourself and issue a separately validated request if appropriate.
+- API origins registered in `resources` require explicit selection in authenticated
+  fetch, including paths outside their permitted prefixes (which require a new
+  mapping before resource fetch will permit them). Plain fetch can still make anonymous requests. Outside managed origins,
+  legacy fetch behavior is unchanged.
+- Worker selection must satisfy both resource mappings and
+  `OidcTrustedDomains.js`. Deploy the matching worker: missing/older workers
+  reject resource acquisition with `RESOURCE_WORKER_UNSUPPORTED` instead of
+  falling back to browser storage. Lost worker memory requires restoring or
+  reauthenticating the original session; stale placeholders cannot recover grants.
+- DPoP tokens retain their grant's key and nonce, and API proofs hash the selected
+  resource access token. Follow the existing DPoP setup, including worker settings.
+  API `DPoP-Nonce` responses are retained separately for each resource, not mixed
+  with token-endpoint nonces. API HTTP responses are returned without automatic
+  retries; callers decide whether to retry a nonce challenge.
+- Configure `audiences` for JWT access tokens; resource identifiers need not equal
+  JWT audiences. Configured audience and issuer mismatches are rejected.
+  Without an audience mapping, and for opaque tokens, the client must trust the
+  provider to honor `resource`. No token introspection, signature-verification
+  extension, or token exchange is introduced. APIs must validate tokens themselves.
+- Explicit insufficient returned scopes are rejected. As specified by OAuth,
+  omitted `scope` is treated as the requested scope; this also requires a
+  conforming provider.
+- `invalid_target`, login/consent requirements, network failures, and silent
+  timeouts remain explicit. The client never retries by stripping `resource`,
+  using a default/sibling token, or navigating interactively. Catch acquisition
+  errors and offer a user-driven sign-in/consent action appropriate to the provider.
+
+Observe `resource_token_acquired`, `resource_token_cleared`, and
+`resource_token_error` through `subscribeEvents`; each identifies its resource,
+and errors include the typed `OidcError`. See the [FAQ](../../FAQ.md#how-do-i-call-multiple-apis-with-different-audiences)
+for troubleshooting.
 
 <a id="service-worker-support"></a>
 
