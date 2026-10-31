@@ -6,6 +6,9 @@ export interface OidcResourceConfiguration {
   audiences?: readonly string[];
 }
 
+/** Worker-only resource refresh routing hint, removed before the provider request. */
+export const RESOURCE_TOKEN_REQUEST_HEADER = 'x-oidc-resource';
+
 /** Builds an isolated storage/worker context without creating another OIDC client. */
 export const getResourceContextName = (configurationName: string, resource: string): string =>
   `${configurationName}#resource=${encodeURIComponent(resource)}`;

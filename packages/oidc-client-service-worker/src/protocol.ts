@@ -46,6 +46,7 @@ export {
   getResourceContextName,
   isResourceOriginManaged,
   isResourceUrlAllowed,
+  RESOURCE_TOKEN_REQUEST_HEADER,
   validateResourceIdentifier,
 } from './resource';
 

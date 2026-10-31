@@ -94,7 +94,17 @@ flowchart LR
     Fetch --> API
 ```
 
+## Building the package
+
+Run `pnpm build` from the repository root to build the workspace dependencies.
+The package build copies only worker runtime assets into its distribution.
+Worker declarations are not flattened into React's output, where they could
+overwrite the public React type entry point.
+
 ## Resource-aware API hooks
+
+The resource-token hook observes restored persisted tokens as well as newly
+acquired tokens. A clear operation cannot be undone by an in-flight cache lookup.
 
 Use one `OidcProvider` with the
 [multi-API configuration](../oidc-client/README.md#resource-indicators-and-multiple-apis).

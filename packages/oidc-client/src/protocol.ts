@@ -24,6 +24,7 @@ export {
   getResourceContextName,
   isResourceOriginManaged,
   isResourceUrlAllowed,
+  RESOURCE_TOKEN_REQUEST_HEADER,
   validateResourceIdentifier,
 } from '@axa-fr/oidc-client-service-worker/protocol';
 

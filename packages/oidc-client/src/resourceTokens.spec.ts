@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
+import { eventNames } from './events';
 import { initSession } from './initSession';
 import { registrationCache } from './initWorker';
 import { generateJwkAsync } from './jwt';
@@ -143,6 +144,24 @@ afterEach(async () => {
 });
 
 describe('resource-specific access tokens', () => {
+  it('shares concurrent login attempts before asynchronous resource clearing finishes', async () => {
+    let release: () => void;
+    const gate = new Promise<void>(resolve => {
+      release = resolve;
+    });
+    const clear = vi.spyOn(oidc.resourceTokens, 'clearAllAsync').mockReturnValue(gate);
+    vi.spyOn(oidc, 'initAsync').mockRejectedValue(new Error('Stop before authorization.'));
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const first = oidc.loginAsync();
+    const second = oidc.loginAsync();
+    const clearingCalls = clear.mock.calls.length;
+    release();
+    await Promise.allSettled([first, second]);
+    expect(clearingCalls).toBe(1);
+    expect(oidc.initAsync).toHaveBeenCalledOnce();
+    expect(oidc.loginPromise).toBeNull();
+  });
+
   const installSilentFrame = () => {
     const frame = { contentWindow: {}, setAttribute: vi.fn(), style: {}, remove: vi.fn() };
     const append = vi.fn();
@@ -325,6 +344,7 @@ describe('resource-specific access tokens', () => {
         parameters.get('refresh_token') === 'refresh-0' ? 'refresh-1' : 'refresh-2',
       );
     });
+
     const [a, b] = await Promise.all([
       client.getAccessTokenForResourceAsync(resourceA),
       client.getAccessTokenForResourceAsync(resourceB),
@@ -338,6 +358,53 @@ describe('resource-specific access tokens', () => {
     expect(oidc.tokens.accessToken).toBe('default-token');
     expect(client.getAccessTokenForResource(resourceA)).toEqual(a);
     expect(client.getAccessTokenForResource(resourceB)).toEqual(b);
+  });
+
+  it('notifies subscribers when a persisted resource token is restored without a network request', async () => {
+    const token = await client.getAccessTokenForResourceAsync(resourceA);
+    const restoredOidc = new Oidc(oidc.configuration, 'default', () => fetch);
+    restoredOidc.tokens = oidc.tokens;
+    const restoredClient = new OidcClient(restoredOidc);
+    const listener = vi.fn();
+    restoredOidc.subscribeEvents(listener);
+
+    expect(restoredClient.getAccessTokenForResource(resourceA)).toBeNull();
+    await expect(restoredClient.getAccessTokenForResourceAsync(resourceA)).resolves.toEqual(token);
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(listener).toHaveBeenCalledWith(eventNames.resource_token_acquired, {
+      resource: resourceA,
+    });
+    listener.mockClear();
+    await restoredClient.getAccessTokenForResourceAsync(resourceA);
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('does not restore a persisted token after the resource is cleared during its cache lookup', async () => {
+    await client.getAccessTokenForResourceAsync(resourceA);
+    let release: () => void;
+    const gate = new Promise<void>(resolve => {
+      release = resolve;
+    });
+    const initialize = oidc.initAsync.bind(oidc);
+    const initialization = vi
+      .spyOn(oidc, 'initAsync')
+      .mockImplementationOnce(initialize)
+      .mockImplementationOnce(async (...parameters) => {
+        await gate;
+        return initialize(...parameters);
+      });
+
+    const acquisition = client.getAccessTokenForResourceAsync(resourceA);
+    const rejection = expect(acquisition).rejects.toMatchObject({
+      code: OidcErrorCode.RESOURCE_TOKEN_UNAVAILABLE,
+    });
+    await vi.waitFor(() => expect(initialization).toHaveBeenCalledTimes(2));
+    await client.clearResourceTokensAsync(resourceA);
+    release();
+
+    await rejection;
+    expect(client.getAccessTokenForResource(resourceA)).toBeNull();
+    expect(fetch).toHaveBeenCalledOnce();
   });
 
   it('deduplicates concurrent requests for the same resource', async () => {

@@ -74,6 +74,11 @@ URL mapping, and existing trusted-domain authorization. Resource access tokens
 remain masked even if the default configuration exposes its access token.
 Resource code/refresh requests must select their intended resource and exact
 token endpoint; revocation uses the exact configured revocation endpoint.
+Resource refreshes additionally send the internal `x-oidc-resource` header,
+containing the URI-encoded resource identifier. The worker requires it to match
+the single OAuth `resource` value and removes the header before contacting the
+provider. Ordinary default-token refreshes do not send this hint and update the
+default entry even when their grant contains exactly one resource.
 DPoP proofs use the real selected token and its grant's key. Token-endpoint
 nonces belong to the grant; API nonces are per resource and do not overwrite
 the grant nonce. API nonce responses are retained without automatic HTTP retries.

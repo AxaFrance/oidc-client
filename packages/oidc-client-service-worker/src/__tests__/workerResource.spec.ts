@@ -5,7 +5,7 @@ import { runInNewContext } from 'node:vm';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getResourceContextName } from '../resource';
+import { getResourceContextName, RESOURCE_TOKEN_REQUEST_HEADER } from '../resource';
 import type { DomainDetails } from '../types';
 
 interface WorkerEvent {
@@ -77,12 +77,19 @@ const dispatch = async (request: Request): Promise<Response> => {
 const tokenRequest = (
   parameters: Record<string, string>,
   headers: Record<string, string> = {},
+  isResourceRequest = true,
 ): Promise<Response> =>
   dispatch(
     new Request(`${issuer}/token`, {
       method: 'POST',
       body: new URLSearchParams(parameters),
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...headers },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        ...(isResourceRequest && parameters.grant_type === 'refresh_token' && parameters.resource
+          ? { [RESOURCE_TOKEN_REQUEST_HEADER]: encodeURIComponent(parameters.resource) }
+          : {}),
+        ...headers,
+      },
     }),
   );
 
@@ -274,6 +281,8 @@ describe('standalone Service Worker resource integration', () => {
       .slice(1)
       .map(([, init]) => new URLSearchParams(String(init?.body)).get('refresh_token'));
     expect(refreshBodies).toEqual(['refresh-0', 'refresh-1']);
+    for (const [, init] of network.mock.calls)
+      expect(new Headers(init?.headers).has(RESOURCE_TOKEN_REQUEST_HEADER)).toBe(false);
     network.mockClear();
     await dispatch(
       new Request('https://api.example.com/a/items', {
@@ -293,6 +302,51 @@ describe('standalone Service Worker resource integration', () => {
     );
     expect(network.mock.calls[0][1]).toEqual({ redirect: 'error' });
     expect((await init()).tokens).toMatchObject({ access_token: base.access_token });
+  });
+
+  it('keeps single-resource default renewal in the default token entry', async () => {
+    configuration.resource = [resourceA];
+    const base = await login();
+    const response = await tokenRequest(
+      {
+        grant_type: 'refresh_token',
+        refresh_token: String(base.refresh_token),
+        client_id: 'client',
+        redirect_uri: 'https://app.example.com/callback',
+        resource: resourceA,
+      },
+      {},
+      false,
+    );
+    expect(response.status).toBe(200);
+    const renewed = await response.json();
+    expect(renewed.access_token).toBe(base.access_token);
+    expect(renewed.resourceContext).toBeUndefined();
+    expect((await init()).resourceContexts).toEqual([]);
+    await dispatch(
+      new Request(`${issuer}/userinfo`, {
+        headers: { Authorization: `Bearer ${base.access_token}` },
+      }),
+    );
+    expect((network.mock.calls.at(-1)?.[0] as Request).headers.get('Authorization')).toBe(
+      `Bearer ${resourceA}-secret`,
+    );
+  });
+
+  it('rejects a resource routing hint that disagrees with the OAuth resource', async () => {
+    const base = await login();
+    network.mockClear();
+    const response = await tokenRequest(
+      {
+        grant_type: 'refresh_token',
+        refresh_token: String(base.refresh_token),
+        resource: resourceA,
+      },
+      { [RESOURCE_TOKEN_REQUEST_HEADER]: encodeURIComponent(resourceB) },
+    );
+    expect(response.status).toBe(500);
+    expect(network).not.toHaveBeenCalled();
+    expect((await init()).resourceContexts).toEqual([]);
   });
 
   it('never attaches a token for API B to API A', async () => {

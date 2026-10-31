@@ -181,6 +181,9 @@ the configured worker.
 
 - Each existing OIDC client owns one reusable resource manager. Separate entries
   retain default and sibling access tokens; no additional OIDC client is created.
+  Default renewal updates only the default entry, even for single-resource grants.
+  Restoring a persisted resource entry emits `resource_token_acquired` when its
+  public snapshot changes; unchanged cache hits do not emit another event.
 - Resources and requested scopes already included in the initial grant may use
   its refresh token. Rotation is serialized with default-token renewal using
   Web Locks, or a local queue when Web Locks are unavailable.
@@ -199,7 +202,8 @@ the configured worker.
   The renewal margin is capped at half the issued access-token lifetime to avoid
   immediate renewal loops for short-lived API tokens.
 - Clearing a resource is local-only: it drops that entry and its transaction
-  state, but does not revoke the shared grant or clear siblings. Session
+  state, but does not revoke the shared grant or clear siblings. Clearing
+  invalidates in-flight cache lookups as well as network responses. Session
   clearing removes all resource entries. Logout follows
   `logout_tokens_to_invalidate`, including resource access tokens and independent
   refresh grants, deduplicating shared refresh tokens.
@@ -227,6 +231,7 @@ the configured worker.
   reauthenticating the original session; stale placeholders cannot recover grants.
 - DPoP tokens retain their grant's key and nonce, and API proofs hash the selected
   resource access token. Follow the existing DPoP setup, including worker settings.
+  Proof targets omit URL queries and fragments as required by RFC 9449.
   API `DPoP-Nonce` responses are retained separately for each resource, not mixed
   with token-endpoint nonces. API HTTP responses are returned without automatic
   retries; callers decide whether to retry a nonce challenge.

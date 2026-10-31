@@ -13,7 +13,11 @@ import {
   OidcErrorCode,
 } from './oidcError';
 import { isTokensOidcValid, isTokensValid, TokenRenewMode, Tokens } from './parseTokens';
-import { getContextResource, getResourceConfiguration } from './protocol';
+import {
+  getContextResource,
+  getResourceConfiguration,
+  RESOURCE_TOKEN_REQUEST_HEADER,
+} from './protocol';
 import { performTokenRequestAsync } from './requests';
 import {
   cancelResourceTransactions,
@@ -313,6 +317,7 @@ export class ResourceTokens {
       }
       let context = await this.contextAsync(resource);
       const parent = await this.contextAsync();
+      if (!isCurrent()) throw unavailable('The resource transaction was cleared.');
       const parentNonce = parent.tokens?.idTokenPayload?.nonce;
       if (
         !parent.tokens ||
@@ -327,8 +332,17 @@ export class ResourceTokens {
       if (tokens) {
         this.validate(resource, tokens, context.server.issuer);
         if (!options.forceRenew && isTokensValid(tokens, this.renewalMargin(tokens))) {
+          const previous = this.cached.get(resource);
           this.cached.set(resource, tokens);
           this.scheduleRenewal(resource, tokens);
+          if (
+            previous?.accessToken !== tokens.accessToken ||
+            previous?.expiresAt !== tokens.expiresAt ||
+            previous?.scope !== tokens.scope ||
+            previous?.tokenType !== tokens.tokenType
+          ) {
+            oidc.publishEvent(eventNames.resource_token_acquired, { resource });
+          }
           return this.publicToken(resource, tokens);
         }
       }
@@ -357,7 +371,9 @@ export class ResourceTokens {
       if (!isCurrent()) throw unavailable('The resource transaction was cleared.');
       if (refreshToken) {
         const nonce = await source.storage.getNonceAsync();
-        const headers: Record<string, string> = {};
+        const headers: Record<string, string> = context.isWorker
+          ? { [RESOURCE_TOKEN_REQUEST_HEADER]: encodeURIComponent(resource) }
+          : {};
         if (isDpop) {
           headers.DPoP = await this.generateProofAsync(resource, {
             accessToken: source.tokens.accessToken,
