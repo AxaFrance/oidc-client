@@ -328,6 +328,18 @@ as `login_required` or `consent_required` may require interactive sign-in.
 Refresh-token renewal does not use this iframe flow, although refresh tokens
 can still expire or be revoked.
 
+Explicit iframe-only login retains its existing promise convention:
+`loginAsync(undefined, undefined, false, undefined, true)` in the core client or
+`login(undefined, undefined, true)` in React resolves failures with an `Error`
+value. Inspect the awaited result as well as silent-login events. Disabled
+silent callbacks resolve `undefined`. Resource-token acquisition is a separate
+API and rejects failures. Failed explicit silent login preserves the existing
+tokens and renewal timer.
+
+Without a `resources` registry, callbacks and local session clearing honor
+custom storage without introducing native `sessionStorage` access. Resource
+transaction bookkeeping uses native tab-scoped `sessionStorage` when enabled.
+
 In the local React Multi Auth demo, sign in as Alice first, then select a
 configuration with silent callbacks and click **Silent Login**. The request
 uses that configuration's scopes and resources. Overriding the scopes with only

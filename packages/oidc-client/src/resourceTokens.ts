@@ -678,6 +678,7 @@ export class ResourceTokens {
   }
 
   async clearAllAsync(): Promise<void> {
+    if (!this.oidc.configuration.resources?.length) return;
     this.generation++;
     cancelResourceTransactions(this.oidc.configurationName);
     this.pending.clear();

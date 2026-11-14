@@ -55,7 +55,8 @@ const MultiAuth = ({
     setIsLoginPending(true);
     setLoginError(null);
     try {
-      await login(undefined, undefined, isSilent);
+      const result = await login(undefined, undefined, isSilent);
+      if (result instanceof Error) throw result;
     } catch (error) {
       const message = describeDemoError(error);
       console.error('Multi Auth login failed:', message);

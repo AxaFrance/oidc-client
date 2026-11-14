@@ -297,7 +297,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
 
   async silentLoginCallbackAsync() {
     try {
-      const resource = getCallbackResource(this.configurationName, this.location.getCurrentHref());
+      const resource = this.configuration.resources?.length
+        ? getCallbackResource(this.configurationName, this.location.getCurrentHref())
+        : undefined;
       const response = await this.loginCallbackAsync(true);
       this._silentLoginCallbackFromIFrame(response.parsedTokens, resource);
     } catch (exception) {
@@ -431,7 +433,9 @@ Please checkout that you are using OIDC hook inside a <OidcProvider configuratio
     }
 
     const loginCallbackLocalAsync = async (): Promise<InternalLoginCallback> => {
-      const resource = getCallbackResource(this.configurationName, this.location.getCurrentHref());
+      const resource = this.configuration.resources?.length
+        ? getCallbackResource(this.configurationName, this.location.getCurrentHref())
+        : undefined;
       const response = await loginCallbackAsync(this)(isSilenSignin, resource);
       // @ts-ignore
       const parsedTokens = response.tokens;

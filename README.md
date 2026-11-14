@@ -124,6 +124,10 @@ redirects; a configured worker additionally enforces its trusted-domain rules.
 Use explicit resource selection for resource-managed API origins, including with
 `fetchWithTokens()`. Existing configurations without `resources` keep their
 current fetch behavior.
+Without a resource registry, callbacks and local session clearing continue to
+honor custom storage without adding native `sessionStorage` access. Explicit
+iframe-only login retains its fulfilled error-result convention; check the
+returned value for `Error`. The new resource-acquisition methods reject on failure.
 
 Default-token renewal keeps its own entry even with a single configured resource.
 Restoring persisted resource tokens notifies subscribers, while resource clearing

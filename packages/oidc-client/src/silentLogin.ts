@@ -191,9 +191,7 @@ export const defaultSilentLoginAsync =
         state,
         scope,
       );
-      if (!silentResult) {
-        throw new Error('Silent login requires silent_login_uri and silent_redirect_uri.');
-      }
+      if (!silentResult) return;
       if (silentResult.oidcError) throw silentResult.oidcError;
       if (!silentResult.tokens) {
         throw new OidcError(
@@ -211,7 +209,7 @@ export const defaultSilentLoginAsync =
       oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
       return {};
     };
-    return loginLocalAsync();
+    return loginLocalAsync().catch(error => error);
   };
 
 export default defaultSilentLoginAsync;

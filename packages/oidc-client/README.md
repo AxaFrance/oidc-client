@@ -119,6 +119,11 @@ exchange, and refresh requests, preserving the existing scope encoding.
 Use `resources` to register each managed resource exactly once and specify its
 permitted API URL prefixes. A resource is an API identifier, not a scope.
 
+Clients without a resource registry retain the existing callback, custom-storage,
+fetch and local-session-clearing paths. Resource transaction bookkeeping uses
+native tab-scoped `sessionStorage`; configuring custom storage does not remove
+that requirement when opting into resource management.
+
 This example is illustrative: replace the issuer, resource identifiers,
 audiences, scopes, and callback routes with values supported by your provider.
 It does not claim that the hosted demo providers support RFC 8707.
@@ -382,8 +387,11 @@ Silent login uses an iframe and the provider's existing session. It depends on p
 For a vanilla application, implement both the `silent_login_uri` page and the `silent_redirect_uri` callback page. The login page starts `loginAsync` with `isSilentSignin: true` (the third argument); the callback page calls `silentLoginCallbackAsync()`. Keep these routes separate from the interactive callback. The React provider handles these routes for you; its [silent-login route implementation](../react-oidc/src/core/default-component/SilentLogin.component.tsx) is also a reference for forwarding silent-login parameters.
 
 To request iframe-only sign-in from the main page, call
-`loginAsync(undefined, undefined, false, undefined, true)`. Provider and timeout
-errors reject the promise instead of resolving with an error value. A failed
+`loginAsync(undefined, undefined, false, undefined, true)`. This existing entry
+point preserves its fulfilled-result convention: provider and timeout failures
+resolve with an `Error` value, and disabled silent callbacks resolve `undefined`.
+Check `result instanceof Error` after awaiting it; errors are also reported by
+silent-login events. Resource-acquisition methods reject on failure. A failed
 attempt does not replace the current main-session tokens or cancel their renewal
 timer. Supply both silent routes, and retain all API scopes required by configured
 resources if overriding the scope.

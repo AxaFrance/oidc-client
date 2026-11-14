@@ -58,7 +58,7 @@ describe('explicit silent login', () => {
     issuedAt: 0,
   };
 
-  it('rejects provider errors without overwriting an existing session or stopping renewal', async () => {
+  it('returns provider errors without overwriting an existing session or stopping renewal', async () => {
     const { contentWindow, getListener } = installDom();
     const publishEvent = vi.fn();
     const oidc = { tokens, timeoutId: 123 };
@@ -73,7 +73,7 @@ describe('explicit silent login', () => {
       data: 'custom_oidc_error:{"error":"login_required","error_description":"Sign in first."}',
     } as unknown as MessageEvent);
 
-    await expect(promise).rejects.toMatchObject({
+    await expect(promise).resolves.toMatchObject({
       code: OidcErrorCode.LOGIN_REQUIRED,
       oauthError: 'login_required',
     });
@@ -83,18 +83,18 @@ describe('explicit silent login', () => {
     expect(publishEvent).not.toHaveBeenCalledWith('token_acquired', expect.anything());
   });
 
-  it('rejects timeout failures instead of resolving with an error value', async () => {
+  it('preserves fulfilled error values on timeout', async () => {
     vi.useFakeTimers();
     installDom();
     const promise = defaultSilentLoginAsync(window, 'custom', configuration, vi.fn(), {
       tokens: null,
       timeoutId: null,
     })();
-    const rejection = expect(promise).rejects.toMatchObject({
+    const result = expect(promise).resolves.toMatchObject({
       code: OidcErrorCode.SILENT_LOGIN_TIMEOUT,
     });
     await vi.advanceTimersByTimeAsync(25);
-    await rejection;
+    await result;
   });
 
   it('adopts successful iframe tokens and restarts automatic renewal', async () => {

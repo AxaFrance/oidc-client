@@ -226,6 +226,52 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe('standalone Service Worker resource integration', () => {
+  it('preserves legacy init messages, default renewal, API injection, revocation and clearing', async () => {
+    configuration = {
+      token_renew_mode: 'access_token_invalid',
+      demonstrating_proof_of_possession: false,
+    } as typeof configuration;
+    const original = await login();
+    const renewed = await (
+      await tokenRequest(
+        {
+          grant_type: 'refresh_token',
+          refresh_token: String(original.refresh_token),
+        },
+        {},
+        false,
+      )
+    ).json();
+    expect(renewed.access_token).toBe(original.access_token);
+    expect(renewed.refresh_token).toBe(original.refresh_token);
+    expect(lastRequestParameters().get('refresh_token')).toBe('refresh-0');
+    expect(lastRequestParameters().has('resource')).toBe(false);
+    expect((await init()).resourceContexts).toEqual([]);
+
+    await dispatch(
+      new Request('https://api.example.com/legacy', {
+        headers: { Authorization: `Bearer ${renewed.access_token}` },
+      }),
+    );
+    const apiRequest = network.mock.calls.at(-1)?.[0];
+    expect(apiRequest instanceof Request && apiRequest.headers.get('Authorization')).toBe(
+      'Bearer null-secret',
+    );
+
+    await dispatch(
+      new Request(`${issuer}/revoke`, {
+        method: 'POST',
+        body: new URLSearchParams({
+          token: String(renewed.refresh_token),
+          token_type_hint: 'refresh_token',
+        }),
+      }),
+    );
+    expect(lastRequestParameters().get('token')).toBe('refresh-1');
+    await message('clear', 'default', { status: 'LOGGED_OUT' });
+    expect((await init()).tokens).toBeNull();
+  });
+
   it('never falls back to the default token outside mapped paths on a managed API origin', async () => {
     await login();
     network.mockClear();

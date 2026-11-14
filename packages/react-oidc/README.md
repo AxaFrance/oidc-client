@@ -290,8 +290,10 @@ The hook also returns `reloadOidcUser()`. Use `useOidcUser<MyUserInfo>(configura
 
 `login(undefined, undefined, true)` requests iframe-only sign-in using the
 configuration's scopes. It also works when the iframe restores an existing
-worker session. OAuth and timeout failures reject the promise; catch them and
-offer interactive login when the provider requires it. A scope override must
+worker session. This existing entry point resolves OAuth and timeout failures
+with an `Error` value; check `result instanceof Error` after awaiting it and
+offer interactive login when needed. Disabled silent callbacks resolve
+`undefined`. The resource hooks reject acquisition failures. A scope override must
 still include the scopes required by any configured resources.
 
 Prefer `useOidcFetch` over manually building authorization headers. When worker token hiding is enabled, `accessToken` is a placeholder rather than the real token. Do not render or log raw tokens, and treat user claims as personal data. An ID token identifies the user to the client; it is not a replacement for an API access token.
