@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.30.0
+
+- [687450f9](https://github.com/AxaFrance/oidc-client/commit/687450f983f2418eeb2a831f5fc1758e59734974) - [skip ci] Update to version 7.30.0 in package.json, 2026-11-14 by *github-actions[bot]*
+- [965c0484](https://github.com/AxaFrance/oidc-client/commit/965c0484991bddb78e60290f651ac225d70a2f25) - feat: RFC 8707 resource indicators and isolated API tokens (#1740) (release), 2026-11-14 by *Guillaume Chervet*
+
+
 ## v7.29.8
 
+- [f44fd4a6](https://github.com/AxaFrance/oidc-client/commit/f44fd4a6cc331c28b9a17e7dc2e4154f942615ec) - [skip ci] Generate changelog to version 7.29.8, 2026-10-15 by *github-actions[bot]*
 - [7c498e99](https://github.com/AxaFrance/oidc-client/commit/7c498e99bb265fa35c11814f7e7cc5105c8349c9) - [skip ci] Update to version 7.29.8 in package.json, 2026-10-15 by *github-actions[bot]*
 - [f2bfe0e6](https://github.com/AxaFrance/oidc-client/commit/f2bfe0e622688b5ff68cb251b0ad24c8c8d65817) - fix(oidc): emit syncTokensAsync_begin, syncTokensAsync_end and syncTokensAsync_error events (release) (#1738), 2026-10-15 by *Christopher Pruijsen*
 
@@ -334,10 +341,5 @@
 ## v7.25.4
 
 - [1b2fa1da](https://github.com/AxaFrance/oidc-client/commit/1b2fa1da513b419c2c28e67a331d12670b07a94d) - refactor(oidc): update librairie (release), 2025-03-25 by *Guillaume Chervet*
-
-
-## v7.25.3
-
-- [ca0f0645](https://github.com/AxaFrance/oidc-client/commit/ca0f0645c52dd827b97912d5ee6f1836e05f56e1) - fix(oidc): lost session back (release) (#1514), 2025-02-06 by *Guillaume Chervet*
 
 
