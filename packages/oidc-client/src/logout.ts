@@ -47,6 +47,7 @@ const keepExtras = (extras: StringMap): StringMap => {
 };
 
 export const destroyAsync = oidc => async status => {
+  if (oidc.resourceTokens) await oidc.resourceTokens.clearAllAsync();
   timer.clearTimeout(oidc.timeoutId);
   oidc.timeoutId = null;
   if (oidc.checkSessionIFrame) {
@@ -165,6 +166,9 @@ export const logoutAsync =
 
     try {
       try {
+        if (configuration.resources?.length && oidc.resourceTokens) {
+          await oidc.resourceTokens.withRefreshLockAsync(async (): Promise<void> => {});
+        }
         const revocationEndpoint = oidcServerConfiguration.revocationEndpoint;
         if (revocationEndpoint) {
           const promises = [];
@@ -197,6 +201,38 @@ export const logoutAsync =
               revokeAccessTokenExtras,
             );
             promises.push(revokeRefreshTokenPromise);
+          }
+          if (oidc.resourceTokens) {
+            const resourceTokens = await oidc.resourceTokens.getTokensToRevokeAsync();
+            const seen = new Set<string>([accessToken, refreshToken].filter(Boolean));
+            for (const tokens of resourceTokens) {
+              for (const [tokenType, token] of [
+                [TOKEN_TYPE.access_token, tokens.accessToken],
+                [TOKEN_TYPE.refresh_token, tokens.refreshToken],
+              ]) {
+                if (
+                  token &&
+                  !seen.has(token) &&
+                  configuration.logout_tokens_to_invalidate.includes(tokenType)
+                ) {
+                  seen.add(token);
+                  promises.push(
+                    performRevocationRequestAsync(fetch)(
+                      revocationEndpoint,
+                      token,
+                      tokenType,
+                      configuration.client_id,
+                      extractExtras(
+                        extras,
+                        tokenType === TOKEN_TYPE.access_token
+                          ? ':revoke_access_token'
+                          : ':revoke_refresh_token',
+                      ),
+                    ),
+                  );
+                }
+              }
+            }
           }
           if (promises.length > 0) {
             // Revocation must be awaited *before* navigation, so a cancelled

@@ -1,4 +1,36 @@
+import type { OidcResourceConfiguration } from './protocol';
+
+export type { OidcResourceConfiguration } from './protocol';
+
 export type Fetch = typeof window.fetch;
+
+/** Access-token metadata; accessToken is a placeholder when the worker hides it. */
+export interface ResourceAccessToken {
+  resource: string;
+  issuer: string;
+  clientId: string;
+  configurationName: string;
+  accessToken: string;
+  expiresAt: number;
+  scope?: string;
+  tokenType?: string;
+}
+
+/** Options for acquiring a resource-specific token. */
+export interface ResourceTokenOptions {
+  forceRenew?: boolean;
+}
+
+/** Options for explicitly selecting a resource in authenticated fetch. */
+export interface ResourceFetchOptions {
+  resource?: string;
+  demonstratingProofOfPossession?: boolean;
+}
+
+/** OAuth parameters with RFC 8707 repeated resource values. */
+export interface OAuthParameters {
+  [key: string]: string | readonly string[];
+}
 
 export type LogoutToken = 'access_token' | 'refresh_token';
 
@@ -25,6 +57,8 @@ export type OidcConfiguration = {
   silent_login_uri?: string;
   silent_login_timeout?: number;
   scope: string;
+  resource?: string | readonly string[];
+  resources?: readonly OidcResourceConfiguration[];
   authority: string;
   authority_time_cache_wellknowurl_in_second?: number;
   authority_timeout_wellknowurl_in_millisecond?: number;

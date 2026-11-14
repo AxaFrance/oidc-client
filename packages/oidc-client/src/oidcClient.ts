@@ -8,7 +8,14 @@ import { ILOidcLocation, OidcLocation } from './location';
 import { LoginCallback, Oidc } from './oidc.js';
 import { getValidTokenAsync, OidcToken, Tokens, ValidToken } from './parseTokens.js';
 import { syncTokensInfoAsync } from './renewTokens';
-import { Fetch, OidcConfiguration, StringMap } from './types.js';
+import {
+  Fetch,
+  OidcConfiguration,
+  ResourceAccessToken,
+  ResourceFetchOptions,
+  ResourceTokenOptions,
+  StringMap,
+} from './types.js';
 
 export interface EventSubscriber {
   (name: string, data: any);
@@ -174,8 +181,46 @@ export class OidcClient {
     return getValidTokenAsync(oidcToken, waitMs, numberWait);
   }
 
-  fetchWithTokens(fetch: Fetch, demonstratingProofOfPossession: boolean = false): Fetch {
-    return fetchWithTokens(fetch, this._oidc, demonstratingProofOfPossession);
+  /** Acquires or renews an access token belonging to an explicitly configured resource. */
+  getAccessTokenForResourceAsync(
+    resource: string,
+    options?: ResourceTokenOptions,
+  ): Promise<ResourceAccessToken> {
+    return this._oidc.resourceTokens.getAccessTokenAsync(resource, options);
+  }
+
+  /** Reads an already acquired usable resource token without starting authorization. */
+  getAccessTokenForResource(resource: string): ResourceAccessToken | null {
+    return this._oidc.resourceTokens.peek(resource);
+  }
+
+  /** Clears only this resource locally, without revoking a shared refresh grant. */
+  clearResourceTokensAsync(resource: string): Promise<void> {
+    return this._oidc.resourceTokens.clearAsync(resource);
+  }
+
+  /** Wraps fetch with an explicit resource and validated API destinations; redirects are not followed. */
+  fetchForResource(
+    resource: string,
+    fetch: Fetch = window.fetch,
+    options: Omit<ResourceFetchOptions, 'resource'> = {},
+  ): Fetch {
+    return this.fetchWithTokens(fetch, options.demonstratingProofOfPossession ?? false, {
+      resource,
+    });
+  }
+
+  fetchWithTokens(
+    fetch: Fetch,
+    demonstratingProofOfPossession: boolean = false,
+    options: ResourceFetchOptions = {},
+  ): Fetch {
+    return fetchWithTokens(
+      fetch,
+      this._oidc,
+      options.demonstratingProofOfPossession ?? demonstratingProofOfPossession,
+      options,
+    );
   }
 
   async userInfoAsync<T extends OidcUserInfo = OidcUserInfo>(

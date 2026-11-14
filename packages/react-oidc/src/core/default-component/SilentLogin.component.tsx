@@ -18,8 +18,10 @@ const SilentLogin: ComponentType<any> = ({ configurationName }) => {
   }
 
   useEffect(() => {
-    if (!oidc.tokens) {
-      oidc.loginAsync(null, extras, true, queryParams.scope);
+    if (!oidc.tokens || queryParams.prompt === 'none' || queryParams._oidc_resource) {
+      oidc
+        .loginAsync(null, extras, true, queryParams.scope)
+        .catch(error => console.error('Silent authorization failed:', error));
     }
   }, []);
 

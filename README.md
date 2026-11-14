@@ -11,6 +11,7 @@ or the React components and hooks.
 - [Choose a package](#choose-a-package)
 - [Getting started](#getting-started)
 - [How it works](#how-it-works)
+- [Multiple APIs and resource indicators](#multiple-apis-and-resource-indicators)
 - [Security and deployment](#security-and-deployment)
 - [Run the demos](#run-the-demos)
 - [FAQ](#faq)
@@ -96,6 +97,51 @@ in React. The [token synchronization events guide](./packages/oidc-client/README
 explains their payloads and timing: an `_end` event can also report session loss
 or deferred renewal, and does not guarantee that tokens were refreshed.
 
+## Multiple APIs and resource indicators
+
+[RFC 8707 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html)
+let one OIDC session acquire separate access tokens for explicitly configured
+APIs. Configure `resources` with permitted API URL prefixes and, for JWT access
+tokens, the provider's audience values. `resource` selects the resource or
+resources included in the initial authorization grant.
+
+```javascript
+// After signing in with the multi-API configuration linked below:
+const ordersFetch = oidcClient.fetchForResource('https://orders.example.com', fetch);
+const inventoryFetch = oidcClient.fetchForResource('https://inventory.example.com', fetch);
+const [orders, inventory] = await Promise.all([
+  ordersFetch('https://orders.example.com/v1/orders'),
+  inventoryFetch('https://inventory.example.com/v1/items'),
+]);
+if (!orders.ok || !inventory.ok) throw new Error('A protected API request failed.');
+```
+
+See the [complete multi-API configuration and lifecycle example](./packages/oidc-client/README.md#resource-indicators-and-multiple-apis)
+and [React resource hooks](./packages/react-oidc/README.md#resource-aware-api-hooks).
+Resource caches do not overwrite the default or sibling access tokens.
+Resource fetch rejects destinations outside its mappings and automatic
+redirects; a configured worker additionally enforces its trusted-domain rules.
+Use explicit resource selection for resource-managed API origins, including with
+`fetchWithTokens()`. Existing configurations without `resources` keep their
+current fetch behavior.
+Without a resource registry, callbacks and local session clearing continue to
+honor custom storage without adding native `sessionStorage` access. Explicit
+iframe-only login retains its fulfilled error-result convention; check the
+returned value for `Error`. The new resource-acquisition methods reject on failure.
+
+Default-token renewal keeps its own entry even with a single configured resource.
+Restoring persisted resource tokens notifies subscribers, while resource clearing
+also invalidates in-flight cache lookups. Concurrent login calls share one
+authorization transaction while resource state is cleared.
+
+Providers must honor resource indicators. The client checks configured JWT
+audiences but cannot inspect opaque-token audiences. Unsupported targets,
+missing silent-login setup, login/consent requirements, and incompatible
+workers produce errors rather than a different-resource token fallback.
+Short-lived resource tokens cap the renewal margin at half their lifetime.
+Additional authorization requires a fresh ID token for the same user; resource
+refresh grants may omit ID tokens.
+
 ## Security and deployment
 
 - **Service-worker isolation is not an XSS or CSRF prevention mechanism.** Malicious
@@ -120,6 +166,36 @@ See the [FAQ](./FAQ.md) for deployment and security considerations.
 
 ## Run the demos
 
+Local development now defaults to the [OpenIddict .NET fixture](./examples/openiddict-server/README.md).
+After installing the .NET 10 SDK and running `pnpm install --frozen-lockfile` and
+`pnpm build`, run `pnpm demo:server`, `pnpm demo:react`, and `pnpm demo:native`
+in separate terminals. Use React at `http://localhost:5173/resources` and native
+at `http://localhost:5174/` to test two isolated RFC 8707 API audiences.
+Append `?dpop=true&worker=on` or `?dpop=true&worker=off` to compare DPoP modes.
+Use the registered `localhost` origins, not `127.0.0.1` or `[::1]`.
+Switching to browser storage removes the demo's OIDC worker and reloads before
+authentication starts. Close other tabs of the same demo when switching modes;
+worker registrations are origin-wide and tokens are not migrated between modes.
+Changing `dpop` clears this tab's demo OIDC sessions, resource tokens and proof
+keys, and releases the demo worker before obtaining a grant in the selected
+proof mode. The Alice provider session is retained.
+
+On React's `/multi-auth` page, sign in as Alice once, then use **Silent Login**
+with a configuration that enables silent callbacks. It reuses the provider
+session and the selected configuration's scopes/resources without navigating
+the main page. Select `config_with_dpop` to use DPoP for that named configuration;
+its **Selected configuration proof** label is independent of the default
+configuration's mode banner. Missing provider sessions report `login_required`.
+
+Production builds retain Duende. Set `VITE_OIDC_PROVIDER=duende` to use Duende
+in development. The fixture's DPoP and session-monitoring adapters are custom
+demo-only integrations, not native OpenIddict features or production security.
+See the fixture guide for registered origins, callback differences, provider
+limitations and the credential-masked [browser evidence](./examples/e2e/screenshots/).
+
+The local-demo Actions workflow checks the built packages' public types, both
+demo production builds, .NET tests and Chromium end-to-end scenarios.
+
 Try the hosted [React demo](https://black-rock-0dc6b0d03.1.azurestaticapps.net/) or
 [vanilla JavaScript demo](https://icy-glacier-004ab4303.2.azurestaticapps.net/).
 These are learning environments, not production security templates.
@@ -134,19 +210,21 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-Then choose one command, also from the repository root:
+Start `pnpm demo:server` for the Vite demos, then choose one command, also from
+the repository root:
 
 | Demo                      | Command                                      | Guide                                                                                                          |
 | ------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Vanilla JavaScript (Vite) | `pnpm --dir examples/oidc-client-demo start` | [Callbacks, session restoration, and token isolation](./examples/oidc-client-demo/README.md)                   |
-| React (Vite)              | `pnpm --dir examples/react-oidc-demo start`  | [Hooks, protected components, API requests, and multiple configurations](./examples/react-oidc-demo/README.md) |
+| Vanilla JavaScript (Vite) | `pnpm demo:native` | [Callbacks, session restoration, and token isolation](./examples/oidc-client-demo/README.md)                   |
+| React (Vite)              | `pnpm demo:react`  | [Hooks, protected components, API requests, and multiple configurations](./examples/react-oidc-demo/README.md) |
 | Next.js (Pages Router)    | `pnpm --dir examples/nextjs-demo dev`        | [Browser authentication and custom history integration](./examples/nextjs-demo/README.md)                      |
 
-For Vite, open the URL printed in the terminal (normally `http://localhost:5173`;
-another port is used if it is busy). The Next.js demo uses `http://localhost:3001`.
-Register the actual origin and callback URLs with your provider before testing
-sign-in. The demos use an external provider whose availability and registrations
-are outside this repository's control.
+The Vite demo commands require the registered ports: React uses
+`http://localhost:5173` and native uses `http://localhost:5174`.
+The Next.js demo retains its external provider and uses `http://localhost:3001`.
+When using an external provider, register the actual origin and callback URLs
+before testing sign-in; its availability and registrations are outside this
+repository's control.
 
 ## FAQ
 

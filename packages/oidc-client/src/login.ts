@@ -21,6 +21,12 @@ import {
   PushedAuthorizationRequestErrorCode,
 } from './pushedAuthorizationRequestError.js';
 import { performAuthorizationRequestAsync, performFirstTokenRequestAsync } from './requests.js';
+import {
+  applyResourceParameters,
+  rememberResourceTransaction,
+  RESOURCE_LOGIN_PARAMETER,
+  resourceContextName,
+} from './resourceParameters';
 import { getParseQueryStringFromLocation } from './route-utils.js';
 import { Fetch, OidcConfiguration, StringMap } from './types.js';
 
@@ -43,12 +49,17 @@ export const defaultLoginAsync =
   ): Promise<unknown> => {
     const originExtras = extras;
     extras = { ...extras };
+    const resource = extras[RESOURCE_LOGIN_PARAMETER];
+    delete extras[RESOURCE_LOGIN_PARAMETER];
+    const contextName = resourceContextName(configurationName, resource);
     const loginLocalAsync = async () => {
       const url = callbackPath || oidcLocation.getPath();
 
       if (!('state' in extras)) {
         extras.state = generateRandom(16);
       }
+      if (resource !== undefined)
+        rememberResourceTransaction(configurationName, extras.state, resource);
 
       publishEvent(eventNames.loginAsync_begin, {});
       if (extras) {
@@ -66,30 +77,43 @@ export const defaultLoginAsync =
           scope = configuration.scope;
         }
 
-        const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
+        const extraFinal = applyResourceParameters(
+          !configuration.extras ? extras : { ...configuration.extras, ...extras },
+          configuration,
+          resource,
+        );
+        if (typeof extraFinal.scope === 'string') scope = extraFinal.scope;
         if (!extraFinal.nonce) {
           extraFinal.nonce = generateRandom(12);
         }
         const nonce = { nonce: extraFinal.nonce };
-        const serviceWorker = await initWorkerAsync(configuration, configurationName);
+        const serviceWorker = await initWorkerAsync(configuration, contextName);
         const oidcServerConfiguration = await initAsync(
           configuration.authority,
           configuration.authority_configuration,
         );
         let storage;
         if (serviceWorker) {
-          serviceWorker.setLoginParams({ callbackPath: url, extras: originExtras, scope: scope });
-          await serviceWorker.initAsync(oidcServerConfiguration, 'loginAsync', configuration);
+          serviceWorker.setLoginParams({
+            callbackPath: url,
+            extras: originExtras,
+            scope,
+            resource,
+          });
+          await serviceWorker.initAsync(oidcServerConfiguration, 'loginAsync', {
+            ...configuration,
+            scope,
+          });
           await serviceWorker.setNonceAsync(nonce);
           serviceWorker.startKeepAliveServiceWorker();
           storage = serviceWorker;
         } else {
           const session = initSession(
-            configurationName,
+            contextName,
             configuration.storage ?? sessionStorage,
             configuration.login_state_storage ?? configuration.storage ?? sessionStorage,
           );
-          session.setLoginParams({ callbackPath: url, extras: originExtras, scope: scope });
+          session.setLoginParams({ callbackPath: url, extras: originExtras, scope, resource });
           await session.setNonceAsync(nonce);
           storage = session;
         }
@@ -144,10 +168,11 @@ export const defaultLoginAsync =
 
 export const loginCallbackAsync =
   (oidc: Oidc) =>
-  async (isSilentSignin = false) => {
+  async (isSilentSignin = false, resource?: string) => {
     try {
       oidc.publishEvent(eventNames.loginCallbackAsync_begin, {});
       const configuration = oidc.configuration;
+      const contextName = resourceContextName(oidc.configurationName, resource);
       const clientId = configuration.client_id;
       const redirectUri = isSilentSignin
         ? configuration.silent_redirect_uri
@@ -161,7 +186,7 @@ export const loginCallbackAsync =
       const href = oidc.location.getCurrentHref();
       const queryParams = getParseQueryStringFromLocation(href);
       const sessionState = queryParams.session_state;
-      const serviceWorker = await initWorkerAsync(configuration, oidc.configurationName);
+      const serviceWorker = await initWorkerAsync(configuration, contextName);
       let storage;
       let nonceData;
       let getLoginParams;
@@ -176,7 +201,7 @@ export const loginCallbackAsync =
         storage = serviceWorker;
       } else {
         const session = initSession(
-          oidc.configurationName,
+          contextName,
           configuration.storage ?? sessionStorage,
           configuration.login_state_storage ?? configuration.storage ?? sessionStorage,
         );
@@ -229,12 +254,16 @@ export const loginCallbackAsync =
         );
       }
 
-      const data = {
-        code: queryParams.code,
-        grant_type: 'authorization_code',
-        client_id: configuration.client_id,
-        redirect_uri: redirectUri,
-      };
+      const data = applyResourceParameters(
+        {
+          code: queryParams.code,
+          grant_type: 'authorization_code',
+          client_id: configuration.client_id,
+          redirect_uri: redirectUri,
+        },
+        configuration,
+        resource,
+      );
 
       const extras = {};
       // @ts-ignore
@@ -256,13 +285,27 @@ export const loginCallbackAsync =
       let demonstratingProofOfPossessionJwk;
       if (configuration.demonstrating_proof_of_possession) {
         if (serviceWorker) {
-          headersExtras['DPoP'] = `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${oidc.configurationName}`;
+          headersExtras['DPoP'] = `DPOP_SECURED_BY_OIDC_SERVICE_WORKER_${contextName}`;
         } else {
-          demonstratingProofOfPossessionJwk = await generateJwkAsync(window)(
-            configuration.demonstrating_proof_of_possession_configuration.generateKeyAlgorithm,
-          );
+          demonstratingProofOfPossessionJwk =
+            resource === undefined
+              ? await generateJwkAsync(window)(
+                  configuration.demonstrating_proof_of_possession_configuration
+                    .generateKeyAlgorithm,
+                )
+              : await initSession(
+                  oidc.configurationName,
+                  configuration.storage,
+                ).getDemonstratingProofOfPossessionJwkAsync();
+          if (!demonstratingProofOfPossessionJwk) {
+            throw new OidcError(
+              OidcErrorCode.RESOURCE_TOKEN_UNAVAILABLE,
+              'The original OIDC DPoP key is unavailable.',
+              { phase: 'callback', retryable: false },
+            );
+          }
           const session = initSession(
-            oidc.configurationName,
+            contextName,
             configuration.storage,
             configuration.login_state_storage ?? configuration.storage,
           );
@@ -275,9 +318,14 @@ export const loginCallbackAsync =
         }
       }
 
+      const tokenParameters = applyResourceParameters(
+        { ...data, ...extras },
+        configuration,
+        resource,
+      );
       let tokenResponse = await performFirstTokenRequestAsync(storage)(
         url,
-        { ...data, ...extras },
+        tokenParameters,
         headersExtras,
         oidc.configuration.token_renew_mode,
         tokenRequestTimeout,
@@ -302,7 +350,7 @@ export const loginCallbackAsync =
         }
         tokenResponse = await performFirstTokenRequestAsync(storage)(
           url,
-          { ...data, ...extras },
+          tokenParameters,
           headersExtras,
           oidc.configuration.token_renew_mode,
           tokenRequestTimeout,
@@ -329,6 +377,8 @@ export const loginCallbackAsync =
 
       let loginParams;
       const formattedTokens = tokenResponse.data.tokens;
+      if (configuration.resources?.length)
+        formattedTokens.scope ??= getLoginParams?.scope ?? configuration.scope;
       const demonstratingProofOfPossessionNonce =
         tokenResponse.data.demonstratingProofOfPossessionNonce;
 
@@ -338,6 +388,16 @@ export const loginCallbackAsync =
           phase: isSilentSignin ? 'refresh' : 'callback',
           retryable: false,
         });
+      }
+      if (resource !== undefined && formattedTokens.idTokenPayload?.nonce !== nonceData.nonce) {
+        throw new OidcError(
+          OidcErrorCode.INVALID_NONCE,
+          'Resource authorization requires the transaction nonce in a fresh ID token.',
+          {
+            phase: isSilentSignin ? 'refresh' : 'callback',
+            retryable: false,
+          },
+        );
       }
       const { isValid, reason } = isTokensOidcValid(
         formattedTokens,
@@ -383,7 +443,7 @@ export const loginCallbackAsync =
         }
       } else {
         const session = initSession(
-          oidc.configurationName,
+          contextName,
           configuration.storage,
           configuration.login_state_storage ?? configuration.storage,
         );
@@ -393,14 +453,16 @@ export const loginCallbackAsync =
         }
       }
 
-      await oidc.startCheckSessionAsync(
-        oidcServerConfiguration.checkSessionIframe,
-        clientId,
-        sessionState,
-        isSilentSignin,
-      );
+      if (resource === undefined)
+        await oidc.startCheckSessionAsync(
+          oidcServerConfiguration.checkSessionIframe,
+          clientId,
+          sessionState,
+          isSilentSignin,
+        );
       oidc.publishEvent(eventNames.loginCallbackAsync_end, {});
       return {
+        resource,
         tokens: formattedTokens,
         state: 'request.state',
         callbackPath: loginParams.callbackPath,

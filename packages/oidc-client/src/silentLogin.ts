@@ -11,6 +11,7 @@ import { autoRenewTokens } from './renewTokens.js';
 import timer from './timer.js';
 import { OidcConfiguration, StringMap } from './types.js';
 export type SilentLoginResponse = {
+  resource?: string;
   tokens: Tokens | null;
   sessionState: string | null;
   error?: string;
@@ -175,39 +176,40 @@ export const defaultSilentLoginAsync =
     };
 
     const loginLocalAsync = async () => {
-      if (oidc.timeoutId) {
-        timer.clearTimeout(oidc.timeoutId);
-      }
-
       let state;
       if (extras && 'state' in extras) {
         state = extras.state;
         delete extras.state;
       }
 
-      try {
-        const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
-        const silentResult = await silentLoginAsync(
+      const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
+      const silentResult = await silentLoginAsync(
+        {
+          ...extraFinal,
+          prompt: 'none',
+        },
+        state,
+        scope,
+      );
+      if (!silentResult) return;
+      if (silentResult.oidcError) throw silentResult.oidcError;
+      if (!silentResult.tokens) {
+        throw new OidcError(
+          OidcErrorCode.TOKEN_REQUEST_FAILED,
+          'Silent login returned no tokens.',
           {
-            ...extraFinal,
-            prompt: 'none',
+            phase: 'login',
+            retryable: false,
           },
-          state,
-          scope,
         );
-
-        if (silentResult) {
-          oidc.tokens = silentResult.tokens;
-          publishEvent(eventNames.token_acquired, {});
-          // @ts-ignore
-          oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
-          return {};
-        }
-      } catch (e) {
-        return e;
       }
+      if (oidc.timeoutId) timer.clearTimeout(oidc.timeoutId);
+      oidc.tokens = silentResult.tokens;
+      publishEvent(eventNames.token_acquired, {});
+      oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
+      return {};
     };
-    return loginLocalAsync();
+    return loginLocalAsync().catch(error => error);
   };
 
 export default defaultSilentLoginAsync;

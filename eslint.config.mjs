@@ -31,6 +31,8 @@ export default [
       'public/**/*',
       'examples/**/static/**/*',
       'examples/**/dist/**/*',
+      'examples/e2e/report/**/*',
+      'examples/e2e/test-results/**/*',
       'examples/**/OidcTrustedDomains.js',
       'examples/**/OidcServiceWorker.js',
       'examples/**/nextjs-demo/**',

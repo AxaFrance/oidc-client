@@ -102,6 +102,13 @@ export const initSession = (
     return storage[`oidc.dpop_nonce.${configurationName}`];
   };
 
+  const setDemonstratingProofOfPossessionApiNonce = async (nonce: string): Promise<void> => {
+    writeRaw(storage, `oidc.dpop_api_nonce.${configurationName}`, nonce);
+  };
+
+  const getDemonstratingProofOfPossessionApiNonce = (): string | undefined =>
+    storage[`oidc.dpop_api_nonce.${configurationName}`];
+
   const getTokens = () => {
     const parsed = parseJsonOrNull(storage[`oidc.${configurationName}`]) as {
       tokens: any;
@@ -170,6 +177,8 @@ export const initSession = (
     setCodeVerifierAsync,
     setDemonstratingProofOfPossessionNonce,
     getDemonstratingProofOfPossessionNonce,
+    setDemonstratingProofOfPossessionApiNonce,
+    getDemonstratingProofOfPossessionApiNonce,
     setDemonstratingProofOfPossessionJwkAsync,
     getDemonstratingProofOfPossessionJwkAsync,
   };

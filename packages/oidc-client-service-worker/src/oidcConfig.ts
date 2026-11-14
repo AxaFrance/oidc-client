@@ -1,4 +1,5 @@
 import { acceptAnyDomainToken } from './constants';
+import { getTokenContexts } from './tokenContexts';
 import { Database, Domain, OidcConfig, OidcServerConfiguration, TrustedDomains } from './types';
 import { getDomains, normalizeUrl } from './utils';
 
@@ -83,7 +84,7 @@ const shouldBypassNonOidcRequest = (
 
 const getMatchingOidcConfigurations = (database: Database, url: string): OidcConfig[] => {
   const normalizedUrl = normalizeUrl(url);
-  return Object.values(database).filter(config => {
+  return getTokenContexts(database).filter(config => {
     const { oidcServerConfiguration } = config || {};
     const { tokenEndpoint, revocationEndpoint } = oidcServerConfiguration || {};
 

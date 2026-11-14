@@ -208,11 +208,14 @@ export const generateJwtDemonstratingProofOfPossessionAsync =
   (w: any) =>
   (demonstratingProofOfPossessionConfiguration: DemonstratingProofOfPossessionConfiguration) =>
   async (jwk: any, method = 'POST', url: string, extrasClaims = {}) => {
+    const target = new URL(url, w.location?.href);
+    target.search = '';
+    target.hash = '';
     const claims = {
       // https://www.rfc-editor.org/rfc/rfc9449.html#name-concept
       jti: btoa(w.crypto.randomUUID()),
       htm: method,
-      htu: url,
+      htu: target.href,
       iat: Math.round(Date.now() / 1000),
       ...extrasClaims,
     };

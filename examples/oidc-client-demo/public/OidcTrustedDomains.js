@@ -29,4 +29,12 @@ trustedDomains.config_separate_oidc_access_token_domains = {
   oidcDomains: ['https://demo.duendesoftware.com'],
   accessTokenDomains: ['https://myapi'],
 };
+if (self.location.hostname === 'localhost' && new URL(self.location.href).searchParams.get('provider') === 'openiddict') {
+  trustedDomains.default = {
+    oidcDomains: ['http://localhost:7001'],
+    accessTokenDomains: ['http://localhost:7001/connect/userinfo', 'http://localhost:7002/api/orders', 'http://localhost:7003/api/inventory'],
+    demonstratingProofOfPossession: true,
+    demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent: true,
+  };
+}
 //# sourceMappingURL=OidcTrustedDomains.js.map

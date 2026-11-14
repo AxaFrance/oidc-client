@@ -3,6 +3,12 @@ import { base64urlOfHashOfASCIIEncodingAsync } from './crypto';
 import { getDpopConfiguration, getDpopOnlyWhenDpopHeaderPresent } from './dpop';
 import { generateJwkAsync, generateJwtDemonstratingProofOfPossessionAsync } from './jwt';
 import { getCurrentDatabasesTokenEndpoint, shouldBypassNonOidcRequest } from './oidcConfig';
+import {
+  getContextResource,
+  getResourceConfiguration,
+  RESOURCE_TOKEN_REQUEST_HEADER,
+} from './resource';
+import { getOrCreateResourceContext, getTokenContexts } from './tokenContexts';
 import { Database, MessageEventData, OidcConfig, TrustedDomains } from './types';
 import {
   checkDomain,
@@ -88,17 +94,26 @@ async function generateDpopAsync(
     const dpopConfiguration = currentDatabase.demonstratingProofOfPossessionConfiguration;
     const jwk = currentDatabase.demonstratingProofOfPossessionJwkJson;
     const method = originalRequest.method;
+    const resourceNonce = currentDatabase.resource
+      ? url === normalizeUrl(currentDatabase.oidcServerConfiguration!.tokenEndpoint)
+        ? currentDatabase.demonstratingProofOfPossessionNonce
+        : currentDatabase.demonstratingProofOfPossessionApiNonce
+      : undefined;
     const dpop = await generateJwtDemonstratingProofOfPossessionAsync(self)(dpopConfiguration)(
       jwk,
       method,
       url,
-      extrasClaims,
+      {
+        ...extrasClaims,
+        ...(resourceNonce ? { nonce: resourceNonce } : {}),
+      },
     );
 
     headersExtras.dpop = dpop;
-    if (currentDatabase.demonstratingProofOfPossessionNonce != null) {
-      headersExtras.nonce = currentDatabase.demonstratingProofOfPossessionNonce;
-    }
+    const nonceHeader =
+      resourceNonce ??
+      (!currentDatabase.resource ? currentDatabase.demonstratingProofOfPossessionNonce : undefined);
+    if (nonceHeader) headersExtras.nonce = nonceHeader;
   }
   return headersExtras;
 }
@@ -153,8 +168,19 @@ const handleFetch = (event: FetchEvent): void => {
         }
 
         const currentDatabaseForRequestAccessToken = currentDatabasesForRequestAccessToken?.find(
-          c => c.configurationName.endsWith(key),
+          c =>
+            key.includes('#resource=')
+              ? c.configurationName === key
+              : !c.resource && c.configurationName.endsWith(key),
         );
+        if (key.includes('#resource=') && !currentDatabaseForRequestAccessToken) {
+          console.error(
+            '[OidcServiceWorker] Resource token destination or context is not permitted.',
+          );
+          return new Response('Resource token destination or context is not permitted.', {
+            status: 403,
+          });
+        }
 
         // Inject the access token into the request if one is available
         if (currentDatabaseForRequestAccessToken?.tokens?.access_token) {
@@ -163,6 +189,10 @@ const handleFetch = (event: FetchEvent): void => {
           if (tokenError) {
             return tokenError;
           }
+          const accessToken = currentDatabaseForRequestAccessToken.tokens!.access_token;
+          const generation = currentDatabaseForRequestAccessToken.generation;
+          const parentGeneration =
+            currentDatabaseForRequestAccessToken.parentConfiguration?.generation;
 
           // Adjust request mode for CORS if configured
           let requestMode = originalRequest.mode;
@@ -192,9 +222,7 @@ const handleFetch = (event: FetchEvent): void => {
             ) {
               // DPoP mode
               const claimsExtras = {
-                ath: await base64urlOfHashOfASCIIEncodingAsync(
-                  currentDatabaseForRequestAccessToken.tokens.access_token,
-                ),
+                ath: await base64urlOfHashOfASCIIEncodingAsync(accessToken),
               };
               const dpopHeaders = await generateDpopAsync(
                 originalRequest,
@@ -204,13 +232,13 @@ const handleFetch = (event: FetchEvent): void => {
               );
               headers = {
                 ...dpopHeaders,
-                authorization: `DPoP ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
+                authorization: `DPoP ${accessToken}`,
               };
             } else {
               // Bearer mode
               headers = {
                 ...serializeHeaders(originalRequest.headers),
-                authorization: `${authenticationMode} ${currentDatabaseForRequestAccessToken.tokens.access_token}`,
+                authorization: `${authenticationMode} ${accessToken}`,
               };
             }
           }
@@ -228,7 +256,31 @@ const handleFetch = (event: FetchEvent): void => {
           }
 
           const newRequest = new Request(originalRequest, init);
-          return fetch(newRequest);
+          if (
+            currentDatabaseForRequestAccessToken.resource &&
+            (currentDatabaseForRequestAccessToken.generation !== generation ||
+              currentDatabaseForRequestAccessToken.parentConfiguration?.generation !==
+                parentGeneration ||
+              currentDatabaseForRequestAccessToken.tokens?.access_token !== accessToken)
+          ) {
+            console.error('[OidcServiceWorker] The resource token changed before dispatch.');
+            return new Response('The resource token changed before dispatch.', { status: 403 });
+          }
+          const response = await fetch(
+            newRequest,
+            currentDatabaseForRequestAccessToken.resource ? { redirect: 'error' } : undefined,
+          );
+          if (
+            currentDatabaseForRequestAccessToken.resource &&
+            currentDatabaseForRequestAccessToken.generation === generation &&
+            currentDatabaseForRequestAccessToken.parentConfiguration?.generation ===
+              parentGeneration &&
+            response.headers.has('DPoP-Nonce')
+          ) {
+            currentDatabaseForRequestAccessToken.demonstratingProofOfPossessionApiNonce =
+              response.headers.get('DPoP-Nonce');
+          }
+          return response;
         }
 
         // Pass through non-POST requests without modification
@@ -264,29 +316,112 @@ const handleFetch = (event: FetchEvent): void => {
                             currentDb.tokens.access_token,
                           ),
                         };
-                        headers = await generateDpopAsync(
-                          originalRequest,
-                          currentDb,
-                          url,
-                          claimsExtras,
-                        );
-
                         const keyRefreshToken = encodeURIComponent(
                           `${TOKEN.REFRESH_TOKEN}_${currentDb.configurationName}`,
                         );
-                        if (actualBody.includes(keyRefreshToken)) {
+                        if (
+                          [
+                            new URLSearchParams(actualBody).get('refresh_token'),
+                            new URLSearchParams(actualBody).get('token'),
+                          ].includes(decodeURIComponent(keyRefreshToken))
+                        ) {
+                          const form = new URLSearchParams(actualBody);
+                          const selected = form.getAll('resource');
+                          const resourceHeader = originalRequest.headers.get(
+                            RESOURCE_TOKEN_REQUEST_HEADER,
+                          );
+                          const isRevocation =
+                            currentDb.oidcServerConfiguration?.revocationEndpoint &&
+                            url ===
+                              normalizeUrl(currentDb.oidcServerConfiguration.revocationEndpoint) &&
+                            form.has('token');
+                          if (isRevocation) {
+                            currentDatabase = currentDb;
+                          } else if (resourceHeader !== null) {
+                            const resource = decodeURIComponent(resourceHeader);
+                            if (selected.length !== 1 || selected[0] !== resource)
+                              throw new Error('The resource routing hint must match the request.');
+                            if (!currentDb.oidcConfiguration)
+                              throw new Error('The resource grant configuration is unavailable.');
+                            const resourceConfiguration = getResourceConfiguration(
+                              currentDb.oidcConfiguration.resources,
+                              resource,
+                            );
+                            const grantedScope =
+                              currentDb.tokens.scope ??
+                              currentDb.authorizationScope ??
+                              currentDb.oidcConfiguration.scope;
+                            const requestedScopes = [
+                              form.get('scope'),
+                              resourceConfiguration.scope,
+                            ].filter((scope): scope is string => typeof scope === 'string');
+                            if (
+                              requestedScopes.some(
+                                scope =>
+                                  !scope
+                                    .split(/\s+/)
+                                    .filter(Boolean)
+                                    .every(value => grantedScope?.split(/\s+/).includes(value)),
+                              )
+                            ) {
+                              throw new Error('The resource scope is outside this refresh grant.');
+                            }
+                            if (
+                              currentDb.resource !== undefined
+                                ? currentDb.resource !== resource
+                                : !(
+                                    typeof currentDb.oidcConfiguration.resource === 'string'
+                                      ? [currentDb.oidcConfiguration.resource]
+                                      : (currentDb.oidcConfiguration.resource ?? [])
+                                  ).includes(resource)
+                            )
+                              throw new Error('The resource is outside this refresh grant.');
+                            currentDatabase = currentDb.resource
+                              ? currentDb
+                              : getOrCreateResourceContext(currentDb, resource);
+                            currentDatabase.refreshGrant = currentDb;
+                            currentDatabase.requestedScope = form.get('scope') ?? grantedScope;
+                            currentDatabase.nonce = currentDb.nonce;
+                            currentDatabase.demonstratingProofOfPossessionJwkJson =
+                              currentDb.demonstratingProofOfPossessionJwkJson;
+                            currentDatabase.demonstratingProofOfPossessionConfiguration =
+                              currentDb.demonstratingProofOfPossessionConfiguration;
+                            currentDatabase.demonstratingProofOfPossessionNonce =
+                              currentDb.demonstratingProofOfPossessionNonce;
+                          } else if (currentDb.resource) {
+                            throw new Error(
+                              'A resource refresh must select exactly its own resource.',
+                            );
+                          } else {
+                            currentDatabase = currentDb;
+                            currentDatabase.requestedScope =
+                              form.get('scope') ?? currentDb.tokens.scope;
+                          }
+                          headers = await generateDpopAsync(
+                            originalRequest,
+                            currentDatabase,
+                            url,
+                            claimsExtras,
+                          );
                           newBody = newBody.replace(
                             keyRefreshToken,
                             encodeURIComponent(currentDb.tokens.refresh_token as string),
                           );
-                          currentDatabase = currentDb;
                           break;
                         }
-
                         const keyAccessToken = encodeURIComponent(
                           `${TOKEN.ACCESS_TOKEN}_${currentDb.configurationName}`,
                         );
-                        if (actualBody.includes(keyAccessToken)) {
+                        if (
+                          new URLSearchParams(actualBody).get('token') ===
+                          decodeURIComponent(keyAccessToken)
+                        ) {
+                          headers = await generateDpopAsync(
+                            originalRequest,
+                            currentDb,
+                            url,
+                            claimsExtras,
+                          );
                           newBody = newBody.replace(
                             keyAccessToken,
                             encodeURIComponent(currentDb.tokens.access_token),
@@ -295,6 +430,25 @@ const handleFetch = (event: FetchEvent): void => {
                           break;
                         }
                       }
+                    }
+                    if (!currentDatabase)
+                      throw new Error(
+                        'The token placeholder does not identify an available grant.',
+                      );
+                    delete headers[RESOURCE_TOKEN_REQUEST_HEADER];
+                    const generation = currentDatabase.generation;
+                    const grant = currentDatabase.refreshGrant ?? currentDatabase;
+                    const grantGeneration = grant.generation;
+                    if (
+                      currentDatabase.resource &&
+                      url !==
+                        normalizeUrl(currentDatabase.oidcServerConfiguration!.tokenEndpoint) &&
+                      url !==
+                        normalizeUrl(currentDatabase.oidcServerConfiguration!.revocationEndpoint)
+                    ) {
+                      throw new Error(
+                        'Resource tokens may only be sent to their exact token endpoint.',
+                      );
                     }
 
                     const fetchPromise = fetch(originalRequest, {
@@ -324,7 +478,13 @@ const handleFetch = (event: FetchEvent): void => {
 
                     // Hide real token values in the response
                     const hidden = await fetchPromise.then(
-                      hideTokens(currentDatabase as OidcConfig),
+                      hideTokens(
+                        currentDatabase,
+                        () =>
+                          currentDatabase!.generation === generation &&
+                          grant.generation === grantGeneration,
+                        () => grant.generation === grantGeneration,
+                      ),
                     );
                     resolve(hidden);
                     return;
@@ -341,7 +501,34 @@ const handleFetch = (event: FetchEvent): void => {
                     ) {
                       throw new Error('No configuration name found in code_verifier');
                     }
-                    currentDatabase = database[currentLoginCallbackConfigurationName];
+                    currentDatabase =
+                      getTokenContexts(database).find(
+                        context =>
+                          context.configurationName === currentLoginCallbackConfigurationName,
+                      ) ?? null;
+                    if (!currentDatabase)
+                      throw new Error(
+                        'No available authorization transaction matches the code verifier.',
+                      );
+                    if (currentDatabase.resource) {
+                      const selected = new URLSearchParams(actualBody).getAll('resource');
+                      if (selected.length !== 1 || selected[0] !== currentDatabase.resource)
+                        throw new Error('Authorization resource mismatch.');
+                      if (
+                        url !== normalizeUrl(currentDatabase.oidcServerConfiguration!.tokenEndpoint)
+                      )
+                        throw new Error('Invalid resource token endpoint.');
+                      currentDatabase.refreshGrant = currentDatabase;
+                    }
+                    currentDatabase.requestedScope =
+                      currentDatabase.authorizationScope ??
+                      (currentDatabase.resource
+                        ? getResourceConfiguration(
+                            currentDatabase.oidcConfiguration?.resources,
+                            currentDatabase.resource,
+                          ).scope
+                        : currentDatabase.oidcConfiguration?.scope);
+                    const generation = currentDatabase.generation;
                     let newBody = actualBody;
                     const codeVerifier = currentDatabase.codeVerifier;
                     if (codeVerifier != null) {
@@ -364,7 +551,12 @@ const handleFetch = (event: FetchEvent): void => {
                       credentials: clonedRequest.credentials,
                       integrity: clonedRequest.integrity,
                     });
-                    const hidden = await hideTokens(currentDatabase)(resp);
+                    const hidden = await hideTokens(
+                      currentDatabase,
+                      () => currentDatabase!.generation === generation,
+                      undefined,
+                      true,
+                    )(resp);
                     resolve(hidden);
                     return;
                   }
@@ -389,7 +581,7 @@ const handleFetch = (event: FetchEvent): void => {
               .catch(reject);
           });
 
-          return responsePromise;
+          return await responsePromise;
         }
 
         // Default: pass through the request unchanged
@@ -403,7 +595,7 @@ const handleFetch = (event: FetchEvent): void => {
   );
 };
 
-const handleMessage = async (event: ExtendableMessageEvent) => {
+const handleMessageAsync = async (event: ExtendableMessageEvent): Promise<void> => {
   const port = event.ports[0];
   const data = event.data as MessageEventData;
 
@@ -417,6 +609,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
   }
 
   const configurationName = data.configurationName.split('#')[0];
+  const resource = getContextResource(data.configurationName);
 
   if (trustedDomains == null) {
     trustedDomains = {};
@@ -468,9 +661,23 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       trustedDomains[configurationName] = [];
     }
   }
+  if (resource !== undefined) {
+    try {
+      currentDatabase = getOrCreateResourceContext(currentDatabase, resource);
+    } catch (error) {
+      console.error('[OidcServiceWorker] Invalid resource context:', error);
+      port.postMessage({ configurationName, error: 'The resource is not registered.' });
+      return;
+    }
+  }
 
   switch (data.type) {
     case 'clear':
+      currentDatabase.generation = (currentDatabase.generation ?? 0) + 1;
+      for (const entry of Object.values(currentDatabase.resourceEntries ?? {})) {
+        entry.generation = (entry.generation ?? 0) + 1;
+      }
+      currentDatabase.resourceEntries = undefined;
       currentDatabase.tokens = null;
       currentDatabase.state = null;
       currentDatabase.codeVerifier = null;
@@ -479,6 +686,9 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
       currentDatabase.demonstratingProofOfPossessionJwkJson = null;
       currentDatabase.demonstratingProofOfPossessionConfiguration = null;
       currentDatabase.demonstratingProofOfPossessionOnlyWhenDpopHeaderPresent = false;
+      currentDatabase.authorizationScope = undefined;
+      currentDatabase.requestedScope = undefined;
+      currentDatabase.demonstratingProofOfPossessionApiNonce = null;
       currentDatabase.status = data.data.status;
       port.postMessage({ configurationName });
       return;
@@ -500,10 +710,24 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 
       currentDatabase.oidcServerConfiguration = oidcServerConfiguration;
       currentDatabase.oidcConfiguration = data.data.oidcConfiguration;
+      if (data.data.where === 'loginAsync')
+        currentDatabase.authorizationScope = currentDatabase.oidcConfiguration.scope;
+      if (resource !== undefined)
+        getResourceConfiguration(currentDatabase.oidcConfiguration.resources, resource);
 
       if (currentDatabase.demonstratingProofOfPossessionConfiguration == null) {
+        const parent = currentDatabase.parentConfiguration;
+        if (parent?.demonstratingProofOfPossessionJwkJson) {
+          currentDatabase.demonstratingProofOfPossessionJwkJson =
+            parent.demonstratingProofOfPossessionJwkJson;
+          currentDatabase.demonstratingProofOfPossessionConfiguration =
+            parent.demonstratingProofOfPossessionConfiguration;
+        }
         const demonstratingProofOfPossessionConfiguration = getDpopConfiguration(trustedDomain);
-        if (demonstratingProofOfPossessionConfiguration != null) {
+        if (
+          demonstratingProofOfPossessionConfiguration != null &&
+          currentDatabase.demonstratingProofOfPossessionConfiguration == null
+        ) {
           if (currentDatabase.oidcConfiguration.demonstrating_proof_of_possession) {
             console.warn(
               'In service worker, demonstrating_proof_of_possession must be configured from trustedDomains file',
@@ -525,23 +749,32 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
           status: currentDatabase.status,
           configurationName,
           version,
+          resourceTokenManagement: true,
+          resourceContexts: Object.keys(currentDatabase.resourceEntries ?? {}),
         });
       } else {
-        const tokens = { ...currentDatabase.tokens };
+        const tokens = {
+          ...currentDatabase.tokens,
+          idTokenPayload: currentDatabase.tokens.idTokenPayload
+            ? { ...currentDatabase.tokens.idTokenPayload }
+            : undefined,
+        };
         if (currentDatabase.hideAccessToken) {
-          tokens.access_token = `${TOKEN.ACCESS_TOKEN}_${configurationName}#tabId=${tabId}`;
+          tokens.access_token = `${TOKEN.ACCESS_TOKEN}_${currentDatabase.configurationName}`;
         }
         if (tokens.refresh_token) {
-          tokens.refresh_token = `${TOKEN.REFRESH_TOKEN}_${configurationName}#tabId=${tabId}`;
+          tokens.refresh_token = `${TOKEN.REFRESH_TOKEN}_${(currentDatabase.refreshGrant ?? currentDatabase).configurationName}`;
         }
         if (tokens?.idTokenPayload?.nonce && currentDatabase.nonce != null) {
-          tokens.idTokenPayload.nonce = `${TOKEN.NONCE_TOKEN}_${configurationName}#tabId=${tabId}`;
+          tokens.idTokenPayload.nonce = `${TOKEN.NONCE_TOKEN}_${currentDatabase.configurationName}`;
         }
         port.postMessage({
           tokens,
           status: currentDatabase.status,
           configurationName,
           version,
+          resourceTokenManagement: true,
+          resourceContexts: Object.keys(currentDatabase.resourceEntries ?? {}),
         });
       }
       return;
@@ -585,7 +818,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
     case 'getCodeVerifier': {
       const codeVerifier =
         currentDatabase.codeVerifier != null
-          ? `${TOKEN.CODE_VERIFIER}_${configurationName}#tabId=${tabId}`
+          ? `${TOKEN.CODE_VERIFIER}_${currentDatabase.configurationName}`
           : null;
       port.postMessage({
         configurationName,
@@ -609,6 +842,17 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
     case 'setNonce': {
       const nonce = data.data.nonce;
       if (nonce) {
+        if (
+          !currentDatabase.resource &&
+          currentDatabase.nonce &&
+          nonce.nonce !== currentDatabase.nonce.nonce
+        ) {
+          currentDatabase.generation = (currentDatabase.generation ?? 0) + 1;
+          for (const entry of Object.values(currentDatabase.resourceEntries ?? {})) {
+            entry.generation = (entry.generation ?? 0) + 1;
+          }
+          currentDatabase.resourceEntries = undefined;
+        }
         currentDatabase.nonce = nonce;
       }
       port.postMessage({ configurationName });
@@ -616,7 +860,7 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
     }
 
     case 'getNonce': {
-      const keyNonce = `${TOKEN.NONCE_TOKEN}_${configurationName}#tabId=${tabId}`;
+      const keyNonce = `${TOKEN.NONCE_TOKEN}_${currentDatabase.configurationName}`;
       const nonce = currentDatabase.nonce ? keyNonce : null;
       port.postMessage({ configurationName, nonce });
       return;
@@ -624,6 +868,18 @@ const handleMessage = async (event: ExtendableMessageEvent) => {
 
     default:
       return;
+  }
+};
+
+const handleMessage = async (event: ExtendableMessageEvent): Promise<void> => {
+  try {
+    await handleMessageAsync(event);
+  } catch (error) {
+    console.error('[OidcServiceWorker] Message failed:', error);
+    event.ports?.[0]?.postMessage({
+      configurationName: event.data?.configurationName,
+      error: error instanceof Error ? error.message : 'The worker could not process this message.',
+    });
   }
 };
 

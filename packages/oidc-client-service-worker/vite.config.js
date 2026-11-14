@@ -2,25 +2,26 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     dts({
-      insertTypesEntry: true,
+      entryRoot: 'src',
+      outDir: 'dist',
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/__tests__/**'],
     }),
   ],
   build: {
+    emptyOutDir: mode !== 'protocol',
     minify: false, //default esbuild
     sourcemap: true,
     lib: {
       // Could also be a dictionary or array of multiple entry points
-      entry: {
-        OidcServiceWorker: resolve(__dirname, './src/OidcServiceWorker.ts'),
-        protocol: resolve(__dirname, './src/protocol.ts'),
-      },
+      entry: resolve(__dirname, mode === 'protocol' ? './src/protocol.ts' : './src/OidcServiceWorker.ts'),
       name: 'OidcServiceWorker',
-      formats: ['es'],
+      formats: mode === 'protocol' ? ['es'] : ['iife'],
       // the proper extensions will be added
-      fileName: format => `[name].${format === 'es' ? 'js' : format}`,
+      fileName: () => mode === 'protocol' ? 'protocol.js' : 'OidcServiceWorker.js',
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
@@ -33,4 +34,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

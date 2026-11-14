@@ -1,4 +1,9 @@
 export const OidcErrorCode = {
+  INVALID_RESOURCE: 'INVALID_RESOURCE',
+  INVALID_TARGET: 'INVALID_TARGET',
+  RESOURCE_TOKEN_UNAVAILABLE: 'RESOURCE_TOKEN_UNAVAILABLE',
+  RESOURCE_CONTEXT_MISMATCH: 'RESOURCE_CONTEXT_MISMATCH',
+  RESOURCE_WORKER_UNSUPPORTED: 'RESOURCE_WORKER_UNSUPPORTED',
   LOGIN_REQUIRED: 'LOGIN_REQUIRED',
   CONSENT_REQUIRED: 'CONSENT_REQUIRED',
   INTERACTION_REQUIRED: 'INTERACTION_REQUIRED',
@@ -85,6 +90,8 @@ export const isRetryableHttpStatus = (status?: number): boolean =>
 
 export const oidcErrorCodeFromOAuthError = (oauthError?: string): OidcErrorCode => {
   switch (oauthError) {
+    case 'invalid_target':
+      return OidcErrorCode.INVALID_TARGET;
     case 'login_required':
       return OidcErrorCode.LOGIN_REQUIRED;
     case 'consent_required':

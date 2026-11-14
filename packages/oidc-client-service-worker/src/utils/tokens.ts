@@ -1,5 +1,6 @@
 /* eslint-disable simple-import-sort/exports */
 import { TOKEN, TokenRenewMode } from '../constants';
+import { getResourceConfiguration } from '../resource';
 import {
   AccessTokenPayload,
   IdTokenPayload,
@@ -120,7 +121,20 @@ function _hideTokens(
   tokens: Tokens,
   currentDatabaseElement: OidcConfig,
   configurationName: string,
+  isAuthorizationCode = false,
 ) {
+  const hasNewIdToken = typeof tokens.id_token === 'string' && tokens.id_token.length > 0;
+  const parent = currentDatabaseElement.parentConfiguration;
+  if (
+    currentDatabaseElement.resource &&
+    currentDatabaseElement.refreshGrant === currentDatabaseElement &&
+    tokens.refresh_token &&
+    tokens.refresh_token === parent?.tokens?.refresh_token
+  ) {
+    throw new Error(
+      'The provider reused a refresh token across separate authorization transactions; use a multi-resource authorization grant instead.',
+    );
+  }
   if (!tokens.issued_at) {
     const currentTimeUnixSecond = new Date().getTime() / 1000;
     tokens.issued_at = currentTimeUnixSecond;
@@ -129,6 +143,15 @@ function _hideTokens(
   }
 
   const accessTokenPayload = extractTokenPayload(tokens.access_token);
+  if (
+    currentDatabaseElement.resource ||
+    currentDatabaseElement.oidcConfiguration?.resources?.length
+  ) {
+    tokens.scope ??=
+      currentDatabaseElement.requestedScope ??
+      currentDatabaseElement.tokens?.scope ??
+      currentDatabaseElement.oidcConfiguration?.scope;
+  }
   const secureTokens = {
     ...tokens,
     accessTokenPayload,
@@ -156,10 +179,24 @@ function _hideTokens(
       const keyNonce = `${TOKEN.NONCE_TOKEN}_${currentDatabaseElement.configurationName}`;
       _idTokenPayload.nonce = keyNonce;
     }
-    secureTokens.idTokenPayload = _idTokenPayload;
+    secureTokens.idTokenPayload =
+      currentDatabaseElement.resource && !hasNewIdToken ? null : _idTokenPayload;
+  }
+  if (
+    currentDatabaseElement.resource &&
+    isAuthorizationCode &&
+    (!hasNewIdToken ||
+      typeof tokens.idTokenPayload?.sub !== 'string' ||
+      !tokens.idTokenPayload.sub ||
+      (currentDatabaseElement.nonce &&
+        tokens.idTokenPayload.nonce !== currentDatabaseElement.nonce.nonce))
+  ) {
+    throw new Error(
+      'Resource authorization requires a fresh ID token with the expected subject and nonce.',
+    );
   }
   if (tokens.refresh_token) {
-    secureTokens.refresh_token = `${TOKEN.REFRESH_TOKEN}_${configurationName}`;
+    secureTokens.refresh_token = `${TOKEN.REFRESH_TOKEN}_${(currentDatabaseElement.refreshGrant ?? currentDatabaseElement).configurationName}`;
   }
 
   tokens.issued_at = extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload);
@@ -175,8 +212,9 @@ function _hideTokens(
       : tokens.issued_at + expireIn;
 
   let expiresAt: number;
-  const tokenRenewMode = (currentDatabaseElement.oidcConfiguration as OidcConfiguration)
-    .token_renew_mode;
+  const tokenRenewMode = currentDatabaseElement.resource
+    ? TokenRenewMode.access_token_invalid
+    : (currentDatabaseElement.oidcConfiguration as OidcConfiguration).token_renew_mode;
   if (tokenRenewMode === TokenRenewMode.access_token_invalid) {
     expiresAt = accessTokenExpiresAt;
   } else if (tokenRenewMode === TokenRenewMode.id_token_invalid) {
@@ -189,12 +227,62 @@ function _hideTokens(
   tokens.expiresAt = expiresAt;
   const nonce = currentDatabaseElement.nonce ? currentDatabaseElement.nonce.nonce : null;
   const { isValid, reason } = isTokensOidcValid(
-    tokens,
+    currentDatabaseElement.resource && !hasNewIdToken
+      ? { ...tokens, idTokenPayload: undefined }
+      : tokens,
     nonce as string,
     currentDatabaseElement.oidcServerConfiguration as OidcServerConfiguration,
   ); // TODO: Type assertion, could be null.
   if (!isValid) {
     throw Error(`Tokens are not OpenID valid, reason: ${reason}`);
+  }
+  if (currentDatabaseElement.resource) {
+    if (
+      typeof tokens.access_token !== 'string' ||
+      !tokens.access_token ||
+      !Number.isFinite(expiresAt) ||
+      !Number.isFinite(tokens.issued_at) ||
+      (tokens.refresh_token != null &&
+        (typeof tokens.refresh_token !== 'string' || !tokens.refresh_token))
+    ) {
+      throw new Error('The provider did not return a usable resource token response.');
+    }
+    const resource = getResourceConfiguration(
+      currentDatabaseElement.oidcConfiguration?.resources,
+      currentDatabaseElement.resource,
+    );
+    tokens.scope ??=
+      currentDatabaseElement.requestedScope ??
+      resource.scope ??
+      currentDatabaseElement.oidcConfiguration?.scope;
+    secureTokens.scope = tokens.scope;
+    if (
+      resource.scope &&
+      !resource.scope
+        .split(/\s+/)
+        .filter(Boolean)
+        .every(scope => (tokens.scope ?? '').split(/\s+/).includes(scope))
+    ) {
+      throw new Error('The provider did not grant the required resource scopes.');
+    }
+    const parentSubject = currentDatabaseElement.parentConfiguration?.tokens?.idTokenPayload?.sub;
+    const subject = tokens.idTokenPayload?.sub ?? oldTokens?.idTokenPayload?.sub ?? parentSubject;
+    if (typeof parentSubject !== 'string' || subject !== parentSubject) {
+      throw new Error('Resource authorization must preserve the authenticated subject.');
+    }
+    if (
+      (accessTokenPayload?.iss !== undefined &&
+        accessTokenPayload.iss !== currentDatabaseElement.oidcServerConfiguration?.issuer) ||
+      (accessTokenPayload &&
+        resource.audiences &&
+        !resource.audiences.some(audience =>
+          (typeof accessTokenPayload.aud === 'string'
+            ? [accessTokenPayload.aud]
+            : (accessTokenPayload.aud ?? [])
+          ).includes(audience),
+        ))
+    )
+      throw new Error('Resource token issuer or configured audience does not match.');
   }
 
   // When refresh_token is not rotated we reuse old refresh_token
@@ -210,26 +298,85 @@ function _hideTokens(
   }
 
   currentDatabaseElement.status = 'LOGGED_IN';
+  if (currentDatabaseElement.resource) {
+    const grant = currentDatabaseElement.refreshGrant ?? currentDatabaseElement;
+    const subject =
+      tokens.idTokenPayload?.sub ??
+      grant.tokens?.idTokenPayload?.sub ??
+      currentDatabaseElement.parentConfiguration?.tokens?.idTokenPayload?.sub;
+    if (typeof subject !== 'string')
+      throw new Error('Resource tokens require an authenticated OIDC subject.');
+    if (grant !== currentDatabaseElement && tokens.refresh_token && grant.tokens) {
+      grant.tokens.refresh_token = tokens.refresh_token;
+    }
+    const resourceContext = {
+      resource: currentDatabaseElement.resource,
+      issuer: currentDatabaseElement.oidcServerConfiguration!.issuer,
+      clientId: currentDatabaseElement.oidcConfiguration!.client_id!,
+      configurationName: currentDatabaseElement.configurationName.split('#')[0],
+      subject,
+      grantResource: grant.resource ?? null,
+    };
+    currentDatabaseElement.tokens!.resourceContext = resourceContext;
+    secureTokens.resourceContext = resourceContext;
+  }
   return secureTokens;
 }
 
 const demonstratingProofOfPossessionNonceResponseHeader = 'DPoP-Nonce';
-function hideTokens(currentDatabaseElement: OidcConfig) {
+function hideTokens(
+  currentDatabaseElement: OidcConfig,
+  isCurrent: () => boolean = () => true,
+  isGrantCurrent: () => boolean = isCurrent,
+  isAuthorizationCode = false,
+) {
   const configurationName = currentDatabaseElement.configurationName;
   return (response: Response) => {
     if (response.status !== 200) {
       return response;
     }
     const newHeaders = new Headers(response.headers);
-    if (response.headers.has(demonstratingProofOfPossessionNonceResponseHeader)) {
+    if (
+      response.headers.has(demonstratingProofOfPossessionNonceResponseHeader) &&
+      isGrantCurrent()
+    ) {
       currentDatabaseElement.demonstratingProofOfPossessionNonce = response.headers.get(
         demonstratingProofOfPossessionNonceResponseHeader,
       );
+      if (
+        currentDatabaseElement.refreshGrant &&
+        currentDatabaseElement.refreshGrant !== currentDatabaseElement
+      ) {
+        currentDatabaseElement.refreshGrant.demonstratingProofOfPossessionNonce =
+          currentDatabaseElement.demonstratingProofOfPossessionNonce;
+      }
       newHeaders.delete(demonstratingProofOfPossessionNonceResponseHeader);
     }
 
     return response.json().then<Response>((tokens: Tokens) => {
-      const secureTokens = _hideTokens(tokens, currentDatabaseElement, configurationName);
+      const grant = currentDatabaseElement.refreshGrant;
+      if (
+        currentDatabaseElement.resource &&
+        grant &&
+        isGrantCurrent() &&
+        grant.tokens &&
+        typeof tokens.refresh_token === 'string' &&
+        tokens.refresh_token &&
+        (grant !== currentDatabaseElement ||
+          tokens.refresh_token !==
+            currentDatabaseElement.parentConfiguration?.tokens?.refresh_token)
+      ) {
+        grant.tokens.refresh_token = tokens.refresh_token;
+      }
+      if (!isCurrent()) {
+        throw new Error('The token transaction was cleared before its response.');
+      }
+      const secureTokens = _hideTokens(
+        tokens,
+        currentDatabaseElement,
+        configurationName,
+        isAuthorizationCode,
+      );
       const body = JSON.stringify(secureTokens);
       return new Response(body, {
         status: response.status,

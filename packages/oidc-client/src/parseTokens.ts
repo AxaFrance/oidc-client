@@ -32,6 +32,16 @@ export type Tokens = {
   accessToken: string;
   expiresAt: number;
   issuedAt: number;
+  scope?: string;
+  tokenType?: string;
+  resourceContext?: {
+    resource: string;
+    issuer: string;
+    clientId: string;
+    configurationName: string;
+    subject: string;
+    grantResource: string | null;
+  };
 };
 
 export type TokenRenewModeType = {
@@ -139,10 +149,13 @@ export const parseOriginalTokens = (tokens, oldTokens, tokenRenewMode: string) =
     accessToken: tokens.access_token,
     expiresIn: tokens.expires_in,
     idToken: tokens.id_token,
-    scope: tokens.scope,
+    scope: tokens.scope ?? oldTokens?.scope,
     tokenType: tokens.token_type,
     issuedAt: tokens.issued_at,
   };
+  if (tokens.resourceContext !== undefined) {
+    Object.assign(data, { resourceContext: tokens.resourceContext });
+  }
 
   if ('refresh_token' in tokens) {
     // @ts-ignore

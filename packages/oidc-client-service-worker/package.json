@@ -38,7 +38,7 @@
   },
   "scripts": {
     "copy": "cpy --flat ./src/OidcTrustedDomains.js ./dist/",
-    "build": "tsc && vite build && pnpm run copy",
+    "build": "tsc && vite build && vite build --mode protocol && pnpm run copy",
     "test": "vitest run",
     "test:watch": "vitest --coverage",
     "coverage": "vitest run --coverage",
@@ -47,6 +47,7 @@
     "lint": "eslint src"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "5.0.3",
     "cpy": "13.2.3",
     "cpy-cli": "^7.0.0",
