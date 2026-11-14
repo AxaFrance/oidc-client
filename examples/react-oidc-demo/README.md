@@ -118,6 +118,25 @@ The fetch demonstrations derive userinfo from the selected authority and opt in
 to DPoP in local DPoP mode. Online separate-domain placeholders are unchanged;
 the local worker allows only the registered userinfo and API paths.
 
+### Local silent login and DPoP
+
+1. Open `/multi-auth`, select `config_classic`, and use **Login** to sign in as Alice.
+2. Select another configuration with silent callbacks, or keep the current one,
+   and click **Silent Login**. The main page stays in place and the iframe reuses
+   Alice's provider session, including when worker tokens have already been restored.
+3. Select `config_with_dpop` and use **Silent Login**, then **Call both APIs**.
+   Both results must report `tokenType: "DPoP"`. **Selected configuration proof**
+   reflects the named configuration; the top mode banner describes the default.
+   Use `?dpop=true&worker=on` or `?dpop=true&worker=off` to enable DPoP globally.
+
+Silent Login uses the selected configuration's complete scopes and resources.
+Do not narrow its scope to `openid profile email` while still requesting Orders
+and Inventory: OpenIddict requires the corresponding API read scopes and
+otherwise rejects the request with `invalid_scope`. A missing provider session
+reports `login_required` on the page; use interactive Login rather than retrying
+silently. Configurations that deliberately disable silent callbacks do not show
+the button. Close other demo tabs before changing storage modes.
+
 ## Service worker behavior
 
 The online default configuration enables `/OidcServiceWorker.js` but sets

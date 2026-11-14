@@ -325,6 +325,19 @@ as `login_required` or `consent_required` may require interactive sign-in.
 Refresh-token renewal does not use this iframe flow, although refresh tokens
 can still expire or be revoked.
 
+In the local React Multi Auth demo, sign in as Alice first, then select a
+configuration with silent callbacks and click **Silent Login**. The request
+uses that configuration's scopes and resources. Overriding the scopes with only
+`openid profile email` while requesting Orders/Inventory causes `invalid_scope`:
+those resources require `orders.read` and `inventory.read`. Errors are displayed
+on the page; without an Alice cookie, `login_required` is expected.
+
+For DPoP, select `config_with_dpop` or use `?dpop=true&worker=on` (or `worker=off`).
+The named configuration's **Selected configuration proof** label shows its
+effective mode; the top banner describes the default configuration.
+Use **Call both APIs** to verify that both results report `tokenType: "DPoP"`.
+The local adapter is demo-only, not native OpenIddict DPoP support.
+
 ## Will I stay signed in after sleep or a browser restart?
 
 Not necessarily. Browsers can suspend timers and terminate service workers;

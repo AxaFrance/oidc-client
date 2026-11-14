@@ -176,37 +176,40 @@ export const defaultSilentLoginAsync =
     };
 
     const loginLocalAsync = async () => {
-      if (oidc.timeoutId) {
-        timer.clearTimeout(oidc.timeoutId);
-      }
-
       let state;
       if (extras && 'state' in extras) {
         state = extras.state;
         delete extras.state;
       }
 
-      try {
-        const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
-        const silentResult = await silentLoginAsync(
-          {
-            ...extraFinal,
-            prompt: 'none',
-          },
-          state,
-          scope,
-        );
-
-        if (silentResult) {
-          oidc.tokens = silentResult.tokens;
-          publishEvent(eventNames.token_acquired, {});
-          // @ts-ignore
-          oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
-          return {};
-        }
-      } catch (e) {
-        return e;
+      const extraFinal = !configuration.extras ? extras : { ...configuration.extras, ...extras };
+      const silentResult = await silentLoginAsync(
+        {
+          ...extraFinal,
+          prompt: 'none',
+        },
+        state,
+        scope,
+      );
+      if (!silentResult) {
+        throw new Error('Silent login requires silent_login_uri and silent_redirect_uri.');
       }
+      if (silentResult.oidcError) throw silentResult.oidcError;
+      if (!silentResult.tokens) {
+        throw new OidcError(
+          OidcErrorCode.TOKEN_REQUEST_FAILED,
+          'Silent login returned no tokens.',
+          {
+            phase: 'login',
+            retryable: false,
+          },
+        );
+      }
+      if (oidc.timeoutId) timer.clearTimeout(oidc.timeoutId);
+      oidc.tokens = silentResult.tokens;
+      publishEvent(eventNames.token_acquired, {});
+      oidc.timeoutId = autoRenewTokens(oidc, oidc.tokens.expiresAt, extras, scope);
+      return {};
     };
     return loginLocalAsync();
   };

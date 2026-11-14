@@ -5,9 +5,10 @@ import {
   useOidcAccessToken,
   useOidcIdToken,
 } from '@axa-fr/react-oidc';
-import React, { useReducer, useState } from 'react';
+import React, { type ChangeEvent, type ReactElement, useReducer, useState } from 'react';
 
 import { withDemoProvider } from '../../shared/provider';
+import { describeDemoError } from '../../shared/resourcePlayground';
 import {
   configurationGoogle,
   configurationIdentityServer,
@@ -32,13 +33,36 @@ const fetchWithLogs =
     return await fetch(url, options, ...rest);
   };
 
-const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
+const MultiAuth = ({
+  configurationName,
+  handleConfigurationChange,
+  canSilentLogin,
+}: {
+  configurationName: string;
+  handleConfigurationChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+  canSilentLogin: boolean;
+}): ReactElement => {
   const { login, logout, isAuthenticated } = useOidc(configurationName);
   const { isAuthenticated: isAuthenticatedDefault } = useOidc('default');
   const [fname, setFname] = useState('');
+  const [isLoginPending, setIsLoginPending] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
-  const handleChange = e => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFname(e.target.value);
+  };
+  const runLoginAsync = async (isSilent: boolean): Promise<void> => {
+    setIsLoginPending(true);
+    setLoginError(null);
+    try {
+      await login(undefined, undefined, isSilent);
+    } catch (error) {
+      const message = describeDemoError(error);
+      console.error('Multi Auth login failed:', message);
+      setLoginError(message);
+    } finally {
+      setIsLoginPending(false);
+    }
   };
   return (
     <div className="container-fluid mt-3">
@@ -58,7 +82,11 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
             &quot;refresh_token&quot; for very sensitive operation, it retrive only access_token
             valid for a small amout of time.
           </p>
-          <select value={configurationName} onChange={handleConfigurationChange}>
+          <select
+            value={configurationName}
+            onChange={handleConfigurationChange}
+            disabled={isLoginPending}
+          >
             <option value="config_classic">config_classic</option>
             <option value="config_without_discovery">config_without_discovery</option>
             <option value="config_with_monitor_session">config_with_monitor_session</option>
@@ -77,31 +105,41 @@ const MultiAuth = ({ configurationName, handleConfigurationChange }) => {
             <option value="config_multi_tab_login">config_multi_tab_login</option>
           </select>
           {!isAuthenticated && (
-            <button type="button" className="btn btn-primary" onClick={() => login()}>
-              Login
-            </button>
-          )}
-          {isAuthenticatedDefault && (
             <button
               type="button"
               className="btn btn-primary"
-              onClick={() =>
-                login(
-                  undefined,
-                  {
-                    'test:token_request': 'test',
-                    youhou: 'youhou',
-                    grant_type: 'tenant',
-                    tenantId: '1234',
-                  },
-                  true,
-                  'openid profile email',
-                )
-              }
+              disabled={isLoginPending}
+              onClick={() => runLoginAsync(false)}
             >
-              Silent Login
+              Login
             </button>
           )}
+          {canSilentLogin &&
+            (demoEnvironment.provider === 'openiddict' || isAuthenticatedDefault) && (
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={isLoginPending}
+                onClick={() => runLoginAsync(true)}
+              >
+                Silent Login
+              </button>
+            )}
+          {demoEnvironment.provider === 'openiddict' && (
+            <p data-testid="selected-proof">
+              Selected configuration proof:{' '}
+              {configurationName === 'config_with_dpop' || demoEnvironment.isDpop
+                ? 'DPoP'
+                : 'Bearer'}
+            </p>
+          )}
+          {canSilentLogin && demoEnvironment.provider === 'openiddict' && (
+            <p>
+              Silent Login reuses the local Alice session without leaving this page. Sign in with
+              Login first; without a provider session it reports login_required.
+            </p>
+          )}
+          {loginError && <p role="alert">{loginError}</p>}
           {isAuthenticated && (
             <button type="button" className="btn btn-primary" onClick={() => logout()}>
               logout
@@ -248,6 +286,7 @@ export const MultiAuthContainer = () => {
         <MultiAuth
           configurationName={configurationName}
           handleConfigurationChange={handleConfigurationChange}
+          canSilentLogin={Boolean(configurations[configurationName].silent_redirect_uri)}
         />
         <DisplayAccessToken configurationName={configurationName} />
       </OidcProvider>

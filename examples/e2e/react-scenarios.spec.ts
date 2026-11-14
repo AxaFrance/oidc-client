@@ -90,3 +90,52 @@ for (const isDpop of [false, true]) {
     }
   });
 }
+
+for (const isWorker of [false, true]) {
+  for (const configuration of ['config_classic', 'config_with_dpop']) {
+    test(`React explicit silent login: ${configuration} / ${isWorker ? 'worker' : 'browser'}`, async ({
+      page,
+    }) => {
+      await page.goto(
+        `http://localhost:5173/multi-auth?worker=${isWorker ? 'on' : 'off'}&dpop=false`,
+      );
+      await page.getByRole('combobox').selectOption(configuration);
+      await page.getByRole('button', { name: 'Silent Login', exact: true }).click();
+      await expect(page.getByRole('alert')).toContainText('login_required');
+      await expect(page.getByRole('button', { name: 'Login', exact: true })).toBeVisible();
+
+      await page.getByRole('button', { name: 'Login', exact: true }).click();
+      await signIn(page);
+      await expect(page.getByRole('button', { name: 'logout', exact: true })).toBeVisible();
+      await expect(page.getByTestId('selected-proof')).toContainText(
+        configuration === 'config_with_dpop' ? 'DPoP' : 'Bearer',
+      );
+      const errors: string[] = [];
+      page.on('pageerror', error => errors.push(error.message));
+      const originalUrl = page.url();
+      const authorization = page.waitForRequest(
+        request => new URL(request.url()).pathname === '/connect/token',
+      );
+      await page.getByRole('button', { name: 'Silent Login', exact: true }).click();
+      await authorization;
+      await expect(
+        page.locator('p').filter({ hasText: `oidc:${configuration}:silentLoginAsync_end` }),
+      ).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Silent Login', exact: true })).toBeEnabled();
+      await expect(page.getByRole('alert')).not.toBeVisible();
+      expect(page.url()).toBe(originalUrl);
+      await page.getByRole('button', { name: 'Call both APIs' }).click();
+      await expect(page.getByTestId('resource-status')).toContainText('Both APIs accepted');
+      for (const api of ['orders', 'inventory']) {
+        const result = JSON.parse(await page.getByTestId(`${api}-result`).innerText());
+        expect(result.tokenType).toBe(configuration === 'config_with_dpop' ? 'DPoP' : 'Bearer');
+        expect(result.subject).toBe('alice');
+      }
+      expect(errors).toEqual([]);
+      await capture(
+        page,
+        `react-explicit-silent-${configuration}-${isWorker ? 'worker' : 'browser'}`,
+      );
+    });
+  }
+}

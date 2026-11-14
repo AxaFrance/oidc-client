@@ -173,6 +173,13 @@ Switching to browser storage removes the demo's OIDC worker and reloads before
 authentication starts. Close other tabs of the same demo when switching modes;
 worker registrations are origin-wide and tokens are not migrated between modes.
 
+On React's `/multi-auth` page, sign in as Alice once, then use **Silent Login**
+with a configuration that enables silent callbacks. It reuses the provider
+session and the selected configuration's scopes/resources without navigating
+the main page. Select `config_with_dpop` to use DPoP for that named configuration;
+its **Selected configuration proof** label is independent of the default
+configuration's mode banner. Missing provider sessions report `login_required`.
+
 Production builds retain Duende. Set `VITE_OIDC_PROVIDER=duende` to use Duende
 in development. The fixture's DPoP and session-monitoring adapters are custom
 demo-only integrations, not native OpenIddict features or production security.

@@ -288,6 +288,12 @@ The hook also returns `reloadOidcUser()`. Use `useOidcUser<MyUserInfo>(configura
 
 `login(callbackPath?, extras?, silentLoginOnly?, scope?)`, `logout(callbackPath?, extras?)`, and `renewTokens(extras?)` return promises.
 
+`login(undefined, undefined, true)` requests iframe-only sign-in using the
+configuration's scopes. It also works when the iframe restores an existing
+worker session. OAuth and timeout failures reject the promise; catch them and
+offer interactive login when the provider requires it. A scope override must
+still include the scopes required by any configured resources.
+
 Prefer `useOidcFetch` over manually building authorization headers. When worker token hiding is enabled, `accessToken` is a placeholder rather than the real token. Do not render or log raw tokens, and treat user claims as personal data. An ID token identifies the user to the client; it is not a replacement for an API access token.
 
 ## Service worker

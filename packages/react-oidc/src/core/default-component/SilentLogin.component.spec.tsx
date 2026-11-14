@@ -74,6 +74,15 @@ describe('silent login', () => {
     expect(loginAsync).not.toHaveBeenCalled();
   });
 
+  it('starts an explicit silent authorization even when worker tokens were restored', () => {
+    getParseQueryStringFromLocation.mockReturnValue({ prompt: 'none' });
+    getOrThrow.mockReturnValue({ tokens: {}, loginAsync });
+
+    render(<SilentLogin configurationName="custom" />);
+
+    expect(loginAsync).toHaveBeenCalledExactlyOnceWith(null, { prompt: 'none' }, true, undefined);
+  });
+
   it('only starts silent login on the initial mount', () => {
     getParseQueryStringFromLocation.mockReturnValue({ prompt: 'none' });
     const { rerender } = render(<SilentLogin configurationName="custom" />);
