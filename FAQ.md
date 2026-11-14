@@ -52,6 +52,9 @@ are registered. Switching from `worker=on` to `worker=off` unregisters this demo
 OIDC worker and reloads before using browser storage; unrelated workers are left
 alone. Close other tabs of the same demo before switching, since registrations
 are origin-wide. Tokens are not migrated between modes.
+Changing `dpop` clears this tab's demo OIDC sessions, resource tokens and proof
+keys and releases the demo worker, so a cached Bearer grant cannot be reused as
+DPoP or vice versa. The Alice provider cookie remains available for fresh sign-in.
 
 The demo CI also type-checks the built packages. React packaging must copy only
 worker runtime assets: flattening the worker's nested declaration files can

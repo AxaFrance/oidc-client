@@ -3,18 +3,21 @@ import { expect, test } from '@playwright/test';
 import { getDemoEnvironment, prepareDemoWorkerAsync, withDemoProvider } from '../shared/provider';
 
 function storage(value: string | null = null): Storage {
+  const values = new Map(value === null ? [] : [['oidc-demo-options', value]]);
   return {
-    length: value === null ? 0 : 1,
+    get length(): number {
+      return values.size;
+    },
     clear: (): void => {
-      value = null;
+      values.clear();
     },
-    key: (): string => 'oidc-demo-options',
-    getItem: (): string | null => value,
-    setItem: (_key: string, next: string): void => {
-      value = next;
+    key: (index: number): string | null => [...values.keys()][index] ?? null,
+    getItem: (key: string): string | null => values.get(key) ?? null,
+    setItem: (key: string, next: string): void => {
+      values.set(key, next);
     },
-    removeItem: (): void => {
-      value = null;
+    removeItem: (key: string): void => {
+      values.delete(key);
     },
   };
 }
@@ -94,89 +97,127 @@ test('local configuration rejects unregistered loopback hostnames', () => {
   }
 });
 
-for (const state of ['active', 'waiting', 'installing', 'unrelated', 'failure']) {
-  test(`browser mode handles ${state} registrations without removing unrelated workers`, async () => {
-    const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
-    const windowDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'window');
-    let removed = 0;
-    let reloaded = 0;
-    let inspected = 0;
-    const demoWorker = {
-      scriptURL: 'http://localhost:5173/OidcServiceWorker.js?provider=openiddict',
-    };
-    const registrations = [
-      {
-        active: state === 'active' || state === 'failure' ? demoWorker : null,
-        waiting: state === 'waiting' ? demoWorker : null,
-        installing: state === 'installing' ? demoWorker : null,
-        unregister: async (): Promise<boolean> => {
-          removed++;
-          return state !== 'failure';
-        },
-      },
-      ...['http://localhost:5173/pwa.js', 'http://localhost:5174/OidcServiceWorker.js'].map(
-        (scriptURL: string) => ({
-          active: { scriptURL },
-          waiting: null,
-          installing: null,
+test('proof changes keep a pending session reset across callbacks until startup succeeds', () => {
+  const saved = storage(JSON.stringify({ isDpop: false, isWorker: true }));
+  for (const search of ['?dpop=true&worker=on', '']) {
+    const environment = getDemoEnvironment({
+      isDevelopment: true,
+      location: { hostname: 'localhost', search },
+      storage: saved,
+    });
+    expect(environment.isDpop).toBe(true);
+    expect(saved.getItem('oidc-demo-reset-session')).toBe('true');
+  }
+});
+
+for (const resetProof of [false, true]) {
+  for (const state of ['active', 'waiting', 'installing', 'unrelated', 'failure']) {
+    test(`${resetProof ? 'proof switch' : 'browser mode'} handles ${state} registrations without removing unrelated workers`, async () => {
+      const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+      const windowDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'window');
+      let removed = 0;
+      let reloaded = 0;
+      let inspected = 0;
+      const saved = storage();
+      const sessionKeys = [
+        'oidc.default',
+        'oidc.jwk.default',
+        'oidc.config_classic',
+        'oidc.default.resource',
+      ];
+      for (const key of sessionKeys) saved.setItem(key, 'previous session');
+      saved.setItem('unrelated-setting', 'keep');
+      if (resetProof) saved.setItem('oidc-demo-reset-session', 'true');
+      const demoWorker = {
+        scriptURL: 'http://localhost:5173/OidcServiceWorker.js?provider=openiddict',
+      };
+      const registrations = [
+        {
+          active: state === 'active' || state === 'failure' ? demoWorker : null,
+          waiting: state === 'waiting' ? demoWorker : null,
+          installing: state === 'installing' ? demoWorker : null,
           unregister: async (): Promise<boolean> => {
-            throw new Error('An unrelated worker must not be removed.');
-          },
-        }),
-      ),
-    ];
-    Object.defineProperty(globalThis, 'navigator', {
-      configurable: true,
-      value: {
-        serviceWorker: {
-          controller:
-            state === 'active' || state === 'failure'
-              ? demoWorker
-              : { scriptURL: 'http://localhost:5173/pwa.js' },
-          getRegistrations: async (): Promise<typeof registrations> => {
-            inspected++;
-            return registrations;
+            removed++;
+            return state !== 'failure';
           },
         },
-      },
-    });
-    Object.defineProperty(globalThis, 'window', {
-      configurable: true,
-      value: {
-        location: {
-          origin: 'http://localhost:5173',
-          reload: (): void => {
-            reloaded++;
+        ...['http://localhost:5173/pwa.js', 'http://localhost:5174/OidcServiceWorker.js'].map(
+          (scriptURL: string) => ({
+            active: { scriptURL },
+            waiting: null,
+            installing: null,
+            unregister: async (): Promise<boolean> => {
+              throw new Error('An unrelated worker must not be removed.');
+            },
+          }),
+        ),
+      ];
+      Object.defineProperty(globalThis, 'navigator', {
+        configurable: true,
+        value: {
+          serviceWorker: {
+            controller:
+              state === 'active' || state === 'failure'
+                ? demoWorker
+                : { scriptURL: 'http://localhost:5173/pwa.js' },
+            getRegistrations: async (): Promise<typeof registrations> => {
+              inspected++;
+              return registrations;
+            },
           },
         },
-      },
-    });
-    try {
-      expect(
-        await prepareDemoWorkerAsync({ provider: 'duende', isWorker: false, isDpop: false }),
-      ).toBe(true);
-      expect(
-        await prepareDemoWorkerAsync({ provider: 'openiddict', isWorker: true, isDpop: false }),
-      ).toBe(true);
-      expect(inspected).toBe(0);
-      const startup = prepareDemoWorkerAsync({
-        provider: 'openiddict',
-        isWorker: false,
-        isDpop: false,
       });
-      if (state === 'failure')
-        await expect(startup).rejects.toThrow('Unable to unregister the demo OIDC worker');
-      else expect(await startup).toBe(state !== 'active');
-      expect(inspected).toBe(1);
-      expect(removed).toBe(state === 'unrelated' ? 0 : 1);
-      expect(reloaded).toBe(state === 'active' ? 1 : 0);
-    } finally {
-      if (navigatorDescriptor) Object.defineProperty(globalThis, 'navigator', navigatorDescriptor);
-      else Reflect.deleteProperty(globalThis, 'navigator');
-      if (windowDescriptor) Object.defineProperty(globalThis, 'window', windowDescriptor);
-      else Reflect.deleteProperty(globalThis, 'window');
-    }
-  });
+      Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: {
+          sessionStorage: storage(),
+          location: {
+            origin: 'http://localhost:5173',
+            reload: (): void => {
+              reloaded++;
+            },
+          },
+        },
+      });
+      try {
+        expect(
+          await prepareDemoWorkerAsync({ provider: 'duende', isWorker: false, isDpop: false }),
+        ).toBe(true);
+        expect(
+          await prepareDemoWorkerAsync({ provider: 'openiddict', isWorker: true, isDpop: false }),
+        ).toBe(true);
+        expect(inspected).toBe(0);
+        const startup = prepareDemoWorkerAsync(
+          {
+            provider: 'openiddict',
+            isWorker: resetProof,
+            isDpop: false,
+          },
+          saved,
+        );
+        if (state === 'failure')
+          await expect(startup).rejects.toThrow('Unable to unregister the demo OIDC worker');
+        else expect(await startup).toBe(state !== 'active');
+        expect(inspected).toBe(1);
+        expect(removed).toBe(state === 'unrelated' ? 0 : 1);
+        expect(reloaded).toBe(state === 'active' ? 1 : 0);
+        for (const key of sessionKeys)
+          expect(saved.getItem(key)).toBe(
+            resetProof && state !== 'failure' ? null : 'previous session',
+          );
+        expect(saved.getItem('unrelated-setting')).toBe('keep');
+        expect(saved.getItem('oidc-demo-reset-session')).toBe(
+          resetProof && state === 'failure' ? 'true' : null,
+        );
+      } finally {
+        if (navigatorDescriptor)
+          Object.defineProperty(globalThis, 'navigator', navigatorDescriptor);
+        else Reflect.deleteProperty(globalThis, 'navigator');
+        if (windowDescriptor) Object.defineProperty(globalThis, 'window', windowDescriptor);
+        else Reflect.deleteProperty(globalThis, 'window');
+      }
+    });
+  }
 }
 
 test('invalid provider, origin, and query modes reject explicitly', () => {

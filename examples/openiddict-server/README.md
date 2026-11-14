@@ -61,6 +61,13 @@ failures stop startup with an explicit error. Close other tabs of the same demo
 before switching modes because registrations are origin-wide. Tokens are not
 migrated between storage modes; sign in again when prompted.
 
+Changing `dpop` clears all demo OIDC configurations in this tab, including cached
+resource tokens and proof keys, and unregisters the demo worker before startup.
+A controlled page reloads before obtaining a grant in the selected proof mode.
+Unrelated session storage is preserved. The Alice provider cookie is retained;
+this local reset does not revoke the previous grant or end the provider session.
+Close other tabs of the same demo before changing proof modes as well.
+
 OpenIddict rejects fragment-bearing OAuth callbacks. The native local callback
 is `/authentication/callback`; React's local hash example uses
 `/multi-auth/authentification/hash-callback`. Online legacy hash callbacks remain

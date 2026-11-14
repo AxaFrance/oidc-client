@@ -53,6 +53,9 @@ Compare `?dpop=true&worker=on` with `?dpop=true&worker=off`; local modes persist
 across redirects. The Google-labeled local entry is a synthetic public client.
 Local hash-example callbacks are registered fragment-free paths. DPoP and session
 monitoring use custom demo-only adapters, as documented in the fixture guide.
+Changing `dpop` resets this tab's demo OIDC sessions, resource tokens and proof
+keys and releases the demo worker before obtaining a fresh grant. The Alice
+provider cookie is retained. Close other tabs of this demo before changing modes.
 
 In online mode, the following suffixes are appended to `window.location.origin`.
 For example, the default login callback is normally

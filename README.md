@@ -172,6 +172,9 @@ Use the registered `localhost` origins, not `127.0.0.1` or `[::1]`.
 Switching to browser storage removes the demo's OIDC worker and reloads before
 authentication starts. Close other tabs of the same demo when switching modes;
 worker registrations are origin-wide and tokens are not migrated between modes.
+Changing `dpop` clears this tab's demo OIDC sessions, resource tokens and proof
+keys, and releases the demo worker before obtaining a grant in the selected
+proof mode. The Alice provider session is retained.
 
 On React's `/multi-auth` page, sign in as Alice once, then use **Silent Login**
 with a configuration that enables silent callbacks. It reuses the provider

@@ -46,6 +46,9 @@ storage with `?dpop=true&worker=on` or `?dpop=true&worker=off`. Local callbacks 
 `/authentication/callback` and `/authentication/silent-callback`; online legacy
 hash callbacks remain unchanged. The fixture's DPoP adapter is demo-only, not
 native OpenIddict support.
+Changing `dpop` resets this tab's demo OIDC sessions, resource tokens and proof
+keys and releases the demo worker before obtaining a fresh grant. The Alice
+provider cookie is retained. Close other tabs of this demo before changing modes.
 
 Callback URLs are built from `window.location.origin`. The local fixture
 registers these path-based URLs; online mode retains the legacy hash suffixes:

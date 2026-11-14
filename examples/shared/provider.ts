@@ -4,6 +4,7 @@ export const localAuthority = 'http://localhost:7001';
 export const ordersResource = 'http://localhost:7002/';
 export const inventoryResource = 'http://localhost:7003/';
 export const unsupportedResource = 'urn:demo:unsupported';
+const resetSessionKey = 'oidc-demo-reset-session';
 
 export interface DemoEnvironment {
   provider: 'openiddict' | 'duende';
@@ -57,21 +58,28 @@ export function getDemoEnvironment(options: {
         ? previous.isWorker === true
         : true,
   };
+  if ('isDpop' in previous && previous.isDpop !== result.isDpop) {
+    options.storage.setItem(resetSessionKey, 'true');
+  }
   options.storage.setItem('oidc-demo-options', JSON.stringify(result));
   return result;
 }
 
-/** Releases this demo's OIDC worker before browser storage mode starts; false means reloading. */
-export async function prepareDemoWorkerAsync(environment: DemoEnvironment): Promise<boolean> {
-  if (environment.provider !== 'openiddict' || environment.isWorker || !navigator.serviceWorker)
-    return true;
+/** Resets changed proof modes and releases the demo worker as needed; false means reloading. */
+export async function prepareDemoWorkerAsync(
+  environment: DemoEnvironment,
+  storage: Storage = window.sessionStorage,
+): Promise<boolean> {
+  if (environment.provider !== 'openiddict') return true;
+  const shouldResetSession = storage.getItem(resetSessionKey) === 'true';
+  if (environment.isWorker && !shouldResetSession) return true;
 
-  const isDemoWorker = (worker: ServiceWorker | null): boolean => {
+  const isDemoWorker = (worker: ServiceWorker | null | undefined): boolean => {
     if (!worker) return false;
     const url = new URL(worker.scriptURL);
     return url.origin === window.location.origin && url.pathname === '/OidcServiceWorker.js';
   };
-  const registrations = await navigator.serviceWorker.getRegistrations();
+  const registrations = (await navigator.serviceWorker?.getRegistrations()) ?? [];
   for (const registration of registrations) {
     if (
       isDemoWorker(registration.active) ||
@@ -79,10 +87,17 @@ export async function prepareDemoWorkerAsync(environment: DemoEnvironment): Prom
       isDemoWorker(registration.installing)
     ) {
       if (!(await registration.unregister()))
-        throw new Error('Unable to unregister the demo OIDC worker before using browser storage.');
+        throw new Error('Unable to unregister the demo OIDC worker before changing modes.');
     }
   }
-  if (isDemoWorker(navigator.serviceWorker.controller)) {
+  if (shouldResetSession) {
+    const keys = Array.from({ length: storage.length }, (_, index) => storage.key(index));
+    for (const key of keys) {
+      if (key?.startsWith('oidc.')) storage.removeItem(key);
+    }
+    storage.removeItem(resetSessionKey);
+  }
+  if (isDemoWorker(navigator.serviceWorker?.controller)) {
     window.location.reload();
     return false;
   }
