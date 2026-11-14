@@ -87,6 +87,12 @@ application JavaScript while keeping the refresh token in the worker.
 
 ## Resource-specific token isolation
 
+Use the [local OpenIddict demos](../../examples/openiddict-server/README.md) to test
+two isolated audiences and DPoP nonce challenges end to end. Their local trust
+rules activate only for a localhost worker explicitly selected with
+`provider=openiddict`; the online trust rules do not gain localhost access.
+Generated DPoP targets exclude query strings and fragments.
+
 The clients' [RFC 8707 resource API](../oidc-client/README.md#resource-indicators-and-multiple-apis)
 uses nested resource entries in the existing named/tab session, not separate
 OIDC clients. Access tokens, authorization state, PKCE, grant references, and

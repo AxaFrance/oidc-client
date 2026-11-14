@@ -1,55 +1,73 @@
 import { TokenAutomaticRenewMode, TokenRenewMode } from '@axa-fr/react-oidc';
 
-export const configurationIdentityServer = {
-  client_id: 'interactive.public.short',
-  redirect_uri: window.location.origin + '/authentication/callback',
-  silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
-  scope: 'openid profile email api offline_access',
-  authority: 'https://demo.duendesoftware.com',
-  par: 'auto' as const,
-  refresh_time_before_tokens_expiration_in_second: 40,
-  token_renew_mode: TokenRenewMode.access_token_invalid,
-  token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
-  service_worker_relative_url: '/OidcServiceWorker.js',
-  service_worker_only: false,
-};
+import { getDemoEnvironment, withDemoProvider } from '../../shared/provider';
 
-export const configurationIdentityServerWithHash = {
-  client_id: 'interactive.public.short',
-  redirect_uri: window.location.origin + '/multi-auth/authentification#authentication-callback',
-  silent_redirect_uri:
-    window.location.origin + '/multi-auth/authentification#authentication-silent-callback',
-  silent_login_uri:
-    window.location.origin + '/multi-auth/authentification#authentication-silent-login',
-  scope: 'openid profile email api offline_access',
-  authority: 'https://demo.duendesoftware.com',
-  par: 'auto' as const,
-  refresh_time_before_tokens_expiration_in_second: 10,
-  service_worker_relative_url: '/OidcServiceWorker.js',
-  service_worker_only: false,
-};
+export const demoEnvironment = getDemoEnvironment({
+  isDevelopment: import.meta.env.DEV,
+  provider: import.meta.env.VITE_OIDC_PROVIDER,
+  location: window.location,
+  storage: window.sessionStorage,
+});
 
-export const configurationIdentityServerWithoutDiscovery = {
-  client_id: 'interactive.public.short',
-  redirect_uri: window.location.origin + '/authentication/callback',
-  silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
-  scope: 'openid profile email api offline_access',
-  authority: 'https://demo.duendesoftware.com',
-  par: 'auto' as const,
-  authority_configuration: {
-    authorization_endpoint: 'https://demo.duendesoftware.com/connect/authorize',
-    pushed_authorization_request_endpoint: 'https://demo.duendesoftware.com/connect/par',
-    token_endpoint: 'https://demo.duendesoftware.com/connect/token',
-    userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
-    end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
-    revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
-    check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession',
-    issuer: 'https://demo.duendesoftware.com',
+export const configurationIdentityServer = withDemoProvider(
+  {
+    client_id: 'interactive.public.short',
+    redirect_uri: window.location.origin + '/authentication/callback',
+    silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
+    scope: 'openid profile email api offline_access',
+    authority: 'https://demo.duendesoftware.com',
+    par: 'auto' as const,
+    refresh_time_before_tokens_expiration_in_second: 40,
+    token_renew_mode: TokenRenewMode.access_token_invalid,
+    token_automatic_renew_mode: TokenAutomaticRenewMode.AutomaticBeforeTokenExpiration,
+    service_worker_relative_url: '/OidcServiceWorker.js',
+    service_worker_only: false,
   },
-  refresh_time_before_tokens_expiration_in_second: 10,
-  service_worker_relative_url: '/OidcServiceWorker.js',
-  service_worker_only: false,
-};
+  demoEnvironment,
+);
+
+export const configurationIdentityServerWithHash = withDemoProvider(
+  {
+    client_id: 'interactive.public.short',
+    redirect_uri: window.location.origin + '/multi-auth/authentification#authentication-callback',
+    silent_redirect_uri:
+      window.location.origin + '/multi-auth/authentification#authentication-silent-callback',
+    silent_login_uri:
+      window.location.origin + '/multi-auth/authentification#authentication-silent-login',
+    scope: 'openid profile email api offline_access',
+    authority: 'https://demo.duendesoftware.com',
+    par: 'auto' as const,
+    refresh_time_before_tokens_expiration_in_second: 10,
+    service_worker_relative_url: '/OidcServiceWorker.js',
+    service_worker_only: false,
+  },
+  demoEnvironment,
+);
+
+export const configurationIdentityServerWithoutDiscovery = withDemoProvider(
+  {
+    client_id: 'interactive.public.short',
+    redirect_uri: window.location.origin + '/authentication/callback',
+    silent_redirect_uri: window.location.origin + '/authentication/silent-callback',
+    scope: 'openid profile email api offline_access',
+    authority: 'https://demo.duendesoftware.com',
+    par: 'auto' as const,
+    authority_configuration: {
+      authorization_endpoint: 'https://demo.duendesoftware.com/connect/authorize',
+      pushed_authorization_request_endpoint: 'https://demo.duendesoftware.com/connect/par',
+      token_endpoint: 'https://demo.duendesoftware.com/connect/token',
+      userinfo_endpoint: 'https://demo.duendesoftware.com/connect/userinfo',
+      end_session_endpoint: 'https://demo.duendesoftware.com/connect/endsession',
+      revocation_endpoint: 'https://demo.duendesoftware.com/connect/revocation',
+      check_session_iframe: 'https://demo.duendesoftware.com/connect/checksession',
+      issuer: 'https://demo.duendesoftware.com',
+    },
+    refresh_time_before_tokens_expiration_in_second: 10,
+    service_worker_relative_url: '/OidcServiceWorker.js',
+    service_worker_only: false,
+  },
+  demoEnvironment,
+);
 
 export const configurationGoogle = {
   client_id: '908893276222-f2drloh56ll0g99md38lv2k810d0nk0p.apps.googleusercontent.com',

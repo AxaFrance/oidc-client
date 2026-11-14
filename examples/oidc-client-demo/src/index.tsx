@@ -1,4 +1,11 @@
-import { OidcClient } from '@axa-fr/oidc-client';
+import { getParseQueryStringFromLocation, OidcClient } from '@axa-fr/oidc-client';
+
+import {
+  getDemoEnvironment,
+  prepareDemoWorkerAsync,
+  withDemoProvider,
+} from '../../shared/provider';
+import { displayResources } from './resources';
 
 class Router {
   getCustomHistory() {
@@ -108,27 +115,64 @@ const display = (element: any) => {
 };
 
 // @ts-ignore
-export const execute = () => {
+export const execute = async (): Promise<void> => {
   const router = new Router();
 
   const root = document.getElementById('root');
   const game = document.getElementById('game');
 
-  const configuration = {
-    client_id: 'interactive.public.short',
-    redirect_uri: window.location.origin + '/#/authentication/callback',
-    silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
-    scope: 'openid profile email api offline_access',
-    authority: 'https://demo.duendesoftware.com',
-    par: 'auto' as const,
-    refresh_time_before_tokens_expiration_in_second: 40,
-    service_worker_relative_url: '/OidcServiceWorker.js',
-    service_worker_only: true,
-  };
+  const environment = getDemoEnvironment({
+    isDevelopment: import.meta.env.DEV,
+    provider: import.meta.env.VITE_OIDC_PROVIDER,
+    location: window.location,
+    storage: window.sessionStorage,
+  });
+  if (!(await prepareDemoWorkerAsync(environment))) return;
+  const configuration = withDemoProvider(
+    {
+      client_id: 'interactive.public.short',
+      redirect_uri: window.location.origin + '/#/authentication/callback',
+      silent_redirect_uri: window.location.origin + '/#/authentication/silent-callback',
+      scope: 'openid profile email api offline_access',
+      authority: 'https://demo.duendesoftware.com',
+      par: 'auto' as const,
+      refresh_time_before_tokens_expiration_in_second: 40,
+      service_worker_relative_url: '/OidcServiceWorker.js',
+      service_worker_only: true,
+    },
+    environment,
+  );
+
+  const mode = document.getElementById('demo-mode');
+  if (mode)
+    mode.textContent = `Provider: ${environment.provider === 'openiddict' ? 'OpenIddict (local)' : 'Duende (online)'} | Storage: ${environment.isWorker ? 'Service Worker' : 'Browser'} | Proof: ${environment.isDpop ? 'DPoP' : 'Bearer'}`;
 
   const href = window.location.href;
 
   const vanillaOidc = OidcClient.getOrCreate(() => fetch)(configuration);
+
+  if (
+    environment.provider === 'openiddict' &&
+    window.location.pathname === '/authentication/silent-login'
+  ) {
+    const parameters = getParseQueryStringFromLocation(window.location.href);
+    const { state: _state, scope, ...extras } = parameters;
+    vanillaOidc
+      .tryKeepExistingSessionAsync()
+      .then(() => vanillaOidc.loginAsync(undefined, extras, true, scope))
+      .catch(error => console.error('Native silent login failed:', error));
+    return;
+  }
+  if (
+    environment.provider === 'openiddict' &&
+    window.location.pathname === '/authentication/silent-callback'
+  ) {
+    vanillaOidc
+      .tryKeepExistingSessionAsync()
+      .then(() => vanillaOidc.silentLoginCallbackAsync())
+      .catch(error => console.error('Native silent callback failed:', error));
+    return;
+  }
 
   // @ts-ignore
   function logout() {
@@ -150,10 +194,11 @@ export const execute = () => {
       root.innerHTML = `<div>
             <h3>Login demo Authenticated</h3>
             <button id="logout">Logout</button>
-            <pre>${JSON.stringify(vanillaOidc.tokens, null, '\t')}</pre>
+            <pre data-sensitive>${JSON.stringify(vanillaOidc.tokens, null, '\t')}</pre>
         </div>`;
       // @ts-ignore
       window.document.getElementById('logout').addEventListener('click', logout);
+      if (environment.provider === 'openiddict') displayResources(vanillaOidc);
     });
     return;
   }
@@ -166,10 +211,11 @@ export const execute = () => {
       root.innerHTML = `<div>
             <h3>Login demo Authenticated</h3>
             <button id="logout">Logout</button>
-            <pre>${JSON.stringify(tokens, null, '\t')}</pre>
+            <pre data-sensitive>${JSON.stringify(tokens, null, '\t')}</pre>
         </div>`;
       // @ts-ignore
       window.document.getElementById('logout').addEventListener('click', logout);
+      if (environment.provider === 'openiddict') displayResources(vanillaOidc);
     } else {
       // @ts-ignore
       function login() {
@@ -192,4 +238,9 @@ export const execute = () => {
   });
 };
 
-execute();
+execute().catch((error: unknown): void => {
+  console.error('Native demo startup failed:', error);
+  const container = document.getElementById('root');
+  if (container)
+    container.textContent = error instanceof Error ? error.message : 'Native demo startup failed.';
+});

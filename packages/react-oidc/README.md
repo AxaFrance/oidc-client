@@ -103,6 +103,11 @@ overwrite the public React type entry point.
 
 ## Resource-aware API hooks
 
+The [local React/OpenIddict playground](../../examples/openiddict-server/README.md)
+demonstrates both resource hooks against real, separately validated API audiences
+in Bearer/DPoP and browser/worker modes. Production demos retain Duende; local DPoP
+and session monitoring use explicitly documented custom demo-only adapters.
+
 The resource-token hook observes restored persisted tokens as well as newly
 acquired tokens. A clear operation cannot be undone by an in-flight cache lookup.
 
@@ -282,6 +287,12 @@ The hook also returns `reloadOidcUser()`. Use `useOidcUser<MyUserInfo>(configura
 | `useOidcIdToken(configurationName?)`                                  | `idToken`, `idTokenPayload`.                                                                             |
 
 `login(callbackPath?, extras?, silentLoginOnly?, scope?)`, `logout(callbackPath?, extras?)`, and `renewTokens(extras?)` return promises.
+
+`login(undefined, undefined, true)` requests iframe-only sign-in using the
+configuration's scopes. It also works when the iframe restores an existing
+worker session. OAuth and timeout failures reject the promise; catch them and
+offer interactive login when the provider requires it. A scope override must
+still include the scopes required by any configured resources.
 
 Prefer `useOidcFetch` over manually building authorization headers. When worker token hiding is enabled, `accessToken` is a placeholder rather than the real token. Do not render or log raw tokens, and treat user claims as personal data. An ID token identifies the user to the client; it is not a replacement for an API access token.
 

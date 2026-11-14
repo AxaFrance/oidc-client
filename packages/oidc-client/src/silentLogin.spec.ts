@@ -2,7 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { OidcError, OidcErrorCode, serializeOidcError } from './oidcError';
 import { isOidcStateError, OidcStateError, OidcStateErrorCode } from './oidcStateError';
-import { _silentLoginAsync } from './silentLogin';
+import { type Tokens } from './parseTokens';
+import * as renewal from './renewTokens';
+import { _silentLoginAsync, defaultSilentLoginAsync } from './silentLogin';
+import timer from './timer';
 
 const installDom = () => {
   const contentWindow = {};
@@ -30,8 +33,91 @@ const installDom = () => {
 };
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.useRealTimers();
   vi.unstubAllGlobals();
+});
+
+describe('explicit silent login', () => {
+  const configuration = {
+    authority: 'https://issuer.example.com',
+    client_id: 'client',
+    redirect_uri: 'https://client.example.com/callback',
+    scope: 'openid',
+    silent_login_uri: 'https://client.example.com/silent-login',
+    silent_redirect_uri: 'https://client.example.com/silent-callback',
+    silent_login_timeout: 25,
+  };
+  const tokens: Tokens = {
+    accessToken: 'access',
+    refreshToken: 'refresh',
+    idToken: 'id',
+    accessTokenPayload: null,
+    idTokenPayload: null,
+    expiresAt: 100,
+    issuedAt: 0,
+  };
+
+  it('rejects provider errors without overwriting an existing session or stopping renewal', async () => {
+    const { contentWindow, getListener } = installDom();
+    const publishEvent = vi.fn();
+    const oidc = { tokens, timeoutId: 123 };
+    const clearTimeout = vi.spyOn(timer, 'clearTimeout').mockImplementation(() => undefined);
+    const renew = vi
+      .spyOn(renewal, 'autoRenewTokens')
+      .mockReturnValue(setTimeout(() => undefined, 0));
+    const promise = defaultSilentLoginAsync(window, 'custom', configuration, publishEvent, oidc)();
+    getListener()({
+      origin: 'https://client.example.com',
+      source: contentWindow,
+      data: 'custom_oidc_error:{"error":"login_required","error_description":"Sign in first."}',
+    } as unknown as MessageEvent);
+
+    await expect(promise).rejects.toMatchObject({
+      code: OidcErrorCode.LOGIN_REQUIRED,
+      oauthError: 'login_required',
+    });
+    expect(oidc.tokens).toBe(tokens);
+    expect(clearTimeout).not.toHaveBeenCalled();
+    expect(renew).not.toHaveBeenCalled();
+    expect(publishEvent).not.toHaveBeenCalledWith('token_acquired', expect.anything());
+  });
+
+  it('rejects timeout failures instead of resolving with an error value', async () => {
+    vi.useFakeTimers();
+    installDom();
+    const promise = defaultSilentLoginAsync(window, 'custom', configuration, vi.fn(), {
+      tokens: null,
+      timeoutId: null,
+    })();
+    const rejection = expect(promise).rejects.toMatchObject({
+      code: OidcErrorCode.SILENT_LOGIN_TIMEOUT,
+    });
+    await vi.advanceTimersByTimeAsync(25);
+    await rejection;
+  });
+
+  it('adopts successful iframe tokens and restarts automatic renewal', async () => {
+    const { contentWindow, getListener } = installDom();
+    const publishEvent = vi.fn();
+    const oidc = { tokens: null, timeoutId: 123 };
+    const clearTimeout = vi.spyOn(timer, 'clearTimeout').mockImplementation(() => undefined);
+    const renew = vi
+      .spyOn(renewal, 'autoRenewTokens')
+      .mockReturnValue(setTimeout(() => undefined, 0));
+    const promise = defaultSilentLoginAsync(window, 'custom', configuration, publishEvent, oidc)();
+    getListener()({
+      origin: 'https://client.example.com',
+      source: contentWindow,
+      data: `custom_oidc_tokens:${JSON.stringify({ tokens, sessionState: null })}`,
+    } as unknown as MessageEvent);
+
+    await expect(promise).resolves.toEqual({});
+    expect(oidc.tokens).toEqual(tokens);
+    expect(clearTimeout).toHaveBeenCalledWith(123);
+    expect(renew).toHaveBeenCalledWith(oidc, tokens.expiresAt, {}, undefined);
+    expect(publishEvent).toHaveBeenCalledWith('token_acquired', {});
+  });
 });
 
 describe('_silentLoginAsync typed errors', () => {

@@ -1,0 +1,43 @@
+name: Local OpenIddict demos
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  end-to-end:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test:server
+      - name: Type-check and build the demos
+        run: |
+          pnpm exec tsc -p examples/react-oidc-demo/tsconfig.json --noEmit
+          pnpm exec tsc -p examples/oidc-client-demo/tsconfig.json --noEmit
+          pnpm --dir examples/react-oidc-demo build
+          pnpm --dir examples/oidc-client-demo build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - name: Upload credential-masked screenshots
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openiddict-demo-screenshots
+          path: examples/e2e/screenshots/*.png
+          if-no-files-found: error

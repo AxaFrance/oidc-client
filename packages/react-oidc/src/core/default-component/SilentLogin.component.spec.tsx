@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SilentLogin from './SilentLogin.component';
 
@@ -17,7 +17,21 @@ vi.mock('@axa-fr/oidc-client', () => ({
 describe('silent login', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    loginAsync.mockResolvedValue(undefined);
     getOrThrow.mockReturnValue({ tokens: null, loginAsync });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('logs rejected silent authorization without an unhandled promise', async () => {
+    const error = new Error('invalid_target');
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    getParseQueryStringFromLocation.mockReturnValue({});
+    loginAsync.mockRejectedValue(error);
+    render(<SilentLogin configurationName="custom" />);
+    await waitFor(() => expect(log).toHaveBeenCalledWith('Silent authorization failed:', error));
   });
 
   it.each([{}, { state: 'state' }, { state: 'state', scope: 'openid' }])(
@@ -58,6 +72,15 @@ describe('silent login', () => {
     render(<SilentLogin configurationName="custom" />);
 
     expect(loginAsync).not.toHaveBeenCalled();
+  });
+
+  it('starts an explicit silent authorization even when worker tokens were restored', () => {
+    getParseQueryStringFromLocation.mockReturnValue({ prompt: 'none' });
+    getOrThrow.mockReturnValue({ tokens: {}, loginAsync });
+
+    render(<SilentLogin configurationName="custom" />);
+
+    expect(loginAsync).toHaveBeenCalledExactlyOnceWith(null, { prompt: 'none' }, true, undefined);
   });
 
   it('only starts silent login on the initial mount', () => {

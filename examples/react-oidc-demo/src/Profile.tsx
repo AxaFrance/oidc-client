@@ -9,12 +9,17 @@ import {
 } from '@axa-fr/react-oidc';
 import React from 'react';
 
+import { demoEnvironment } from './configurations';
+
 interface OidcUserRoleInfo extends OidcUserInfo {
   role?: string[];
 }
 
 const DisplayUserInfo = () => {
-  const { oidcUser, oidcUserLoadingState, reloadOidcUser } = useOidcUser<OidcUserRoleInfo>();
+  const { oidcUser, oidcUserLoadingState, reloadOidcUser } = useOidcUser<OidcUserRoleInfo>(
+    'default',
+    demoEnvironment.isDpop,
+  );
 
   switch (oidcUserLoadingState) {
     case OidcUserStatus.Loading:
@@ -73,7 +78,11 @@ const DisplayAccessToken = () => {
           XSRF attacks. &quot;access_token&quot; and &quot;refresh_token&quot; will never be
           accessible from your client side javascript.
         </p>
-        {<p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>}
+        {
+          <p data-sensitive className="card-text">
+            Access Token: {JSON.stringify(accessToken)}
+          </p>
+        }
         {accessTokenPayload != null && (
           <p className="card-text">Access Token Payload: {JSON.stringify(accessTokenPayload)}</p>
         )}
@@ -93,7 +102,11 @@ const DisplayIdToken = () => {
     <div className="card text-white bg-info mb-3">
       <div className="card-body">
         <h5 className="card-title">ID Token</h5>
-        {<p className="card-text">IdToken: {JSON.stringify(idToken)}</p>}
+        {
+          <p data-sensitive className="card-text">
+            IdToken: {JSON.stringify(idToken)}
+          </p>
+        }
         {idTokenPayload != null && (
           <p className="card-text">IdToken Payload: {JSON.stringify(idTokenPayload)}</p>
         )}
