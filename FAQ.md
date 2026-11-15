@@ -370,6 +370,16 @@ renewal/session monitoring before worker cleanup. A later call can retry.
 Worker cleanup can still reject, leaving page authentication state cleared.
 See [session restoration](./packages/oidc-client/README.md#session-restoration).
 
+## Why do I see service-worker script update requests?
+
+The client explicitly checks for script updates on first initialization and at
+most once per hour per registration within the current page, including failed
+checks. Routine token timer ticks reuse that check. A replacement registration
+is checked immediately, and version-mismatch recovery can force a check.
+Browsers can also initiate their own update checks, independently of this limit.
+`OidcKeepAliveServiceWorker.json` requests are a separate keep-alive mechanism;
+neither mechanism guarantees that the browser retains worker memory.
+
 ## Can restoration report success with expired stored tokens?
 
 `tryKeepExistingSessionAsync()` checks expiry and waits for expired tokens to be

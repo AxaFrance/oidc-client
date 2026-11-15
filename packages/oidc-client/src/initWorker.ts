@@ -179,6 +179,11 @@ let controllerChangeReloading = false;
 // regardless of how many times initWorkerAsync is invoked.
 export const registrationCache = new Map<string, Promise<ServiceWorkerRegistration>>();
 
+const registrationUpdateTimes = new WeakMap<ServiceWorkerRegistration, number>();
+const observedRegistrations = new WeakSet<ServiceWorkerRegistration>();
+const observedInstallingWorkers = new WeakSet<ServiceWorker>();
+const SW_UPDATE_INTERVAL_MS = 60 * 60 * 1000;
+
 // AbortError surfaces during transient lifecycle events (e.g. iOS Safari tab shutdown or
 // backgrounding) and does not represent a genuine configuration problem. We treat it as
 // non-fatal, clear the cache entry so future calls can retry, and fall back to the
@@ -356,6 +361,8 @@ export const initWorkerAsync = async (
   };
 
   const trackInstallingWorker = (newSW: ServiceWorker) => {
+    if (observedInstallingWorkers.has(newSW)) return;
+    observedInstallingWorkers.add(newSW);
     stopKeepAlive();
     newSW.addEventListener('statechange', async () => {
       if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
@@ -373,13 +380,16 @@ export const initWorkerAsync = async (
     });
   };
 
-  // 1) Détection updatefound – registered BEFORE update() to avoid missing the event
-  registration.addEventListener('updatefound', () => {
-    const newSW = registration.installing;
-    if (newSW) {
-      trackInstallingWorker(newSW);
-    }
-  });
+  // Observe each registration once, before update() can emit updatefound.
+  if (!observedRegistrations.has(registration)) {
+    observedRegistrations.add(registration);
+    registration.addEventListener('updatefound', () => {
+      const newSW = registration.installing;
+      if (newSW) {
+        trackInstallingWorker(newSW);
+      }
+    });
+  }
 
   // Handle a SW that is already installing or waiting (e.g. when the listener above was
   // registered after the updatefound event already fired in a previous call)
@@ -396,10 +406,16 @@ export const initWorkerAsync = async (
     }
   }
 
-  // (Optional but useful on Safari) ask for update early – non-blocking to avoid slowing init
-  registration.update().catch(ex => {
-    console.error(ex);
-  });
+  // Keep cold-start checks without refetching scripts on every token timer tick.
+  // Record the attempt before starting it so concurrent calls and failures are bounded.
+  const now = Date.now();
+  const lastUpdate = registrationUpdateTimes.get(registration);
+  if (lastUpdate === undefined || now - lastUpdate >= SW_UPDATE_INTERVAL_MS) {
+    registrationUpdateTimes.set(registration, now);
+    registration.update().catch(ex => {
+      console.error(ex);
+    });
+  }
 
   // 2) Claim + init classique (Safari-safe)
   // IMPORTANT: claim() is done BEFORE registering the controllerchange listener,
