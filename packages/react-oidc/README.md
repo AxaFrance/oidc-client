@@ -288,6 +288,13 @@ The hook also returns `reloadOidcUser()`. Use `useOidcUser<MyUserInfo>(configura
 
 `login(callbackPath?, extras?, silentLoginOnly?, scope?)`, `logout(callbackPath?, extras?)`, and `renewTokens(extras?)` return promises.
 
+If core renewal returns no tokens (for example, after an `invalid_grant` response
+or when no renewal timer exists), the hook's `renewTokens()` resolves with
+`accessToken`, `accessTokenPayload`, `idToken`, and `idTokenPayload` set to `null`.
+Exceptions from the underlying API still reject the promise. `isAuthenticated`
+follows the client's current tokens on renewal and synchronization error events;
+an error that retains tokens does not by itself mark the user signed out.
+
 `login(undefined, undefined, true)` requests iframe-only sign-in using the
 configuration's scopes. It also works when the iframe restores an existing
 worker session. This existing entry point resolves OAuth and timeout failures
