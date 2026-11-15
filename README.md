@@ -93,7 +93,9 @@ the client manages tokens in browser storage and the authenticated fetch wrapper
 adds the access token to API requests.
 
 Session restoration tolerates missing or malformed saved login parameters in
-both storage modes. Failed restoration clears page tokens and stops renewal and
+both storage modes and waits for expired tokens to be renewed before reporting
+success. Await restoration before reading tokens or starting authenticated work.
+Failed restoration clears page tokens and stops renewal and
 session monitoring before worker cleanup. See [session restoration](./packages/oidc-client/README.md#session-restoration)
 for retry behavior and cleanup limitations.
 
