@@ -41,6 +41,10 @@ Duende. Both demos expose separate Orders/Inventory API calls, renewal, local
 clearing, wrong-destination rejection and explicit provider errors. Run
 `pnpm test:server` and `pnpm test:e2e` for the server and browser suites.
 
+Build validation and E2E tests are mandatory before submitting or updating any
+pull request, including documentation-only changes. Follow the complete,
+sequential [contribution checks](./README.md#contribute).
+
 The fictional Alice sign-in requires no credentials. DPoP and session monitoring
 use custom loopback-only adapters; they are not native OpenIddict features or a
 production server. Local OAuth callbacks are fragment-free. Restarting the

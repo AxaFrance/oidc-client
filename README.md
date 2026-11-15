@@ -261,9 +261,18 @@ GitHub Actions installs Node.js before pnpm. The Node setup steps disable
 automatic package-manager caching (`package-manager-cache: false`) so they do
 not try to invoke pnpm before it is installed.
 
+Before submitting or updating any pull request, all of these checks must pass,
+including for documentation-only changes. Run them sequentially so the tests
+use completed build artifacts:
+
 ```sh
 pnpm lint-fix
 pnpm lint
-pnpm test:ci
 pnpm build
+pnpm test:ci
+pnpm test:e2e
 ```
+
+The E2E suite requires the .NET 10 SDK and Playwright Chromium
+(`pnpm exec playwright install chromium`). It starts its own local demo servers;
+stop manually started instances first. See the [local fixture verification guide](./examples/openiddict-server/README.md#verification-and-evidence).
