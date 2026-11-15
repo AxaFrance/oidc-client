@@ -5,6 +5,7 @@ A framework-independent OpenID Connect (OIDC) client for browser applications, w
 For React applications, use [`@axa-fr/react-oidc`](../react-oidc/README.md).
 
 - [Quick start](#quick-start)
+- [Session restoration](#session-restoration)
 - [Service worker](#service-worker)
 - [Configuration](#configuration)
 - [Token renewal](#token-renewal)
@@ -104,6 +105,18 @@ const profile = await response.json();
 ```
 
 The wrapper attaches an access token, or a token placeholder when the service worker hides it, and integrates with token renewal. Only use it for API URLs you trust: the wrapper itself is not a destination allowlist. HTTP error responses still need an explicit `response.ok` check.
+
+## Session restoration
+
+`tryKeepExistingSessionAsync()` can restore existing tokens from the service
+worker or configured browser storage when saved login parameters are missing or
+cannot be parsed. Renewal then starts without saved extras or scope overrides.
+This does not recover missing tokens or bypass login callback state/nonce checks.
+
+If restoration fails, the client clears page tokens and cached user information,
+cancels its renewal timer, and stops session monitoring before awaiting worker
+cleanup. A subsequent call can retry restoration. Worker cleanup failures still
+reject the call, but leave page authentication state cleared.
 
 ## Resource indicators and multiple APIs
 

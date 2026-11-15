@@ -92,6 +92,11 @@ in the worker; the application receives placeholders instead. Without the worker
 the client manages tokens in browser storage and the authenticated fetch wrapper
 adds the access token to API requests.
 
+Session restoration tolerates missing or malformed saved login parameters in
+both storage modes. Failed restoration clears page tokens and stops renewal and
+session monitoring before worker cleanup. See [session restoration](./packages/oidc-client/README.md#session-restoration)
+for retry behavior and cleanup limitations.
+
 Observe renewal checks through `subscribeEvents` in the core client or `onEvent`
 in React. The [token synchronization events guide](./packages/oidc-client/README.md#token-synchronization-events)
 explains their payloads and timing: an `_end` event can also report session loss

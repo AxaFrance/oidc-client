@@ -17,6 +17,7 @@ not guarantees that every reported problem is resolved.
 - [What do syncTokensAsync events mean?](#what-do-synctokensasync-events-mean)
 - [Why are tokens renewed every few seconds?](#why-are-tokens-renewed-every-few-seconds)
 - [Why does silent sign-in fail in some browsers?](#why-does-silent-sign-in-fail-in-some-browsers)
+- [Can a session be restored without saved login parameters?](#can-a-session-be-restored-without-saved-login-parameters)
 - [Will I stay signed in after sleep or a browser restart?](#will-i-stay-signed-in-after-sleep-or-a-browser-restart)
 - [Does logout sign me out of every application?](#does-logout-sign-me-out-of-every-application)
 - [What does session monitoring require?](#what-does-session-monitoring-require)
@@ -352,6 +353,18 @@ The named configuration's **Selected configuration proof** label shows its
 effective mode; the top banner describes the default configuration.
 Use **Call both APIs** to verify that both results report `tokenType: "DPoP"`.
 The local adapter is demo-only, not native OpenIddict DPoP support.
+
+## Can a session be restored without saved login parameters?
+
+Yes. `tryKeepExistingSessionAsync()` tolerates missing or malformed saved login
+parameters with both service-worker and browser token storage. Existing tokens
+are still required; renewal starts without any saved extras or scope overrides.
+Login callback state and nonce validation remain required.
+
+Other restoration errors clear page tokens and cached user information and stop
+renewal/session monitoring before worker cleanup. A later call can retry.
+Worker cleanup can still reject, leaving page authentication state cleared.
+See [session restoration](./packages/oidc-client/README.md#session-restoration).
 
 ## Will I stay signed in after sleep or a browser restart?
 

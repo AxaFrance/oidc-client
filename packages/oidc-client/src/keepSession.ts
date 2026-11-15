@@ -4,6 +4,7 @@ import { initWorkerAsync } from './initWorker';
 import Oidc from './oidc';
 import { setTokens } from './parseTokens';
 import { autoRenewTokens } from './renewTokens';
+import timer from './timer';
 
 export const tryKeepSessionAsync = async (oidc: Oidc) => {
   let serviceWorker;
@@ -33,8 +34,8 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         oidc.timeoutId = autoRenewTokens(
           oidc,
           oidc.tokens.expiresAt,
-          getLoginParams.extras,
-          getLoginParams.scope,
+          getLoginParams?.extras,
+          getLoginParams?.scope,
         );
         const sessionState = await serviceWorker.getSessionStateAsync();
         // @ts-ignore
@@ -76,8 +77,8 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         oidc.timeoutId = autoRenewTokens(
           oidc,
           oidc.tokens.expiresAt,
-          getLoginParams.extras,
-          getLoginParams.scope,
+          getLoginParams?.extras,
+          getLoginParams?.scope,
         );
         const sessionState = await session.getSessionStateAsync();
         // @ts-ignore
@@ -104,6 +105,11 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
     });
     return false;
   } catch (exception) {
+    oidc.tokens = null;
+    oidc.userInfo = null;
+    timer.clearTimeout(oidc.timeoutId);
+    oidc.timeoutId = null;
+    oidc.checkSessionIFrame?.stop();
     console.error(exception);
     if (serviceWorker) {
       await serviceWorker.clearAsync();
