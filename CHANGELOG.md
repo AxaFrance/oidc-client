@@ -1,7 +1,15 @@
 # Changelog
 
+## v7.30.2
+
+- [69b4dfbc](https://github.com/AxaFrance/oidc-client/commit/69b4dfbc8c69193114eaa9a65b6ca6a204c74a36) - [skip ci] Update to version 7.30.2 in package.json, 2026-11-15 by *github-actions[bot]*
+- [11060396](https://github.com/AxaFrance/oidc-client/commit/110603969f911954e6eb0ba8010fae4caad9d67c) - fix: await expired session renewal before readiness (#1746) (release), 2026-11-15 by *Guillaume Chervet*
+- [9639fbae](https://github.com/AxaFrance/oidc-client/commit/9639fbae6fea584cbe0bb47729458b365a2d4273) - fix(react): handle empty renewal results and session loss (#1747) (release), 2026-11-15 by *Guillaume Chervet*
+
+
 ## v7.30.1
 
+- [a08cc3e9](https://github.com/AxaFrance/oidc-client/commit/a08cc3e9ec1d1d59351a749c000131a1adc4f6e4) - [skip ci] Generate changelog to version 7.30.1, 2026-11-15 by *github-actions[bot]*
 - [2cb55a1c](https://github.com/AxaFrance/oidc-client/commit/2cb55a1ce7859c9f56ebc20d4cdea57f63696d7a) - [skip ci] Update to version 7.30.1 in package.json, 2026-11-15 by *github-actions[bot]*
 - [c3ff0bfb](https://github.com/AxaFrance/oidc-client/commit/c3ff0bfbcb12ae299e4e0d33611fedc849e5ba85) - fix: restore sessions safely without login metadata (#1744) (release), 2026-11-15 by *Guillaume Chervet*
 
@@ -338,10 +346,5 @@
 ## v7.25.6
 
 - [2cb8cdea](https://github.com/AxaFrance/oidc-client/commit/2cb8cdeafdb39fadc19beb878808a5d2291cd6fa) - fix(oidc): multi-tab dpop not working with (#1531) (release), 2025-03-28 by *Guillaume Chervet*
-
-
-## v7.25.5
-
-- [d7567ba2](https://github.com/AxaFrance/oidc-client/commit/d7567ba28c0dfe9b248be52ecfac4df6f98b397b) - feature(oidc-service-worker): multi tab auth (#1528) (release), 2025-03-27 by *Guillaume Chervet*
 
 
