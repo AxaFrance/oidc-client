@@ -99,6 +99,10 @@ Failed restoration clears page tokens and stops renewal and
 session monitoring before worker cleanup. See [session restoration](./packages/oidc-client/README.md#session-restoration)
 for retry behavior and cleanup limitations.
 
+The React `renewTokens()` hook returns null token fields when core
+renewal produces no tokens, and authentication state follows current tokens on
+renewal/error events. See the [React hook guide](./packages/react-oidc/README.md).
+
 Observe renewal checks through `subscribeEvents` in the core client or `onEvent`
 in React. The [token synchronization events guide](./packages/oidc-client/README.md#token-synchronization-events)
 explains their payloads and timing: an `_end` event can also report session loss
