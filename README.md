@@ -92,6 +92,10 @@ in the worker; the application receives placeholders instead. Without the worker
 the client manages tokens in browser storage and the authenticated fetch wrapper
 adds the access token to API requests.
 
+Routine service-worker synchronization checks for script updates at most once
+per hour per registration within a page. Cold starts and version-mismatch
+recovery still check for updates. See the [worker update FAQ](./FAQ.md#why-do-i-see-service-worker-script-update-requests).
+
 Session restoration tolerates missing or malformed saved login parameters in
 both storage modes. Failed restoration clears page tokens and stops renewal and
 session monitoring before worker cleanup. See [session restoration](./packages/oidc-client/README.md#session-restoration)

@@ -340,6 +340,13 @@ service_worker_only: true,
 
 Serve the worker from a URL whose scope covers your application, using HTTPS (or localhost for development). With `service_worker_only: true`, login requires an available service worker. With `false` (the default), the client can fall back to browser storage when worker mode is unavailable. Choose that fallback deliberately.
 
+Worker initialization explicitly checks for script updates once on cold start,
+then at most once per hour per registration within the page, even if a check
+fails. Concurrent and repeated synchronization calls share that limit. New
+registrations and version-mismatch recovery can check immediately. Browser
+initiated checks are independent. Update listeners remain active between checks,
+and controller claiming and worker activation still run during initialization.
+
 ### Trusted-domain options
 
 These options belong in each named entry in `OidcTrustedDomains.js`, not in `OidcConfiguration`.
