@@ -23,6 +23,11 @@ pnpm --dir examples/nextjs-demo dev
 Open **http://localhost:3001**. The `dev` script explicitly selects port `3001`,
 and the OIDC callback configuration uses that same origin.
 
+Keep Next.js and React updated together with the workspace lockfile. Run
+`pnpm audit --audit-level low` at the root to check this demo and the development
+tools for known advisories; the workspace browser suite covers the Vite demos,
+not this Next.js application's external-provider login.
+
 ## Configuration and provider requirements
 
 [`components/layout.js`](components/layout.js) contains the OIDC configuration.

@@ -18,14 +18,14 @@ jobs:
       canSkip: ${{ steps.check.outputs.canSkip }}
     steps:
       - id: check
-        uses: Legorooj/skip-ci@main
+        uses: Legorooj/skip-ci@df35c2883fffdc55f099e8a673026d0d1e836d78 # main
   tests:
     needs: skip_ci
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
@@ -33,10 +33,9 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         name: Install pnpm
         with:
-          version: 11.10.0
           run_install: false
 
       - name: pnpm i
@@ -68,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ secrets.GIT_TOKEN }}
           fetch-depth: 0
@@ -101,14 +100,14 @@ jobs:
       - name: Compute release version
         id: tag_release
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@af99e60ce8132224b8e6ebab5023449fe256ed46 # v7
         with:
           github_token: ${{ secrets.GIT_TOKEN  }}
           dry_run: true
       - name: Compute prerelease version
         id: tag_version
         if: steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@af99e60ce8132224b8e6ebab5023449fe256ed46 # v7
         with:
           github_token: ${{ secrets.GIT_TOKEN  }}
           dry_run: true
@@ -140,13 +139,13 @@ jobs:
             echo "new_version=$version-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
 
       - name: Install npm with trusted publishing support
-        run: npm install --global "npm@^11.5.1"
+        run: npm install --global "npm@12.2.2"
 
       - name: Verify npm trusted publishing prerequisites
         shell: bash
@@ -168,10 +167,9 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         name: Install pnpm
         with:
-          version: 11.10.0
           run_install: false
 
       - name: Update package versions to ${{ steps.tag.outputs.new_version }}
@@ -581,7 +579,7 @@ jobs:
      #        -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
  #
       - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         with:
           tag: ${{ steps.tag_release.outputs.new_tag }}

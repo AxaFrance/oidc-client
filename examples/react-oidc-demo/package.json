@@ -20,24 +20,23 @@
   },
   "dependencies": {
     "@axa-fr/react-oidc": "workspace:*",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "react-router-dom": "^7.18.4"
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.7",
+    "@testing-library/user-event": "14.6.10",
     "@types/react": "19.3.0",
-    "@vitejs/plugin-react": "6.1.2",
-    "bootstrap": "^5.3.8",
-    "copyfiles": "2.4.1",
+    "@vitejs/plugin-react": "6.3.0",
+    "bootstrap": "^5.3.9",
     "cross-env": "^10.1.0",
-    "jsdom": "30.1.2",
+    "jsdom": "31.0.1",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vite": "8.3.4",
+    "vite": "8.3.8",
     "vite-plugin-dts": "5.1.2",
-    "vitest": "5.0.3"
+    "vitest": "5.1.0"
   },
   "license": "MIT",
   "publishConfig": {

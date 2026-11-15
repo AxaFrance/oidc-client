@@ -652,4 +652,6 @@ This requires an active worker. See the protocol reference for payloads, timeout
 The demos belong to the pnpm monorepo. Follow their READMEs rather than installing each workspace independently.
 
 For source development, use the root [contributor commands](../../README.md#contribute)
-and the committed lockfile. Keep this package's Vitest and coverage versions aligned.
+and the committed lockfile with the root-pinned pnpm version. Keep this package's
+Vitest and coverage versions aligned. Run `pnpm audit --audit-level low` at the
+root to include development dependencies.

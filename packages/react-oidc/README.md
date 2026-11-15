@@ -471,5 +471,6 @@ When no client has been initialized for a name, `useOidc`, `useOidcUser`, `useOi
 The demos use the repository's pnpm workspace. Follow their READMEs for setup rather than installing each package separately.
 
 For source development, use the root [contributor commands](../../README.md#contribute)
-and the committed lockfile. Keep Vitest and coverage versions aligned; MSW stays
-on version 2 to satisfy Vitest's mocker peer dependency.
+and the committed lockfile with the root-pinned pnpm version. Keep Vitest and
+coverage versions aligned; Vitest 5.1 supports the workspace's MSW 3 dependency.
+Run `pnpm audit --audit-level low` at the root to include development dependencies.

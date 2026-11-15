@@ -18,26 +18,25 @@ jobs:
       canSkip: ${{ steps.check.outputs.canSkip }}
     steps:
       - id: check
-        uses: Legorooj/skip-ci@main
+        uses: Legorooj/skip-ci@df35c2883fffdc55f099e8a673026d0d1e836d78 # main
   build_and_deploy_job:
     if: (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) && !github.event.pull_request.head.repo.fork && needs.skip_ci.outputs.canSkip != 'true'
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         name: Install pnpm
         with:
-          version: 11.10.0
           run_install: false
       - name: pnpm install root
         run: pnpm i --frozen-lockfile
@@ -49,7 +48,7 @@ jobs:
         working-directory: ./examples/oidc-client-demo
       - name: Build And Deploy
         id: builddeploy
-        uses: Azure/static-web-apps-deploy@v1
+        uses: Azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ICY_GLACIER_004AB4303 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
@@ -69,7 +68,7 @@ jobs:
     steps:
       - name: Close Pull Request
         id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
+        uses: Azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ICY_GLACIER_004AB4303 }}
           action: "close"

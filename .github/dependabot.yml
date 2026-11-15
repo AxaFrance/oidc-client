@@ -9,3 +9,22 @@ updates:
       interval: 'monthly'
     commit-message:
       prefix: 'build(npm): '
+  - package-ecosystem: 'nuget'
+    directories:
+      - '/examples/openiddict-server'
+      - '/examples/openiddict-server.tests'
+    schedule:
+      interval: 'monthly'
+    ignore:
+      - dependency-name: 'Microsoft.EntityFrameworkCore.*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'System.Security.Cryptography.*'
+        update-types: ['version-update:semver-major']
+    commit-message:
+      prefix: 'build(nuget): '
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    commit-message:
+      prefix: 'build(actions): '
