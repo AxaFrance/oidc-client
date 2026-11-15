@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.30.3
+
+- [b735ea16](https://github.com/AxaFrance/oidc-client/commit/b735ea16694b15620a5ef261baa0fd13bc399af8) - [skip ci] Update to version 7.30.3 in package.json, 2026-11-15 by *github-actions[bot]*
+- [50ee8bfb](https://github.com/AxaFrance/oidc-client/commit/50ee8bfb338c8c147a91489b9b178722af32912a) - fix: bound service worker script update checks (#1745) (release), 2026-11-15 by *Guillaume Chervet*
+
+
 ## v7.30.2
 
+- [54bf1063](https://github.com/AxaFrance/oidc-client/commit/54bf106307fc81efc038bda94f7f1e45210df622) - [skip ci] Generate changelog to version 7.30.2, 2026-11-15 by *github-actions[bot]*
 - [69b4dfbc](https://github.com/AxaFrance/oidc-client/commit/69b4dfbc8c69193114eaa9a65b6ca6a204c74a36) - [skip ci] Update to version 7.30.2 in package.json, 2026-11-15 by *github-actions[bot]*
 - [11060396](https://github.com/AxaFrance/oidc-client/commit/110603969f911954e6eb0ba8010fae4caad9d67c) - fix: await expired session renewal before readiness (#1746) (release), 2026-11-15 by *Guillaume Chervet*
 - [9639fbae](https://github.com/AxaFrance/oidc-client/commit/9639fbae6fea584cbe0bb47729458b365a2d4273) - fix(react): handle empty renewal results and session loss (#1747) (release), 2026-11-15 by *Guillaume Chervet*
@@ -341,10 +348,5 @@
 ## v7.25.7
 
 - [930ad036](https://github.com/AxaFrance/oidc-client/commit/930ad0367cfcaa5bd15726c17501d70b0768ce5e) - fix(oidc-service-worker): fetch already consume (release) (#1534), 2025-04-01 by *Guillaume Chervet*
-
-
-## v7.25.6
-
-- [2cb8cdea](https://github.com/AxaFrance/oidc-client/commit/2cb8cdeafdb39fadc19beb878808a5d2291cd6fa) - fix(oidc): multi-tab dpop not working with (#1531) (release), 2025-03-28 by *Guillaume Chervet*
 
 
