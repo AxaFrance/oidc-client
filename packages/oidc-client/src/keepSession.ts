@@ -2,9 +2,29 @@ import { eventNames } from './events';
 import { initSession } from './initSession';
 import { initWorkerAsync } from './initWorker';
 import Oidc from './oidc';
-import { setTokens } from './parseTokens';
-import { autoRenewTokens } from './renewTokens';
+import { isTokensValid, setTokens } from './parseTokens';
+import { autoRenewTokens, renewTokensAndStartTimerAsync } from './renewTokens';
 import timer from './timer';
+
+const renewExpiredSessionAsync = async (oidc: Oidc, loginParams) => {
+  if (isTokensValid(oidc.tokens)) return true;
+
+  const tokens = await renewTokensAndStartTimerAsync(
+    oidc,
+    true,
+    loginParams?.extras,
+    loginParams?.scope,
+  );
+  if (isTokensValid(tokens)) return true;
+
+  oidc.tokens = null;
+  oidc.userInfo = null;
+  oidc.publishEvent(eventNames.tryKeepExistingSessionAsync_end, {
+    success: false,
+    message: 'stored tokens could not be renewed',
+  });
+  return false;
+};
 
 export const tryKeepSessionAsync = async (oidc: Oidc) => {
   let serviceWorker;
@@ -30,6 +50,7 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         // @ts-ignore
         oidc.tokens = tokens;
         const getLoginParams = serviceWorker.getLoginParams(oidc.configurationName);
+        if (!(await renewExpiredSessionAsync(oidc, getLoginParams))) return false;
         // @ts-ignore
         oidc.timeoutId = autoRenewTokens(
           oidc,
@@ -73,6 +94,7 @@ export const tryKeepSessionAsync = async (oidc: Oidc) => {
         // @ts-ignore
         oidc.tokens = setTokens(tokens, null, configuration.token_renew_mode);
         const getLoginParams = session.getLoginParams();
+        if (!(await renewExpiredSessionAsync(oidc, getLoginParams))) return false;
         // @ts-ignore
         oidc.timeoutId = autoRenewTokens(
           oidc,

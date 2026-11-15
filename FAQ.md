@@ -380,6 +380,26 @@ Browsers can also initiate their own update checks, independently of this limit.
 `OidcKeepAliveServiceWorker.json` requests are a separate keep-alive mechanism;
 neither mechanism guarantees that the browser retains worker memory.
 
+## Can restoration report success with expired stored tokens?
+
+`tryKeepExistingSessionAsync()` checks expiry and waits for expired tokens to be
+renewed before returning `true`, for both worker and browser storage. This also
+applies to fetch-triggered renewal mode. It returns `false` if renewal cannot
+produce tokens, rather than waiting for the first one-second timer tick after
+restoration. Await that promise before reading tokens or sending authenticated
+requests. This does not extend refresh-token lifetimes or restore lost worker
+secrets; an available refresh token or usable silent sign-in flow is required.
+
+## What does React's renewTokens return after session loss?
+
+When the core client returns no tokens, `useOidc().renewTokens()` resolves with
+null access-token and ID-token fields instead of throwing a null-property error.
+Actual exceptions from the core API still reject the promise. Renewal and
+synchronization events update `isAuthenticated` from current client tokens, so
+an error with retained tokens does not force a signed-out state. Use the
+provider's session-loss screen or events for recovery, and the core
+`renewTokensOrThrowAsync()` API when you need strict renewal errors.
+
 ## Will I stay signed in after sleep or a browser restart?
 
 Not necessarily. Browsers can suspend timers and terminate service workers;

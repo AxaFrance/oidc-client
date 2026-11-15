@@ -113,6 +113,16 @@ worker or configured browser storage when saved login parameters are missing or
 cannot be parsed. Renewal then starts without saved extras or scope overrides.
 This does not recover missing tokens or bypass login callback state/nonce checks.
 
+Restoration checks token expiry before reporting success. When the restored
+tokens are expired, it awaits renewal using the available refresh token or
+configured silent sign-in flow, including in fetch-triggered renewal mode. It
+starts the renewal timer, session monitoring and optional user-info preload only
+after renewal succeeds. Unexpired tokens do not trigger an initial renewal.
+If renewal returns no valid tokens, restoration returns `false` with cleared page
+tokens. A refresh token or usable silent sign-in flow is still required.
+Await the restoration promise before reading `tokens` or starting authenticated
+work; the internal token snapshot is used while renewal is pending.
+
 If restoration fails, the client clears page tokens and cached user information,
 cancels its renewal timer, and stops session monitoring before awaiting worker
 cleanup. A subsequent call can retry restoration. Worker cleanup failures still

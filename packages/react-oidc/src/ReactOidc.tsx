@@ -39,11 +39,7 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
     }
 
     const newSubscriptionId = oidc.subscribeEvents((name: string, data: any) => {
-      if (
-        name === OidcClient.eventNames.logout_from_another_tab ||
-        name === OidcClient.eventNames.logout_from_same_tab ||
-        name === OidcClient.eventNames.token_acquired
-      ) {
+      if (isTokenStateEvent(name)) {
         if (isMounted) {
           setIsAuthenticated(defaultIsAuthenticated(getOidc, configurationName));
         }
@@ -90,14 +86,10 @@ export const useOidc = (configurationName = defaultConfigurationName) => {
     const tokens = await oidc.renewTokensAsync(extras);
 
     return {
-      // @ts-ignore
-      accessToken: tokens.accessToken,
-      // @ts-ignore
-      accessTokenPayload: tokens.accessTokenPayload,
-      // @ts-ignore
-      idToken: tokens.idToken,
-      // @ts-ignore
-      idTokenPayload: tokens.idTokenPayload,
+      accessToken: tokens?.accessToken ?? null,
+      accessTokenPayload: tokens?.accessTokenPayload ?? null,
+      idToken: tokens?.idToken ?? null,
+      idTokenPayload: tokens?.idTokenPayload ?? null,
     };
   };
   return { login, logout, renewTokens, isAuthenticated };

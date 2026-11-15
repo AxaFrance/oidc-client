@@ -219,4 +219,44 @@ describe('useOidc', () => {
     await expect(result.current.renewTokens(extras)).resolves.toEqual(initialTokens);
     expect(client.renewTokensAsync).toHaveBeenCalledExactlyOnceWith(extras);
   });
+
+  it.each([null, undefined])('returns empty token fields when renewal returns %s', async tokens => {
+    client.renewTokensAsync.mockResolvedValue(tokens);
+    const { result } = renderHook(() => useOidc());
+
+    await expect(result.current.renewTokens()).resolves.toEqual({
+      accessToken: null,
+      accessTokenPayload: null,
+      idToken: null,
+      idTokenPayload: null,
+    });
+  });
+
+  it('preserves exceptions rejected by the core renewal API', async () => {
+    const error = new Error('renewal failed');
+    client.renewTokensAsync.mockRejectedValue(error);
+    const { result } = renderHook(() => useOidc());
+    await expect(result.current.renewTokens()).rejects.toBe(error);
+  });
+
+  it.each(['token_renewed', 'refreshTokensAsync_error', 'syncTokensAsync_error'])(
+    'updates authentication from current tokens on %s',
+    name => {
+      const { result } = renderHook(() => useOidc());
+      const listener = subscribeEvents.mock.calls[0][0];
+      expect(result.current.isAuthenticated).toBe(true);
+
+      // A retryable error can leave valid tokens available.
+      act(() => listener(name));
+      expect(result.current.isAuthenticated).toBe(true);
+
+      client.tokens = null;
+      act(() => listener(name));
+      expect(result.current.isAuthenticated).toBe(false);
+
+      client.tokens = { ...initialTokens };
+      act(() => listener('token_acquired'));
+      expect(result.current.isAuthenticated).toBe(true);
+    },
+  );
 });

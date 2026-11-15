@@ -97,9 +97,15 @@ per hour per registration within a page. Cold starts and version-mismatch
 recovery still check for updates. See the [worker update FAQ](./FAQ.md#why-do-i-see-service-worker-script-update-requests).
 
 Session restoration tolerates missing or malformed saved login parameters in
-both storage modes. Failed restoration clears page tokens and stops renewal and
+both storage modes and waits for expired tokens to be renewed before reporting
+success. Await restoration before reading tokens or starting authenticated work.
+Failed restoration clears page tokens and stops renewal and
 session monitoring before worker cleanup. See [session restoration](./packages/oidc-client/README.md#session-restoration)
 for retry behavior and cleanup limitations.
+
+The React `renewTokens()` hook returns null token fields when core
+renewal produces no tokens, and authentication state follows current tokens on
+renewal/error events. See the [React hook guide](./packages/react-oidc/README.md).
 
 Observe renewal checks through `subscribeEvents` in the core client or `onEvent`
 in React. The [token synchronization events guide](./packages/oidc-client/README.md#token-synchronization-events)
