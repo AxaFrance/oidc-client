@@ -370,6 +370,16 @@ renewal/session monitoring before worker cleanup. A later call can retry.
 Worker cleanup can still reject, leaving page authentication state cleared.
 See [session restoration](./packages/oidc-client/README.md#session-restoration).
 
+## What does React's renewTokens return after session loss?
+
+When the core client returns no tokens, `useOidc().renewTokens()` resolves with
+null access-token and ID-token fields instead of throwing a null-property error.
+Actual exceptions from the core API still reject the promise. Renewal and
+synchronization events update `isAuthenticated` from current client tokens, so
+an error with retained tokens does not force a signed-out state. Use the
+provider's session-loss screen or events for recovery, and the core
+`renewTokensOrThrowAsync()` API when you need strict renewal errors.
+
 ## Will I stay signed in after sleep or a browser restart?
 
 Not necessarily. Browsers can suspend timers and terminate service workers;
