@@ -7,6 +7,10 @@ server**: sign-in creates a fictional Alice session without credentials.
 ## Start from the repository root
 
 Install the .NET 10 SDK, the Node version required by the root manifest, and pnpm.
+Microsoft packages track the latest .NET 10 patches; Entity Framework Core 11
+requires a framework upgrade and is outside this fixture's target. Both server
+and test projects audit direct and transitive NuGet packages during restore,
+with audit warnings treated as errors.
 Then run:
 
 ```sh

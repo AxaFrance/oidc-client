@@ -264,12 +264,26 @@ Read the [contribution guide](./CONTRIBUTING.md) and
 bindings, service worker, and demo applications.
 
 Dependency updates must include the affected workspace manifests and
-`pnpm-lock.yaml`. Keep Vitest and `@vitest/coverage-v8` on matching versions.
-MSW remains on version 2 because Vitest's mocker requires that major version.
+`pnpm-lock.yaml`. Use the pinned pnpm 12.21.0 version; CI reads it from the root
+`packageManager` field. Keep Vitest and `@vitest/coverage-v8` on matching versions.
+The publishing workflow pins npm 12.2.2 for trusted publishing.
+Vitest 5.1 supports MSW 3. Dependency updates respect pnpm's release-age policy;
+MSW 3.0.6 is deferred while it is inside that window.
+
+Run `pnpm audit --audit-level low` to check all workspace dependencies, including
+development and optional dependencies. CI runs the same audit without ignored
+advisories. The targeted `minimatch` override in `pnpm-workspace.yaml` addresses
+GHSA-g3hv-75wg-m249 until typescript-eslint updates its dependency range. A clean
+audit covers known published advisories, not every possible security flaw.
+The .NET fixture audits direct and transitive NuGet dependencies during restore,
+with audit warnings treated as errors. Its Microsoft dependencies stay on the
+latest .NET 10 patch line; upgrading Entity Framework Core 11 requires .NET 11.
 
 GitHub Actions installs Node.js before pnpm. The Node setup steps disable
 automatic package-manager caching (`package-manager-cache: false`) so they do
-not try to invoke pnpm before it is installed.
+not try to invoke pnpm before it is installed. Workflow actions are pinned to
+commit hashes, with release versions in comments; Dependabot checks npm, NuGet,
+and GitHub Actions updates.
 
 Before submitting or updating any pull request, all of these checks must pass,
 including for documentation-only changes. Run them sequentially so the tests

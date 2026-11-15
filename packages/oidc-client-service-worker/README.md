@@ -209,6 +209,8 @@ Protocol constants and types are exported from
 `@axa-fr/oidc-client`.
 
 For source development, use the root [contributor commands](../../README.md#contribute)
-and the committed lockfile. Keep this package's Vitest and coverage versions aligned.
+and the committed lockfile with the root-pinned pnpm version. Keep this package's
+Vitest and coverage versions aligned. Run `pnpm audit --audit-level low` at the
+root to include development dependencies.
 
 [Back to the project overview](../../README.md)

@@ -27,6 +27,8 @@ registered ports; see the [OpenIddict fixture guide](../openiddict-server/README
 Local mode requires `localhost`; the unregistered `127.0.0.1` and `[::1]` aliases
 are rejected.
 The original package start script also refreshes the worker before starting Vite.
+The `public` directory contains browser assets only; service-worker build
+manifests and tooling configurations belong in the workspace package.
 [`vite.config.js`](vite.config.js) does not fix a port; a busy port may cause Vite
 to choose another. Register the actual browser origin with your identity provider.
 

@@ -31,6 +31,7 @@ not guarantees that every reported problem is resolved.
 - [Does the service worker protect me from XSS?](#does-the-service-worker-protect-me-from-xss)
 - [What should I include in a bug report?](#what-should-i-include-in-a-bug-report)
 - [Why does CI fail to locate pnpm during Node setup?](#why-does-ci-fail-to-locate-pnpm-during-node-setup)
+- [How are dependency vulnerabilities checked?](#how-are-dependency-vulnerabilities-checked)
 - [Why can an Azure demo deployment fail after a successful build?](#why-can-an-azure-demo-deployment-fail-after-a-successful-build)
 
 ## How do I test RFC 8707 locally with OpenIddict?
@@ -73,6 +74,24 @@ fail with `Unable to locate executable file: pnpm`. The workflows set
 install the pinned pnpm version with `pnpm/action-setup` before installing
 dependencies. This fixes the setup failure; it does not bypass lint, tests, or
 build checks.
+
+## How are dependency vulnerabilities checked?
+
+Install from the repository root with the pinned pnpm 12.21.0 version and
+`pnpm install --frozen-lockfile`, then run `pnpm audit --audit-level low`.
+CI checks production, development, and optional dependencies without advisory
+exceptions. The scoped `minimatch` override fixes GHSA-g3hv-75wg-m249 in the
+typescript-eslint dependency tree; it must remain until the upstream range is
+patched. Build, lint, unit, and browser tests also check upgrade compatibility.
+
+The OpenIddict fixture enables NuGet auditing for direct and transitive packages
+and treats audit warnings as errors. To inspect its reports, run
+`dotnet list examples/openiddict-server/OpenIddictDemo.csproj package --vulnerable --include-transitive`
+and the equivalent command for
+`examples/openiddict-server.tests/OpenIddictDemo.Tests.csproj`.
+Microsoft packages remain on the .NET 10 patch line to match the fixture target.
+A clean report means no advisories known to the queried registry at that time;
+it cannot guarantee the absence of undiscovered vulnerabilities.
 
 ## Why can an Azure demo deployment fail after a successful build?
 
