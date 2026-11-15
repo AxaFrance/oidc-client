@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.30.1
+
+- [2cb55a1c](https://github.com/AxaFrance/oidc-client/commit/2cb55a1ce7859c9f56ebc20d4cdea57f63696d7a) - [skip ci] Update to version 7.30.1 in package.json, 2026-11-15 by *github-actions[bot]*
+- [c3ff0bfb](https://github.com/AxaFrance/oidc-client/commit/c3ff0bfbcb12ae299e4e0d33611fedc849e5ba85) - fix: restore sessions safely without login metadata (#1744) (release), 2026-11-15 by *Guillaume Chervet*
+
+
 ## v7.30.0
 
+- [560fa360](https://github.com/AxaFrance/oidc-client/commit/560fa3600995d1cd65840e23d3772571d30ffda3) - [skip ci] Generate changelog to version 7.30.0, 2026-11-14 by *github-actions[bot]*
 - [687450f9](https://github.com/AxaFrance/oidc-client/commit/687450f983f2418eeb2a831f5fc1758e59734974) - [skip ci] Update to version 7.30.0 in package.json, 2026-11-14 by *github-actions[bot]*
 - [965c0484](https://github.com/AxaFrance/oidc-client/commit/965c0484991bddb78e60290f651ac225d70a2f25) - feat: RFC 8707 resource indicators and isolated API tokens (#1740) (release), 2026-11-14 by *Guillaume Chervet*
 
@@ -336,10 +343,5 @@
 ## v7.25.5
 
 - [d7567ba2](https://github.com/AxaFrance/oidc-client/commit/d7567ba28c0dfe9b248be52ecfac4df6f98b397b) - feature(oidc-service-worker): multi tab auth (#1528) (release), 2025-03-27 by *Guillaume Chervet*
-
-
-## v7.25.4
-
-- [1b2fa1da](https://github.com/AxaFrance/oidc-client/commit/1b2fa1da513b419c2c28e67a331d12670b07a94d) - refactor(oidc): update librairie (release), 2025-03-25 by *Guillaume Chervet*
 
 
