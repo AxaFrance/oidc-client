@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.30.4
+
+- [34e5e611](https://github.com/AxaFrance/oidc-client/commit/34e5e6113d8ad1fc63f70e97ab83a43e5e6295e9) - [skip ci] Update to version 7.30.4 in package.json, 2026-11-15 by *github-actions[bot]*
+- [c66ee9b8](https://github.com/AxaFrance/oidc-client/commit/c66ee9b8410176d4e39fbe3ae9c51705ecbae343) - chore(deps): update pnpm and dependencies with security audit checks (#1749) (release), 2026-11-15 by *Guillaume Chervet*
+
+
 ## v7.30.3
 
+- [e7c35f99](https://github.com/AxaFrance/oidc-client/commit/e7c35f99dd151056b000bb8de71d1be5c302bf6f) - [skip ci] Generate changelog to version 7.30.3, 2026-11-15 by *github-actions[bot]*
 - [b735ea16](https://github.com/AxaFrance/oidc-client/commit/b735ea16694b15620a5ef261baa0fd13bc399af8) - [skip ci] Update to version 7.30.3 in package.json, 2026-11-15 by *github-actions[bot]*
 - [50ee8bfb](https://github.com/AxaFrance/oidc-client/commit/50ee8bfb338c8c147a91489b9b178722af32912a) - fix: bound service worker script update checks (#1745) (release), 2026-11-15 by *Guillaume Chervet*
 
@@ -343,10 +350,5 @@
 ## v7.25.8
 
 - [4c85da7d](https://github.com/AxaFrance/oidc-client/commit/4c85da7d0e0e802c95efe31c5de948ac5abd5494) - fix(oidc-service-worker): Error with latest Safari (#1547) (release), 2025-04-04 by *Guillaume Chervet*
-
-
-## v7.25.7
-
-- [930ad036](https://github.com/AxaFrance/oidc-client/commit/930ad0367cfcaa5bd15726c17501d70b0768ce5e) - fix(oidc-service-worker): fetch already consume (release) (#1534), 2025-04-01 by *Guillaume Chervet*
 
 
