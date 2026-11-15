@@ -370,6 +370,16 @@ renewal/session monitoring before worker cleanup. A later call can retry.
 Worker cleanup can still reject, leaving page authentication state cleared.
 See [session restoration](./packages/oidc-client/README.md#session-restoration).
 
+## Can restoration report success with expired stored tokens?
+
+`tryKeepExistingSessionAsync()` checks expiry and waits for expired tokens to be
+renewed before returning `true`, for both worker and browser storage. This also
+applies to fetch-triggered renewal mode. It returns `false` if renewal cannot
+produce tokens, rather than waiting for the first one-second timer tick after
+restoration. Await that promise before reading tokens or sending authenticated
+requests. This does not extend refresh-token lifetimes or restore lost worker
+secrets; an available refresh token or usable silent sign-in flow is required.
+
 ## What does React's renewTokens return after session loss?
 
 When the core client returns no tokens, `useOidc().renewTokens()` resolves with

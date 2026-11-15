@@ -156,6 +156,104 @@ describe.each(['service worker', 'browser storage'])('session restoration with %
     expect(clearWorker).not.toHaveBeenCalled();
   });
 
+  it('does not renew unexpired stored tokens during restoration', async () => {
+    const renew = vi.spyOn(renewal, 'renewTokensAndStartTimerAsync');
+    await expect(restore()).resolves.toBe(true);
+    expect(renew).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])(
+    'awaits expired-token renewal before readiness (saved metadata: %s)',
+    async saved => {
+      vi.setSystemTime((tokens.expiresAt + 1) * 1000);
+      if (saved) loginStateStorage['oidc.login.default'] = JSON.stringify(loginParams);
+      const renewed = {
+        ...tokens,
+        accessToken: 'renewed-access-token',
+        expiresAt: tokens.expiresAt + 3600,
+      };
+      let finishRenewal: () => void;
+      const renew = vi.spyOn(renewal, 'renewTokensAndStartTimerAsync').mockImplementation(
+        () =>
+          new Promise(resolve => {
+            finishRenewal = () => {
+              oidc.tokens = renewed;
+              resolve(renewed);
+            };
+          }),
+      );
+
+      const restoring = restore();
+      await vi.waitFor(() => expect(renew).toHaveBeenCalledOnce());
+      expect(renew).toHaveBeenCalledWith(
+        oidc,
+        true,
+        saved ? loginParams.extras : undefined,
+        saved ? loginParams.scope : undefined,
+      );
+      expect(renewal.autoRenewTokens).not.toHaveBeenCalled();
+      expect(getSessionState).not.toHaveBeenCalled();
+      expect(oidc.userInfoAsync).not.toHaveBeenCalled();
+      expect(oidc.publishEvent).not.toHaveBeenCalledWith(
+        eventNames.tryKeepExistingSessionAsync_end,
+        expect.objectContaining({ success: true }),
+      );
+
+      finishRenewal();
+      await expect(restoring).resolves.toBe(true);
+      expect(oidc.tokens).toEqual(renewed);
+      expect(renewal.autoRenewTokens).toHaveBeenCalledWith(
+        oidc,
+        renewed.expiresAt,
+        saved ? loginParams.extras : undefined,
+        saved ? loginParams.scope : undefined,
+      );
+      expect(oidc.userInfoAsync).toHaveBeenCalledOnce();
+      expect(vi.getTimerCount()).toBe(1);
+    },
+  );
+
+  it.each([null, { ...tokens, expiresAt: 1 }])(
+    'returns false when renewal produces no valid tokens: %j',
+    async result => {
+      vi.setSystemTime((tokens.expiresAt + 1) * 1000);
+      vi.spyOn(renewal, 'renewTokensAndStartTimerAsync').mockResolvedValue(result);
+
+      await expect(restore()).resolves.toBe(false);
+
+      expect(oidc.tokens).toBeNull();
+      expect(oidc.userInfo).toBeNull();
+      expect(renewal.autoRenewTokens).not.toHaveBeenCalled();
+      expect(getSessionState).not.toHaveBeenCalled();
+      expect(oidc.userInfoAsync).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+      expect(oidc.publishEvent).toHaveBeenCalledWith(
+        eventNames.tryKeepExistingSessionAsync_end,
+        expect.objectContaining({ success: false }),
+      );
+    },
+  );
+
+  it('cleans up a rejected initial renewal and allows restoration to be retried', async () => {
+    vi.setSystemTime((tokens.expiresAt + 1) * 1000);
+    const renew = vi
+      .spyOn(renewal, 'renewTokensAndStartTimerAsync')
+      .mockRejectedValueOnce(new Error('renewal failed'));
+    await expect(restore()).resolves.toBe(false);
+    expect(oidc.tokens).toBeNull();
+    expect(oidc.timeoutId).toBeNull();
+    expect(oidc.userInfoAsync).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
+
+    renew.mockImplementationOnce(async () => {
+      const renewed = { ...tokens, expiresAt: tokens.expiresAt + 3600 };
+      oidc.tokens = renewed;
+      return renewed;
+    });
+    await expect(restore()).resolves.toBe(true);
+    expect(renew).toHaveBeenCalledTimes(2);
+  });
+
   it.each(['session state', 'session monitoring', 'user info'])(
     'clears page state on a %s failure and allows a successful retry',
     async stage => {
