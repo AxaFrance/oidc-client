@@ -35,6 +35,10 @@ providers or scopes, optional service-worker token isolation, and support for
 [Pushed Authorization Requests (PAR)](./packages/oidc-client/README.md#pushed-authorization-requests-par)
 when supported by your authorization server.
 
+Authenticated fetch binds DPoP proofs to the HTTP method and absolute request
+URI, with the query and fragment omitted from the proof. See the
+[FAQ on DPoP target mismatches](./FAQ.md#why-does-my-api-reject-the-dpop-target-uri).
+
 ## Getting started
 
 1. Register a **public browser client** with your OIDC provider. Enable the
