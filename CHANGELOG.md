@@ -1,7 +1,14 @@
 # Changelog
 
+## v7.30.5
+
+- [d8f6799b](https://github.com/AxaFrance/oidc-client/commit/d8f6799bb20a98240b5cba6567156b75fef27f64) - [skip ci] Update to version 7.30.5 in package.json, 2026-11-21 by *github-actions[bot]*
+- [3e3bb2dd](https://github.com/AxaFrance/oidc-client/commit/3e3bb2ddb81891113e50984e252907632ed2902b) - fix(oidc): align DPoP proofs with authenticated fetch targets (#1753) (release), 2026-11-21 by *Guillaume Chervet*
+
+
 ## v7.30.4
 
+- [c126ebcd](https://github.com/AxaFrance/oidc-client/commit/c126ebcd9e406253773db213929dde6595fb3ff5) - [skip ci] Generate changelog to version 7.30.4, 2026-11-15 by *github-actions[bot]*
 - [34e5e611](https://github.com/AxaFrance/oidc-client/commit/34e5e6113d8ad1fc63f70e97ab83a43e5e6295e9) - [skip ci] Update to version 7.30.4 in package.json, 2026-11-15 by *github-actions[bot]*
 - [c66ee9b8](https://github.com/AxaFrance/oidc-client/commit/c66ee9b8410176d4e39fbe3ae9c51705ecbae343) - chore(deps): update pnpm and dependencies with security audit checks (#1749) (release), 2026-11-15 by *Guillaume Chervet*
 
@@ -345,10 +352,5 @@
 ## v7.25.9
 
 - [c1ece663](https://github.com/AxaFrance/oidc-client/commit/c1ece663131db50a8c1152b18be0d3d5f6a0025e) - fix(oidc): make bearer fetch works on safari back (release) (#1550), 2025-04-11 by *Guillaume Chervet*
-
-
-## v7.25.8
-
-- [4c85da7d](https://github.com/AxaFrance/oidc-client/commit/4c85da7d0e0e802c95efe31c5de948ac5abd5494) - fix(oidc-service-worker): Error with latest Safari (#1547) (release), 2025-04-04 by *Guillaume Chervet*
 
 
