@@ -346,6 +346,10 @@ The worker can hide access and refresh tokens from application JavaScript, but i
 - **PAR:** set `par: 'auto'` or `'required'` in `configuration`; the default is `'disabled'`. `auto` uses PAR when an endpoint is advertised; missing required endpoints fail before navigation. Once selected, PAR errors never silently downgrade. See [full PAR semantics, errors, and CORS requirements](../oidc-client/README.md#pushed-authorization-requests-par).
 - **DPoP:** enable `demonstrating_proof_of_possession` and use `useOidcFetch(undefined, 'default', true)` or `withOidcFetch(undefined, 'default', true)`. For user info, use `useOidcUser('default', true)`. See [DPoP and worker-specific settings](../oidc-client/README.md#dpop). Both the identity provider and resource server must support it.
 
+Authenticated fetch uses the URL and effective HTTP method of `Request` inputs
+for DPoP. The proof's target URI excludes the query and fragment. See the
+[FAQ on DPoP target mismatches](../../FAQ.md#why-does-my-api-reject-the-dpop-target-uri).
+
 ## Custom components and provider options
 
 Replace built-in status screens with your own components. These are **provider props**, not fields inside `configuration`:

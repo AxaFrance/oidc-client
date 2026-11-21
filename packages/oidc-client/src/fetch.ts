@@ -20,16 +20,18 @@ export const fetchWithTokens =
   ): Fetch =>
   async (...params: Parameters<Fetch>): Promise<Response> => {
     const [url, options, ...rest] = params;
+    const request = url instanceof Request ? url : undefined;
+    const resolveDestination = () =>
+      new URL(
+        request?.url ?? url.toString(),
+        globalThis.document?.baseURI ?? globalThis.window?.location?.href,
+      ).href;
     const phase = typeof selection === 'string' ? selection : 'api_request';
     const resource = typeof selection === 'string' ? undefined : selection.resource;
     let destination: string | undefined;
     if (resource === undefined && phase === 'api_request' && oidc.configuration.resources?.length) {
       try {
-        const candidate = new URL(
-          url instanceof Request ? url.url : url.toString(),
-          window.location.href,
-        ).toString();
-        if (isResourceOriginManaged(oidc.configuration.resources, candidate)) {
+        if (isResourceOriginManaged(oidc.configuration.resources, resolveDestination())) {
           throw new Error('Select a resource explicitly when fetching a resource-managed API.');
         }
       } catch (cause) {
@@ -49,10 +51,7 @@ export const fetchWithTokens =
       try {
         if (typeof resource !== 'string')
           throw new Error('An explicit resource identifier is required.');
-        destination = new URL(
-          url instanceof Request ? url.url : url.toString(),
-          window.location.href,
-        ).toString();
+        destination = resolveDestination();
         if (
           !isResourceUrlAllowed(
             getResourceConfiguration(oidc.configuration.resources, resource),
@@ -76,24 +75,17 @@ export const fetchWithTokens =
     const optionTmp: RequestInit =
       resource !== undefined
         ? {
-            ...(url instanceof Request
-              ? { method: url.method, headers: url.headers, credentials: url.credentials }
-              : { method: 'GET' }),
+            method: request?.method ?? 'GET',
             ...options,
             redirect: options?.redirect ?? 'error',
           }
         : options
           ? { ...options }
-          : { method: 'GET' };
-    let headers = new Headers();
-    if (optionTmp.headers) {
-      headers =
-        resource !== undefined
-          ? new Headers(optionTmp.headers)
-          : !(optionTmp.headers instanceof Headers)
-            ? new Headers(optionTmp.headers)
-            : optionTmp.headers;
-    }
+          : { method: request?.method ?? 'GET' };
+    const headers =
+      resource === undefined && optionTmp.headers instanceof Headers
+        ? optionTmp.headers
+        : new Headers(optionTmp.headers ?? request?.headers);
     const oidcToken: OidcToken = {
       getTokens: () => oidc.tokens,
       configuration: {
@@ -128,25 +120,28 @@ export const fetchWithTokens =
           demonstrating_proof_of_possession) ||
         resourceToken?.tokenType?.toLowerCase() === 'dpop'
       ) {
-        const demonstrationOdProofOfPossession =
+        const target = new Request(destination ?? resolveDestination(), {
+          method: optionTmp.method ?? request?.method,
+        });
+        const proof =
           resource === undefined
             ? await oidc.generateDemonstrationOfProofOfPossessionAsync(
                 accessToken,
-                url.toString(),
-                optionTmp.method,
+                target.url,
+                target.method,
               )
             : await oidc.resourceTokens.generateProofAsync(resource, {
                 accessToken,
-                url: destination,
-                method: optionTmp.method ?? 'GET',
+                url: target.url,
+                method: target.method,
               });
         headers.set('Authorization', `DPoP ${accessToken}`);
-        headers.set('DPoP', demonstrationOdProofOfPossession);
+        headers.set('DPoP', proof);
       } else {
         headers.set('Authorization', `Bearer ${accessToken}`);
       }
       if (!optionTmp.credentials) {
-        optionTmp.credentials = 'same-origin';
+        optionTmp.credentials = request?.credentials ?? 'same-origin';
       }
     }
     const newOptions = { ...optionTmp, headers };

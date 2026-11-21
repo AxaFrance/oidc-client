@@ -466,9 +466,14 @@ The PAR endpoint must allow CORS from your application and accept public clients
 
 ## DPoP
 
-Generated `htu` values exclude query strings and fragments, as RFC 9449 requires;
-relative targets resolve against the current browser location. Worker registration
-also preserves existing URL query parameters when appending the SDK version.
+Generated `htu` values contain the absolute request URI without its query or
+fragment. Authenticated fetch resolves relative URLs against the document's base
+URL and uses the URL and effective HTTP method of `Request` inputs. The HTTP
+request retains its query parameters. See the
+[FAQ on DPoP target mismatches](../../FAQ.md#why-does-my-api-reject-the-dpop-target-uri).
+
+Worker registration preserves existing URL query parameters when appending the
+SDK version.
 
 [Demonstrating Proof of Possession (RFC 9449)](https://www.rfc-editor.org/rfc/rfc9449.html) binds supported tokens to a key and uses signed proofs for requests. It requires support from the authorization server and resource server. It reduces the usefulness of a stolen token without its key; it does not make an application immune to XSS.
 

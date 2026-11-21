@@ -12,6 +12,7 @@ not guarantees that every reported problem is resolved.
 - [Do I need a service worker?](#do-i-need-a-service-worker)
 - [Why is my access token a placeholder?](#why-is-my-access-token-a-placeholder)
 - [Why does my API return 401, especially with multiple tabs?](#why-does-my-api-return-401-especially-with-multiple-tabs)
+- [Why does my API reject the DPoP target URI?](#why-does-my-api-reject-the-dpop-target-uri)
 - [Why does login fail when two tabs sign in together?](#why-does-login-fail-when-two-tabs-sign-in-together)
 - [How are tokens renewed?](#how-are-tokens-renewed)
 - [What do syncTokensAsync events mean?](#what-do-synctokensasync-events-mean)
@@ -241,6 +242,19 @@ React also provides `withOidcFetch`. For Axios, use an integration that actually
 routes requests through the OIDC fetch wrapper, or use the wrapper directly;
 changing libraries alone does not supply the tab marker. Only call trusted URLs
 with the wrapper: it is not itself a destination allowlist.
+
+## Why does my API reject the DPoP target URI?
+
+For a request to `https://localhost:5002/v1/usecases?filter=all`, the DPoP `htu`
+claim is `https://localhost:5002/v1/usecases`. The resource server must compare
+it against the absolute request URI, ignoring the query and fragment. If the
+API is behind a reverse proxy, use the API's trusted proxy configuration to
+recover the scheme and authority seen by the browser. See
+[RFC 9449, sections 4.2 and 4.3](https://www.rfc-editor.org/rfc/rfc9449.html#section-4.2).
+
+Authenticated fetch resolves relative URLs against the document's base URL and
+uses the URL and effective HTTP method of `Request` inputs. The query parameters
+still reach the API.
 
 ## Why does login fail when two tabs sign in together?
 
